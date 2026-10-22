@@ -364,7 +364,7 @@
     var dur = +player.dataset.dur || secs(s.episodes[ep - 1][1]);
     var nextHref = player.dataset.next || '';
     var seriesHref = player.dataset.series || '';
-    var t = 0, timer = null, lastWrite = 0, lastWriteSec = -99, ended = false;
+    var t = 0, timer = null, lastWrite = 0, lastWriteSec = -99, ended = false, epDone = false;
 
     /* 9.2 — กลับมาต่อจากตำแหน่งเดิม
        ?t=<วินาที> มาจากลิงก์ "ดูต่อ" · ถ้าไม่มี ใช้ค่าที่บันทึกไว้ของตอนนี้ */
@@ -424,7 +424,7 @@
     function finishEpisode() {
       if (timer) { clearInterval(timer); timer = null; }
       player.classList.remove('playing');
-      ended = true;
+      ended = true; epDone = true;
       paint();
       if (ep < s.eps) {
         /* จุดที่ควรดูต่อคือ "ต้นตอนถัดไป" — รายการค้างอัปเดตเองทันที */
@@ -453,8 +453,11 @@
           + '</div><div class="na">'
           + '<a class="btn btn-accent" href="' + nextHref + '">เล่นเลย</a>'
           + '<button class="btn btn-ghost" id="nuCancel">' + (auto ? 'ยกเลิก' : 'ปิด') + '</button></div>';
+        /* ยกเลิก = หยุดนับถอยหลังและเก็บการ์ด แต่ "ตอนนี้ดูจบแล้ว" ยังเป็นจริง
+           จึงไม่ปลด epDone — ไม่งั้นตอนออกจากหน้าจะเขียนทับจุดค้างกลับไปที่ตอนเดิม */
         $('#nuCancel').addEventListener('click', function () {
-          clearInterval(tick); nextUp.hidden = true; ended = false;
+          if (tick) clearInterval(tick);
+          nextUp.hidden = true;
         });
       }
       nextUp.hidden = false;
@@ -517,7 +520,7 @@
     if (barWrap) barWrap.addEventListener('click', function (ev) {
       var r = barWrap.getBoundingClientRect();
       t = Math.max(0, Math.min(dur - 1, Math.round((ev.clientX - r.left) / r.width * dur)));
-      ended = false;
+      ended = false; epDone = false;
       if (nextUp) nextUp.hidden = true;
       persist(true); paint();
     });
@@ -534,7 +537,8 @@
     });
 
     /* เขียนกลับเมื่อออกจากหน้า — กันกรณีปิดแท็บกลางคัน */
-    function flush() { if (!ended) Progress.set(slug, ep, t, dur); }
+    /* ถ้าตอนนี้ดูจบไปแล้ว จุดค้างถูกเลื่อนไปตอนถัดไปแล้ว — ห้ามเขียนทับกลับ */
+    function flush() { if (!epDone) Progress.set(slug, ep, t, dur); }
     window.addEventListener('pagehide', flush);
     document.addEventListener('visibilitychange', function () {
       if (document.visibilityState === 'hidden') { if (timer) stop(); else flush(); }

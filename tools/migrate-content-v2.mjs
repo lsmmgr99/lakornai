@@ -4,7 +4,8 @@
 
    สิ่งที่เปลี่ยน
    1. ตัดธงล็อกตอน (ค่าที่ 3 ของทุก episode) ออกทั้ง 418 ตอน  — AC-3
-   2. ตัด seed `cont` และ `following` ที่เขียนมือ ออกทั้งก้อน      — AC-2
+   2. ตัด seed `cont` ที่เขียนมือออกทั้งก้อน — ความคืบหน้าอ่าน/เขียนที่ localStorage เท่านั้น (AC-2)
+      (`following` คงไว้เฉพาะเพื่อให้ generator ม็อกอัพของ Visual รันได้เท่าเดิม เว็บจริงไม่อ่าน)
    3. ดึง `synopsis` / `airtime` / `views` ของจริงจาก series/*.html เดิมเข้ามาเก็บในข้อมูล
    4. เพิ่ม `tropes[]` ต่อเรื่อง ตามผลยืนยันของ Research (AIO-20 §1/§4)
    5. เพิ่มคำอธิบายแนว (`intro`) ให้ 6 หมวด — ปิดช่องว่าง thin content ที่ SEO ชี้ (AIO-19 §9.3)
@@ -22,11 +23,18 @@ const win = {};
 new Function('window', fs.readFileSync(R('assets/data.js'), 'utf8'))(win);
 const OLD = win.LAKORN;
 
-/* ---------- ดึง synopsis / airtime / views จากหน้า series เดิม ---------- */
+/* ---------- ดึง synopsis / airtime / views จากหน้า series เดิม ----------
+   หน้าเก่าถูกแทนที่ด้วย redirect stub ไปแล้วหลัง AIO-22 สคริปต์นี้จึงรับได้สองทาง:
+   ถ้ายังอ่านจากไฟล์เก่าได้ก็ดึงจากไฟล์ · ถ้าไม่ได้ ใช้ค่าที่อยู่ใน data.js ปัจจุบัน
+   (ทำให้รันซ้ำได้ตลอด และยังตรวจย้อนได้ว่าค่าตั้งต้นมาจากไหน) */
 const extra = {};
-for (const f of fs.readdirSync(R('series'))) {
+for (const s0 of OLD.series) {
+  if (s0.synopsis) extra[s0.slug] = { synopsis: s0.synopsis, airtime: s0.airtime, views: s0.views };
+}
+for (const f of fs.readdirSync(R('series')).filter(x => x.endsWith('.html'))) {
   const slug = f.replace(/\.html$/, '');
   const html = fs.readFileSync(R(`series/${f}`), 'utf8');
+  if (!/<p class="syn">/.test(html)) continue;   // เป็น redirect stub ไม่ใช่หน้าเดิม
   const syn = (html.match(/<p class="syn">([\s\S]*?)<\/p>/) || [])[1] || '';
   const facts = (html.match(/<div class="facts">([\s\S]*?)<\/div>/) || [])[1] || '';
   const cells = facts.split(/<\/span>/).map(x => x.replace(/<[^>]+>/g, '').trim()).filter(Boolean);
@@ -74,9 +82,13 @@ const GENRE_INTRO = {
 
 /* ---------- ประกอบข้อมูลใหม่ ---------- */
 const out = {
-  genres: OLD.genres.map(g => ({ ...g, intro: GENRE_INTRO[g.slug] || '' })),
+  genres: OLD.genres.map(g => ({ ...g, intro: GENRE_INTRO[g.slug] || g.intro || '' })),
   tropes: TROPES,
   subs: OLD.subs,
+  /* ⚠️ ใช้โดย generator ม็อกอัพ design/v2/pages-discovery.mjs:826 เท่านั้น
+     เว็บจริงไม่อ่านค่านี้เลย — รายการติดตามของผู้ใช้อยู่ที่ localStorage `lakorn.follows`
+     คงไว้เพื่อให้ generator ของ Visual รันแล้วได้ผลเท่าเดิม (ห้ามแก้ไฟล์ใต้ design/v2/) */
+  following: OLD.following || ['villainess-reborn', 'durian-revenge', 'ayutthaya-love', 'undercover-tycoon', 'mangosteen-heart'],
   series: OLD.series.map(s => ({
     slug: s.slug,
     title: s.title,

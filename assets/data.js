@@ -150,6 +150,13 @@ window.LAKORN = {
   "พรุ่งนี้ทุกคนจะได้รู้ว่าฉันเป็นใคร",
   "เขาไม่ได้มาคนเดียว"
  ],
+ "following": [
+  "villainess-reborn",
+  "durian-revenge",
+  "ayutthaya-love",
+  "undercover-tycoon",
+  "mangosteen-heart"
+ ],
  "series": [
   {
    "slug": "durian-revenge",

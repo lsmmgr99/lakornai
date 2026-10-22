@@ -167,7 +167,7 @@ let css = cutBetween(v2, /===== 25\. แผง\/กริดราคา/, /====
 css = cutBetween(css, /===== 29\. styleguide helpers/, /===== 30\./);
 /* คอมเมนต์ของ Visual บางบรรทัดอ้างถึงของที่ถูกลบ (".ep.lock", "ปุ่มเหรียญ") เพื่อเตือน dev
    มีประโยชน์ในไฟล์เสนอแบบ แต่ในเว็บจริงคือถ้อยคำต้องห้ามที่ค้างอยู่ — ถอดออกตอนคัดลอก */
-const DEAD_WORD = /\.ep\.lock|เหรียญ|coin-btn|paywall|สมาชิก|\bVIP\b/;
+const DEAD_WORD = /\.ep\.lock|เหรียญ|coin-btn|paywall|สมาชิก|\bVIP\b|mockup/i;
 css = css.join('\n').replace(/\/\*[\s\S]*?\*\//g, c => (DEAD_WORD.test(c) ? '' : c)).split('\n');
 write('assets/site.css',
   '/* สร้างโดย build/build.mjs จาก design/v2/v2.css + build/site-extra.css — อย่าแก้ไฟล์นี้ตรง ๆ */\n'
@@ -178,7 +178,15 @@ write('assets/favicon.svg',
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0E0D12"/>` +
   `<path d="M12 9.5 23 16l-11 6.5z" fill="#F5C451"/></svg>\n`);
 
-/* 4.5 app.js — โค้ดรันไทม์ของเว็บจริง (ดูต่อ/ติดตาม/เพลเยอร์/คลัง) */
+/* 4.5 ถ้ามี content.json ของหลังบ้านแล้ว ให้ assets/data.js เป็น "ผลผลิตของ build"
+   ที่สร้างจากไฟล์นั้น เบราว์เซอร์จะได้ข้อมูลชุดเดียวกับที่หน้า HTML ถูกสร้างมา */
+if (fs.existsSync(R('content.json'))) {
+  write('assets/data.js',
+    '/* สร้างโดย build/build.mjs จาก content.json (ADR-001 §6) — อย่าแก้ไฟล์นี้ตรง ๆ */\n'
+    + 'window.LAKORN = ' + JSON.stringify(D, null, 1) + ';\n');
+}
+
+/* 4.6 app.js — โค้ดรันไทม์ของเว็บจริง (ดูต่อ/ติดตาม/เพลเยอร์/คลัง) */
 fs.copyFileSync(R('build/app.src.js'), R('assets/app.js'));
 
 /* ============================ 5. robots + sitemap ============================ */

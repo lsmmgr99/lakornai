@@ -4,6 +4,15 @@
    ไม่ทับค่าโทเคนหรือสีของ Visual แม้แต่ตัวเดียว
    ========================================================================== */
 
+/* --- AC-4 · ปิดช่องว่างของ --faint ---
+   visual-design §2.2 หมายเหตุ 2 เขียนกฎไว้ว่า --faint (#6F6B7C · 3.75:1)
+   "ใช้กับกราฟิกเท่านั้น ห้ามใช้กับข้อความ" แต่ v2.css ของม็อกอัพยังใช้กับข้อความอยู่ 4 จุด
+   เว็บจริงจึงเลื่อนขึ้นเป็น --dim (#8C889A · 5.63:1) ซึ่งผ่าน AA สำหรับข้อความ
+   จุดที่เป็นกราฟิกล้วน (chevron, จุดคั่น ·) ยังใช้ --faint ได้ตามกฎเดิม */
+.crumbs span{color:var(--dim)}
+.field input::placeholder,.field textarea::placeholder{color:var(--dim)}
+.notif .tm{color:var(--dim)}
+
 /* --- ปกเป็น <img> ใน <span> จึงต้องบังคับ display --- */
 .poster{display:block}
 .card{display:block}
@@ -15,6 +24,12 @@
   width:28px;text-align:center;flex:none}
 .flatlist .th2{width:34px;aspect-ratio:var(--ar-poster);border-radius:6px;overflow:hidden;flex:none}
 .flatlist .th2 img{width:100%;height:100%;object-fit:cover}
+
+/* --- toast: ในม็อกอัพโชว์ค้างไว้ให้เห็นในภาพ · เว็บจริงต้องซ่อนจนกว่าจะมีข้อความ --- */
+.toast{opacity:0;visibility:hidden;pointer-events:none;
+  transform:translateX(-50%) translateY(10px);
+  transition:opacity var(--d-slow) var(--ease),transform var(--d-slow) var(--ease),visibility var(--d-slow)}
+.toast.show{opacity:1;visibility:visible;pointer-events:auto;transform:translateX(-50%)}
 
 /* --- header: ชื่อเรื่องในแถบย้อนกลับ --- */
 .htitle{font-family:var(--display);font-weight:600;font-size:17px;white-space:nowrap;
@@ -29,7 +44,8 @@
 .hero-sec{margin-top:var(--s4)}
 .dots button{width:9px;height:9px;padding:0;border-radius:50%;background:var(--border-i);border:0}
 .dots button[aria-selected=true]{width:24px;border-radius:5px;background:var(--accent)}
-.hero .btn-row .btn-ghost{background:rgba(255,255,255,.08)}
+.hero h2 a{color:inherit}
+.hero h2 a:hover{color:var(--accent-hi)}
 
 /* --- ส่วนหัวของหน้าแนว/แท็ก --- */
 .lead{color:var(--fg-2);font-size:var(--t-long);line-height:var(--lh-long);max-width:66ch;
@@ -83,6 +99,9 @@
 .player .bigplay{transition:opacity var(--d-base) var(--ease)}
 
 /* --- ฟีด --- */
+/* ม็อกอัพคิดความสูงจาก 100dvh - navh เพราะไม่มี header ในภาพ
+   เว็บจริงมี header sticky 58px ด้วย ถ้าไม่หักออกข้อความล่างจะถูก bottom nav ทับ */
+.stage .player.full{height:calc(100dvh - var(--navh) - 58px)}
 .feed-desktop{display:block}
 .feed-side{display:none}
 .feed-arrows{position:absolute;right:var(--s4);top:50%;transform:translateY(-50%);
@@ -121,14 +140,14 @@
 .narrow{max-width:760px}
 .center{text-align:center;justify-content:center}
 .rowlist .rl{flex:1}
-.rowlist .rv{color:var(--faint);font-size:var(--t-sub)}
+.rowlist .rv{color:var(--dim);font-size:var(--t-sub)}
 .switch{width:52px;height:30px;border-radius:999px;background:var(--surface-3);
   border:1px solid var(--border-i);position:relative;flex:none;transition:background var(--d-fast) var(--ease)}
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;
   background:var(--fg-3);transition:transform var(--d-base) var(--ease),background var(--d-fast) var(--ease)}
 .switch.on{background:var(--accent-soft);border-color:var(--accent)}
 .switch.on::after{transform:translateX(22px);background:var(--accent)}
-.ver{text-align:center;color:var(--faint);font-size:var(--t-meta);margin-top:var(--s7)}
+.ver{text-align:center;color:var(--dim);font-size:var(--t-meta);margin-top:var(--s7)}
 
 /* --- onboarding --- */
 .pickgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}

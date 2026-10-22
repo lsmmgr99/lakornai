@@ -1,0 +1,37 @@
+/* เซิร์ฟเวอร์ static ตัวเล็กสำหรับเปิดดูเว็บในเครื่อง (ไม่ใช่ของ production ไม่ deploy)
+   รัน:  node tools/serve.mjs            → http://127.0.0.1:4173
+         node tools/serve.mjs 5000       → เปลี่ยนพอร์ต
+
+   ทำไมต้องมี: URL ของเว็บจริงเป็นโฟลเดอร์ (/series/ceo-cold/) ไม่ใช่ .html
+   เปิดด้วย file:// จะได้รายการไฟล์แทนหน้าเว็บ · ตัวนี้ map โฟลเดอร์ → index.html ให้ */
+import http from 'node:http';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const PORT = Number(process.argv[2]) || 4173;
+const TYPES = {
+  '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
+  '.xml': 'application/xml; charset=utf-8', '.txt': 'text/plain; charset=utf-8',
+  '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.map': 'application/json',
+};
+
+http.createServer((req, res) => {
+  let p = decodeURIComponent(req.url.split('?')[0].split('#')[0]);
+  let f = path.join(ROOT, p);
+  if (!f.startsWith(ROOT)) { res.writeHead(403).end('forbidden'); return; }
+  try { if (fs.statSync(f).isDirectory()) f = path.join(f, 'index.html'); } catch { /* ไปต่อ */ }
+  if (!fs.existsSync(f)) {
+    const nf = path.join(ROOT, '404/index.html');
+    res.writeHead(404, { 'content-type': TYPES['.html'] });
+    res.end(fs.existsSync(nf) ? fs.readFileSync(nf) : 'ไม่พบหน้านี้');
+    return;
+  }
+  res.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream' });
+  res.end(fs.readFileSync(f));
+}).listen(PORT, '127.0.0.1', () => {
+  console.log(`LakornAI · http://127.0.0.1:${PORT}/`);
+});

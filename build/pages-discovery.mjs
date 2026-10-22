@@ -24,14 +24,14 @@ export function buildHome() {
           <span class="bg">${coverImg(L, s, { lazy: i > 0 })}</span>
           <div class="body">
             <span class="kick">${ic('sparkle', 'sm')} เรื่องเด่นประจำสัปดาห์</span>
-            <h2>${esc(s.title)}</h2>
+            <h2><a href="${L(U.series(s.slug))}">${esc(s.title)}</a></h2>
             <div class="facts">${aiBadge}${freeBadge}<b class="num">${s.eps} ตอน</b>
               <span>${s.genres.map(genreLabel).join(' · ')}</span><span>${esc(s.status)}</span></div>
             <p class="hk">${esc(s.hook)}</p>
             <div class="btn-row">
               <a class="btn btn-accent" href="${L(U.watch(s.slug, 1))}" data-resume="${s.slug}">${ic('playf', 'sm')} <span data-resume-label>เริ่มดู EP.1</span></a>
-              <a class="btn btn-ghost" href="${L(U.series(s.slug))}">รายละเอียดเรื่อง</a>
               <button class="icon-btn" data-follow="${s.slug}" aria-pressed="false" aria-label="ติดตาม ${esc(s.title)}">${ic('heart')}</button>
+              <button class="icon-btn" data-share aria-label="แชร์ ${esc(s.title)}">${ic('share')}</button>
             </div>
           </div>
         </article>`).join('')}</div>
@@ -173,6 +173,10 @@ export function buildFeed() {
     out: 'feed/index.html', url: U.feed, page: 'feed', bodyClass: 'stage',
     title: 'ฟีดแนวตั้ง — ละครสั้น AI ปัดดูทีละเรื่อง · LakornAI',
     desc: 'ปัดขึ้นดูละครสั้น AI ภาษาไทยทีละเรื่อง ไม่ต้องเลือกเอง เริ่มจากตอนแรกของทุกเรื่อง ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก เจอเรื่องที่ชอบแล้วกดดูทั้งเรื่องต่อได้ทันที',
+    jsonLd: [collectionLd({
+      url: U.feed, name: 'ฟีดแนวตั้ง',
+      description: 'ตอนแรกของทุกเรื่องในคลัง เรียงให้ปัดดูต่อเนื่อง', items: SERIES,
+    })],
     body,
   });
 }
@@ -241,6 +245,10 @@ export function buildBrowse() {
     out: 'browse/index.html', url: U.browse,
     title: 'เลือกดูละครสั้น AI — ทุกหมวด แท็ก และดัชนี · LakornAI',
     desc: 'ทางเข้ารวมของคลัง LakornAI เลือกจาก 6 แนวหลัก แท็กเรื่อง อันดับยอดนิยม ตอนใหม่ล่าสุด ตารางออกตอน และดัชนี ก–ฮ ทุกเรื่องดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก',
+    jsonLd: [
+      collectionLd({ url: U.browse, name: 'เลือกดู', description: 'ทางเข้ารวมของทุกหมวดและดัชนีในคลัง', items: SERIES }),
+      breadcrumb([['หน้าแรก', U.home], ['เลือกดู', U.browse]]),
+    ],
     body,
   });
 }
@@ -362,6 +370,10 @@ export function buildNew() {
     out: 'new/index.html', url: U.newEp,
     title: 'ตอนใหม่ล่าสุด — ละครสั้น AI อัปเดตทุกวัน · LakornAI',
     desc: 'ตอนใหม่ของละครสั้น AI ภาษาไทยที่เพิ่งลง เรียงจากใหม่สุด กรองตามแนวได้ ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก กดเข้าดูได้ทันทีไม่ต้องรอ',
+    jsonLd: [collectionLd({
+      url: U.newEp, name: 'ตอนใหม่ล่าสุด',
+      description: 'ตอนล่าสุดของทุกเรื่องที่ยังออกตอนอยู่', items: airing,
+    })],
     body: L => shell(L, {
       active: 'new',
       main: wrapF(L, `${pageHead('ตอนใหม่ล่าสุด', 'ตอนล่าสุดของทุกเรื่องที่ยังออกตอนอยู่')}
@@ -384,6 +396,10 @@ export function buildSchedule() {
     out: 'schedule/index.html', url: U.schedule,
     title: 'ตารางออกตอน — ละครสั้น AI เรื่องไหนออกวันไหน · LakornAI',
     desc: 'ตารางออกตอนของละครสั้น AI ภาษาไทยทุกเรื่องในคลัง เรื่องไหนปล่อยตอนใหม่ทุกวัน เรื่องไหนรายสัปดาห์และกี่โมง ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก',
+    jsonLd: [collectionLd({
+      url: U.schedule, name: 'ตารางออกตอน',
+      description: 'รอบปล่อยตอนใหม่ของทุกเรื่องในคลัง', items: [...daily, ...weekly],
+    })],
     body: L => shell(L, {
       active: 'browse',
       main: wrapF(L, `${pageHead('ตารางออกตอน', 'เรื่องไหนปล่อยตอนใหม่วันไหน เวลาเท่าไร')}
@@ -428,7 +444,8 @@ export function buildAZ() {
 export function buildCast() {
   for (const c of CAST_PAGES) {
     definePage({
-      out: `cast/${encodeURIComponent(c.name)}/index.html`, url: U.cast(c.name),
+      /* ชื่อโฟลเดอร์ใช้ชื่อจริง (ไทย) · URL เป็นรูป encode — เซิร์ฟเวอร์ decode แล้วหาเจอ */
+      out: `cast/${c.name}/index.html`, url: U.cast(c.name),
       title: `${c.name} — ตัวละครในละครสั้น AI ${c.items.length} เรื่อง · LakornAI`,
       desc: `${c.name} เป็นตัวละครใน ${c.items.map(s => s.title).join(' · ')} ละครสั้น AI ภาษาไทยของ LakornAI ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`,
       jsonLd: [breadcrumb([['หน้าแรก', U.home], ['ตัวละคร', U.az], [c.name, U.cast(c.name)]])],

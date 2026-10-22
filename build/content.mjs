@@ -8,7 +8,43 @@ import { fileURLToPath } from 'node:url';
 export const DIR = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(DIR, '..');
 
+/* ---------- ADR-001 §6: content.json ----------
+   หลังบ้าน (AIO-23) เป็นคนผลิตไฟล์นี้ หน้าบ้านเป็นคนบริโภค
+   วันนี้ยังไม่มีไฟล์ → ถอยไปอ่าน assets/data.js ตามที่โจทย์สั่ง ("ไม่ต้องรอ schema")
+   วันที่ไฟล์มา ให้วางที่ราก แล้ว build ใหม่ — ไม่ต้องแก้หน้าใดเลย */
+const KNOWN_VERSIONS = [1];
+const DAY_TH = { daily: 'ทุกวัน', mon: 'จันทร์', tue: 'อังคาร', wed: 'พุธ', thu: 'พฤหัสบดี', fri: 'ศุกร์', sat: 'เสาร์', sun: 'อาทิตย์' };
+const mmss = sec => Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+const thViews = n => n == null ? '' : (n >= 1e6 ? (n / 1e6).toFixed(1) + ' ล้าน' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n));
+
+function fromContentJson(j) {
+  if (!KNOWN_VERSIONS.includes(j.version)) {
+    throw new Error(`content.json version ${j.version} — generator นี้รู้จักแค่ ${KNOWN_VERSIONS.join(',')} (ADR-001 กฎ V1)`);
+  }
+  return {
+    genres: j.genres.map(g => ({ ...g, intro: g.intro || '' })),
+    tropes: (j.tropes || []).map(t => ({
+      ...t,
+      items: t.items || j.series.filter(s => (s.tropes || []).includes(t.slug)).map(s => s.slug),
+    })),
+    subs: j.subs || [],
+    following: [],
+    series: j.series.map(s => ({
+      slug: s.slug, title: s.title, genres: s.genres, tropes: s.tropes || [], eps: s.eps,
+      status: s.status === 'ended' ? 'จบแล้ว' : 'ตอนใหม่ทุก' + (DAY_TH[s.releaseDay] || 'วัน'),
+      airtime: s.releaseDay ? 'ทุก' + (DAY_TH[s.releaseDay] || 'วัน') : '',
+      views: thViews(s.views),
+      c1: (s.theme || {}).c1 || '#2a2733', c2: (s.theme || {}).c2 || '#4a4556',
+      cast: s.cast || [], hook: s.hook, synopsis: s.synopsis,
+      cover: s.cover || `assets/covers/${s.slug}.webp`,
+      episodes: s.episodes.map(e => [e.title, mmss(e.durationSec)]),
+    })),
+  };
+}
+
 function load() {
+  const cj = path.join(ROOT, 'content.json');
+  if (fs.existsSync(cj)) return fromContentJson(JSON.parse(fs.readFileSync(cj, 'utf8')));
   const win = {};
   new Function('window', fs.readFileSync(path.join(ROOT, 'assets/data.js'), 'utf8'))(win);
   return win.LAKORN;

@@ -38,7 +38,7 @@ function shareSlot(names, fallback) {
   shareMisses.add(names[names.length - 1]);
   return fallback;
 }
-export const coverUrl = s => `/assets/covers/${s.slug}.webp`;
+export const coverUrl = s => '/' + (s.cover || `assets/covers/${s.slug}.webp`).replace(/^\//, '');
 export const COVER_W = 1024, COVER_H = 1536;
 
 export function shareImage({ series = null, ep = null } = {}) {

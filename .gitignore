@@ -3,3 +3,6 @@
 Thumbs.db
 *.log
 design/v2/shots-jpeg/
+
+# ภาพจากชุดทดสอบ (สร้างใหม่ได้ด้วย node tools/smoke.mjs)
+tools/shots/
