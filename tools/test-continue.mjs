@@ -4,20 +4,31 @@
 
    ตรวจ 10 ข้อตามเกณฑ์ตรวจรับ ข้อไหนตกจะ exit 1 พร้อมบอกว่าข้อไหน */
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
-const PORT = 4188, CDP = 9444;
+/* พอร์ตและโปรไฟล์เบราว์เซอร์ตั้งทับได้ — workspace นี้แชร์กับ run อื่น
+   พอร์ตเดิมหรือโปรไฟล์ร่วมทำให้การรันค้าง (Reviewer-Codex เจอตอนรันขนานกัน) */
+const PORT = +(process.env.AC2_PORT || 4188), CDP = +(process.env.AC2_CDP || 9444);
+const PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-ac2-'));
 const BASE = `http://127.0.0.1:${PORT}`;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)], { stdio: 'ignore' });
 const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dbus',
-  `--remote-debugging-port=${CDP}`, '--remote-allow-origins=*', 'about:blank'], { stdio: 'ignore' });
+  `--user-data-dir=${PROFILE}`, `--remote-debugging-port=${CDP}`, '--remote-allow-origins=*', 'about:blank'],
+  { stdio: 'ignore' });
 
-function cleanup(code) { try { server.kill('SIGTERM'); } catch {} try { chrome.kill('SIGTERM'); } catch {} process.exit(code); }
+function cleanup(code) {
+  try { server.kill('SIGTERM'); } catch {}
+  try { chrome.kill('SIGTERM'); } catch {}
+  try { fs.rmSync(PROFILE, { recursive: true, force: true }); } catch {}
+  process.exit(code);
+}
 
 async function wsUrl() {
   for (let i = 0; i < 80; i++) {
@@ -67,6 +78,48 @@ function check(name, ok, detail = '') {
   else { fail++; console.log(`  ✗ ${name}${detail ? ' — ' + detail : ''}`); }
 }
 
+/* อ่านเปอร์เซ็นต์ที่ "แสดงอยู่บนหน้า" (ข้อความ · ความกว้างแถบ · aria-valuenow)
+   มาคู่กับค่าที่ "บันทึกไว้จริง" ใน lakorn.cont ของรายการเดียวกัน
+   ค่าที่คาดหวังคำนวณจาก sec/dur ดิบใน storage ไม่ได้เอามาจากโค้ดเว็บ
+   ⇒ ถ้าใครเปลี่ยนสูตรหรือใส่ค่าตายตัว สองฝั่งจะไม่ตรงกันทันที */
+const pctProbe = (rowSel, textSel) => `(function () {
+  var cont = JSON.parse(localStorage.getItem('lakorn.cont') || '{}');
+  return Array.prototype.slice.call(document.querySelectorAll(${JSON.stringify(rowSel)})).map(function (a) {
+    var slug = (a.getAttribute('href').match(/watch\\/([^\\/]+)\\//) || [])[1];
+    var e = cont[slug] || null;
+    var txt = (a.querySelector(${JSON.stringify(textSel)}) || {}).textContent || '';
+    var fill = a.querySelector('.pbar i'), pbar = a.querySelector('.pbar');
+    return {
+      slug: slug, text: txt.trim(),
+      shown: (txt.match(/ดูไปแล้ว (\\d+)%/) || [])[1],
+      shownEp: (txt.match(/EP\\.(\\d+)\\//) || [])[1],
+      bar: fill ? fill.style.width : null,
+      aria: pbar ? pbar.getAttribute('aria-valuenow') : null,
+      want: e ? Math.round(e.sec / e.dur * 100) : null,
+      wantEp: e ? e.ep : null,
+      sec: e && e.sec, dur: e && e.dur
+    };
+  });
+})()`;
+
+/* เงื่อนไขรับรองของ AC-2: "render จากค่าที่บันทึกไว้จริง ไม่มีเปอร์เซ็นต์ที่เขียนมือเหลือแม้จุดเดียว"
+   ต้องตรวจสองชั้น — ตรงกับค่าจริงทุกใบ และสองใบที่ค่าต่างกันต้องแสดงต่างกัน
+   (ข้อเดิมใช้ regex /ดูไปแล้ว \d+%/ ซึ่งค่าตายตัว 62% ก็ผ่าน — Reviewer-Codex วัดได้) */
+function checkPct(where, rows) {
+  const bad = rows.filter(r => !(r.want !== null
+    && +r.shown === r.want
+    && r.bar === r.want + '%'
+    && (r.aria === null || +r.aria === r.want)
+    && +r.shownEp === r.wantEp));
+  check(`${where} · เปอร์เซ็นต์ ข้อความ และแถบความคืบหน้า ตรงกับ sec/dur ที่บันทึกไว้จริงทุกใบ`,
+    rows.length >= 2 && bad.length === 0, JSON.stringify(bad.length ? bad : rows));
+  const shown = rows.map(r => r.shown).filter(v => v !== undefined);
+  check(`${where} · สองรายการที่ความคืบหน้าต่างกัน แสดงเปอร์เซ็นต์ต่างกันจริง (ค่าตายตัวผ่านไม่ได้)`,
+    rows.length >= 2 && new Set(rows.map(r => r.want)).size === rows.length
+      && new Set(shown).size === rows.length,
+    JSON.stringify(rows.map(r => `${r.slug}: แสดง ${r.shown}% · จริง ${r.want}% (${r.sec}/${r.dur})`)));
+}
+
 try {
   console.log('AC-2 · ทดสอบด้วยเบราว์เซอร์จริงที่ ' + BASE);
 
@@ -80,10 +133,47 @@ try {
   check('คลัง → แท็บดูต่อ โชว์หน้าว่างที่ออกแบบไว้',
     await evaluate(`/ยังไม่มีเรื่องที่ดูค้าง/.test(document.querySelector('#libPanel').textContent)`));
 
-  /* ---- ดูตอนหนึ่ง แล้วดูว่าบันทึกจริงไหม ---- */
+  /* ---- ดูตอนหนึ่ง แล้วดูว่าบันทึก "เป็นช่วง ๆ ขณะเล่น" จริงไหม ----
+     AC-2 สั่งสองอย่างแยกกัน: เขียนเมื่อเปลี่ยนตอน **และ** เขียนเป็นช่วง ๆ ขณะเล่น (throttle)
+     ข้อเดิมคลิกหยุดก่อนอ่าน storage ซึ่ง stop() บังคับเขียนด้วย persist(true) อยู่แล้ว
+     จึงกลบการหายไปของการบันทึกระหว่างเล่นทั้งก้อน — Reviewer-Codex ลบ persist(false)
+     ใน timer ออกแล้วด่านยังผ่าน · รอบนี้อ่าน storage **ขณะยังเล่นอยู่**
+     ไม่หยุด ไม่ seek ไม่เปลี่ยนหน้า ไม่ซ่อนหน้า และนับจำนวนการเขียนเพื่อคุม throttle */
   await go('/watch/ceo-cold/ep-7/');
+  /* นับการเขียนที่ชั้น Storage ของเบราว์เซอร์ ไม่ใช่ที่โค้ดเว็บ — ครอบทุกเส้นทางที่เขียน lakorn.cont
+     ติดตะขอหลังหน้าโหลดเสร็จ จึงไม่นับการเขียนครั้งแรกตอนเปิดตอน (บรรทัดสุดท้ายของ initWatch) */
+  await evaluate(`(function () {
+    window.__w = 0;
+    var orig = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (k, v) {
+      if (k === 'lakorn.cont') window.__w++;
+      return orig.call(this, k, v);
+    };
+    return true;
+  })()`);
+  const snap = () => evaluate(`({
+    w: window.__w,
+    playing: document.getElementById('player').classList.contains('playing'),
+    e: JSON.parse(localStorage.getItem('lakorn.cont')||'{}')['ceo-cold']
+  })`);
+  const s0 = await snap();
   await evaluate(`document.getElementById('playBtn').click()`);
-  await sleep(2500);                       /* เพลเยอร์จำลองเดิน 6 เท่า = ~15 วินาทีของเนื้อหา */
+  const tPlay = Date.now();
+  await sleep(1300);
+  const s1 = await snap();                 /* อ่านขณะกำลังเล่น ไม่แตะอะไรเลย */
+  await sleep(1800);
+  const s2 = await snap();                 /* อ่านอีกครั้ง ยังเล่นอยู่เหมือนกัน */
+  const played = (Date.now() - tPlay) / 1000;
+  check('ยังเล่นอยู่จริงตอนอ่าน storage ทั้งสองครั้ง (ไม่ได้หยุด/seek/เปลี่ยนหน้า/ซ่อนหน้า)',
+    s1.playing && s2.playing, `playing = ${s1.playing} / ${s2.playing}`);
+  check('บันทึกเป็นช่วง ๆ ขณะเล่น · ค่าใน storage เดินหน้าตามเวลาโดยไม่ต้องกดหยุด',
+    s1.e && s2.e && s1.e.sec > (s0.e ? s0.e.sec : 0) && s2.e.sec > s1.e.sec,
+    `sec ${s0.e && s0.e.sec} → ${s1.e && s1.e.sec} → ${s2.e && s2.e.sec}`);
+  check('การเขียนระหว่างเล่นเกิดหลายครั้ง ไม่ใช่ครั้งเดียวตอนกดเล่น',
+    s2.w >= 2 && s2.w - s1.w >= 1,
+    `เขียน ${s2.w} ครั้งตั้งแต่กดเล่น (ช่วงหลัง ${s2.w - s1.w} ครั้ง)`);
+  check('throttle ยังคุมอยู่ · ไม่เขียนทุก tick (เพลเยอร์จำลองเดิน 6 tick/วินาที)',
+    s2.w <= 2 * Math.ceil(played) + 1, `เขียน ${s2.w} ครั้งใน ${played.toFixed(1)} วินาที`);
   await evaluate(`document.getElementById('playBtn').click()`);  /* หยุด → บังคับเขียน */
   const e1 = await evaluate(`JSON.parse(localStorage.getItem('lakorn.cont')||'{}')['ceo-cold']`);
   check('เล่นแล้วเขียน lakorn.cont กลับ localStorage', !!e1, JSON.stringify(e1));
@@ -129,6 +219,14 @@ try {
   await go('/watch/durian-revenge/ep-3/');
   await evaluate(`document.getElementById('playBtn').click()`);
   await sleep(1800);
+  /* วางตำแหน่งของเรื่องนี้ไว้ราว 70% ให้ต่างจากเรื่องแรก (ราว 10%) อย่างชัดเจน
+     ด่านเปอร์เซ็นต์ข้างล่างจะเทียบสองค่านี้กับ storage ทีละใบ
+     ค่าตายตัวค่าเดียวตรงกับสองเรื่องที่ความคืบหน้าต่างกันไม่ได้ */
+  await evaluate(`(function(){
+    var b = document.getElementById('barWrap'), r = b.getBoundingClientRect();
+    b.dispatchEvent(new MouseEvent('click', {clientX: r.left + r.width * 0.7, clientY: r.top + 2, bubbles:true}));
+    return true;
+  })()`);
   await evaluate(`document.getElementById('playBtn').click()`);
 
   /* ---- แท็บใหม่: ค่าต้องยังอยู่ ---- */
@@ -141,8 +239,9 @@ try {
   check('เปิดหน้าใหม่แล้วค่ายังอยู่ · แถบดูต่อ render จากค่าที่บันทึกจริง', rail.length === 2, JSON.stringify(rail));
   check('เรียงล่าสุดอยู่บนสุด (durian-revenge ที่ดูทีหลังอยู่ใบแรก)',
     rail[0] && /durian-revenge/.test(rail[0].href), rail[0] && rail[0].href);
-  check('การ์ดโชว์ตอนและเปอร์เซ็นต์จากค่าจริง ไม่ใช่ค่าตายตัว',
+  check('การ์ดโชว์เลขตอนของเรื่องที่ค้างไว้จริง (EP.3/24)',
     rail[0] && /EP\.3\/24 · ดูไปแล้ว \d+%/.test(rail[0].text), rail[0] && rail[0].text);
+  checkPct('หน้าแรก แถบดูต่อ', await evaluate(pctProbe('#contRail .cont', '.m')));
 
   /* ---- กดแล้วต้องต่อจากตอนและตำแหน่งเดิม ----
      ยืนยันกับ "วินาทีที่บันทึกไว้จริง" ไม่ใช่แค่ว่าไม่ใช่ 0:00
@@ -170,6 +269,8 @@ try {
   /* เพิ่งเปิด ceo-cold ไปเมื่อกี้ → ceo-cold ต้องเป็นรายการล่าสุด = อยู่บนสุด */
   check('หน้าคลัง แท็บดูต่อ render จากค่าเดียวกันและเรียงล่าสุดก่อน',
     libRows.length === 2 && /ceo-cold/.test(libRows[0]), JSON.stringify(libRows));
+  /* หน้าคลังเป็นอีกเทมเพลตหนึ่ง (contRowHtml) มี aria-valuenow ด้วย — ต้องตรวจแยกจากหน้าแรก */
+  checkPct('หน้าคลัง แท็บดูต่อ', await evaluate(pctProbe('#libPanel .controw', '.st')));
 
   /* ---- ดูจบตอน: รายการต้องขยับไปตอนถัดไปเอง ---- */
   await go('/watch/durian-revenge/ep-3/');
