@@ -90,6 +90,16 @@ try {
   check('บันทึก "เลขตอน" ถูกต้อง (ep = 7)', e1 && e1.ep === 7, 'ได้ ' + (e1 && e1.ep));
   check('บันทึก "ตำแหน่งในตอน" เดินจริง (sec > 5)', e1 && e1.sec > 5, 'sec = ' + (e1 && e1.sec));
 
+  /* ---- คีย์บอร์ดตาม UX §7.4 ต้องยังเลื่อนเวลาได้หลังกดปุ่มเล่น (โฟกัสอยู่ที่ปุ่ม) ----
+     ยามที่กันไม่ให้แย่ง Space/Enter จากปุ่ม ต้องไม่กินลูกศรไปด้วย */
+  await evaluate(`document.getElementById('playBtn').focus()`);
+  const tBefore = await evaluate(`document.getElementById('tNow').textContent`);
+  await evaluate(`document.getElementById('playBtn').dispatchEvent(
+    new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true,cancelable:true})), true`);
+  const tAfter = await evaluate(`document.getElementById('tNow').textContent`);
+  check('กดลูกศร → ขณะโฟกัสอยู่ที่ปุ่มเล่น ยังเลื่อนเวลาได้ (UX §7.4)',
+    tAfter !== tBefore, `${tBefore} → ${tAfter}`);
+
   /* ---- ดูอีกเรื่องให้มีสองรายการ แล้วตรวจลำดับ ---- */
   await go('/watch/durian-revenge/ep-3/');
   await evaluate(`document.getElementById('playBtn').click()`);
@@ -116,8 +126,10 @@ try {
   const href = rail[1].href;                       /* ceo-cold */
   check('ลิงก์ดูต่อชี้ไปตอนเดิมพร้อมตำแหน่ง (?t=)', /watch\/ceo-cold\/ep-7\/\?t=\d+/.test(href), href);
   const tParam = +(href.match(/\?t=(\d+)/) || [])[1];
+  /* เทียบกับค่าที่อยู่ใน localStorage ตอนหน้านี้ถูก render ไม่ใช่ค่าที่จำไว้ก่อนหน้า */
+  const live = await evaluate(`JSON.parse(localStorage.getItem('lakorn.cont')||'{}')['ceo-cold']`);
   check('เลขใน ?t= ตรงกับวินาทีที่บันทึกไว้จริง (lakorn.cont.sec)',
-    tParam === Math.round(e1.sec), `?t=${tParam} · sec ที่บันทึก = ${e1 && e1.sec}`);
+    tParam === Math.round(live.sec), `?t=${tParam} · sec ที่บันทึก = ${live && live.sec}`);
   await go('/' + href.replace(/^\//, ''));
   const resumed = await evaluate(`document.getElementById('tNow').textContent`);
   const want = Math.floor(tParam / 60) + ':' + String(tParam % 60).padStart(2, '0');

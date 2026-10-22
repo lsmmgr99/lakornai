@@ -555,17 +555,19 @@
     /* คีย์บอร์ด (UX §7.4) */
     document.addEventListener('keydown', function (ev) {
       if (ev.defaultPrevented || ev.ctrlKey || ev.metaKey || ev.altKey) return;
-      /* อย่าแย่งคีย์จากสิ่งที่กดได้ด้วยตัวเอง — ปุ่ม "ยกเลิก" ในการ์ดตอนถัดไป (UX §6.26)
-         และลิงก์ในการ์ดจบเรื่องต้องกด Enter/Space/ลูกศรได้ตามปกติ */
-      var tgt = ev.target;
-      if (tgt && tgt.closest
-        ? tgt.closest('input, textarea, select, button, a[href], [contenteditable]')
-        : /input|textarea|select/i.test((tgt && tgt.tagName) || '')) return;
+      var tgt = ev.target || {};
+      var hit = function (sel) { return tgt.closest ? !!tgt.closest(sel) : false; };
+      if (/input|textarea|select/i.test(tgt.tagName || '') || hit('input, textarea, select, [contenteditable]')) return;
       var k = ev.key.toLowerCase();
-      var seek = ev.key === 'ArrowRight' || ev.key === 'ArrowLeft';
+      /* Space/Enter บนปุ่มหรือลิงก์ที่โฟกัสอยู่เป็นของตัวมันเอง ห้ามแย่ง
+         ไม่งั้นปุ่ม "ยกเลิก" ในการ์ดตอนถัดไป (UX §6.26 = ทางออกจากการเด้งอัตโนมัติ)
+         จะกดด้วยคีย์บอร์ดไม่ได้ เพราะ Space ถูก preventDefault ไปเล่น/หยุดเพลเยอร์แทน
+         (ลูกศรไม่อยู่ในข้อนี้ — ปุ่ม/ลิงก์ไม่ได้ใช้ลูกศรเอง การเลื่อนเวลาด้วย ←/→
+          หลังกดปุ่มเล่นจึงยังทำงานตาม UX §7.4) */
+      if ((k === ' ' || k === 'k') && hit('button, a[href]')) return;
       /* ตอนนี้ดูจบแล้ว → การ์ดตอนถัดไป/การ์ดจบเรื่องเปิดอยู่ ลูกศรเป็นปุ่มสำรวจการ์ด
          ไม่ใช่ปุ่มเลื่อนเวลา · จะดูตอนนี้ซ้ำให้กดที่แถบเวลา หรือเปิดตอนนั้นใหม่ */
-      if (ended && seek) return;
+      if (ended && (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft')) return;
       if (k === ' ' || k === 'k') { ev.preventDefault(); timer ? stop() : play(); }
       else if (ev.key === 'ArrowRight') { t = Math.min(dur - 1, t + 5); persist(true); paint(); }
       else if (ev.key === 'ArrowLeft') { t = Math.max(0, t - 5); persist(true); paint(); }
