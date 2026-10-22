@@ -109,12 +109,23 @@ try {
   check('การ์ดโชว์ตอนและเปอร์เซ็นต์จากค่าจริง ไม่ใช่ค่าตายตัว',
     rail[0] && /EP\.3\/24 · ดูไปแล้ว \d+%/.test(rail[0].text), rail[0] && rail[0].text);
 
-  /* ---- กดแล้วต้องต่อจากตอนและตำแหน่งเดิม ---- */
+  /* ---- กดแล้วต้องต่อจากตอนและตำแหน่งเดิม ----
+     ยืนยันกับ "วินาทีที่บันทึกไว้จริง" ไม่ใช่แค่ว่าไม่ใช่ 0:00
+     ข้อที่ยืนยันแค่ !== '0:00' จะผ่านเหมือนกันถ้าโค้ดต่อที่ 0:01 หรือต่อผิดตอน
+     ซึ่งลูกค้าเขียนเองว่า "ต่อจากตอนและตำแหน่งเดิม" — ด่านนี้ต้องจับการถอยหลังได้ */
   const href = rail[1].href;                       /* ceo-cold */
   check('ลิงก์ดูต่อชี้ไปตอนเดิมพร้อมตำแหน่ง (?t=)', /watch\/ceo-cold\/ep-7\/\?t=\d+/.test(href), href);
+  const tParam = +(href.match(/\?t=(\d+)/) || [])[1];
+  check('เลขใน ?t= ตรงกับวินาทีที่บันทึกไว้จริง (lakorn.cont.sec)',
+    tParam === Math.round(e1.sec), `?t=${tParam} · sec ที่บันทึก = ${e1 && e1.sec}`);
   await go('/' + href.replace(/^\//, ''));
   const resumed = await evaluate(`document.getElementById('tNow').textContent`);
-  check('เปิดลิงก์แล้วเวลาเริ่มที่ตำแหน่งเดิม ไม่ใช่ 0:00', resumed !== '0:00', 'tNow = ' + resumed);
+  const want = Math.floor(tParam / 60) + ':' + String(tParam % 60).padStart(2, '0');
+  check('เปิดลิงก์แล้วเวลาเริ่มที่ตำแหน่งเดิมตรงวินาที (ไม่ใช่แค่ไม่ใช่ 0:00)',
+    resumed === want, `tNow = ${resumed} · ควรเป็น ${want} (จาก ?t=${tParam})`);
+  check('ตอนที่เปิดคือตอนเดิม ไม่ใช่ต้นเรื่อง',
+    await evaluate(`document.body.dataset.ep`) === '7', 'ep = ' + await evaluate(`document.body.dataset.ep`));
+
 
   /* ---- หน้าคลังอ่านค่าเดียวกัน ---- */
   await go('/library/?tab=continue');
@@ -139,6 +150,35 @@ try {
   check('การ์ดตอนถัดไปโผล่พร้อมนับถอยหลัง',
     await evaluate(`!document.getElementById('nextUp').hidden && /ตอนถัดไป/.test(document.getElementById('nextUp').textContent)`));
 
+  /* ---- การ์ดตอนถัดไป: โฟกัสต้องไม่หลุดตอนนับถอยหลัง ----
+     UX §6.26 ให้ปุ่ม "ยกเลิก" เป็นทางออกจากการเด้งอัตโนมัติ
+     ถ้าการ์ด re-render ทุกวินาที โหนดปุ่มถูกสร้างใหม่ โฟกัสเด้งไป BODY → กดด้วยคีย์บอร์ดไม่ทัน */
+  await evaluate(`document.getElementById('nuCancel').focus()`);
+  await sleep(1300);
+  check('โฟกัสยังอยู่ที่ปุ่ม "ยกเลิก" หลังนับถอยหลังเดินไป 1 วินาที',
+    await evaluate(`document.activeElement && document.activeElement.id`) === 'nuCancel',
+    'activeElement = ' + await evaluate(`document.activeElement && (document.activeElement.id || document.activeElement.tagName)`));
+  check('ตัวเลขนับถอยหลังยังเดินอยู่จริง (ไม่ได้หยุดเพราะเลิก re-render)',
+    +(await evaluate(`(document.getElementById('nuLeft')||{}).textContent`)) < 5,
+    'nuLeft = ' + await evaluate(`(document.getElementById('nuLeft')||{}).textContent`));
+  /* กดปุ่มด้วยคีย์บอร์ดจริง (Enter บนปุ่มที่โฟกัสอยู่) ต้องเก็บการ์ดได้ */
+  for (const type of ['keyDown', 'char', 'keyUp']) {
+    await send('Input.dispatchKeyEvent', { type, key: 'Enter', code: 'Enter', windowsVirtualKeyCode: 13, text: '\r' });
+  }
+  await sleep(300);
+  check('กด Enter บนปุ่ม "ยกเลิก" ที่โฟกัสอยู่ แล้วการ์ดถูกเก็บจริง',
+    await evaluate(`document.getElementById('nextUp').hidden === true`));
+
+  /* ---- ยามหลังดูจบตอน: ลูกศรต้องไม่ดึงจุดค้างถอยกลับไปตอนที่ดูจบแล้ว ----
+     นี่คือข้อถดถอยของบั๊กที่รีวิวด่าน 1 จับได้ (ชุด 27 ข้อเดิมไม่มีข้อไหนแตะสภาพหลังดูจบ) */
+  const keyArrow = k => evaluate(
+    `document.body.focus(), document.dispatchEvent(new KeyboardEvent('keydown',{key:'${k}',bubbles:true,cancelable:true})), true`);
+  await keyArrow('ArrowLeft');
+  await keyArrow('ArrowLeft');
+  const afterArrow = await evaluate(`JSON.parse(localStorage.getItem('lakorn.cont')||'{}')['durian-revenge']`);
+  check('ดูจบตอน → กดลูกศร ← แล้วจุดค้างยังอยู่ที่ตอนถัดไป (EP.4) ไม่ถอยกลับ EP.3',
+    afterArrow && afterArrow.ep === 4, JSON.stringify(afterArrow));
+
   /* ---- ดูจบเรื่อง: ต้องออกจากรายการค้าง ไปโผล่ที่ "ดูจบแล้ว" ---- */
   await go('/watch/house-13/ep-12/');
   await evaluate(`
@@ -155,6 +195,26 @@ try {
   check('ดูจบเรื่อง → ไปโผล่ที่ "ดูจบแล้ว"', !!done['house-13'], JSON.stringify(Object.keys(done)));
   check('การ์ดจบเรื่องโผล่และมีปุ่มพาไปต่อ (ห้ามเป็นทางตาย)',
     await evaluate(`!document.getElementById('endCard').hidden && !!document.querySelector('#endCard .ec-next')`));
+
+  /* ---- ยามหลังดูจบเรื่อง: ต้องไม่มีทางหลุดออกจาก "ดูจบแล้ว" ด้วยการกดปุ่มเดียว ----
+     รีวิวด่าน 1 วัดได้ว่ากด → หนึ่งครั้งบนการ์ดจบเรื่อง ทำให้ done ว่างและ cont กลับมาเป็น 99%
+     การ์ดจบเรื่องโฟกัสลิงก์ให้เองตอนเปิด ลูกศรคือปุ่มที่คนใช้สำรวจการ์ดนี้ตามปกติ */
+  check('การ์ดจบเรื่องโฟกัสลิงก์แรกให้เอง (เส้นทางที่ลูกศรถูกกดจริง)',
+    await evaluate(`!!document.activeElement && document.activeElement.classList.contains('ec-next')`));
+  for (const k of ['ArrowRight', 'ArrowLeft', 'ArrowRight']) {
+    await evaluate(`document.activeElement.dispatchEvent(new KeyboardEvent('keydown',{key:'${k}',bubbles:true,cancelable:true})), true`);
+  }
+  await keyArrow('ArrowRight');     /* และกรณีโฟกัสหลุดไป BODY แล้วกดลูกศร */
+  await keyArrow('ArrowLeft');
+  const cont2 = await evaluate(`JSON.parse(localStorage.getItem('lakorn.cont')||'{}')`);
+  const done2 = await evaluate(`JSON.parse(localStorage.getItem('lakorn.done')||'{}')`);
+  check('ดูจบเรื่อง → กดลูกศรซ้ำ ๆ แล้วยังอยู่ใน "ดูจบแล้ว"', !!done2['house-13'], JSON.stringify(Object.keys(done2)));
+  check('ดูจบเรื่อง → กดลูกศรซ้ำ ๆ แล้วไม่ถูกดึงกลับเข้ารายการค้าง', !cont2['house-13'], JSON.stringify(cont2['house-13']));
+  /* ออกจากหน้าแล้วสภาพต้องยังเดิม (pagehide → flush) */
+  await go('/library/?tab=done');
+  check('ออกจากหน้าหลังดูจบเรื่อง → แท็บ "ดูจบแล้ว" ยังมีเรื่องนั้น ไม่ถูกเขียนทับตอนออกจากหน้า',
+    await evaluate(`!!JSON.parse(localStorage.getItem('lakorn.done')||'{}')['house-13']
+      && !JSON.parse(localStorage.getItem('lakorn.cont')||'{}')['house-13']`));
   await go('/library/?tab=done');
   check('แท็บ "ดูจบแล้ว" ในคลังมีเรื่องนั้นจริง',
     await evaluate(`/บ้านเลขที่ 13/.test(document.getElementById('libPanel').textContent)`));
@@ -199,6 +259,21 @@ try {
   check('หน้าแรกโชว์ชั้น "ติดตามไว้" เมื่อมีเรื่องที่ติดตาม',
     await evaluate(`!document.getElementById('followSec').hidden
       && document.querySelectorAll('#followRail .card').length === 1`));
+
+  /* ---- ?t= ที่เกินความยาวตอน ต้องถูกปฏิเสธ ไม่ใช่หนีบเป็นวินาทีสุดท้าย ----
+     วันนี้ผู้ใช้ยังเจอเองไม่ได้ (เพราะ ?t= สร้างจาก dur ชุดเดียวกัน)
+     แต่วันที่มีไฟล์วิดีโอจริงแล้วความยาวตอนเปลี่ยน ลิงก์ที่คนแชร์ไว้จะเข้าเส้นนี้ทั้งหมด */
+  await go('/');
+  await evaluate('localStorage.clear()');
+  await go('/watch/house-13/ep-1/?t=999999');
+  const over = await evaluate(`({ tNow: document.getElementById('tNow').textContent,
+    cont: JSON.parse(localStorage.getItem('lakorn.cont')||'{}')['house-13'] })`);
+  check('?t= ที่เกินความยาวตอน ไม่ทำให้ตอนนั้นกลายเป็น "ดูไปแล้ว 99%" โดยไม่ได้ดู',
+    over.tNow === '0:00' && over.cont && over.cont.sec === 0, JSON.stringify(over));
+  await go('/watch/house-13/ep-1/?t=abc');
+  check('?t= ที่ไม่ใช่ตัวเลข → เริ่มที่ 0:00', await evaluate(`document.getElementById('tNow').textContent`) === '0:00');
+  await go('/watch/house-13/ep-1/?t=-50');
+  check('?t= ติดลบ → เริ่มที่ 0:00', await evaluate(`document.getElementById('tNow').textContent`) === '0:00');
 
   /* ---- ล้างข้อมูลแล้วต้องกลับไปหน้าว่าง ไม่พัง ---- */
   await go('/');

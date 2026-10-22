@@ -3,10 +3,14 @@
    ตั้งใจให้เป็นตัวเดียวกับที่ผู้ตรวจรันเองได้ · ทุกข้อพิมพ์ตัวเลขที่นับได้ออกมาด้วย */
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SKIP = new Set(['.git', 'design', 'node_modules', 'build', 'tools', 'docs', '.paperclip-repositories', '.claude']);
+/* `admin` = แผงหลังบ้านของ AIO-23 (Dev-Codex เป็นเจ้าของ) ไม่ใช่หน้าของผู้ชม
+   เกณฑ์ AC-1/AC-3/AC-6 เขียนไว้สำหรับ "หน้าที่ให้ Google เก็บ" และ "ถ้อยคำที่ผู้ชมเห็น"
+   จึงไม่เอามานับรวม — แต่ไม่ปล่อยลอย: ตรวจแยกท้ายไฟล์ว่าต้อง noindex และไม่หลุด sitemap */
+const SKIP = new Set(['.git', 'design', 'node_modules', 'build', 'tools', 'docs', 'admin', '.paperclip-repositories', '.claude']);
 
 function walk(dir, out = []) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -44,15 +48,26 @@ ok(watchWithTitle.length === watchPages.length,
   `หน้ารับชม ${watchPages.length} หน้า มีชื่อตอนใน <h1> ตอนส่งออก ${watchWithTitle.length} หน้า`);
 ok(indexable.length > 0, `หน้าที่เปิดให้เก็บดัชนี ${indexable.length} หน้า · noindex ${PAGES.length - indexable.length} หน้า`);
 
-/* ---------------- AC-2 ---------------- */
-head('AC-2 · "ดูต่อ" ทำงานจริง (ตรวจเชิงไฟล์ · พฤติกรรมจริงดู tools/test-continue.mjs)');
+/* ---------------- AC-2 ----------------
+   ข้อนี้เคยเป็น grep "ตัวสะกดของซอร์ส" ล้วน ซึ่งผูกกับวิธีเขียนโค้ด ไม่ใช่ผลลัพธ์:
+   จัดรูปโค้ดใหม่ก็แดงทั้งที่พฤติกรรมเท่าเดิม · เขียนตัวอักษรครบแต่ไม่เคยถูกเรียกก็เขียวได้
+   และทำให้ความคุ้มครองพฤติกรรมทั้งหมดไปแขวนอยู่กับ test-continue.mjs เพียงลำพัง
+   ตอนนี้ด่านนี้ "รัน" ชุดพฤติกรรมจริงให้เลย — คำสั่งเดียวที่ผู้ตรวจรันครอบ AC-2 ทั้งข้อ */
+head('AC-2 · "ดูต่อ" ทำงานจริง (รันชุดพฤติกรรมด้วยเบราว์เซอร์จริง)');
 const app = read(path.join(ROOT, 'assets/app.js'));
-const writes = (app.match(/save\('cont'/g) || []).length;
-ok(writes >= 2, `assets/app.js เขียน lakorn.cont กลับ ${writes} จุด (ของเดิมเขียน 0 จุด)`);
-ok(/localStorage/.test(app) && /sec:/.test(app), 'บันทึกทั้งเลขตอน (ep) และตำแหน่งในตอน (sec)');
-ok(/sort\(function \(a, b\) \{ return b\.ts - a\.ts; \}\)/.test(app), 'เรียงรายการค้างจากล่าสุดอยู่บนสุด (ts มาก → น้อย)');
-ok(/'\?t=' \+ Math\.round\(e\.sec\)/.test(app), 'ลิงก์ดูต่อพาไปตอนเดิมพร้อมตำแหน่งเดิม (?t=)');
-ok(/Progress\.finish\(slug\)/.test(app), 'ดูจบเรื่อง → ออกจากรายการค้าง ไปที่ "ดูจบแล้ว"');
+ok(app === read(path.join(ROOT, 'build/app.src.js')),
+  'assets/app.js ตรงกับต้นฉบับ build/app.src.js (ถ้าไม่ตรง คือมีคนแก้ไฟล์ที่ build ทับ)');
+if (process.env.SKIP_BROWSER) {
+  ok(false, 'ข้ามชุดพฤติกรรม AC-2 เพราะตั้ง SKIP_BROWSER — ข้อนี้นับเป็นตก ไม่ใช่ผ่าน');
+} else {
+  const r = spawnSync(process.execPath, [path.join(ROOT, 'tools/test-continue.mjs')],
+    { encoding: 'utf8', timeout: 480000 });
+  const out = (r.stdout || '') + (r.stderr || '');
+  const m = out.match(/ผล: ผ่าน (\d+) · ตก (\d+)/);
+  ok(!!m && r.status === 0,
+    m ? `tools/test-continue.mjs · ผ่าน ${m[1]} ตก ${m[2]}` : 'รัน tools/test-continue.mjs ไม่สำเร็จ (ต้องมี Chromium ของ playwright ในเครื่อง)');
+  if (m && +m[2] > 0) out.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
+}
 const hand = PAGES.filter(f => /(ดูไปแล้ว \d+%|ดูต่อ EP\.\d+|EP\.\d+\/\d+ ·)/.test(read(f)));
 ok(hand.length === 0, `หน้าที่ยังมีเปอร์เซ็นต์/เลขตอนของ "ดูต่อ" เขียนมือใน HTML: ${hand.length} ไฟล์${hand.length ? ' → ' + hand.slice(0, 3).map(rel) : ''}`);
 const data = read(path.join(ROOT, 'assets/data.js'));
@@ -172,5 +187,19 @@ const hasShare = fs.existsSync(shareDir) && fs.readdirSync(shareDir).some(f => /
 ok(fs.existsSync(shareDir), 'มีช่องเสียบที่ assets/share/ พร้อมคำอธิบายการตั้งชื่อไฟล์');
 console.log(`  ℹ ไฟล์ภาพแชร์จาก Visual: ${hasShare ? 'มีแล้ว — og:image ใช้ 1200×630' : 'ยังไม่ส่ง — og:image ถอยไปใช้ปก 2:3 ไปก่อน'}`);
 
-console.log(`\n${fail ? '✗ ตก ' + fail + ' ข้อ' : '✓ ผ่านทุกข้อ'} · ตรวจ ${PAGES.length} หน้าจริง + ${STUBS.length} ไฟล์ส่งต่อ`);
+/* ---------------- หลังบ้าน (ไม่ใช่หน้าของผู้ชม แต่ต้องไม่หลุดเข้าผลค้นหา) ---------------- */
+head('แผงหลังบ้าน admin/ · ไม่นับเป็นหน้าผู้ชม แต่ต้องไม่หลุดเข้าดัชนี');
+const adminDir = path.join(ROOT, 'admin');
+if (!fs.existsSync(adminDir)) console.log('  ℹ ยังไม่มีโฟลเดอร์ admin/ ในรีโป (งาน AIO-23)');
+else {
+  const adminHtml = fs.readdirSync(adminDir).filter(f => f.endsWith('.html')).map(f => path.join(adminDir, f));
+  ok(adminHtml.length > 0 && adminHtml.every(f => /content="noindex/.test(read(f))),
+    `หน้าใน admin/ ${adminHtml.length} ไฟล์ · เป็น noindex ทุกไฟล์`);
+  const sm = read(path.join(ROOT, 'sitemap.xml'));
+  ok(!/\/admin\//.test(sm), 'admin/ ไม่อยู่ใน sitemap.xml');
+  console.log('  ℹ ถ้อยคำ "เข้าสู่ระบบ" ใน admin/ เป็นของผู้ดูแลระบบ ไม่ใช่ผู้ชม'
+    + ' — มติ "ตัดล็อกอินถาวร" (22 ต.ค.) ว่าด้วยฝั่งผู้ชม ไม่ใช่หลังบ้าน');
+}
+
+console.log(`\n${fail ? '✗ ตก ' + fail + ' ข้อ' : '✓ ผ่านทุกข้อ'} · ตรวจ ${PAGES.length} หน้าจริง + ${STUBS.length} ไฟล์ส่งต่อ (ไม่รวม admin/)`);
 process.exit(fail ? 1 : 0);
