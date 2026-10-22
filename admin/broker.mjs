@@ -35,7 +35,7 @@ export function createBroker(config,{provider,now=Date.now}={}){
       }
       // API uses POST even for reads, so Origin is always present in browsers.
       if(req.method!=='POST'||req.headers.origin!==origin||req.headers['content-type']!=='application/json')fail(403);
-      let raw='';for await(const chunk of req){raw+=chunk;if(Buffer.byteLength(raw)>18000000)fail(413);}let body;try{body=JSON.parse(raw);}catch{fail(400);}
+      const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>18000000)fail(413);chunks.push(chunk);}let body;try{body=JSON.parse(Buffer.concat(chunks,size).toString('utf8'));}catch{fail(400);}
       let id=req.headers.cookie?.split(/;\s*/).find(x=>x.startsWith('lakorn_session='))?.slice(15),s=sessions.get(id);
       if(s&&(now()-s.seen>300000||now()>s.expires)){sessions.delete(id);s=null;}
       if(p==='/api/session'){

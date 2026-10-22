@@ -34,8 +34,18 @@ test('HTTP trust boundary, device timing, permission, conflict, allowlist, logou
  assert.deepEqual(received.get(draft.series[0].cover),Buffer.from(upload.base64,'base64'));
  assert.deepEqual(JSON.parse(received.get('content.json')),draft);
  for(const covers of [[upload,upload],[{...upload,slug:'missing-story'}],[{...upload,base64:'AAAA'}]])assert.equal((await call('commit',{...body,content:draft,covers})).status,400);
+ const thaiDraft=structuredClone(content);thaiDraft.series[0].title='กขค';
+ const bytes=Buffer.from(JSON.stringify({...body,content:thaiDraft}));
+ const split=bytes.indexOf(Buffer.from('กขค'))+1;
+ const splitStatus=await new Promise((resolve,reject)=>{
+  const req=http.request(origin+'/api/commit',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','Content-Length':bytes.length,Cookie:cookie,'X-CSRF-Token':csrf}},res=>{res.resume();res.on('end',()=>resolve(res.statusCode));});
+  req.on('error',reject);req.write(bytes.subarray(0,split));setTimeout(()=>req.end(bytes.subarray(split)),50);
+ });
+ assert.equal(splitStatus,200);assert.equal(JSON.parse(received.get('content.json')).series[0].title,'กขค');
+ assert.deepEqual(JSON.parse(received.get('content.json')),thaiDraft);
+ const beforePending=commits;
  let release;hold=new Promise(r=>release=r);const pending=call('commit',body);
- while(commits<3)await new Promise(r=>setImmediate(r));
+ while(commits<=beforePending)await new Promise(r=>setImmediate(r));
  assert.equal((await call('heartbeat')).status,200);
  assert.equal((await call('commit',body)).status,409);
  assert.equal((await call('logout')).status,200);

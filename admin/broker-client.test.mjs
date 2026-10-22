@@ -19,3 +19,17 @@ test('declining remote draft retains edits and saves with remote head; transient
  heartbeatStatus=200;await beat();assert.equal(cleared,false);
  heartbeatStatus=403;await beat();assert.equal(cleared,true);assert.equal(buttons.save.disabled,true);
 });
+
+for(const canWrite of [true,false])test(`accepting remote draft loads exact content; canWrite=${canWrite}`,async()=>{
+ const buttons=Object.fromEntries(['login','save','logout'].map(k=>[k,{disabled:true}]));
+ const remote={head:'remote-head',content:{generatedAt:'remote',series:[{title:'กขค'}]},canWrite};
+ let poll;const loaded=[];
+ const context={document:{getElementById:id=>buttons[id],addEventListener(){}},window:{addEventListener(){}},confirm:()=>true,
+ setTimeout:fn=>{poll=fn;},clearTimeout(){},setInterval(){return 1;},clearInterval(){},
+ fetch:async url=>({ok:true,json:async()=>({session:{csrf:'csrf'},login:{interval:5},poll:{canWrite},load:remote}[url.split('/').at(-1)])})};
+ vm.createContext(context);vm.runInContext(source,context);
+ await context.connectBroker({getDraft:()=>{throw Error('unexpected save');},loadDraft:content=>loaded.push(content),message(){}});
+ await buttons.login.onclick();await poll();
+ assert.equal(loaded.length,1);assert.deepEqual(loaded[0],remote.content);
+ assert.equal(buttons.save.disabled,!canWrite);
+});
