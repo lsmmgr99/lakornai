@@ -159,6 +159,21 @@ try {
   check('แท็บ "ดูจบแล้ว" ในคลังมีเรื่องนั้นจริง',
     await evaluate(`/บ้านเลขที่ 13/.test(document.getElementById('libPanel').textContent)`));
 
+  /* ---- ตารางตอน: แท็บช่วงตอนซ่อนได้จริง และสถานะมาจากข้อมูลในเครื่อง ---- */
+  await go('/series/ceo-cold/');
+  const grid = await evaluate(`JSON.stringify({
+    total: document.querySelectorAll('#epGrid .ep').length,
+    shown: [...document.querySelectorAll('#epGrid .ep')].filter(a=>!a.hidden).length,
+    tab: (document.querySelector('.ep-tabs [aria-selected=true]')||{}).textContent,
+    cur: (document.querySelector('#epGrid .ep.cur')||{}).textContent,
+    done: document.querySelectorAll('#epGrid .ep.done').length
+  })`);
+  const g = JSON.parse(grid);
+  check('แท็บช่วงตอนซ่อนตอนนอกช่วงได้จริง', g.total === 60 && g.shown === 20, grid);
+  check('หน้าเรื่องติดสถานะ "กำลังดู" จากค่าที่บันทึกไว้', g.cur === '7', 'cur = ' + g.cur);
+  check('แท็บเริ่มที่ช่วงที่มีตอนกำลังดู', g.tab === '1–20', 'tab = ' + g.tab);
+  check('ตอนก่อนหน้าแสดงเป็น "ดูแล้ว"', g.done === 6, 'done = ' + g.done);
+
   /* ---- ลิงก์เก่าแบบ #ep ต้องเด้งไป path จริง ---- */
   await send('Page.navigate', { url: BASE + '/watch/ceo-cold/ep-1/#ep9' });
   await sleep(900);

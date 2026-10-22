@@ -33,7 +33,7 @@
     });
   }
   function url(p) { return ROOT + String(p).replace(/^\//, ''); }
-  function cover(s) { return url('assets/covers/' + s.slug + '.webp'); }
+  function cover(s) { return url(s.cover || ('assets/covers/' + s.slug + '.webp')); }
   function secs(mmss) { var p = String(mmss).split(':'); return (+p[0]) * 60 + (+p[1]); }
   function fmt(x) { return Math.floor(x / 60) + ':' + String(Math.floor(x % 60)).padStart(2, '0'); }
 
@@ -287,9 +287,13 @@
     var dn = Progress.done()[slug];
     var cur = e ? e.ep : 0;
     var watchedTo = dn ? (BY[slug] ? BY[slug].eps : 0) : Math.max(0, cur - 1);
+    /* หน้ารับชมมี .cur มาจาก HTML อยู่แล้ว (คือตอนที่เปิดอยู่)
+       หน้าเรื่องไม่มี เพราะ HTML ที่ส่งออกไม่รู้จักผู้ใช้ — ติดให้จากค่าที่บันทึกไว้ */
+    var fixed = !!$('.ep.cur', grid);
     $$('.ep', grid).forEach(function (a) {
       var n = +a.dataset.n;
       a.classList.remove('done');
+      if (!fixed) a.classList.toggle('cur', n === cur);
       var isCur = a.classList.contains('cur');
       if (n <= watchedTo && !isCur) a.classList.add('done');
       var base = a.getAttribute('aria-label').split(' · ')[0];
@@ -919,6 +923,7 @@
   paintFollow();
   paintResumeButtons();
   bindRails();
+  paintEpGrid();     /* ต้องติดสถานะ .cur ก่อน bindEpTabs จะเลือกแท็บช่วงที่ถูกได้ */
   bindEpTabs();
   initGenreFilter();
   initAccordion();
@@ -926,7 +931,6 @@
 
   if (PAGE === 'home') initHome();
   if (PAGE === 'watch') initWatch();
-  if (PAGE === 'series') paintEpGrid();
   if (PAGE === 'library') initLibrary();
   if (PAGE === 'search') initSearch();
   if (PAGE === 'feed') initFeed();
