@@ -1,38 +1,8 @@
 <!doctype html>
-<html lang="th">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="claude:viewport-fit-sides" content="cover">
-<title>ค้นหา · LakornAI</title>
-<meta name="description" content="LakornAI ละครสั้น AI ภาษาไทย ดูต่อได้ทุกตอน">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="assets/style.css">
-</head>
-<body data-page="search" data-root="">
-<header class="top"><div class="wrap">
-  <a class="logo" href="index.html" aria-label="LakornAI หน้าแรก"><b>Lakorn</b><i>AI</i></a>
-  <nav class="topnav" aria-label="เมนูหลัก"><a href="index.html">หน้าแรก</a><a href="search.html" aria-current=page>ค้นหา</a><a href="continue.html">ดูต่อ</a><a href="following.html">ติดตาม</a><a href="new.html">ตอนใหม่</a><a href="popular.html">ยอดนิยม</a></nav>
-  <a class="icon-btn" href="search.html" aria-label="ค้นหาละคร"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg></a>
-</div></header>
-<main class="page"><div class="wrap">
-<div class="page-head"><h1>ค้นหา</h1></div>
-<label class="search-box" for="q"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg><input id="q" type="search" placeholder="ชื่อเรื่อง ตัวละคร หรือแนวละคร" autocomplete="off"></label>
-<section class="sec" style="margin-top:18px"><div class="chips" role="group" aria-label="แนวละคร" id="searchChips"><button class="chip" data-filter="all" aria-pressed="true">ทั้งหมด</button><button class="chip" data-filter="vertical" aria-pressed="false">ละครแนวตั้ง</button><button class="chip" data-filter="fruit" aria-pressed="false">ละครผลไม้ AI</button><button class="chip" data-filter="western" aria-pressed="false">ละครฝรั่ง</button><button class="chip" data-filter="horror" aria-pressed="false">สยองขวัญ</button><button class="chip" data-filter="timetravel" aria-pressed="false">ย้อนเวลา</button><button class="chip" data-filter="revenge" aria-pressed="false">แก้แค้น</button></div></section>
-<section class="sec" style="margin-top:18px" id="recentWrap"><div class="sec-h"><h2 style="font-size:16px">คำค้นยอดนิยม</h2></div>
-  <div class="recent"><button data-q="ทุเรียน">ทุเรียน</button><button data-q="ประธาน">ประธาน</button><button data-q="ย้อนเวลา">ย้อนเวลา</button><button data-q="ผี">ผี</button><button data-q="แก้แค้น">แก้แค้น</button><button data-q="นางร้าย">นางร้าย</button><button data-q="มาเฟีย">มาเฟีย</button></div></section>
-<section class="sec"><div class="sec-h"><h2 id="resCount">ทุกเรื่อง</h2></div><div class="grid-cat" id="results"></div>
-<div class="empty" id="noRes" hidden><b>ไม่พบเรื่องที่ตรงกับคำค้น</b>ลองพิมพ์ชื่อเรื่องสั้นลง หรือเลือกแนวอื่น</div></section>
-<footer class="foot">
-  <nav aria-label="ลิงก์ส่วนท้าย"><a href="genre-vertical.html">ละครแนวตั้ง</a><a href="genre-fruit.html">ละครผลไม้ AI</a><a href="genre-western.html">ละครสั้น AI ฝรั่ง</a><a href="genre-horror.html">สยองขวัญ</a><a href="genre-timetravel.html">ย้อนเวลา</a><a href="genre-revenge.html">แก้แค้น</a><a href="about.html">เกี่ยวกับเรา</a><a href="contact.html">ติดต่อ</a></nav>
-  <small>© LakornAI · lakornai.tv · ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง (mockup)</small>
-</footer>
-</div></main>
-<nav class="bottom" aria-label="เมนูหลัก"><div class="in"><a href="index.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>หน้าแรก</a><a href="search.html" aria-current=page><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>ค้นหา</a><a href="continue.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg>ดูต่อ</a><a href="following.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>ติดตาม</a></div></nav>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="assets/data.js"></script>
-<script src="assets/app.js"></script>
-</body>
-</html>
+<html lang="th"><head><meta charset="utf-8">
+<title>ย้ายไปที่อยู่ใหม่ · LakornAI</title>
+<meta name="robots" content="noindex,follow">
+<link rel="canonical" href="https://lakornai.tv/search/">
+<meta http-equiv="refresh" content="0;url=search/">
+<script>(function(){var t="search/";location.replace(t);})();</script>
+</head><body><p>หน้านี้ย้ายไปที่ <a href="search/">/search/</a> แล้ว</p></body></html>

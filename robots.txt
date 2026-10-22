@@ -1,0 +1,4 @@
+# LakornAI — ยังไม่เผยแพร่ ปิดการเก็บดัชนีไว้ทั้งเว็บ
+# วันขึ้นจริง: ตั้ง PUBLISHED = true ใน build/seo.mjs แล้ว build ใหม่
+User-agent: *
+Disallow: /

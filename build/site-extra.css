@@ -1,0 +1,157 @@
+/* ============================================================================
+   ส่วนเพิ่มของเว็บจริง — ต่อท้าย design/v2/v2.css ตอน build
+   มีเฉพาะคลาสที่ม็อกอัพไม่ได้ใช้ (เพราะม็อกอัพเป็น href="#" และไม่มีสถานะจริง)
+   ไม่ทับค่าโทเคนหรือสีของ Visual แม้แต่ตัวเดียว
+   ========================================================================== */
+
+/* --- ปกเป็น <img> ใน <span> จึงต้องบังคับ display --- */
+.poster{display:block}
+.card{display:block}
+.card .t,.card .m{display:block}
+.card .t{display:-webkit-box}
+.ep-row .et{font-size:var(--t-sub);color:var(--fg-2)}
+.ep-row .tt{font-size:var(--t-body);font-weight:600;color:var(--fg)}
+.ep-row .rkn{font-family:var(--display);font-weight:600;font-size:22px;color:var(--accent);
+  width:28px;text-align:center;flex:none}
+.flatlist .th2{width:34px;aspect-ratio:var(--ar-poster);border-radius:6px;overflow:hidden;flex:none}
+.flatlist .th2 img{width:100%;height:100%;object-fit:cover}
+
+/* --- header: ชื่อเรื่องในแถบย้อนกลับ --- */
+.htitle{font-family:var(--display);font-weight:600;font-size:17px;white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;min-width:0}
+
+/* --- hero carousel 3 เรื่อง (scroll-snap · ไม่มี JS ก็ยังเลื่อนได้) --- */
+.hero-track{display:grid;grid-auto-flow:column;grid-auto-columns:100%;gap:var(--s3);
+  overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;
+  margin-inline:calc(-1*var(--gutter-l));padding-inline:var(--gutter-l)}
+.hero-track::-webkit-scrollbar{display:none}
+.hero-track>.hero{scroll-snap-align:center}
+.hero-sec{margin-top:var(--s4)}
+.dots button{width:9px;height:9px;padding:0;border-radius:50%;background:var(--border-i);border:0}
+.dots button[aria-selected=true]{width:24px;border-radius:5px;background:var(--accent)}
+.hero .btn-row .btn-ghost{background:rgba(255,255,255,.08)}
+
+/* --- ส่วนหัวของหน้าแนว/แท็ก --- */
+.lead{color:var(--fg-2);font-size:var(--t-long);line-height:var(--lh-long);max-width:66ch;
+  margin-bottom:var(--s5)}
+.res-count{color:var(--muted);font-size:var(--t-sub);margin:var(--s4) 0 var(--s3)}
+.res-count b{color:var(--fg)}
+.chips-lb{align-self:center;font-size:var(--t-meta);color:var(--dim);flex:none;padding-right:4px}
+.chip-row{display:flex;gap:var(--s2);flex-wrap:wrap}
+.empty-inline{padding:var(--s6) 0;text-align:center;color:var(--muted);font-size:var(--t-sub)}
+
+/* --- ค้นหา --- */
+.search-head{position:sticky;top:58px;z-index:10;background:var(--bg);padding:var(--s3) 0}
+.search-head .chips{margin-top:var(--s3)}
+
+/* --- หน้าเรื่อง --- */
+.h1-series{font-size:var(--t-h1-series);line-height:var(--lh-h1s);font-weight:600}
+.sd-cover{max-width:260px;margin:0 auto}
+.facts{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:10px;
+  color:var(--fg-3);font-size:var(--t-meta)}
+.facts>span{display:inline-flex;align-items:center;gap:4px}
+.facts>span+span::before{content:"·";color:var(--faint);margin-right:5px}
+.facts .views{gap:5px}
+.hook-lead{margin-top:var(--s5);font-size:var(--t-body);font-weight:500;color:var(--fg);line-height:1.5}
+.syn{margin-top:var(--s3);color:var(--fg-2);font-size:var(--t-long);line-height:var(--lh-long);max-width:62ch}
+.btn-main{flex:1 1 auto;min-width:200px;max-width:340px}
+.two-col .btn-row,.two-col .perm{margin-top:var(--s4)}
+.two-col .chips{margin-top:var(--s4)}
+.castrow{display:flex;gap:var(--s4);flex-wrap:wrap}
+.castrow a{display:grid;justify-items:center;gap:7px;width:82px;text-align:center;
+  font-size:var(--t-meta);color:var(--fg-2);line-height:1.35}
+.avatar{width:60px;height:60px;border-radius:50%;display:grid;place-items:center;
+  background:linear-gradient(150deg,var(--c2,#4a4556),var(--c1,#2a2733));
+  border:1px solid var(--border-i);font-family:var(--display);font-size:22px;color:#fff}
+.cast-head{display:flex;gap:var(--s4);align-items:center;margin:var(--s5) 0 var(--s5)}
+.cast-head .avatar{width:84px;height:84px;font-size:34px;flex:none}
+.cast-head h1{font-size:var(--t-h1);font-weight:600}
+.cast-head p{color:var(--muted);font-size:var(--t-sub);margin-top:4px}
+
+/* --- หน้ารับชม --- */
+.watch-page{padding-top:0}
+.watch-page .wrap{padding-top:var(--s4)}
+.player-note{margin-top:var(--s3)}
+.ep-nav{display:flex;gap:var(--s3);flex-wrap:wrap;margin:var(--s4) 0}
+.ep-nav .btn{flex:1 1 auto;min-width:0}
+.ep-nav .btn span,.ep-nav .btn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.player .bigplay{border:0;background:none;width:100%;height:100%}
+.player .bigplay svg{width:76px;height:76px;padding:22px;box-sizing:content-box;border-radius:50%;
+  background:rgba(18,16,23,.55);border:1px solid rgba(255,255,255,.28);backdrop-filter:blur(6px);color:#fff}
+.player.playing .bigplay{opacity:0;pointer-events:none}
+.player.playing:hover .bigplay,.player .bigplay:focus-visible{opacity:1;pointer-events:auto}
+.player .bigplay{transition:opacity var(--d-base) var(--ease)}
+
+/* --- ฟีด --- */
+.feed-desktop{display:block}
+.feed-side{display:none}
+.feed-arrows{position:absolute;right:var(--s4);top:50%;transform:translateY(-50%);
+  display:grid;gap:var(--s3);z-index:3}
+@media (min-width:960px){
+  .stage .top{position:static}
+  .feed-desktop{display:grid;grid-template-columns:minmax(0,1fr) 460px 420px minmax(0,1fr);
+    gap:var(--s6);align-items:center;height:calc(100vh - 58px);padding:0 var(--s6)}
+  .feed-desktop .player.full{grid-column:2;height:min(820px,calc(100vh - 110px));
+    border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--e3)}
+  .feed-side{grid-column:3;display:block}
+  .feed-side h2{font-size:var(--t-h1);font-weight:600}
+  .feed-side p{color:var(--fg-2);margin-top:12px;line-height:1.6}
+}
+
+/* --- คลังของฉัน: แถวดูต่อที่ JS สร้าง --- */
+.lib-list .controw{display:flex;gap:var(--s3);align-items:center;padding:var(--s3);
+  border-radius:var(--r-md);background:var(--surface);border:1px solid var(--line);color:var(--fg)}
+.lib-list .controw:hover{border-color:var(--border-i);background:var(--surface-2)}
+.lib-list .controw .th{width:76px;aspect-ratio:var(--ar-poster);border-radius:var(--r-sm);
+  overflow:hidden;flex:none;position:relative}
+.lib-list .controw .th img{width:100%;height:100%;object-fit:cover}
+.lib-list .controw .last{position:absolute;inset:auto 0 0;background:var(--accent);color:var(--on-accent);
+  font-size:13px;text-align:center;font-weight:600;padding:1px 0}
+.lib-list .controw .bd{flex:1;min-width:0}
+.lib-list .controw .bd b{font-size:var(--t-body);font-weight:600;display:block}
+.lib-list .controw .bd .st{font-size:var(--t-meta);color:var(--muted);margin-top:3px;display:block}
+.lib-list .controw .pbar{display:block;height:4px;border-radius:2px;background:var(--line-2);
+  margin-top:8px;max-width:220px;overflow:hidden}
+.lib-list .controw .pbar i{display:block;height:100%;background:var(--free);
+  box-shadow:0 0 10px rgba(79,214,166,.5)}
+.lib-list .controw .go{flex:none}
+.libcard .poster{position:relative}
+
+/* --- ตั้งค่า --- */
+.narrow{max-width:760px}
+.center{text-align:center;justify-content:center}
+.rowlist .rl{flex:1}
+.rowlist .rv{color:var(--faint);font-size:var(--t-sub)}
+.switch{width:52px;height:30px;border-radius:999px;background:var(--surface-3);
+  border:1px solid var(--border-i);position:relative;flex:none;transition:background var(--d-fast) var(--ease)}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;
+  background:var(--fg-3);transition:transform var(--d-base) var(--ease),background var(--d-fast) var(--ease)}
+.switch.on{background:var(--accent-soft);border-color:var(--accent)}
+.switch.on::after{transform:translateX(22px);background:var(--accent)}
+.ver{text-align:center;color:var(--faint);font-size:var(--t-meta);margin-top:var(--s7)}
+
+/* --- onboarding --- */
+.pickgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s3)}
+@media (min-width:720px){.pickgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pickgrid .gtile{min-height:112px}
+.pickgrid .gtile[aria-pressed=true]{outline:2px solid var(--accent);outline-offset:2px}
+.bigico{display:inline-flex;color:var(--accent);margin-bottom:var(--s3)}
+.page-head.center p{margin-inline:auto}
+
+/* --- หน้าสถานะระบบ --- */
+.sys{text-align:center;padding:var(--s9) 0 var(--s6)}
+.sys h1{font-size:var(--t-h1);font-weight:600;margin-top:var(--s3)}
+.sys p{color:var(--muted);margin-top:10px;font-size:var(--t-sub);line-height:var(--lh-sub);
+  max-width:40ch;margin-inline:auto}
+.sys .btn{margin-top:var(--s5)}
+.big404{font-family:var(--display);font-size:86px;font-weight:600;line-height:1;
+  background:linear-gradient(180deg,var(--gold-1),var(--gold-3));
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.sysico{width:88px;height:88px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line-2);
+  display:grid;place-items:center;color:var(--dim);margin:0 auto var(--s4)}
+
+/* --- การ์ดจบตอน/จบเรื่องที่ JS เปิด --- */
+.nextup[hidden],.endcard[hidden]{display:none}
+.panel.center h3{font-size:var(--t-h2);font-weight:600;margin-bottom:var(--s2)}
+.panel.center p{color:var(--muted);font-size:var(--t-sub);margin-bottom:var(--s4)}
+.panel.center{margin-top:var(--s6)}

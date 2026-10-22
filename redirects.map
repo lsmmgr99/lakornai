@@ -1,0 +1,42 @@
+# LakornAI — ตาราง 301 สำหรับตั้งค่าที่เซิร์ฟเวอร์ (ยังไม่ deploy)
+# รูปแบบ: <เดิม> <ปลายทาง> 301
+# หมายเหตุ: /watch/<slug>.html#ep<n> แมปด้วย 301 ไม่ได้ เพราะ fragment ไม่ถูกส่งไปกับ request
+#          ต้องให้หน้าปลายทางอ่าน location.hash เอง — ทำไว้แล้วใน assets/app.js และในไฟล์ stub
+/search.html /search/ 301
+/new.html /new/ 301
+/popular.html /popular/ 301
+/about.html /about/ 301
+/contact.html /contact/ 301
+/continue.html /library/?tab=continue 301
+/following.html /library/?tab=following 301
+/poster-gallery.html /behind-the-ai/ 301
+/genre-vertical.html /genre/vertical/ 301
+/genre-fruit.html /genre/fruit/ 301
+/genre-western.html /genre/western/ 301
+/genre-horror.html /genre/horror/ 301
+/genre-timetravel.html /genre/timetravel/ 301
+/genre-revenge.html /genre/revenge/ 301
+/series/durian-revenge.html /series/durian-revenge/ 301
+/series/ceo-cold.html /series/ceo-cold/ 301
+/series/mirror-bride.html /series/mirror-bride/ 301
+/series/ayutthaya-love.html /series/ayutthaya-love/ 301
+/series/billion-widow.html /series/billion-widow/ 301
+/series/one-night-bangkok.html /series/one-night-bangkok/ 301
+/series/seedless-longan.html /series/seedless-longan/ 301
+/series/house-13.html /series/house-13/ 301
+/series/villainess-reborn.html /series/villainess-reborn/ 301
+/series/undercover-tycoon.html /series/undercover-tycoon/ 301
+/series/heir-returns.html /series/heir-returns/ 301
+/series/mangosteen-heart.html /series/mangosteen-heart/ 301
+/watch/durian-revenge.html /watch/durian-revenge/ep-1/ 301
+/watch/ceo-cold.html /watch/ceo-cold/ep-1/ 301
+/watch/mirror-bride.html /watch/mirror-bride/ep-1/ 301
+/watch/ayutthaya-love.html /watch/ayutthaya-love/ep-1/ 301
+/watch/billion-widow.html /watch/billion-widow/ep-1/ 301
+/watch/one-night-bangkok.html /watch/one-night-bangkok/ep-1/ 301
+/watch/seedless-longan.html /watch/seedless-longan/ep-1/ 301
+/watch/house-13.html /watch/house-13/ep-1/ 301
+/watch/villainess-reborn.html /watch/villainess-reborn/ep-1/ 301
+/watch/undercover-tycoon.html /watch/undercover-tycoon/ep-1/ 301
+/watch/heir-returns.html /watch/heir-returns/ep-1/ 301
+/watch/mangosteen-heart.html /watch/mangosteen-heart/ep-1/ 301
