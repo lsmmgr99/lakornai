@@ -1,0 +1,90 @@
+# LakornAI — commit เนื้อหา → ตรวจ V1–V13 → build artifact   (AIO-30 · ADR-001 §9 และ §12)
+#
+# ขอบเขตของไฟล์นี้ตามที่ ADR-001 §8/§9.1 ล็อกไว้:
+#   ปลายทางคือ "build artifact ที่พร้อม" เท่านั้น
+#   ไม่มี deploy · ไม่มี publish · ไม่ตั้งโดเมน · ไม่แตะเซิร์ฟเวอร์ · ไม่สมัครบริการ
+#   การนำขึ้น staging เป็นงานของ DevOps แยกต่างหาก และขึ้น production ต้องมีอนุมัติของ CEO/บอร์ดต่อครั้ง
+#
+# ตรวจซ้ำในเครื่องได้โดยไม่ต้อง push:   node ci/rehearse.mjs --head
+# (ลำดับขั้นข้างล่างถูกบังคับให้ตรงกับ ci/pipeline.mjs โดย ci/pipeline.test.mjs)
+
+name: content-ci
+
+on:
+  # §9.2 — "อัตโนมัติเมื่อมี commit ที่แตะ content.json" ไม่มีตารางเวลา ไม่ต้องรอใครสั่ง
+  # ปกก็ปลุกด้วย เพราะกฎ V6 ผูกกับการมีไฟล์ปกจริง และปกเป็น path ที่ broker เขียนได้ตาม B7
+  push:
+    paths:
+      - 'content.json'
+      - 'assets/covers/**'
+      # ตัวตรวจและตัว build เองก็ปลุก — ถ้าคนแก้ด่านแล้วด่านไม่ได้รัน ด่านนั้นก็เท่ากับไม่มี
+      - 'admin/validate.mjs'
+      - 'admin/check.mjs'
+      - 'build/**'
+      - 'ci/**'
+      - '.github/workflows/content-ci.yml'
+  pull_request:
+    paths:
+      - 'content.json'
+      - 'assets/covers/**'
+      - 'admin/validate.mjs'
+      - 'admin/check.mjs'
+      - 'build/**'
+      - 'ci/**'
+      - '.github/workflows/content-ci.yml'
+  workflow_dispatch:
+
+# อ่านรีโปได้เท่านั้น · ไม่มีสิทธิ์เขียน ไม่มีสิทธิ์ pages ไม่มีสิทธิ์ packages
+# งานนี้ไม่ต้องเขียนอะไรกลับเข้ารีโป และไม่ควรมีสิทธิ์ที่ไม่ได้ใช้
+permissions:
+  contents: read
+
+# commit เนื้อหาติด ๆ กันไม่ต้องรอกันให้ครบ แต่ของ branch เดียวกันเอาผลล่าสุดพอ
+concurrency:
+  group: content-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-build-artifact:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      # ไม่มี package.json ในรีโปนี้ (ADR-001 §1) จึงไม่มี dependency ให้ติดตั้ง และไม่มี cache ให้กู้
+      - name: ตั้ง Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: ทดสอบตัวด่านเอง
+        run: node --test ci/views-gate.test.mjs ci/pipeline.test.mjs
+
+      # ---- ด่านก่อน build: ข้อมูลผิดต้องล้มที่นี่ ไม่ใช่ไปโผล่บนเว็บ ----
+      - name: ตรวจข้อมูล V1–V10 ก่อน build
+        run: node admin/check.mjs .
+
+      - name: build HTML static
+        run: node build/build.mjs
+
+      # ---- ด่านหลัง build: ตรวจไฟล์ที่เขียนลงดิสก์จริง ----
+      - name: ตรวจ V11 หลัง build (ปิด JS แล้วต้องอ่านเนื้อหาได้)
+        run: node admin/check.mjs . --html
+
+      - name: ตรวจ V12–V13 หลัง build
+        run: node ci/views-gate.mjs .
+
+      # ---- artifact: ขั้นนี้อยู่ท้ายสุด ข้อมูลผิดจึงไม่มีทางได้ artifact ----
+      - name: จัด build artifact
+        run: node ci/stage-artifact.mjs . _artifact
+
+      - name: เก็บ artifact (เก็บไว้ให้ดาวน์โหลด ไม่ได้ publish)
+        uses: actions/upload-artifact@v4
+        with:
+          name: lakornai-static-${{ github.sha }}
+          path: _artifact
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,9 @@
+{
+  "_note": "แหล่งความจริงเดียวของคำว่า 'branch ที่เส้นทางเผยแพร่ใช้' — เจ้าของ: DevOps (AIO-30). ADR-001 §12.1 ข้อ B9 สั่งว่า branch ปลายทางของ broker ต้องไม่ใช่ branch นี้ จนกว่า Security จะเซ็นรับ. ไฟล์นี้ไม่ได้ให้สิทธิ์ deploy แก่ใคร: artifact จาก branch นี้คือของที่ 'มีสิทธิ์ถูกพิจารณา' ขึ้น staging/production ตามประตูอนุมัติของมันเอง ไม่ใช่ของที่ขึ้นเองอัตโนมัติ",
+  "publish": ["main"],
+  "brokerDraftPrefix": "admin-drafts/",
+  "brokerForbidden": ["main"],
+  "autoDeploy": false,
+  "deployGate": "staging = DevOps ทำเองได้แล้วรายงานบนงาน · production = ต้องมีอนุมัติจาก CEO/บอร์ด บันทึกบนงาน ต่อครั้ง",
+  "reviewedBy": null
+}
