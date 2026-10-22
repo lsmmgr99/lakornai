@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const publicFiles=new Set(['/admin/index.html','/admin/editor.mjs','/admin/covers.mjs','/admin/validate.mjs','/admin/style.css','/content.json']);
+const publicFiles=new Set(['/admin/index.html','/admin/editor.mjs','/admin/broker-client.mjs','/admin/covers.mjs','/admin/validate.mjs','/admin/style.css','/content.json']);
 const types={'.html':'text/html; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json','.css':'text/css','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg'};
 http.createServer((req,res)=>{
   const p=new URL(req.url,'http://localhost').pathname.replace(/^\/admin\/$/,'/admin/index.html');

@@ -1,3 +1,4 @@
+import {connectBroker} from './broker-client.mjs';
 import {validate} from './validate.mjs';
 import {inspectCover,exportArchive,MAX_COVER_BYTES} from './covers.mjs';
 const covers=new Map();
@@ -48,3 +49,5 @@ $('export-bundle').onclick=()=>exportDraft(true);
 window.addEventListener('beforeunload',e=>{if(covers.size){e.preventDefault();e.returnValue='';}});
 
 try{const response=await fetch('../content.json');if(!response.ok)throw Error('โหลดข้อมูลไม่สำเร็จ');data=await response.json();const errors=validate(data);if(errors.length)throw Error(errors.join('\n'));render();}catch(e){message(e.message);}
+
+connectBroker({getDraft:()=>({content:data,covers}),loadDraft:remote=>{const errors=validate(remote);if(errors.length)throw Error(errors.join('\n'));data=remote;covers.clear();selected=0;render();},message});

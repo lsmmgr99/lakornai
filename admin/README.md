@@ -3,7 +3,7 @@
 ทำแล้ว: seed ตาม ADR-001, ตัวตรวจข้อมูล, แผงร่างแก้เรื่อง/ตารางตอนหลายรายการ,
 ตรวจชื่อซ้ำทั้งคลัง, ส่งออก JSON, ทดสอบ static rebuild แบบไม่แตะไฟล์หน้าบ้านร่วม
 
-ยังไม่พร้อมใช้งานจริง: OAuth, commit ผ่าน Git API และ CI อัตโนมัติ
+มี implementation OAuth/commit ผ่าน broker พร้อม mock tests; ยังไม่พร้อมใช้งานจริงจนผ่าน live validation, รีวิว และ CI อัตโนมัติ
 ADR-001 §12 เลือก broker ในเครื่องสำหรับ OAuth และเลื่อนระบบวัดวิวออกจากงานนี้
 เส้นส่งออกใช้ได้ถาวรโดยไม่ต้องเข้าสู่ระบบ ส่วน broker ต้องรอ GitHub App ของบริษัทเพื่อทดลองจริง
 โหมดร่างนี้ไม่มีสิทธิ์เขียนรีโป และไม่ใช่การเข้าสู่ระบบแอดมินฉบับส่งมอบ
@@ -58,3 +58,46 @@ QA ตรวจพฤติกรรม, Security เซ็นรับ auth/upl
 อย่าแตก archive ที่มาจากแหล่งอื่นทับรีโปโดยไม่ตรวจรายการไฟล์ก่อน
 เส้นทางนี้ไม่ต้องมี OAuth และคงอยู่แม้เพิ่ม broker แล้ว
 CI ยังต้องให้ DevOps เชื่อม commit → ตรวจ V1–V13 → build artifact ตาม ADR §9
+
+## Broker ในเครื่อง (AIO-31 — รอ live validation และ review)
+
+ใช้ GitHub App ของบริษัท เปิด Device flow และติดตั้งแบบ Selected repositories เฉพาะรีโปนี้
+ให้ Contents: read/write (Metadata: read เป็นสิทธิ์พื้นฐานของ GitHub) ไม่ใช้ OAuth App/PAT
+เจ้าของต้องยืนยัน App permissions และ branch publish ทั้งหมดก่อนทดสอบจริง
+สร้าง branch ร่างที่มี content.json และปกไว้แล้ว โดยชื่อขึ้นต้น `admin-drafts/`
+ตัว broker ไม่สร้าง branch ไม่ merge ไม่ deploy และไม่รับ path/branch จากหน้าเว็บ
+
+```sh
+LAKORN_APP_CLIENT_ID=Iv1_PUBLIC_ID \
+LAKORN_REPO_OWNER=COMPANY LAKORN_REPO_NAME=REPO \
+LAKORN_DRAFT_BRANCH=admin-drafts/content LAKORN_PUBLISH_BRANCHES=main \
+node admin/broker.mjs
+```
+
+เปิด http://127.0.0.1:4190/admin/ กดเข้าสู่ระบบ แล้วเปิด github.com/login/device
+ใส่ user code ด้วยตนเอง จากนั้นโหลดข้อมูล branch ร่างก่อนบันทึก
+ปุ่มบันทึกเปิดหลังตรวจ permissions.push และตรวจซ้ำก่อนเขียน
+commit สร้าง blobs/tree/commit รวม JSON และปกในครั้งเดียว อัปเดต ref ด้วย force:false
+หากหัว branch เปลี่ยน จะปฏิเสธร่างเก่า ให้ส่งออกเก็บไว้แล้วโหลดข้อมูลล่าสุดก่อนปรับใหม่
+ไม่มีการรีเฟรช provider token: หมดอายุให้เข้าสู่ระบบใหม่
+
+Session เป็นคุกกี้ HttpOnly/SameSite=Strict ไม่มีวันหมดอายุถาวร
+หน้าเว็บส่ง heartbeat ทุก 20 วินาที; pagehide ขอ logout และถ้าขาด heartbeat เกิน 60 วินาที
+broker จะล้าง session (รวมกรณี browser crash) อายุสูงสุด 8 ชั่วโมงหรือเท่า token หากสั้นกว่า
+ปิดโปรเซสจะล้างทั้งหมด ไม่มี token/device code/refresh token เข้าดิสก์หรือส่งกลับ browser
+โปรเซสไม่อ่าน PAPERCLIP_GITHUB_* หรือ credential ของ harness
+API รับ POST JSON พร้อม Origin ตรงเท่านั้น ทุกคำขอหลัง bootstrap ต้องมี CSRF ต่อ session
+static navigation ไม่ส่ง Origin ตามปกติ จึงตรวจ Host และปฏิเสธ cross-site fetch metadata;
+ถ้ามี Origin จะต้องตรงเสมอ ไม่มี CORS และไม่เปิดไฟล์นอก allowlist
+
+เอกสารที่ตรวจ 23 ต.ค. 2026:
+- https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app
+- https://docs.github.com/en/rest/git/refs#update-a-reference
+
+ผลที่ทดสอบจริง: mock HTTP trust boundary/CSRF, permissions.push, stale head,
+path allowlist, force:false, device polling/slow_down/denial/session expiry;
+unit validation/cover/tar; Chromium offline export; admin/check.mjs
+ยังไม่ทดสอบจริง: App installation, user consent, read-only user, token revocation,
+GitHub commit attribution, concurrent remote updates, และ CI branch publish
+ต้องผ่าน Reviewer-Claude/Reviewer-Codex อิสระ + QA + Security ก่อน merge
+หากรีวิวขัดกันให้ CTO ตัดสิน ไม่ถือว่า mock tests เป็น live sign-off
