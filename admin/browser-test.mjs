@@ -54,6 +54,21 @@ try {
  if(count!==12)throw Error('Expected 12 series; got '+count);
  await evaluate(`const input=document.querySelector('#editor table input');input.value='ชื่อที่แก้ในเบราว์เซอร์';input.dispatchEvent(new Event('input'));Array.from(document.querySelectorAll('button')).find(b=>b.textContent==='ตรวจชื่อซ้ำอีกครั้ง').click();`);
  if(await evaluate("document.querySelector('#editor table input').value")!=='ชื่อที่แก้ในเบราว์เซอร์')throw Error('Edit lost');
- console.log('PASS browser: 12 series, episode table, edit preserved after duplicate refresh');
+ await evaluate(`(async()=>{
+   const canvas=document.createElement('canvas');canvas.width=2;canvas.height=2;
+   const blob=await new Promise(r=>canvas.toBlob(r,'image/png'));
+   const transfer=new DataTransfer();transfer.items.add(new File([blob],'untrusted-name.txt',{type:'text/plain'}));
+   const input=document.querySelector('#cover-upload');input.files=transfer.files;await input.onchange();
+ })()`);
+ if(!(await evaluate("document.querySelector('#message').textContent")).includes('เก็บปกในร่างแล้ว'))throw Error('Cover not accepted');
+ await evaluate("document.querySelector('#export').onclick()");
+ if(!(await evaluate("document.querySelector('#message').textContent")).includes('มีปกใหม่ในร่าง'))throw Error('JSON-only export must explain pending cover');
+ await evaluate(`window.exportedBlob=null;URL.createObjectURL=b=>{window.exportedBlob=b;return 'blob:test'};HTMLAnchorElement.prototype.click=function(){};document.querySelector('#export-bundle').click()`);
+ for(let i=0;i<50;i++){if(await evaluate('!!window.exportedBlob'))break;await sleep(100);}
+ const exported=await evaluate('window.exportedBlob.text()');
+ if(!exported.includes('ชื่อที่แก้ในเบราว์เซอร์')||!exported.includes('assets/covers/durian-revenge.png'))throw Error('Bundle missing edited title or cover');
+ await evaluate(`(async()=>{const t=new DataTransfer();t.items.add(new File(['<svg/>'],'fake.png',{type:'image/png'}));const input=document.querySelector('#cover-upload');input.files=t.files;await input.onchange();})()`);
+ if(!(await evaluate("document.querySelector('#message').textContent")).includes('รับเฉพาะข้อมูลภาพ'))throw Error('Spoofed image accepted');
+ console.log('PASS browser: table edit, image decode, spoof rejection, JSON guard, bundled title and cover');
  cleanup(0);
 }catch(e){console.error(e);cleanup(1);}
