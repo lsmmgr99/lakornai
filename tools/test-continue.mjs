@@ -2,7 +2,8 @@
    รัน:  node tools/test-continue.mjs
    ต้องมี tools/serve.mjs ทำงานอยู่ (สคริปต์นี้เปิดให้เอง) และ Chromium ของ playwright ในเครื่อง
 
-   ตรวจ 10 ข้อตามเกณฑ์ตรวจรับ ข้อไหนตกจะ exit 1 พร้อมบอกว่าข้อไหน */
+   ไล่ทุกบูลเล็ตของ AC-2 ด้วยพฤติกรรมจริง ข้อไหนตกจะ exit 1 พร้อมบอกว่าข้อไหน
+   ตั้งพอร์ตทับได้ด้วย AC2_PORT / AC2_CDP เมื่อรันขนานกับ run อื่นใน workspace เดียวกัน */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';

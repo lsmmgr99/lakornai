@@ -13,7 +13,7 @@
 node build/build.mjs          # สร้างเว็บทั้งเว็บใหม่ (460 หน้า) — ล้มทันทีถ้าตกเกณฑ์ on-page
 node tools/serve.mjs          # เปิดดูที่ http://127.0.0.1:4173
 node tools/check-ac.mjs       # ตรวจเกณฑ์ตรวจรับ AIO-22 จากไฟล์ที่ส่งมอบจริง
-node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 44 ข้อ
+node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 52 ข้อ (AC2_PORT/AC2_CDP ตั้งทับได้)
 node tools/check-mockup.mjs   # ม็อกอัพที่อนุมัติต้องสร้างซ้ำได้เหมือนเดิม (0 ไฟล์เปลี่ยน)
 node tools/smoke.mjs          # เปิดทุกชนิดหน้าในเบราว์เซอร์ เช็ก error + เก็บภาพ
 node ci/rehearse.mjs --head   # ซ้อม CI ทุกขั้นในสำเนาชั่วคราว (ตรวจ V1–V13 → artifact)
