@@ -1,5 +1,5 @@
 /* Styleguide: token + component sheet (ใช้เป็นหน้าอ้างอิงของ Dev และเป็นภาพในเด็ค) */
-import { D, ic, esc, header, bottomNav, footer, page, write, card, poster, epGrid, epTabs, legend, mockBar, FREE_EPS, COIN_PER_EP } from './lib.mjs';
+import { D, ic, esc, cover, header, bottomNav, footer, page, write, card, poster, epGrid, epTabs, legend, freeAllBar, localNote } from './lib.mjs';
 
 const S = Object.fromEntries(D.series.map(s => [s.slug, s]));
 
@@ -28,13 +28,19 @@ export function buildStyleguide() {
       </div></section>
 
     <section class="sg-sec"><h2>2. สี — สัญญาณ</h2>
-      <p>ระบบสองแกน: <b style="color:var(--accent)">ทอง = ของที่ต้องจ่าย/แบรนด์/โฟกัส</b> และ
-        <b class="free-c">มรกต = ของที่ได้ฟรี/สำเร็จ/ความคืบหน้า</b> — ทำให้เรื่อง paywall อ่านออกจากสีได้โดยไม่ต้องอ่านตัวอักษร</p>
+      <p><b>นิยามใหม่ของ rev.2</b> — rev.1 ใช้ "ทอง = ของที่ต้องจ่าย · มรกต = ของที่ได้ฟรี"
+        ซึ่งหมดความหมายทันทีที่ทุกตอนดูฟรี (คำสั่ง UX §1.0) แกนใหม่จึงเลิกพูดเรื่องเงิน
+        แล้วไปจับ<b>ทิศของเวลา</b>แทน:<br>
+        <b style="color:var(--accent)">แกน 1 · ทอง = "ก้าวต่อไป"</b> — แบรนด์ ปุ่มหลัก โฟกัส ตอนที่กำลังดู ตอนถัดไป สิ่งที่ชวนให้กดต่อ<br>
+        <b class="free-c">แกน 2 · มรกต = "สิ่งที่คุณทำแล้ว"</b> — ตอนที่ดูแล้ว แถบความคืบหน้า ข้อความสำเร็จ จุดยืน "ดูฟรีทุกตอน"<br>
+        อ่านเป็นคู่ได้ทั้งหน้าโดยไม่ต้องอ่านตัวอักษร: <b style="color:var(--accent)">ทองคือ "ไปไหนต่อ"</b> ·
+        <b class="free-c">มรกตคือ "มาถึงไหนแล้ว"</b> — และเพราะไม่มีของที่ต้องจ่ายอีกแล้ว
+        สีเทา <code>--lock</code> ของ rev.1 จึงถูกถอดออกจากชุด token</p>
       <div class="sg-grid">
         ${sw('--accent', '#F5C451', 'ทอง · 11.89:1 บน bg')}
         ${sw('--accent-hi', '#FFD877', 'hover · 14.14:1')}
         ${sw('--accent-press', '#DCAD3D', 'กด · 9.30:1')}
-        ${sw('--free', '#4FD6A6', 'ฟรี/สำเร็จ · 10.60:1')}
+        ${sw('--free', '#4FD6A6', 'ทำแล้ว/สำเร็จ · 10.60:1')}
         ${sw('--hot', '#FF6F91', 'ใหม่/มาแรง · 7.31:1')}
         ${sw('--danger', '#FF7A6B', 'ผิดพลาด · 7.60:1')}
         ${sw('--border-i', '#726E7D', 'ขอบ UI · 3.91 / 3.65 / 3.47 / 3.20 ✅ 1.4.11')}
@@ -67,7 +73,7 @@ export function buildStyleguide() {
            ['h2 section', '20px', 1.35, 'var(--display)', 'ตอนใหม่ล่าสุด', 20],
            ['เนื้อหา (ฐาน)', '17px', 1.6, 'var(--body)', 'เลขาคนใหม่ทำกาแฟหกใส่ประธาน 3 วันติด แต่เขาไม่ไล่เธอออก', 17],
            ['เนื้อหารอง', '15px', 1.55, 'var(--body)', 'ละครแนวตั้ง · 60 ตอน · จบแล้ว · 12.4M วิว', 15],
-           ['ป้าย/เมตา (เล็กสุด)', '13px', 1.5, 'var(--body)', 'ตอน 1–10 ดูฟรี · ตอน 11 ขึ้นไปสำหรับสมาชิก', 13]]
+           ['ป้าย/เมตา (เล็กสุด)', '13px', 1.5, 'var(--body)', 'ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก', 13]]
           .map(([role, size, lh, fam, sample, px]) => `<div class="kv" style="align-items:flex-start;gap:var(--s5)">
             <span class="k" style="flex:none;width:150px"><b style="display:block;color:var(--fg-2)">${role}</b>
               <span class="num">${size} · lh ${lh}</span></span>
@@ -159,27 +165,31 @@ export function buildStyleguide() {
           <p class="note-ex" style="margin-top:var(--s3)">${ic('check', 'sm')}
             <span>ขอบ chip ใช้ <code>--border-i</code> 3.47:1 บน surface-2 — เดิม <code>--border</code> อยู่ที่ 1.65:1 ซึ่งตก 1.4.11</span></p></div>
         <div class="panel"><h3>ช่องกรอก</h3>
-          <label class="field"><span>ปกติ</span><input value="081 234 5678"></label>
-          <label class="field"><span>โฟกัส</span><input class="is-focus" value="081 234 5678"></label>
-          <label class="field bad"><span>ผิดพลาด</span><input value="08123" aria-invalid="true">
-            <span class="err">${ic('alert', 'sm')} เบอร์มือถือไม่ถูกต้อง ต้องมี 10 หลัก</span></label>
-          <label class="field"><span>ช่อง OTP 6 หลัก</span>
-            <span class="otp"><i class="on">4</i><i class="on">8</i><i class="on">1</i><i class="caret"></i><i></i><i></i></span></label></div>
+          <label class="field"><span>ปกติ</span><input value="kan@example.com"></label>
+          <label class="field"><span>โฟกัส</span><input class="is-focus" value="kan@example.com"></label>
+          <label class="field bad"><span>ผิดพลาด</span><input value="kan@" aria-invalid="true">
+            <span class="err">${ic('alert', 'sm')} รูปแบบอีเมลไม่ถูกต้อง</span></label>
+          <div class="search-box"><span class="ic">${ic('search')}</span>
+            <input placeholder="ค้นหาชื่อเรื่อง ตัวละคร หรือแนว" aria-label="ตัวอย่างช่องค้นหา"></div>
+          <p class="note-ex" style="margin-top:var(--s3)">${ic('info', 'sm')}
+            <span>rev.2 เหลือฟอร์มแค่ <b>2 จุดในเว็บ</b> — ช่องค้นหา (A3) และฟอร์มติดต่อ (G2) ·
+            ช่องกรอก 6 กล่องของการยืนยันรหัส และช่องเบอร์มือถือถูกลบไปพร้อมระบบบัญชี (UX 6.21)</span></p></div>
       </div></section>
 
-    <section class="sg-sec"><h2>9. ช่องตอน (6.9) — 4 สถานะ + โฟกัส</h2>
+    <section class="sg-sec"><h2>9. ช่องตอน (6.9) — 3 สถานะ + โฟกัส</h2>
       <div class="panel">
         <div style="display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center">
           <a class="ep" style="width:64px" href="#"><span class="num">12</span></a>
           <a class="ep done" style="width:64px" href="#"><span class="num">9</span></a>
           <a class="ep cur" style="width:64px" href="#"><span class="num">12</span></a>
-          <a class="ep lock" style="width:64px" href="#"><span class="num">14</span><span class="lk">${ic('lock')}</span></a>
           <a class="ep is-focus" style="width:64px" href="#"><span class="num">15</span></a>
-          <span class="note-ex" style="align-self:center">ยังไม่ดู · ดูแล้ว · กำลังดู · ล็อก · โฟกัส</span></div>
+          <span class="note-ex" style="align-self:center">ยังไม่ดู · ดูแล้ว · กำลังดู · โฟกัส</span></div>
         ${legend}
-        <p class="note-ex" style="margin-top:var(--s3)">${ic('alert', 'sm')}
-          <span>ของเดิมใช้จุด 6px บอกสถานะล็อก — เล็กเกินกว่าจะสื่อความ เปลี่ยนเป็นไอคอนกุญแจ + ขอบประ และทุกช่องมี
-          <code>aria-label</code> เต็ม เช่น “ตอนที่ 14 ประตูที่ห้ามเปิด · ล็อก ต้องปลดล็อก”</span></p>
+        <p class="note-ex" style="margin-top:var(--s3)">${ic('info', 'sm')}
+          <span>rev.1 มีสถานะที่ 4 คือ "ล็อก" (ขอบประ + ไอคอนกุญแจ) — <b>ถูกลบตามคำสั่ง §1.0</b>
+          ทุกช่องกดได้ ไม่มีช่อง <code>disabled</code> · legend เหลือ 2 รายการ เพราะช่องที่ไม่ติดสีคือ
+          "ยังไม่ได้ดู" ซึ่งเป็นค่าเริ่มต้น ไม่ต้องอธิบาย · ทุกช่องมี <code>aria-label</code> เต็ม
+          เช่น “ตอนที่ 9 ประตูที่ห้ามเปิด · ดูแล้ว”</span></p>
         <div style="margin-top:var(--s4)">${epTabs(S['ceo-cold'], 0)}${epGrid(S['ceo-cold'], { current: 12, watchedTo: 11, from: 1, to: 20 })}</div>
       </div></section>
 
@@ -187,25 +197,83 @@ export function buildStyleguide() {
       <div class="grid" style="grid-template-columns:repeat(4,1fr);max-width:860px">
         ${card(S['durian-revenge'], { badges: ['<span class="tag tag-ai">AI</span>', '<span class="tag tag-new">ใหม่</span>'] })}
         ${card(S['ceo-cold'], { badges: ['<span class="tag tag-ai">AI</span>', '<span class="tag tag-done">จบแล้ว</span>'] })}
-        ${card(S['villainess-reborn'], { badges: ['<span class="tag tag-free">ดูฟรี 10 ตอน</span>'], lock: true })}
+        ${card(S['villainess-reborn'], { badges: ['<span class="tag tag-ai">AI</span>', '<span class="tag tag-new">มาแรง</span>'] })}
         <a class="card is-hover" href="#">${poster(S['billion-widow'], { badges: ['<span class="tag tag-new">มาแรง</span>'] })}
           <div class="t">${esc(S['billion-widow'].title)}</div><div class="m">แก้แค้น · 50 ตอน</div>
           <div class="hook">${esc(S['billion-widow'].hook)}</div></a>
       </div>
       <p class="note-ex" style="margin-top:var(--s3)">${ic('info', 'sm')}
         <span>ใบขวาสุดคือสถานะ hover — ยกขึ้น 4px เผย hook 1–2 บรรทัด และขอบทอง · บนมือถือไม่มี hover
-        จึงห้ามซ่อนข้อมูลสำคัญไว้ใน hover (UX 6.7)</span></p></section>
+        จึงห้ามซ่อนข้อมูลสำคัญไว้ใน hover (UX 6.7) · <b>ป้าย 🔒 สมาชิก ถูกลบตามคำสั่ง §1.0</b>
+        และไม่เอาป้าย "ดูฟรี" มาแทนทุกใบ — ทุกใบฟรี ป้ายที่ติดทุกใบคือ noise
+        ป้ายนี้ใช้เฉพาะ hero หน้าแรกและบล็อกโปรโมตฟีด (UX 6.1)</span></p></section>
 
-    <section class="sg-sec"><h2>11. แถบสิทธิ์ · แถบ mock (6.15)</h2>
+    <section class="sg-sec"><h2>11. แถบจุดยืน · หมายเหตุข้อมูลตัวอย่าง (6.15)</h2>
       <div style="display:grid;gap:var(--s3);max-width:720px">
-        <div class="perm"><span class="ic">${ic('unlock', 'sm')}</span>
-          <span><b>ตอน 1–${FREE_EPS} ดูฟรี</b> · ตอน ${FREE_EPS + 1} ขึ้นไปสำหรับสมาชิก หรือปลดล็อกทีละตอน ${COIN_PER_EP} เหรียญ</span></div>
-        ${mockBar()}
-        <p class="note-ex">${ic('info', 'sm')}<span>ตัวเลขยอดวิว ราคา และยอดเหรียญทุกจุดในม็อกอัพเป็นตัวเลขตัวอย่าง</span></p></div>
-      <p class="note-ex" style="margin-top:var(--s4)">${ic('alert', 'sm')}
-        <span>แถบ mock เป็น<b>ข้อบังคับ</b>บนทุกหน้ากลุ่ม D (D1–D9) และบนชีต paywall B4</span></p></section>
+        ${freeAllBar}
+        ${localNote()}
+        <p class="note-ex">${ic('info', 'sm')}<span>ตัวเลขยอดวิวทุกจุดในม็อกอัพเป็นตัวเลขตัวอย่าง</span></p></div>
+      <p class="note-ex" style="margin-top:var(--s4)">${ic('info', 'sm')}
+        <span><b>rev.1 มีแถบ mock "ยังไม่มีการตัดเงินจริง" บังคับทุกหน้ากลุ่ม D และบนชีต paywall B4 — ถูกลบทั้งหมด</b>
+        เพราะไม่มีระบบเงินให้ต้องปฏิเสธอีกแล้ว (UX 6.15) · เหลือ 2 แบบ:
+        บรรทัดฟุตเตอร์ <code>ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง (mockup)</code> ทุกหน้า
+        และหมายเหตุ <code>ตัวเลขตัวอย่าง</code> เฉพาะจุดที่โชว์ยอดวิว · แถบเทาคือ
+        <b>บรรทัดข้อมูลถาวร</b> ที่มาแทนแถบ [เข้าสู่ระบบเพื่อซิงก์] ของ rev.1 — ไม่มีปุ่ม ไม่มีลิงก์ ไม่ใช่การขาย</span></p></section>
 
-    <section class="sg-sec"><h2>12. โฟกัสริงบนพื้นสว่าง</h2>
+    <section class="sg-sec"><h2>12. การ์ดตอนถัดไป (6.26) · การ์ดจบเรื่อง (6.25) — ของใหม่ใน rev.2</h2>
+      <p>สองคอมโพเนนต์นี้เกิดจากคำสั่ง §1.0 โดยตรง: ช่องที่ชีต paywall B4 เคยอยู่
+        ถูกแทนด้วยสองการ์ดนี้ ซึ่งทำหน้าที่ตรงข้ามกัน — <b>แทนที่จะหยุดคนดู มันพาไปตอนต่อไป</b>
+        ทั้งคู่เป็น state ซ้อนบนเพลเยอร์ B2 ไม่ใช่หน้าจอใหม่</p>
+      <div style="display:grid;gap:var(--s5);grid-template-columns:repeat(auto-fit,minmax(300px,1fr));max-width:900px">
+        <div>
+          <div class="note-ex" style="margin-bottom:10px">6.26 นับถอยหลัง 5 วินาที · มุมล่างขวา ไม่บล็อกจอ</div>
+          <div class="player" style="aspect-ratio:9/13;border-radius:var(--r-lg);overflow:hidden">
+            <img src="${cover(S['ceo-cold'])}" alt="">
+            <div class="vig"></div>
+            <section class="nextup" role="region" aria-live="polite" aria-label="ตอนถัดไป EP.13 เริ่มใน 3 วินาที">
+              <div class="nh">
+                <span class="ring" style="--p:40%" aria-hidden="true"><b class="num">3</b></span>
+                <span class="thumb"><img src="${cover(S['ceo-cold'])}" alt=""></span>
+                <span class="nt"><b class="num">ตอนถัดไป · EP.13</b><span>หลักฐานชิ้นที่สอง · 2:52 นาที</span></span></div>
+              <div class="na">
+                <button class="btn btn-accent">${ic('playf', 'sm')} เล่นเลย</button>
+                <button class="btn btn-ghost">ยกเลิก</button></div>
+            </section>
+          </div>
+          <p class="note-ex" style="margin-top:10px">${ic('alert', 'sm')}
+            <span><code>region</code> + <code>aria-live="polite"</code> <b>ไม่ใช่ dialog</b> — เพราะวิดีโอยังอยู่ข้างหลังและคนยังโต้ตอบกับมันได้ ·
+            <code>prefers-reduced-motion</code> หรือปิด autoplay ใน D1 → <b>ไม่นับถอยหลังเอง</b> ต้องกด [เล่นเลย]</span></p>
+        </div>
+        <div>
+          <div class="note-ex" style="margin-bottom:10px">6.25 จบเรื่อง · ปุ่มหลักพาไปเรื่องถัดไป ห้ามเป็นทางตาย</div>
+          <div class="player" style="aspect-ratio:9/13;border-radius:var(--r-lg);overflow:hidden">
+            <img src="${cover(S['ceo-cold'])}" alt="">
+            <div class="endcard" role="dialog" aria-modal="true" aria-label="ดูจบแล้ว">
+              <div class="in">
+                <div class="ec-top">
+                  <span class="seal" aria-hidden="true">${ic('checkc', 'lg')}</span>
+                  <h3>ดูจบแล้วทั้ง 60 ตอน</h3>
+                  <p>ประธานเย็นชากับเลขาตัวแสบ</p></div>
+                <button class="ec-next is-focus">
+                  <span class="thumb"><img src="${cover(S['durian-revenge'])}" alt=""></span>
+                  <span class="et"><span>ดูเรื่องถัดไป</span><b>ทุเรียนทวงแค้น</b></span>${ic('playf')}</button>
+                <div class="ec-sec">
+                  <button class="btn btn-ghost">${ic('heartf', 'sm')} ดูซ้ำ</button>
+                  <button class="btn btn-ghost">${ic('share', 'sm')} แชร์</button></div>
+                <div class="ec-hr"></div>
+                <div class="ec-rail"><h4>เรื่องที่คล้ายกัน</h4>
+                  <div class="rail-wrap"><div class="rail">${['billion-widow', 'heir-returns', 'undercover-tycoon', 'mirror-bride']
+                    .map(k => card(S[k])).join('')}</div></div></div>
+                <a class="ec-again" href="#">${ic('refresh', 'sm')} ดูตั้งแต่ EP.1 อีกครั้ง</a>
+              </div></div>
+          </div>
+          <p class="note-ex" style="margin-top:10px">${ic('alert', 'sm')}
+            <span><b>เป็น</b> <code>role="dialog" aria-modal="true"</code> ได้ เพราะเพลเยอร์จบแล้ว ไม่มีอะไรข้างหลังให้โต้ตอบ ·
+            focus ไปที่ปุ่มหลัก · Esc = กลับไปหน้ารายละเอียดเรื่อง · ต้องมีรางเรื่องคล้ายกันเสมอ ห้ามจบที่ปุ่มเดียว</span></p>
+        </div>
+      </div></section>
+
+    <section class="sg-sec"><h2>13. โฟกัสริงบนพื้นสว่าง</h2>
       <p>ปกบางใบสว่างมาก วงโฟกัสทองเดี่ยว ๆ จะจมหาย จึงใช้ <code>outline 2px</code> + <code>box-shadow 0 0 0 4px rgba(14,13,18,.65)</code> เป็นวงนอกสีเข้มเสมอ</p>
       <div style="display:flex;gap:var(--s4);flex-wrap:wrap">
         <a class="card is-focus" href="#" style="width:150px">${poster(S['mangosteen-heart'], { badges: [] })}

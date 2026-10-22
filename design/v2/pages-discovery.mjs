@@ -1,9 +1,9 @@
 /* หน้ากลุ่ม A (การค้นพบ) + B (เรื่องและการรับชม) + C (ไลบรารี) */
 import {
-  D, by, genreLabel, views, cover, ic, esc, TROPES, tropesOf, FREE_EPS, COIN_PER_EP, BALANCE,
+  D, by, genreLabel, views, cover, ic, esc, TROPES, tropesOf,
   header, bottomNav, footer, page, write, poster, card, rankCard, contCard, epRow, epGrid, epTabs,
-  legend, aiBadge, newBadge, hotBadge, doneBadge, mockBar, sampleNote, empty, errorBox,
-  skelCard, skelCont, skelRow, releaseDay,
+  legend, aiBadge, newBadge, hotBadge, doneBadge, freeBadge, sampleNote, empty, errorBox,
+  localNote, freeAllBar, skelCard, skelCont, skelRow, releaseDay,
 } from './lib.mjs';
 
 const S = Object.fromEntries(D.series.map(s => [s.slug, s]));
@@ -12,7 +12,7 @@ const TOP10 = ['ceo-cold', 'durian-revenge', 'billion-widow', 'villainess-reborn
 const CONT = [['villainess-reborn', 12, 27], ['durian-revenge', 5, 62], ['ayutthaya-love', 21, 53], ['mirror-bride', 3, 18]];
 
 /* ===================== A1 หน้าแรก ===================== */
-function homeSections({ guest = false, emptyCont = false } = {}) {
+function homeSections({ emptyCont = false } = {}) {
   const hero = S['durian-revenge'];
   const contRail = emptyCont
     ? `<div class="rail-wrap"><div class="rail wide"><a class="cont" href="#" style="grid-column:span 1">
@@ -26,20 +26,16 @@ function homeSections({ guest = false, emptyCont = false } = {}) {
         <div class="rail wide">${CONT.map(([k, e, p]) => contCard(S[k], e, p)).join('')}</div></div>`;
 
   return `
-  ${guest ? `<div class="sec" style="margin-top:var(--s4)"><div class="perm">${ic('info', 'sm')}
-      <span>ดูฟรีได้เลย 10 ตอนแรกของทุกเรื่อง — <b>เข้าสู่ระบบ</b>เมื่อต้องการปลดล็อกตอนต่อไปและซิงก์ข้ามเครื่อง</span>
-      <a class="btn btn-accent btn-md" href="#" style="flex:none;margin-left:auto">เข้าสู่ระบบ</a></div></div>` : ''}
-
   <section class="sec" aria-label="เรื่องเด่น" style="margin-top:var(--s4)">
     <div class="hero"><div class="bg"><img src="${cover(hero)}" alt=""></div>
       <div class="body">
         <span class="kick">${ic('sparkle', 'sm')} เรื่องเด่นประจำสัปดาห์</span>
         <h2>${esc(hero.title)}</h2>
-        <div class="facts"><span class="tag tag-ai">AI</span><b>${hero.eps} ตอน</b><span>·</span>
+        <div class="facts"><span class="tag tag-ai">AI</span>${freeBadge}<b>${hero.eps} ตอน</b><span>·</span>
           <span>${hero.genres.map(genreLabel).join(' · ')}</span><span>·</span><span>${hero.status}</span></div>
         <p class="hk">${esc(hero.hook)}</p>
         <div class="btn-row">
-          <a class="btn btn-accent" href="#">${ic('playf', 'sm')} ${guest ? 'เริ่มดู EP.1' : 'ดูต่อ EP.5'}</a>
+          <a class="btn btn-accent" href="#">${ic('playf', 'sm')} ดูต่อ EP.5</a>
           <button class="icon-btn" aria-label="ติดตาม">${ic('heart')}</button>
           <button class="icon-btn" aria-label="แชร์">${ic('share')}</button>
         </div>
@@ -47,8 +43,8 @@ function homeSections({ guest = false, emptyCont = false } = {}) {
     <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
   </section>
 
-  ${guest ? '' : `<section class="sec"><div class="sec-h"><h2>ดูต่อจากที่ค้างไว้</h2>
-    <a class="more" href="#">ทั้งหมด ${ic('right', 'sm')}</a></div>${contRail}</section>`}
+  <section class="sec"><div class="sec-h"><h2>ดูต่อจากที่ค้างไว้</h2>
+    <a class="more" href="#">ทั้งหมด ${ic('right', 'sm')}</a></div>${contRail}</section>
 
   <section class="sec" aria-label="ฟีดแนวตั้ง">
     <div class="bento">
@@ -59,7 +55,7 @@ function homeSections({ guest = false, emptyCont = false } = {}) {
           <span><img src="${cover(S['one-night-bangkok'])}" alt=""></span>
         </span>
         <h3>ฟีดแนวตั้ง</h3>
-        <p>ปัดขึ้นดูเรื่องถัดไป ไม่ต้องเลือกเอง — ทุกคลิปในฟีด<b class="free-c"> ดูฟรี</b></p>
+        <p>ปัดขึ้นดูเรื่องถัดไป ไม่ต้องเลือกเอง — ทุกคลิปในฟีด<b class="free-c"> ดูฟรี ไม่ต้องสมัคร</b></p>
         <span class="btn btn-accent" style="align-self:flex-start">${ic('feed', 'sm')} เริ่มเลื่อนดู</span>
       </a>
       <a class="btile" href="#">
@@ -87,8 +83,8 @@ function homeSections({ guest = false, emptyCont = false } = {}) {
     </div>
     <div class="list two" style="margin-top:var(--s4)">
       ${epRow(S['durian-revenge'], 24, { isNew: true })}
-      ${epRow(S['ayutthaya-love'], 19, { isNew: true, lock: true })}
-      ${epRow(S['villainess-reborn'], 13, { lock: true })}
+      ${epRow(S['ayutthaya-love'], 19, { isNew: true })}
+      ${epRow(S['villainess-reborn'], 13, {})}
       ${epRow(S['mangosteen-heart'], 9, {})}
       ${epRow(S['undercover-tycoon'], 7, { cur: true })}
       ${epRow(S['one-night-bangkok'], 4, { done: true })}
@@ -107,10 +103,10 @@ function homeSections({ guest = false, emptyCont = false } = {}) {
     </div>
   </section>
 
-  ${guest ? '' : `<section class="sec"><div class="sec-h"><h2>ติดตามไว้</h2>
+  <section class="sec"><div class="sec-h"><h2>ติดตามไว้</h2>
     <a class="more" href="#">ทั้งหมด ${ic('right', 'sm')}</a></div>
     <div class="rail-wrap"><div class="rail">${['ceo-cold', 'billion-widow', 'house-13', 'seedless-longan', 'heir-returns', 'mirror-bride']
-      .map(k => card(S[k], { hook: true })).join('')}</div></div></section>`}
+      .map(k => card(S[k], { hook: true })).join('')}</div></div></section>
 
   <section class="sec">
     <div class="btile" style="min-height:0;padding:var(--s6)">
@@ -123,16 +119,11 @@ function homeSections({ guest = false, emptyCont = false } = {}) {
 
 export function buildHome() {
   const intro = `<div class="intro"><h1>ละครสั้นแนวตั้ง ดูจบได้ในหนึ่งคืน</h1>
-    <p>12 เรื่องไทยที่สร้างด้วย AI ตอนละไม่เกิน 3 นาที เริ่มดูฟรี 10 ตอนแรกทุกเรื่อง</p></div>`;
+    <p>12 เรื่องไทยที่สร้างด้วย AI ตอนละไม่เกิน 3 นาที — <b class="free-c">ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก</b></p></div>`;
 
   write('home.html', page({
     title: 'หน้าแรก',
     body: `${header({ active: 'home' })}<main id="main" class="page"><div class="wrap">${intro}${homeSections()}</div>${footer()}</main>${bottomNav('home')}`,
-  }));
-
-  write('home-guest.html', page({
-    title: 'หน้าแรก (ยังไม่ล็อกอิน)',
-    body: `${header({ active: 'home', guest: true })}<main id="main" class="page"><div class="wrap">${intro}${homeSections({ guest: true })}</div>${footer()}</main>${bottomNav('home', { notif: false })}`,
   }));
 
   write('home-empty.html', page({
@@ -178,7 +169,7 @@ function feedScreen({ state = 'default' } = {}) {
           <p class="hk">${esc(s.hook)}</p>
           <div class="btn-row" style="margin-top:var(--s3)">
             <a class="btn btn-accent btn-md" href="#">ดูทั้งเรื่อง ${ic('right', 'sm')}</a>
-            <span class="tag tag-free" style="align-self:center">${ic('unlock', 'sm')} ตอนนี้ดูฟรี</span>
+            <span class="tag tag-free" style="align-self:center">${ic('playf', 'sm')} ดูฟรีทุกตอน</span>
           </div></div>
       </div>${sideBtns}</div>
       <div>
@@ -192,7 +183,7 @@ function feedScreen({ state = 'default' } = {}) {
       <div class="ring">${ic('up', 'lg')}</div>
       <h3 style="font-size:var(--t-h1);font-weight:600">ปัดขึ้นเพื่อดูเรื่องถัดไป</h3>
       <p style="color:var(--fg-2);margin-top:8px;font-size:var(--t-sub);line-height:1.6">
-        ปัดลงเพื่อย้อนกลับ · แตะที่จอเพื่อหยุดชั่วคราว<br>ทุกคลิปในฟีดดูฟรี ไม่ต้องใช้เหรียญ</p>
+        ปัดลงเพื่อย้อนกลับ · แตะที่จอเพื่อหยุดชั่วคราว<br>ทุกคลิปในฟีดดูฟรี ไม่ต้องสมัครสมาชิก</p>
       <button class="btn btn-accent" style="margin-top:var(--s5)">เข้าใจแล้ว</button>
       <button class="btn btn-link" style="display:block;margin:4px auto 0">ไม่ต้องแสดงอีก</button>
     </div></div>`;
@@ -285,19 +276,17 @@ function searchPage({ state = 'default' } = {}) {
         <div style="display:flex;gap:7px;flex-wrap:wrap">
           <button class="chip btn-sm" aria-pressed="false" style="min-height:36px;padding:0 12px;font-size:var(--t-meta)">จบแล้ว</button>
           <button class="chip btn-sm" aria-pressed="false" style="min-height:36px;padding:0 12px;font-size:var(--t-meta)">ยังฉายอยู่</button></div></div>
-      <div style="margin-bottom:var(--s4)"><div style="font-size:var(--t-meta);color:var(--dim);margin-bottom:8px">ความยาว</div>
+      <div><div style="font-size:var(--t-meta);color:var(--dim);margin-bottom:8px">ความยาว</div>
         <div style="display:flex;gap:7px;flex-wrap:wrap">
           <button class="chip btn-sm" aria-pressed="false" style="min-height:36px;padding:0 12px;font-size:var(--t-meta)">ไม่เกิน 20 ตอน</button>
           <button class="chip btn-sm" aria-pressed="false" style="min-height:36px;padding:0 12px;font-size:var(--t-meta)">20–40 ตอน</button>
           <button class="chip btn-sm" aria-pressed="false" style="min-height:36px;padding:0 12px;font-size:var(--t-meta)">40 ตอนขึ้นไป</button></div></div>
-      <div><div style="font-size:var(--t-meta);color:var(--dim);margin-bottom:8px">สิทธิ์การดู</div>
-        <button class="chip btn-sm" aria-pressed="false" style="min-height:36px;padding:0 12px;font-size:var(--t-meta)">ดูฟรีได้ทั้งเรื่อง</button></div>
     </div></div>`;
 
   const head = `<div style="position:sticky;top:58px;z-index:10;background:var(--bg);padding:var(--s4) 0 var(--s3)">
       <div class="search-box"><span class="ic">${ic('search')}</span>
-        <input value="${state === 'guest' || state === 'idle' ? '' : 'แก้แค้น'}" placeholder="ค้นหาชื่อเรื่อง ตัวละคร หรือแนว" aria-label="ค้นหา">
-        ${state === 'guest' || state === 'idle' ? '' : `<button class="icon-btn" style="width:32px;height:32px;background:var(--surface-3)" aria-label="ล้าง">${ic('x', 'sm')}</button>`}
+        <input value="${state === 'idle' ? '' : 'แก้แค้น'}" placeholder="ค้นหาชื่อเรื่อง ตัวละคร หรือแนว" aria-label="ค้นหา">
+        ${state === 'idle' ? '' : `<button class="icon-btn" style="width:32px;height:32px;background:var(--surface-3)" aria-label="ล้าง">${ic('x', 'sm')}</button>`}
       </div>
       <div class="chips" style="margin-top:var(--s3)">
         <button class="chip" aria-pressed="false">${ic('filter', 'sm')} ตัวกรอง <span class="n num">1</span></button>
@@ -310,12 +299,13 @@ function searchPage({ state = 'default' } = {}) {
       'ลองคำอื่น หรือเลือกจากคำค้นยอดนิยมด้านล่าง — คลังของเรามี 12 เรื่อง', 'ดูทุกเรื่องในคลัง') +
       `<div class="sec"><div class="sec-h"><h2>คำค้นยอดนิยม</h2></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">${popular.map(p => `<a class="chip" href="#">${p}</a>`).join('')}</div></div>`;
-  } else if (state === 'guest' || state === 'idle') {
-    main = `${state === 'guest' ? `<div class="sec" style="margin-top:var(--s2)"><p class="note-ex">${ic('info', 'sm')}
-        <span>ยังไม่มีประวัติการค้นหาในเครื่องนี้ — ประวัติจะถูกเก็บไว้ในเครื่องเท่านั้น</span></p></div>` : `
+  } else if (state === 'idle') {
+    main = `
       <section class="sec"><div class="sec-h"><h2>ค้นหาล่าสุด</h2><button class="more">ล้างทั้งหมด</button></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">${recent.map(p =>
-          `<a class="chip" href="#">${ic('clock', 'sm')} ${p}</a>`).join('')}</div></section>`}
+          `<a class="chip" href="#">${ic('clock', 'sm')} ${p}</a>`).join('')}</div>
+        <p class="note-ex" style="margin-top:var(--s3)">${ic('info', 'sm')}
+          <span>ประวัติการค้นหาเก็บในเครื่องนี้เท่านั้น</span></p></section>
       <section class="sec"><div class="sec-h"><h2>คำค้นยอดนิยม</h2></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">${popular.map(p => `<a class="chip" href="#">${p}</a>`).join('')}</div></section>
       <section class="sec"><div class="sec-h"><h2>กำลังมาแรง</h2></div>
@@ -334,13 +324,12 @@ function searchPage({ state = 'default' } = {}) {
 }
 
 export function buildSearch() {
-  const mk = (f, t, state, guest = false) => write(f, page({
-    title: t, body: `${header({ active: 'search', guest })}${searchPage({ state })}${bottomNav('search', { notif: !guest })}`,
+  const mk = (f, t, state) => write(f, page({
+    title: t, body: `${header({ active: 'search' })}${searchPage({ state })}${bottomNav('search')}`,
   }));
   mk('search.html', 'ค้นหา — มีผลลัพธ์', 'default');
   mk('search-idle.html', 'ค้นหา — ยังไม่พิมพ์', 'idle');
   mk('search-empty.html', 'ค้นหา — ไม่พบผลลัพธ์', 'empty');
-  mk('search-guest.html', 'ค้นหา — ยังไม่ล็อกอิน (ไม่มีประวัติ)', 'guest', true);
 }
 
 /* ===================== A4/A5 แนว + trope ===================== */
@@ -458,9 +447,9 @@ export function buildNew() {
     ${isEmpty
       ? empty('calendar', 'ยังไม่มีตอนใหม่ในช่วงนี้', 'ลองเลือกแนวอื่น หรือดูตารางออกตอนว่าเรื่องที่ติดตามจะมาวันไหน', 'ดูตารางออกตอน')
       : `<div class="day-h">วันนี้ · 23 ต.ค.</div>
-         <div class="list two">${today.map(([k, n], i) => epRow(S[k], n, { isNew: true, lock: i === 2 })).join('')}</div>
+         <div class="list two">${today.map(([k, n]) => epRow(S[k], n, { isNew: true })).join('')}</div>
          <div class="day-h">เมื่อวาน · 22 ต.ค.</div>
-         <div class="list two">${yday.map(([k, n], i) => epRow(S[k], n, { lock: i === 1 })).join('')}</div>`}
+         <div class="list two">${yday.map(([k, n]) => epRow(S[k], n, {})).join('')}</div>`}
   </div>${footer()}</main>`;
   write('new.html', page({ title: 'ตอนใหม่ล่าสุด', body: `${header({ active: 'new' })}${body(false)}${bottomNav('')}` }));
   write('new-empty.html', page({ title: 'ตอนใหม่ — ไม่มีตอนใหม่', body: `${header({ active: 'new' })}${body(true)}${bottomNav('')}` }));
@@ -470,14 +459,16 @@ export function buildNew() {
 export function buildSchedule() {
   const days = ['จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส', 'อา'];
   const daily = D.series.filter(s => releaseDay(s) === 'ทุกวัน');
-  write('schedule.html', page({
-    title: 'ตารางออกตอน',
-    body: `${header({ active: 'browse' })}<main id="main" class="page"><div class="wrap">
-      <div class="page-head"><h1>ตารางออกตอน</h1><p>เรื่องไหนปล่อยตอนใหม่วันไหน — วันนี้คือวันพฤหัสบดี</p></div>
+  const body = (isEmpty) => `<main id="main" class="page"><div class="wrap">
+      <div class="page-head"><h1>ตารางออกตอน</h1><p>เรื่องไหนปล่อยตอนใหม่วันไหน — วันนี้คือวัน${isEmpty ? 'จันทร์' : 'พฤหัสบดี'}</p></div>
       <div class="daybar" role="tablist" aria-label="เลือกวัน">${days.map((d, i) =>
-        `<button role="tab" aria-selected="${i === 3}" class="${i === 3 ? 'on' : ''}"><b>${d}</b><span class="num">${20 + i}</span></button>`).join('')}</div>
-      <section class="sec"><div class="sec-h"><h2>พฤหัสบดี 23 ต.ค.</h2></div>
-        <div class="list two">${[['ayutthaya-love', 19], ['one-night-bangkok', 4]].map(([k, n]) => epRow(S[k], n, { isNew: true })).join('')}</div></section>
+        `<button role="tab" aria-selected="${i === (isEmpty ? 0 : 3)}" class="${i === (isEmpty ? 0 : 3) ? 'on' : ''}"><b>${d}</b><span class="num">${20 + i}</span></button>`).join('')}</div>
+      ${isEmpty
+        ? `<section class="sec" style="margin-top:var(--s4)">${
+            empty('calendar', 'วันจันทร์ไม่มีเรื่องปล่อยตอนใหม่', 'เรื่องรายสัปดาห์ของเราปล่อยวันอังคาร ศุกร์ และเสาร์ — ส่วนเรื่องที่ออกทุกวันมีตอนใหม่ให้ดูอยู่แล้ว', 'ดูเรื่องที่ออกทุกวัน')
+          }</section>`
+        : `<section class="sec"><div class="sec-h"><h2>พฤหัสบดี 23 ต.ค.</h2></div>
+            <div class="list two">${[['ayutthaya-love', 19], ['one-night-bangkok', 4]].map(([k, n]) => epRow(S[k], n, { isNew: true })).join('')}</div></section>`}
       <section class="sec"><div class="sec-h"><h2>ออกทุกวัน</h2></div>
         <p class="sec-sub">${daily.length} เรื่องที่ปล่อยตอนใหม่ทุกวัน</p>
         <div class="grid">${daily.map(s => card(s)).join('')}</div></section>
@@ -486,8 +477,9 @@ export function buildSchedule() {
           `<a href="#"><span class="th" style="width:40px;aspect-ratio:2/3;border-radius:6px;overflow:hidden;flex:none">
             <img src="${cover(s)}" alt="" style="width:100%;height:100%;object-fit:cover"></span>
             <span class="t">${esc(s.title)}</span><span class="m">ทุกวัน${releaseDay(s)}</span>${ic('right', 'sm')}</a>`).join('')}</div></section>
-    </div>${footer()}</main>${bottomNav('')}`,
-  }));
+    </div>${footer()}</main>`;
+  write('schedule.html', page({ title: 'ตารางออกตอน', body: `${header({ active: 'browse' })}${body(false)}${bottomNav('')}` }));
+  write('schedule-empty.html', page({ title: 'ตารางออกตอน — วันนี้ไม่มีตอนใหม่', body: `${header({ active: 'browse' })}${body(true)}${bottomNav('')}` }));
 }
 
 /* ===================== A10 ดัชนี ก–ฮ / A–Z ===================== */
@@ -510,7 +502,7 @@ export function buildAZ() {
 }
 
 /* ===================== B1 รายละเอียดเรื่อง ===================== */
-function seriesPage(s, { guest = false, loading = false, current = 12, watchedTo = 11 } = {}) {
+function seriesPage(s, { loading = false, current = 12, watchedTo = 11 } = {}) {
   const tr = tropesOf(s.slug);
   if (loading) {
     return `<main id="main" class="page"><div class="wrap">
@@ -535,12 +527,11 @@ function seriesPage(s, { guest = false, loading = false, current = 12, watchedTo
           <span>${s.genres.map(genreLabel).join(' · ')}</span><span>·</span><span class="num">${s.eps} ตอน</span><span>·</span>
           <span>${s.status}</span><span>·</span><span class="num">${views(s)} วิว</span></div>
         <div class="btn-row" style="margin-top:var(--s4)">
-          <a class="btn btn-accent" href="#" style="flex:1 1 auto;min-width:200px;max-width:320px">${ic('playf', 'sm')} ${guest ? 'เริ่มดู EP.1' : `ดูต่อ EP.${current}`}</a>
-          <button class="btn btn-ghost" aria-pressed="${guest ? 'false' : 'true'}">${ic(guest ? 'heart' : 'heartf', 'sm')} ${guest ? 'ติดตาม' : 'ติดตามแล้ว'}</button>
+          <a class="btn btn-accent" href="#" style="flex:1 1 auto;min-width:200px;max-width:320px">${ic('playf', 'sm')} ดูต่อ EP.${current}</a>
+          <button class="btn btn-ghost" aria-pressed="true">${ic('heartf', 'sm')} ติดตามแล้ว</button>
           <button class="icon-btn" aria-label="แชร์" style="margin:0">${ic('share')}</button>
         </div>
-        <div class="perm" style="margin-top:var(--s4)"><span class="ic">${ic('unlock', 'sm')}</span>
-          <span><b>ตอน 1–${FREE_EPS} ดูฟรี</b> · ตอน ${FREE_EPS + 1} ขึ้นไปสำหรับสมาชิก หรือปลดล็อกทีละตอน ${COIN_PER_EP} เหรียญ</span></div>
+        <div style="margin-top:var(--s4)">${freeAllBar}</div>
         <p style="margin-top:var(--s5);font-size:var(--t-body);font-weight:500;color:var(--fg);line-height:1.5">${esc(s.hook)}</p>
         <p style="margin-top:var(--s3);color:var(--fg-2);font-size:var(--t-long);line-height:var(--lh-long);max-width:62ch">
           ${esc(s.hook)} เรื่องราวดำเนินไปใน ${s.eps} ตอนสั้น ตอนละไม่เกิน 3 นาที
@@ -575,19 +566,18 @@ export function buildSeries() {
     title: `${s.title} — รายละเอียดเรื่อง`,
     body: `${header({})}${seriesPage(s)}${bottomNav('')}`,
   }));
-  write('series-guest.html', page({
-    title: `${s.title} — ยังไม่ล็อกอิน`,
-    body: `${header({ guest: true })}${seriesPage(s, { guest: true, current: 1, watchedTo: 0 })}${bottomNav('', { notif: false })}`,
-  }));
   write('series-loading.html', page({
     title: `รายละเอียดเรื่อง — กำลังโหลด`,
     body: `${header({})}${seriesPage(s, { loading: true })}${bottomNav('')}`,
   }));
 }
 
-/* ===================== B2 หน้ารับชม + B3 ชีตตอน + B4 paywall ===================== */
-function watchPlayer(s, ep, { state = 'playing', blur = false } = {}) {
+/* ===================== B2 หน้ารับชม + B3 ชีตตอน
+   + ‹การ์ดตอนถัดไป› (UX §6.26) + ‹การ์ดจบเรื่อง› (UX §6.25)
+   สอง overlay ท้ายนี้มารับช่วงต่อจาก B4 Paywall ที่ถูกลบตามคำสั่ง §1.0 ===================== */
+function watchPlayer(s, ep, { state = 'playing', blur = false, overlay = '' } = {}) {
   const e = s.episodes[ep - 1];
+  const pct = state === 'ended' ? 100 : 42;
   return `<div class="player">
     <img src="${cover(s)}" alt="" ${blur ? 'style="filter:blur(18px) brightness(.55)"' : ''}>
     <div class="vig"></div>
@@ -605,11 +595,10 @@ function watchPlayer(s, ep, { state = 'playing', blur = false } = {}) {
         <p style="color:var(--muted);font-size:var(--t-sub);margin-top:4px">การเชื่อมต่อขัดข้อง</p>
         <button class="btn btn-accent btn-md" style="margin-top:var(--s4)">${ic('refresh', 'sm')} ลองใหม่</button></div></div>` : ''}
     ${state === 'idle' ? `<div class="bigplay"><i>${ic('playf', 'lg')}</i></div>` : ''}
+    ${overlay}
     <div class="pstack">
       <div class="pfoot"><div class="ptext">
         ${state === 'playing' ? `<p class="sub-t">${esc(D.subs[2])}</p>` : ''}
-        ${state === 'preview' ? `<p class="sub-t" style="color:var(--accent);font-weight:600">
-          ${ic('lock', 'sm')} พรีวิวฟรีครบ 30 วินาทีแล้ว</p>` : ''}
       </div>
       <div class="side">
         <button class="b on" aria-label="เปิดเสียง (ตอนนี้ปิดเสียงอยู่)">${ic('mute')}</button><span class="lb">ปิดเสียง</span>
@@ -619,10 +608,9 @@ function watchPlayer(s, ep, { state = 'playing', blur = false } = {}) {
         <button class="b" aria-label="เปิด/ปิดซับไตเติล">${ic('cc')}</button>
       </div></div>
       <div>
-        <div class="bar"><i style="width:${state === 'preview' ? 100 : 42}%"></i>
-          <span class="kn" style="left:calc(${state === 'preview' ? 100 : 42}% - 6px)"></span></div>
-        <div class="times"><span class="num">${state === 'preview' ? '0:30' : '1:12'}</span>
-          <span class="num">${state === 'preview' ? 'พรีวิวฟรี 30 วินาที' : e[1]}</span></div>
+        <div class="bar"><i style="width:${pct}%"></i>
+          <span class="kn" style="left:calc(${pct}% - 6px)"></span></div>
+        <div class="times"><span class="num">${state === 'ended' ? e[1] : '1:12'}</span><span class="num">${e[1]}</span></div>
       </div>
     </div>
   </div>`;
@@ -639,14 +627,13 @@ function watchBody(s, ep, playerHtml) {
           <h1 style="font-size:var(--t-h1-series);font-weight:600;margin-top:var(--s3);line-height:1.3">${esc(e[0])}</h1>
           <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:9px;color:var(--fg-3);font-size:var(--t-meta);align-items:center">
             <span class="num">EP.${ep} จาก ${s.eps}</span><span>·</span><span>${e[1]} นาที</span><span>·</span>
-            <span>${s.genres.map(genreLabel).join(' · ')}</span>${ep > FREE_EPS ? '<span class="tag tag-lock">ปลดล็อกแล้ว</span>' : '<span class="tag tag-free">ตอนฟรี</span>'}</div>
+            <span>${s.genres.map(genreLabel).join(' · ')}</span></div>
           <a class="ep-row" href="#" style="margin-top:var(--s4)">
             <span class="th"><img src="${cover(s)}" alt=""></span>
-            <span class="bd"><span class="h"><b class="num">ตอนถัดไป · EP.${ep + 1}</b>${ep + 1 > FREE_EPS ? `<span class="tag tag-lock">${ic('lock', 'sm')} สมาชิก</span>` : ''}</span>
+            <span class="bd"><span class="h"><b class="num">ตอนถัดไป · EP.${ep + 1}</b></span>
               <span class="st">${esc((s.episodes[ep] || [''])[0])}</span></span>
             <span class="r">${ic('playf', 'sm')}</span></a>
-          <div class="perm" style="margin-top:var(--s4)"><span class="ic">${ic('unlock', 'sm')}</span>
-            <span><b>ตอน 1–${FREE_EPS} ดูฟรี</b> · ตอน ${FREE_EPS + 1} ขึ้นไปใช้ ${COIN_PER_EP} เหรียญ หรือสมัคร VIP ดูไม่อั้น</span></div>
+          <div style="margin-top:var(--s4)">${freeAllBar}</div>
           <section class="sec"><div class="sec-h"><h2>เลือกตอน</h2>
             <span class="more num" style="color:var(--muted)">${s.eps} ตอน</span></div>
             ${epTabs(s, 0)}${epGrid(s, { current: ep, watchedTo: ep - 1 })}${legend}</section>
@@ -670,6 +657,20 @@ export function buildWatch() {
     body: `${header({ back: esc(s.title) })}${watchBody(s, 12, watchPlayer(s, 12, { state: 'error', blur: true }))}${bottomNav('')}`,
   }));
 
+  /* B2 state: ‹การ์ดตอนถัดไป› นับถอยหลัง 5 วินาที (UX §6.26) */
+  write('watch-next.html', page({
+    title: 'หน้ารับชม — การ์ดตอนถัดไป (นับถอยหลัง)',
+    body: `${header({ back: esc(s.title) })}${watchBody(s, 12,
+      watchPlayer(s, 12, { state: 'ended', overlay: nextUpCard(s, 12) }))}${bottomNav('')}`,
+  }));
+
+  /* B2 state: ‹การ์ดจบเรื่อง› (UX §6.25) — ดูจบตอนสุดท้ายของเรื่อง */
+  write('watch-end.html', page({
+    title: 'หน้ารับชม — การ์ดจบเรื่อง',
+    body: `${header({ back: esc(s.title) })}${watchBody(s, s.eps,
+      watchPlayer(s, s.eps, { state: 'ended', overlay: endOfSeriesCard(s, S['durian-revenge']) }))}${bottomNav('')}`,
+  }));
+
   /* B3 ชีตเลือกตอน */
   write('watch-episodes.html', page({
     title: 'ชีตเลือกตอนในเพลเยอร์',
@@ -687,7 +688,7 @@ export function buildWatch() {
   /* B5 แลนดิ้งแชร์ตอน */
   write('share-landing.html', page({
     title: 'แลนดิ้งแชร์ตอน (มาจากโซเชียล)',
-    body: `${header({ back: esc(s.title), guest: true })}
+    body: `${header({ back: esc(s.title) })}
       <main id="main" class="page" style="padding-top:0"><div class="wrap" style="padding-top:var(--s4)">
         <div class="watch-col"><div>${watchPlayer(s, 3)}</div>
         <div>
@@ -697,81 +698,63 @@ export function buildWatch() {
           <div class="btn-row" style="margin-top:var(--s4)">
             <a class="btn btn-accent" href="#" style="flex:1">ดูทั้งเรื่อง ${s.eps} ตอน</a>
             <a class="btn btn-ghost" href="#">ดูเรื่องอื่น</a></div>
-          <div class="perm" style="margin-top:var(--s4)"><span class="ic">${ic('unlock', 'sm')}</span>
-            <span><b>ตอน 1–${FREE_EPS} ดูฟรี</b> ไม่ต้องสมัครสมาชิก</span></div>
+          <div style="margin-top:var(--s4)">${freeAllBar}</div>
           <section class="sec"><div class="sec-h"><h2>เรื่องที่คนดูต่อจากตอนนี้</h2></div>
             <div class="rail-wrap"><div class="rail">${TOP10.slice(0, 6).map(x => card(x)).join('')}</div></div></section>
         </div></div></div>${footer()}</main>${bottomNav('')}`,
   }));
 }
 
-/* ===================== B4 Paywall ===================== */
-function paywall(state) {
-  const s = S['ceo-cold'];
-  const low = state === 'low';
-  const guest = state === 'guest';
-  const busy = state === 'busy';
-  const err = state === 'error';
-  const first = state === 'first';
+/* ===================== ‹การ์ดตอนถัดไป› UX §6.26 + ‹การ์ดจบเรื่อง› UX §6.25 =====================
+   สองคอมโพเนนต์ที่มารับช่วงต่อจาก B4 Paywall · เป็น state ของ B2 ไม่ใช่หน้าจอใหม่ */
 
-  const bal = guest
-    ? `<div class="bal">${ic('info', 'sm')} <span>เข้าสู่ระบบเพื่อดูยอดเหรียญของคุณ</span></div>`
-    : `<div class="bal${low ? ' low' : ''}">${ic('coin', 'sm')}
-        <span>คงเหลือ <b class="num">${low ? 45 : BALANCE.toLocaleString('en-US')}</b> เหรียญ${low ? ` · ขาดอีก ${COIN_PER_EP - 45 > 0 ? COIN_PER_EP - 45 : 0} เหรียญ` : ''}</span></div>`;
-
-  const door1 = guest
-    ? `<button class="door primary"><span class="dt"><b>เข้าสู่ระบบเพื่อปลดล็อก</b>
-        <span>ใช้เบอร์มือถือ ไม่ต้องตั้งรหัสผ่าน</span></span><span class="price">${ic('right')}</span></button>`
-    : low
-      ? `<button class="door primary"><span class="dt"><b>เติมเหรียญแล้วปลดล็อก</b>
-          <span>เหรียญไม่พอ · แพ็กเล็กสุด 100 เหรียญ ฿9</span></span><span class="price num">฿9</span></button>`
-      : `<button class="door primary"${busy ? ' disabled' : ''}><span class="dt"><b>ปลดล็อกตอนนี้</b>
-          <span>${busy ? 'กำลังยืนยัน…' : `ใช้ ${COIN_PER_EP} เหรียญ · ดูได้ตลอด`}</span></span>
-          <span class="price num">${busy ? '<span class="spin" style="border-color:rgba(255,255,255,.25);border-top-color:var(--accent)"></span>' : COIN_PER_EP + ic('coin','sm')}</span></button>`;
-
-  return `<div class="scrim"></div>
-  <div class="sheet pw" role="dialog" aria-modal="true" aria-labelledby="pw-h">
-    <div class="grab"></div>
-    <div class="sh" style="padding-bottom:0"><span style="flex:1"></span><button class="close" aria-label="ปิด">${ic('x')}</button></div>
-    <div class="sb">
-      <div class="pwtop">
-        <div class="lockbig">${ic('lock', 'lg')}</div>
-        <h3 id="pw-h">${err ? 'ปลดล็อกไม่สำเร็จ' : `ตอนที่ 11 ต้องปลดล็อก`}</h3>
-        <p class="sub">${err
-          ? 'ระบบตัดเหรียญไม่สำเร็จ ยังไม่มีการหักเหรียญจากบัญชีของคุณ'
-          : `${esc(s.title)} · ${esc(s.episodes[10][0])}<br>คุณดูพรีวิวฟรีครบ 30 วินาทีแล้ว`}</p>
-        ${err ? '' : bal}
-      </div>
-      ${first ? `<div class="perm" style="margin-bottom:var(--s4)"><span class="ic">${ic('unlock', 'sm')}</span>
-        <span><b>ตอน 1–10 ของทุกเรื่องดูฟรี</b> — ตอน 11 เป็นต้นไปใช้เหรียญหรือสมัคร VIP ครั้งเดียวดูได้ทุกเรื่อง</span></div>` : ''}
-      ${err ? `<div class="errorbox" style="margin-bottom:var(--s4);padding:var(--s5)">
-          <div class="ill">${ic('alert')}</div>
-          <p style="color:var(--muted);font-size:var(--t-sub)">ลองใหม่อีกครั้ง หรือเลือกสมัคร VIP แทน</p>
-          <button class="btn btn-accent btn-md">${ic('refresh', 'sm')} ลองใหม่</button></div>` : ''}
-      <div class="door-wrap">${door1}</div>
-      <div class="door-wrap"><span class="badge">คุ้มที่สุด</span>
-        <button class="door door-vip"><span class="dt"><b>สมัคร VIP ดูไม่อั้น</b>
-          <span>ทุกเรื่อง ทุกตอน ไม่ต้องนับเหรียญ</span></span><span class="price num">฿39<small style="font-size:13px;color:var(--muted)">/เดือน</small></span></button></div>
-      <div class="hr-t"></div>
-      <a class="third" href="#">${ic('gift', 'sm')} ดูโฆษณา 1 คลิป แลก 1 ตอน</a>
-      <div style="margin-top:var(--s2)">${mockBar()}</div>
-      ${sampleNote('ราคาและจำนวนเหรียญเป็นตัวเลขตัวอย่าง ยังไม่ผ่านการยืนยันจากฝ่ายราคา')}
+/* 6.26 — นับถอยหลัง 5 วินาที · region + aria-live ไม่ใช่ dialog · ไม่บล็อกจอ
+   เหลือ 3 วินาที = เดินไปแล้ว 40% ของวง */
+function nextUpCard(s, ep) {
+  const nx = s.episodes[ep] || ['ตอนถัดไป', '2:40'];
+  return `<section class="nextup" role="region" aria-live="polite"
+    aria-label="ตอนถัดไป EP.${ep + 1} เริ่มใน 3 วินาที">
+    <div class="nh">
+      <span class="ring" style="--p:40%" aria-hidden="true"><b class="num">3</b></span>
+      <span class="thumb"><img src="${cover(s)}" alt=""></span>
+      <span class="nt"><b class="num">ตอนถัดไป · EP.${ep + 1}</b><span>${esc(nx[0])} · ${nx[1]} นาที</span></span>
     </div>
-  </div>`;
+    <div class="na">
+      <button class="btn btn-accent">${ic('playf', 'sm')} เล่นเลย</button>
+      <button class="btn btn-ghost">ยกเลิก</button>
+    </div>
+  </section>`;
 }
 
-export function buildPaywall() {
-  const s = S['ceo-cold'];
-  const base = watchBody(s, 11, watchPlayer(s, 11, { state: 'preview', blur: true }));
-  const mk = (f, t, st) => write(f, page({
-    title: t, body: `${header({ back: esc(s.title), guest: st === 'guest' })}${base}${paywall(st)}${bottomNav('')}`,
-  }));
-  mk('paywall-coins-ok.html', 'Paywall — เหรียญพอ', 'ok');
-  mk('paywall-coins-low.html', 'Paywall — เหรียญไม่พอ', 'low');
-  mk('paywall-guest.html', 'Paywall — ยังไม่ล็อกอิน', 'guest');
-  mk('paywall-busy.html', 'Paywall — กำลังยืนยัน', 'busy');
-  mk('paywall-error.html', 'Paywall — ปลดล็อกไม่สำเร็จ', 'error');
-  mk('paywall-first.html', 'Paywall — แถบอธิบายครั้งแรก (E3)', 'first');
+/* 6.25 — dialog (เพลเยอร์จบแล้ว ไม่มีอะไรข้างหลังให้โต้ตอบ) · focus ที่ปุ่มหลัก
+   ห้ามเป็นทางตาย: ปุ่มหลัก + rail เรื่องคล้ายกัน + ลิงก์ดูซ้ำตั้งแต่ EP.1 */
+function endOfSeriesCard(s, nextSeries) {
+  const similar = D.series.filter(x => x.slug !== s.slug && x.slug !== nextSeries.slug
+    && x.genres.some(g => s.genres.includes(g))).slice(0, 6);
+  return `<div class="endcard" role="dialog" aria-modal="true" aria-labelledby="ec-h">
+    <div class="in">
+      <div class="ec-top">
+        <span class="seal" aria-hidden="true">${ic('checkc', 'lg')}</span>
+        <h3 id="ec-h">ดูจบแล้วทั้ง ${s.eps} ตอน</h3>
+        <p>${esc(s.title)} — จบแบบนี้แล้วไปเรื่องถัดไปที่คนดูเรื่องนี้ชอบกันต่อเลย</p>
+      </div>
+      <button class="ec-next is-focus" autofocus>
+        <span class="thumb"><img src="${cover(nextSeries)}" alt=""></span>
+        <span class="et"><span>ดูเรื่องถัดไป</span><b>${esc(nextSeries.title)}</b></span>
+        ${ic('playf')}
+      </button>
+      <div class="ec-sec">
+        <button class="btn btn-ghost">${ic('heartf', 'sm')} ดูซ้ำ</button>
+        <button class="btn btn-ghost">${ic('share', 'sm')} แชร์</button>
+      </div>
+      <div class="ec-hr"></div>
+      <div class="ec-rail">
+        <h4>เรื่องที่คล้ายกัน</h4>
+        <div class="rail-wrap"><div class="rail">${similar.map(x => card(x)).join('')}</div></div>
+      </div>
+      <a class="ec-again" href="#">${ic('refresh', 'sm')} ดูตั้งแต่ EP.1 อีกครั้ง</a>
+    </div>
+  </div>`;
 }
 
 /* ===================== B6 ตัวละคร ===================== */
@@ -797,7 +780,7 @@ export function buildCast() {
 }
 
 /* ===================== C1 คลังของฉัน ===================== */
-function libraryPage({ tab = 'continue', isEmpty = false, guest = false } = {}) {
+function libraryPage({ tab = 'continue', isEmpty = false, loading = false } = {}) {
   const tabs = [['continue', 'ดูต่อ'], ['following', 'ติดตาม'], ['done', 'ดูจบแล้ว'], ['history', 'ประวัติ']];
   const EMPTIES = {
     continue: ['playf', 'ยังไม่มีเรื่องที่ดูค้าง', 'เริ่มจากฟีดแนวตั้ง ปัดดูทีละเรื่องโดยไม่ต้องเลือกเอง', 'เริ่มเลื่อนดูฟีด'],
@@ -807,7 +790,10 @@ function libraryPage({ tab = 'continue', isEmpty = false, guest = false } = {}) 
   };
 
   let content;
-  if (isEmpty) {
+  if (loading) {
+    content = `<div class="lib-list">${[0, 0, 0].map(() => skelRow()).join('')}</div>
+      <div class="lib-grid">${[0, 0, 0, 0, 0].map(() => skelCard()).join('')}</div>`;
+  } else if (isEmpty) {
     const [i, h, p, b] = EMPTIES[tab];
     content = empty(i, h, p, b) + (tab === 'history'
       ? `<div style="display:grid;place-items:center"><button class="btn btn-ghost btn-md is-disabled">${ic('trash', 'sm')} ล้างประวัติ</button></div>` : '');
@@ -850,23 +836,20 @@ function libraryPage({ tab = 'continue', isEmpty = false, guest = false } = {}) 
     <div class="page-head"><h1>คลังของฉัน</h1></div>
     <div class="tabs" role="tablist" aria-label="แท็บคลังของฉัน">${tabs.map(([k, l]) =>
       `<button role="tab" aria-selected="${k === tab}">${l}</button>`).join('')}</div>
-    ${guest ? `<div class="perm" style="margin-top:var(--s4);background:var(--accent-soft);border-color:var(--accent-line)">
-      <span class="ic" style="color:var(--accent)">${ic('info', 'sm')}</span>
-      <span>ข้อมูลนี้เก็บไว้<b style="color:var(--accent)">ในเครื่องนี้เท่านั้น</b> — เข้าสู่ระบบเพื่อซิงก์ข้ามเครื่อง</span>
-      <a class="btn btn-accent btn-md" href="#" style="flex:none;margin-left:auto">เข้าสู่ระบบ</a></div>` : ''}
+    ${isEmpty ? '' : `<div style="margin-top:var(--s4)">${localNote()}</div>`}
     <div style="margin-top:var(--s5)">${content}</div>
   </div>${footer()}</main>`;
 }
 
 export function buildLibrary() {
   const mk = (f, t, o) => write(f, page({
-    title: t, body: `${header({ active: 'library', guest: !!o.guest })}${libraryPage(o)}${bottomNav('library', { notif: !o.guest })}`,
+    title: t, body: `${header({ active: 'library' })}${libraryPage(o)}${bottomNav('library')}`,
   }));
   mk('library.html', 'คลังของฉัน — ดูต่อ', { tab: 'continue' });
   mk('library-following.html', 'คลังของฉัน — ติดตาม', { tab: 'following' });
   mk('library-done.html', 'คลังของฉัน — ดูจบแล้ว', { tab: 'done' });
   mk('library-history.html', 'คลังของฉัน — ประวัติ', { tab: 'history' });
-  mk('library-guest.html', 'คลังของฉัน — ยังไม่ล็อกอิน', { tab: 'continue', guest: true });
+  mk('library-loading.html', 'คลังของฉัน — กำลังโหลด', { tab: 'continue', loading: true });
   mk('library-empty-continue.html', 'คลังของฉัน — ยังไม่มีเรื่องที่ดูค้าง', { tab: 'continue', isEmpty: true });
   mk('library-empty-following.html', 'คลังของฉัน — ยังไม่ติดตามเรื่องไหน', { tab: 'following', isEmpty: true });
   mk('library-empty-done.html', 'คลังของฉัน — ยังไม่มีเรื่องที่ดูจบ', { tab: 'done', isEmpty: true });

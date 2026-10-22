@@ -36,24 +36,6 @@
     "full": true
   },
   {
-    "file": "home-guest.html",
-    "out": "mobile-home-guest.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "home-guest.html",
-    "out": "desktop-home-guest.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
-    "full": false
-  },
-  {
     "file": "home-empty.html",
     "out": "mobile-home-empty.png",
     "w": 390,
@@ -162,15 +144,6 @@
     "full": false
   },
   {
-    "file": "search-guest.html",
-    "out": "mobile-search-guest.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
     "file": "genre.html",
     "out": "mobile-genre.png",
     "w": 390,
@@ -213,15 +186,6 @@
     "h": 844,
     "dpr": 2,
     "mobile": true,
-    "full": false
-  },
-  {
-    "file": "browse.html",
-    "out": "desktop-browse.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
     "full": false
   },
   {
@@ -288,6 +252,15 @@
     "full": false
   },
   {
+    "file": "schedule-empty.html",
+    "out": "mobile-schedule-empty.png",
+    "w": 390,
+    "h": 844,
+    "dpr": 2,
+    "mobile": true,
+    "full": false
+  },
+  {
     "file": "az.html",
     "out": "mobile-az.png",
     "w": 390,
@@ -333,15 +306,6 @@
     "full": true
   },
   {
-    "file": "series-guest.html",
-    "out": "mobile-series-guest.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
     "file": "series-loading.html",
     "out": "mobile-series-loading.png",
     "w": 390,
@@ -378,6 +342,33 @@
     "full": true
   },
   {
+    "file": "watch-next.html",
+    "out": "mobile-watch-next.png",
+    "w": 390,
+    "h": 844,
+    "dpr": 2,
+    "mobile": true,
+    "full": false
+  },
+  {
+    "file": "watch-end.html",
+    "out": "mobile-watch-end.png",
+    "w": 390,
+    "h": 844,
+    "dpr": 2,
+    "mobile": true,
+    "full": false
+  },
+  {
+    "file": "watch-end.html",
+    "out": "desktop-watch-end.png",
+    "w": 1440,
+    "h": 900,
+    "dpr": 1.5,
+    "mobile": false,
+    "full": false
+  },
+  {
     "file": "watch-loading.html",
     "out": "mobile-watch-loading.png",
     "w": 390,
@@ -405,93 +396,12 @@
     "full": false
   },
   {
-    "file": "watch-episodes.html",
-    "out": "desktop-watch-episodes.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
-    "full": false
-  },
-  {
-    "file": "paywall-coins-ok.html",
-    "out": "mobile-paywall-coins-ok.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "paywall-coins-ok.html",
-    "out": "desktop-paywall-coins-ok.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
-    "full": false
-  },
-  {
-    "file": "paywall-coins-low.html",
-    "out": "mobile-paywall-coins-low.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "paywall-guest.html",
-    "out": "mobile-paywall-guest.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "paywall-busy.html",
-    "out": "mobile-paywall-busy.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "paywall-error.html",
-    "out": "mobile-paywall-error.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "paywall-first.html",
-    "out": "mobile-paywall-first.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
     "file": "share-landing.html",
     "out": "mobile-share-landing.png",
     "w": 390,
     "h": 844,
     "dpr": 2,
     "mobile": true,
-    "full": false
-  },
-  {
-    "file": "share-landing.html",
-    "out": "desktop-share-landing.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
     "full": false
   },
   {
@@ -558,8 +468,8 @@
     "full": false
   },
   {
-    "file": "library-guest.html",
-    "out": "mobile-library-guest.png",
+    "file": "library-loading.html",
+    "out": "mobile-library-loading.png",
     "w": 390,
     "h": 844,
     "dpr": 2,
@@ -596,213 +506,6 @@
   {
     "file": "library-empty-history.html",
     "out": "mobile-library-empty-history.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "login.html",
-    "out": "mobile-login.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "login.html",
-    "out": "desktop-login.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
-    "full": false
-  },
-  {
-    "file": "login-error.html",
-    "out": "mobile-login-error.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "login-busy.html",
-    "out": "mobile-login-busy.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "otp.html",
-    "out": "mobile-otp.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "otp-error.html",
-    "out": "mobile-otp-error.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "otp-busy.html",
-    "out": "mobile-otp-busy.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "account.html",
-    "out": "mobile-account.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "account.html",
-    "out": "desktop-account.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
-    "full": false
-  },
-  {
-    "file": "account-guest.html",
-    "out": "mobile-account-guest.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "wallet.html",
-    "out": "mobile-wallet.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "wallet-empty.html",
-    "out": "mobile-wallet-empty.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "topup.html",
-    "out": "mobile-topup.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "topup.html",
-    "out": "desktop-topup.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
-    "full": false
-  },
-  {
-    "file": "vip.html",
-    "out": "mobile-vip.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "vip.html",
-    "out": "desktop-vip.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
-    "full": false
-  },
-  {
-    "file": "vip.html",
-    "out": "mobilefull-vip.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 1,
-    "mobile": true,
-    "full": true
-  },
-  {
-    "file": "checkout.html",
-    "out": "mobile-checkout.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "checkout-busy.html",
-    "out": "mobile-checkout-busy.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "result-success.html",
-    "out": "mobile-result-success.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "result-fail.html",
-    "out": "mobile-result-fail.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "earn.html",
-    "out": "mobile-earn.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "earn-empty.html",
-    "out": "mobile-earn-empty.png",
     "w": 390,
     "h": 844,
     "dpr": 2,
@@ -882,17 +585,17 @@
     "full": false
   },
   {
-    "file": "404.html",
-    "out": "desktop-404.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
+    "file": "offline.html",
+    "out": "mobile-offline.png",
+    "w": 390,
+    "h": 844,
+    "dpr": 2,
+    "mobile": true,
     "full": false
   },
   {
-    "file": "offline.html",
-    "out": "mobile-offline.png",
+    "file": "offline-retry.html",
+    "out": "mobile-offline-retry.png",
     "w": 390,
     "h": 844,
     "dpr": 2,
@@ -981,26 +684,8 @@
     "full": false
   },
   {
-    "file": "legal-terms.html",
-    "out": "desktop-legal-terms.png",
-    "w": 1440,
-    "h": 900,
-    "dpr": 1.5,
-    "mobile": false,
-    "full": false
-  },
-  {
     "file": "legal-privacy.html",
     "out": "mobile-legal-privacy.png",
-    "w": 390,
-    "h": 844,
-    "dpr": 2,
-    "mobile": true,
-    "full": false
-  },
-  {
-    "file": "legal-membership.html",
-    "out": "mobile-legal-membership.png",
     "w": 390,
     "h": 844,
     "dpr": 2,

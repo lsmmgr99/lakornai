@@ -15,17 +15,6 @@
   {
     "id": "A1",
     "name": "หน้าแรก",
-    "state": "ยังไม่ล็อกอิน",
-    "tier": "R1",
-    "file": "home-guest.html",
-    "shots": [
-      "mobile-home-guest.png",
-      "desktop-home-guest.png"
-    ]
-  },
-  {
-    "id": "A1",
-    "name": "หน้าแรก",
     "state": "ไม่มีเรื่องที่ดูค้าง (empty)",
     "tier": "R1",
     "file": "home-empty.html",
@@ -117,16 +106,6 @@
     ]
   },
   {
-    "id": "A3",
-    "name": "ค้นหา",
-    "state": "ยังไม่ล็อกอิน (ไม่มีประวัติ)",
-    "tier": "R1",
-    "file": "search-guest.html",
-    "shots": [
-      "mobile-search-guest.png"
-    ]
-  },
-  {
     "id": "A4",
     "name": "หน้าแนว",
     "state": "",
@@ -165,7 +144,6 @@
     "file": "browse.html",
     "shots": [
       "mobile-browse.png",
-      "desktop-browse.png",
       "mobilefull-browse.png"
     ]
   },
@@ -212,6 +190,16 @@
     ]
   },
   {
+    "id": "A9",
+    "name": "ตารางออกตอน",
+    "state": "วันนี้ไม่มีตอนใหม่ (empty)",
+    "tier": "R2",
+    "file": "schedule-empty.html",
+    "shots": [
+      "mobile-schedule-empty.png"
+    ]
+  },
+  {
     "id": "A10",
     "name": "ดัชนี ก–ฮ / A–Z",
     "state": "",
@@ -232,16 +220,6 @@
       "desktop-series.png",
       "mobilefull-series.png",
       "desktopfull-series.png"
-    ]
-  },
-  {
-    "id": "B1",
-    "name": "รายละเอียดเรื่อง",
-    "state": "ยังไม่ล็อกอิน",
-    "tier": "R1",
-    "file": "series-guest.html",
-    "shots": [
-      "mobile-series-guest.png"
     ]
   },
   {
@@ -269,6 +247,27 @@
   {
     "id": "B2",
     "name": "หน้ารับชม",
+    "state": "การ์ดตอนถัดไป · นับถอยหลัง 5 วินาที (§6.26)",
+    "tier": "R1",
+    "file": "watch-next.html",
+    "shots": [
+      "mobile-watch-next.png"
+    ]
+  },
+  {
+    "id": "B2",
+    "name": "หน้ารับชม",
+    "state": "การ์ดจบเรื่อง (§6.25)",
+    "tier": "R1",
+    "file": "watch-end.html",
+    "shots": [
+      "mobile-watch-end.png",
+      "desktop-watch-end.png"
+    ]
+  },
+  {
+    "id": "B2",
+    "name": "หน้ารับชม",
     "state": "กำลังโหลด",
     "tier": "R1",
     "file": "watch-loading.html",
@@ -289,73 +288,11 @@
   {
     "id": "B3",
     "name": "ชีตเลือกตอนในเพลเยอร์",
-    "state": "",
+    "state": "ทุกตอนกดได้ ไม่มีกุญแจ",
     "tier": "R3",
     "file": "watch-episodes.html",
     "shots": [
-      "mobile-watch-episodes.png",
-      "desktop-watch-episodes.png"
-    ]
-  },
-  {
-    "id": "B4",
-    "name": "Paywall",
-    "state": "a · เหรียญพอ",
-    "tier": "R1",
-    "file": "paywall-coins-ok.html",
-    "shots": [
-      "mobile-paywall-coins-ok.png",
-      "desktop-paywall-coins-ok.png"
-    ]
-  },
-  {
-    "id": "B4",
-    "name": "Paywall",
-    "state": "b · เหรียญไม่พอ",
-    "tier": "R1",
-    "file": "paywall-coins-low.html",
-    "shots": [
-      "mobile-paywall-coins-low.png"
-    ]
-  },
-  {
-    "id": "B4",
-    "name": "Paywall",
-    "state": "c · ยังไม่ล็อกอิน",
-    "tier": "R1",
-    "file": "paywall-guest.html",
-    "shots": [
-      "mobile-paywall-guest.png"
-    ]
-  },
-  {
-    "id": "B4",
-    "name": "Paywall",
-    "state": "กำลังยืนยัน (loading)",
-    "tier": "R1",
-    "file": "paywall-busy.html",
-    "shots": [
-      "mobile-paywall-busy.png"
-    ]
-  },
-  {
-    "id": "B4",
-    "name": "Paywall",
-    "state": "ปลดล็อกไม่สำเร็จ (error)",
-    "tier": "R1",
-    "file": "paywall-error.html",
-    "shots": [
-      "mobile-paywall-error.png"
-    ]
-  },
-  {
-    "id": "E3",
-    "name": "แถบอธิบาย paywall ครั้งแรก",
-    "state": "",
-    "tier": "R3",
-    "file": "paywall-first.html",
-    "shots": [
-      "mobile-paywall-first.png"
+      "mobile-watch-episodes.png"
     ]
   },
   {
@@ -365,8 +302,7 @@
     "tier": "R3",
     "file": "share-landing.html",
     "shots": [
-      "mobile-share-landing.png",
-      "desktop-share-landing.png"
+      "mobile-share-landing.png"
     ]
   },
   {
@@ -433,11 +369,11 @@
   {
     "id": "C1",
     "name": "คลังของฉัน",
-    "state": "ยังไม่ล็อกอิน",
+    "state": "กำลังโหลด (skeleton)",
     "tier": "R1",
-    "file": "library-guest.html",
+    "file": "library-loading.html",
     "shots": [
-      "mobile-library-guest.png"
+      "mobile-library-loading.png"
     ]
   },
   {
@@ -482,191 +418,6 @@
   },
   {
     "id": "D1",
-    "name": "เข้าสู่ระบบ / สมัคร",
-    "state": "",
-    "tier": "R1",
-    "file": "login.html",
-    "shots": [
-      "mobile-login.png",
-      "desktop-login.png"
-    ]
-  },
-  {
-    "id": "D1",
-    "name": "เข้าสู่ระบบ / สมัคร",
-    "state": "เบอร์ไม่ถูกต้อง (error)",
-    "tier": "R1",
-    "file": "login-error.html",
-    "shots": [
-      "mobile-login-error.png"
-    ]
-  },
-  {
-    "id": "D1",
-    "name": "เข้าสู่ระบบ / สมัคร",
-    "state": "กำลังส่ง OTP (loading)",
-    "tier": "R1",
-    "file": "login-busy.html",
-    "shots": [
-      "mobile-login-busy.png"
-    ]
-  },
-  {
-    "id": "D2",
-    "name": "ยืนยัน OTP",
-    "state": "",
-    "tier": "R2",
-    "file": "otp.html",
-    "shots": [
-      "mobile-otp.png"
-    ]
-  },
-  {
-    "id": "D2",
-    "name": "ยืนยัน OTP",
-    "state": "รหัสผิด (error)",
-    "tier": "R2",
-    "file": "otp-error.html",
-    "shots": [
-      "mobile-otp-error.png"
-    ]
-  },
-  {
-    "id": "D2",
-    "name": "ยืนยัน OTP",
-    "state": "กำลังตรวจสอบ (loading)",
-    "tier": "R2",
-    "file": "otp-busy.html",
-    "shots": [
-      "mobile-otp-busy.png"
-    ]
-  },
-  {
-    "id": "D3",
-    "name": "โปรไฟล์ / บัญชี",
-    "state": "สมาชิก VIP",
-    "tier": "R1",
-    "file": "account.html",
-    "shots": [
-      "mobile-account.png",
-      "desktop-account.png"
-    ]
-  },
-  {
-    "id": "D3",
-    "name": "โปรไฟล์ / บัญชี",
-    "state": "ยังไม่ล็อกอิน",
-    "tier": "R1",
-    "file": "account-guest.html",
-    "shots": [
-      "mobile-account-guest.png"
-    ]
-  },
-  {
-    "id": "D4",
-    "name": "กระเป๋าเหรียญ",
-    "state": "",
-    "tier": "R2",
-    "file": "wallet.html",
-    "shots": [
-      "mobile-wallet.png"
-    ]
-  },
-  {
-    "id": "D4",
-    "name": "กระเป๋าเหรียญ",
-    "state": "ยังไม่มีประวัติ (empty)",
-    "tier": "R2",
-    "file": "wallet-empty.html",
-    "shots": [
-      "mobile-wallet-empty.png"
-    ]
-  },
-  {
-    "id": "D5",
-    "name": "เติมเหรียญ",
-    "state": "",
-    "tier": "R1",
-    "file": "topup.html",
-    "shots": [
-      "mobile-topup.png",
-      "desktop-topup.png"
-    ]
-  },
-  {
-    "id": "D6",
-    "name": "แพ็กเกจสมาชิก VIP",
-    "state": "",
-    "tier": "R1",
-    "file": "vip.html",
-    "shots": [
-      "mobile-vip.png",
-      "desktop-vip.png",
-      "mobilefull-vip.png"
-    ]
-  },
-  {
-    "id": "D7",
-    "name": "ยืนยันการชำระ",
-    "state": "",
-    "tier": "R2",
-    "file": "checkout.html",
-    "shots": [
-      "mobile-checkout.png"
-    ]
-  },
-  {
-    "id": "D7",
-    "name": "ยืนยันการชำระ",
-    "state": "กำลังดำเนินการ (loading)",
-    "tier": "R2",
-    "file": "checkout-busy.html",
-    "shots": [
-      "mobile-checkout-busy.png"
-    ]
-  },
-  {
-    "id": "D8",
-    "name": "ผลการชำระ",
-    "state": "สำเร็จ",
-    "tier": "R2",
-    "file": "result-success.html",
-    "shots": [
-      "mobile-result-success.png"
-    ]
-  },
-  {
-    "id": "D8",
-    "name": "ผลการชำระ",
-    "state": "ไม่สำเร็จ (error)",
-    "tier": "R2",
-    "file": "result-fail.html",
-    "shots": [
-      "mobile-result-fail.png"
-    ]
-  },
-  {
-    "id": "D9",
-    "name": "รับเหรียญฟรี",
-    "state": "",
-    "tier": "R2",
-    "file": "earn.html",
-    "shots": [
-      "mobile-earn.png"
-    ]
-  },
-  {
-    "id": "D9",
-    "name": "รับเหรียญฟรี",
-    "state": "ภารกิจครบแล้ว (empty)",
-    "tier": "R2",
-    "file": "earn-empty.html",
-    "shots": [
-      "mobile-earn-empty.png"
-    ]
-  },
-  {
-    "id": "D10",
     "name": "ตั้งค่า",
     "state": "",
     "tier": "R2",
@@ -676,7 +427,7 @@
     ]
   },
   {
-    "id": "D11",
+    "id": "D2",
     "name": "ศูนย์แจ้งเตือน",
     "state": "",
     "tier": "R2",
@@ -686,7 +437,7 @@
     ]
   },
   {
-    "id": "D11",
+    "id": "D2",
     "name": "ศูนย์แจ้งเตือน",
     "state": "ยังไม่มีแจ้งเตือน (empty)",
     "tier": "R2",
@@ -733,8 +484,7 @@
     "tier": "R2",
     "file": "404.html",
     "shots": [
-      "mobile-404.png",
-      "desktop-404.png"
+      "mobile-404.png"
     ]
   },
   {
@@ -745,6 +495,16 @@
     "file": "offline.html",
     "shots": [
       "mobile-offline.png"
+    ]
+  },
+  {
+    "id": "F2",
+    "name": "ออฟไลน์",
+    "state": "กำลังลองใหม่ (loading)",
+    "tier": "R2",
+    "file": "offline-retry.html",
+    "shots": [
+      "mobile-offline-retry.png"
     ]
   },
   {
@@ -816,8 +576,7 @@
     "tier": "R2",
     "file": "legal-terms.html",
     "shots": [
-      "mobile-legal-terms.png",
-      "desktop-legal-terms.png"
+      "mobile-legal-terms.png"
     ]
   },
   {
@@ -832,16 +591,6 @@
   },
   {
     "id": "G6",
-    "name": "เงื่อนไขสมาชิก",
-    "state": "",
-    "tier": "R2",
-    "file": "legal-membership.html",
-    "shots": [
-      "mobile-legal-membership.png"
-    ]
-  },
-  {
-    "id": "G7",
     "name": "นโยบายคุกกี้",
     "state": "",
     "tier": "R2",
@@ -851,25 +600,13 @@
     ]
   },
   {
-    "id": "G8",
+    "id": "G7",
     "name": "เบื้องหลังการสร้างด้วย AI",
     "state": "",
     "tier": "R2",
     "file": "behind-the-ai.html",
     "shots": [
       "mobile-behind-the-ai.png"
-    ]
-  },
-  {
-    "id": "DS",
-    "name": "Design system (token + component)",
-    "state": "",
-    "tier": "—",
-    "file": "styleguide.html",
-    "shots": [
-      "mobile-styleguide.png",
-      "desktop-styleguide.png",
-      "desktopfull-styleguide.png"
     ]
   }
 ]

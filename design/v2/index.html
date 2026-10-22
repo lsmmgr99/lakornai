@@ -13,9 +13,8 @@
     <nav class="topnav" aria-label="เมนูบนสุด"><a href="#">หน้าแรก</a><a href="#">ฟีด</a><a href="#">หมวด<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></a><a href="#">ตอนใหม่</a><a href="#">ยอดนิยม</a><a href="#">คลังของฉัน</a></nav>
     <div class="spacer"></div>
     <button class="icon-btn" aria-label="ค้นหา"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></button>
-    <button class="coin-btn" aria-label="กระเป๋าเหรียญ 1250 เหรียญ" style="margin-left:8px">
-           <span class="c" aria-hidden="true">฿</span><span class="num">1,250</span></button>
-         <button class="avatar" aria-label="บัญชีของฉัน" style="margin-left:8px">ก</button>
+    <button class="icon-btn" style="margin-left:4px;position:relative" aria-label="แจ้งเตือน · มีรายการที่ยังไม่อ่าน"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16S18 14 18 9z"/><path d="M10.4 19.5a2 2 0 0 0 3.2 0"/></svg><i class="ndot"></i></button>
+    <button class="icon-btn" style="margin-left:4px" aria-label="ตั้งค่า"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 14.5a1.5 1.5 0 0 0 .3 1.7l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.5 1.5 0 0 0-2.6 1v.2a2 2 0 1 1-4 0v-.1a1.5 1.5 0 0 0-2.6-1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.5 1.5 0 0 0-1-2.6H3.8a2 2 0 1 1 0-4h.1a1.5 1.5 0 0 0 1-2.6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.5 1.5 0 0 0 2.6-1V3.8a2 2 0 1 1 4 0v.1a1.5 1.5 0 0 0 2.6 1l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.5 1.5 0 0 0 1 2.6h.2a2 2 0 1 1 0 4h-.1a1.5 1.5 0 0 0-1.4.9z"/></svg></button>
   </div></header><main id="main" class="page"><div class="wrap">
       <div class="page-head" style="padding-top:var(--s7)">
         <h1>ม็อกอัพ LakornAI v2 — ดัชนีหน้าจอทั้งหมด</h1>
@@ -32,11 +31,6 @@
     <td><span class="dim">default</span></td>
     <td class="num">R1</td>
     <td class="num">mobile-home.png<br>desktop-home.png<br>mobilefull-home.png<br>desktopfull-home.png</td></tr><tr>
-    <td class="num">A1</td>
-    <td><a href="home-guest.html" style="color:var(--accent)">หน้าแรก</a></td>
-    <td>ยังไม่ล็อกอิน</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-home-guest.png<br>desktop-home-guest.png</td></tr><tr>
     <td class="num">A1</td>
     <td><a href="home-empty.html" style="color:var(--accent)">หน้าแรก</a></td>
     <td>ไม่มีเรื่องที่ดูค้าง (empty)</td>
@@ -82,11 +76,6 @@
     <td>ไม่พบผลลัพธ์ (empty)</td>
     <td class="num">R1</td>
     <td class="num">mobile-search-empty.png</td></tr><tr>
-    <td class="num">A3</td>
-    <td><a href="search-guest.html" style="color:var(--accent)">ค้นหา</a></td>
-    <td>ยังไม่ล็อกอิน (ไม่มีประวัติ)</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-search-guest.png</td></tr><tr>
     <td class="num">A4</td>
     <td><a href="genre.html" style="color:var(--accent)">หน้าแนว</a></td>
     <td><span class="dim">default</span></td>
@@ -106,7 +95,7 @@
     <td><a href="browse.html" style="color:var(--accent)">ฮับเลือกดู</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
-    <td class="num">mobile-browse.png<br>desktop-browse.png<br>mobilefull-browse.png</td></tr><tr>
+    <td class="num">mobile-browse.png<br>mobilefull-browse.png</td></tr><tr>
     <td class="num">A7</td>
     <td><a href="popular.html" style="color:var(--accent)">ยอดนิยม TOP 10</a></td>
     <td><span class="dim">default</span></td>
@@ -127,6 +116,11 @@
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
     <td class="num">mobile-schedule.png</td></tr><tr>
+    <td class="num">A9</td>
+    <td><a href="schedule-empty.html" style="color:var(--accent)">ตารางออกตอน</a></td>
+    <td>วันนี้ไม่มีตอนใหม่ (empty)</td>
+    <td class="num">R2</td>
+    <td class="num">mobile-schedule-empty.png</td></tr><tr>
     <td class="num">A10</td>
     <td><a href="az.html" style="color:var(--accent)">ดัชนี ก–ฮ / A–Z</a></td>
     <td><span class="dim">default</span></td>
@@ -138,11 +132,6 @@
     <td class="num">R1</td>
     <td class="num">mobile-series.png<br>desktop-series.png<br>mobilefull-series.png<br>desktopfull-series.png</td></tr><tr>
     <td class="num">B1</td>
-    <td><a href="series-guest.html" style="color:var(--accent)">รายละเอียดเรื่อง</a></td>
-    <td>ยังไม่ล็อกอิน</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-series-guest.png</td></tr><tr>
-    <td class="num">B1</td>
     <td><a href="series-loading.html" style="color:var(--accent)">รายละเอียดเรื่อง</a></td>
     <td>กำลังโหลด (skeleton)</td>
     <td class="num">R1</td>
@@ -152,6 +141,16 @@
     <td><span class="dim">default</span></td>
     <td class="num">R1</td>
     <td class="num">mobile-watch.png<br>desktop-watch.png<br>mobilefull-watch.png</td></tr><tr>
+    <td class="num">B2</td>
+    <td><a href="watch-next.html" style="color:var(--accent)">หน้ารับชม</a></td>
+    <td>การ์ดตอนถัดไป · นับถอยหลัง 5 วินาที (§6.26)</td>
+    <td class="num">R1</td>
+    <td class="num">mobile-watch-next.png</td></tr><tr>
+    <td class="num">B2</td>
+    <td><a href="watch-end.html" style="color:var(--accent)">หน้ารับชม</a></td>
+    <td>การ์ดจบเรื่อง (§6.25)</td>
+    <td class="num">R1</td>
+    <td class="num">mobile-watch-end.png<br>desktop-watch-end.png</td></tr><tr>
     <td class="num">B2</td>
     <td><a href="watch-loading.html" style="color:var(--accent)">หน้ารับชม</a></td>
     <td>กำลังโหลด</td>
@@ -164,44 +163,14 @@
     <td class="num">mobile-watch-error.png</td></tr><tr>
     <td class="num">B3</td>
     <td><a href="watch-episodes.html" style="color:var(--accent)">ชีตเลือกตอนในเพลเยอร์</a></td>
-    <td><span class="dim">default</span></td>
+    <td>ทุกตอนกดได้ ไม่มีกุญแจ</td>
     <td class="num">R3</td>
-    <td class="num">mobile-watch-episodes.png<br>desktop-watch-episodes.png</td></tr><tr>
-    <td class="num">B4</td>
-    <td><a href="paywall-coins-ok.html" style="color:var(--accent)">Paywall</a></td>
-    <td>a · เหรียญพอ</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-paywall-coins-ok.png<br>desktop-paywall-coins-ok.png</td></tr><tr>
-    <td class="num">B4</td>
-    <td><a href="paywall-coins-low.html" style="color:var(--accent)">Paywall</a></td>
-    <td>b · เหรียญไม่พอ</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-paywall-coins-low.png</td></tr><tr>
-    <td class="num">B4</td>
-    <td><a href="paywall-guest.html" style="color:var(--accent)">Paywall</a></td>
-    <td>c · ยังไม่ล็อกอิน</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-paywall-guest.png</td></tr><tr>
-    <td class="num">B4</td>
-    <td><a href="paywall-busy.html" style="color:var(--accent)">Paywall</a></td>
-    <td>กำลังยืนยัน (loading)</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-paywall-busy.png</td></tr><tr>
-    <td class="num">B4</td>
-    <td><a href="paywall-error.html" style="color:var(--accent)">Paywall</a></td>
-    <td>ปลดล็อกไม่สำเร็จ (error)</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-paywall-error.png</td></tr><tr>
-    <td class="num">E3</td>
-    <td><a href="paywall-first.html" style="color:var(--accent)">แถบอธิบาย paywall ครั้งแรก</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R3</td>
-    <td class="num">mobile-paywall-first.png</td></tr><tr>
+    <td class="num">mobile-watch-episodes.png</td></tr><tr>
     <td class="num">B5</td>
     <td><a href="share-landing.html" style="color:var(--accent)">แลนดิ้งแชร์ตอน</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R3</td>
-    <td class="num">mobile-share-landing.png<br>desktop-share-landing.png</td></tr><tr>
+    <td class="num">mobile-share-landing.png</td></tr><tr>
     <td class="num">B6</td>
     <td><a href="cast.html" style="color:var(--accent)">ตัวละคร/นักแสดง</a></td>
     <td><span class="dim">default</span></td>
@@ -233,10 +202,10 @@
     <td class="num">R1</td>
     <td class="num">mobile-library-history.png</td></tr><tr>
     <td class="num">C1</td>
-    <td><a href="library-guest.html" style="color:var(--accent)">คลังของฉัน</a></td>
-    <td>ยังไม่ล็อกอิน</td>
+    <td><a href="library-loading.html" style="color:var(--accent)">คลังของฉัน</a></td>
+    <td>กำลังโหลด (skeleton)</td>
     <td class="num">R1</td>
-    <td class="num">mobile-library-guest.png</td></tr><tr>
+    <td class="num">mobile-library-loading.png</td></tr><tr>
     <td class="num">C1</td>
     <td><a href="library-empty-continue.html" style="color:var(--accent)">คลังของฉัน</a></td>
     <td>empty 1/4 ดูต่อ</td>
@@ -258,106 +227,16 @@
     <td class="num">R1</td>
     <td class="num">mobile-library-empty-history.png</td></tr><tr>
     <td class="num">D1</td>
-    <td><a href="login.html" style="color:var(--accent)">เข้าสู่ระบบ / สมัคร</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R1</td>
-    <td class="num">mobile-login.png<br>desktop-login.png</td></tr><tr>
-    <td class="num">D1</td>
-    <td><a href="login-error.html" style="color:var(--accent)">เข้าสู่ระบบ / สมัคร</a></td>
-    <td>เบอร์ไม่ถูกต้อง (error)</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-login-error.png</td></tr><tr>
-    <td class="num">D1</td>
-    <td><a href="login-busy.html" style="color:var(--accent)">เข้าสู่ระบบ / สมัคร</a></td>
-    <td>กำลังส่ง OTP (loading)</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-login-busy.png</td></tr><tr>
-    <td class="num">D2</td>
-    <td><a href="otp.html" style="color:var(--accent)">ยืนยัน OTP</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R2</td>
-    <td class="num">mobile-otp.png</td></tr><tr>
-    <td class="num">D2</td>
-    <td><a href="otp-error.html" style="color:var(--accent)">ยืนยัน OTP</a></td>
-    <td>รหัสผิด (error)</td>
-    <td class="num">R2</td>
-    <td class="num">mobile-otp-error.png</td></tr><tr>
-    <td class="num">D2</td>
-    <td><a href="otp-busy.html" style="color:var(--accent)">ยืนยัน OTP</a></td>
-    <td>กำลังตรวจสอบ (loading)</td>
-    <td class="num">R2</td>
-    <td class="num">mobile-otp-busy.png</td></tr><tr>
-    <td class="num">D3</td>
-    <td><a href="account.html" style="color:var(--accent)">โปรไฟล์ / บัญชี</a></td>
-    <td>สมาชิก VIP</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-account.png<br>desktop-account.png</td></tr><tr>
-    <td class="num">D3</td>
-    <td><a href="account-guest.html" style="color:var(--accent)">โปรไฟล์ / บัญชี</a></td>
-    <td>ยังไม่ล็อกอิน</td>
-    <td class="num">R1</td>
-    <td class="num">mobile-account-guest.png</td></tr><tr>
-    <td class="num">D4</td>
-    <td><a href="wallet.html" style="color:var(--accent)">กระเป๋าเหรียญ</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R2</td>
-    <td class="num">mobile-wallet.png</td></tr><tr>
-    <td class="num">D4</td>
-    <td><a href="wallet-empty.html" style="color:var(--accent)">กระเป๋าเหรียญ</a></td>
-    <td>ยังไม่มีประวัติ (empty)</td>
-    <td class="num">R2</td>
-    <td class="num">mobile-wallet-empty.png</td></tr><tr>
-    <td class="num">D5</td>
-    <td><a href="topup.html" style="color:var(--accent)">เติมเหรียญ</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R1</td>
-    <td class="num">mobile-topup.png<br>desktop-topup.png</td></tr><tr>
-    <td class="num">D6</td>
-    <td><a href="vip.html" style="color:var(--accent)">แพ็กเกจสมาชิก VIP</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R1</td>
-    <td class="num">mobile-vip.png<br>desktop-vip.png<br>mobilefull-vip.png</td></tr><tr>
-    <td class="num">D7</td>
-    <td><a href="checkout.html" style="color:var(--accent)">ยืนยันการชำระ</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R2</td>
-    <td class="num">mobile-checkout.png</td></tr><tr>
-    <td class="num">D7</td>
-    <td><a href="checkout-busy.html" style="color:var(--accent)">ยืนยันการชำระ</a></td>
-    <td>กำลังดำเนินการ (loading)</td>
-    <td class="num">R2</td>
-    <td class="num">mobile-checkout-busy.png</td></tr><tr>
-    <td class="num">D8</td>
-    <td><a href="result-success.html" style="color:var(--accent)">ผลการชำระ</a></td>
-    <td>สำเร็จ</td>
-    <td class="num">R2</td>
-    <td class="num">mobile-result-success.png</td></tr><tr>
-    <td class="num">D8</td>
-    <td><a href="result-fail.html" style="color:var(--accent)">ผลการชำระ</a></td>
-    <td>ไม่สำเร็จ (error)</td>
-    <td class="num">R2</td>
-    <td class="num">mobile-result-fail.png</td></tr><tr>
-    <td class="num">D9</td>
-    <td><a href="earn.html" style="color:var(--accent)">รับเหรียญฟรี</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R2</td>
-    <td class="num">mobile-earn.png</td></tr><tr>
-    <td class="num">D9</td>
-    <td><a href="earn-empty.html" style="color:var(--accent)">รับเหรียญฟรี</a></td>
-    <td>ภารกิจครบแล้ว (empty)</td>
-    <td class="num">R2</td>
-    <td class="num">mobile-earn-empty.png</td></tr><tr>
-    <td class="num">D10</td>
     <td><a href="settings.html" style="color:var(--accent)">ตั้งค่า</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
     <td class="num">mobile-settings.png</td></tr><tr>
-    <td class="num">D11</td>
+    <td class="num">D2</td>
     <td><a href="notifications.html" style="color:var(--accent)">ศูนย์แจ้งเตือน</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
     <td class="num">mobile-notifications.png</td></tr><tr>
-    <td class="num">D11</td>
+    <td class="num">D2</td>
     <td><a href="notifications-empty.html" style="color:var(--accent)">ศูนย์แจ้งเตือน</a></td>
     <td>ยังไม่มีแจ้งเตือน (empty)</td>
     <td class="num">R2</td>
@@ -381,12 +260,17 @@
     <td><a href="404.html" style="color:var(--accent)">404 ไม่พบหน้า</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
-    <td class="num">mobile-404.png<br>desktop-404.png</td></tr><tr>
+    <td class="num">mobile-404.png</td></tr><tr>
     <td class="num">F2</td>
     <td><a href="offline.html" style="color:var(--accent)">ออฟไลน์</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
     <td class="num">mobile-offline.png</td></tr><tr>
+    <td class="num">F2</td>
+    <td><a href="offline-retry.html" style="color:var(--accent)">ออฟไลน์</a></td>
+    <td>กำลังลองใหม่ (loading)</td>
+    <td class="num">R2</td>
+    <td class="num">mobile-offline-retry.png</td></tr><tr>
     <td class="num">F3</td>
     <td><a href="patterns.html" style="color:var(--accent)">แพตเทิร์นกลาง loading/empty/error</a></td>
     <td><span class="dim">default</span></td>
@@ -421,23 +305,18 @@
     <td><a href="legal-terms.html" style="color:var(--accent)">ข้อตกลงการใช้</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
-    <td class="num">mobile-legal-terms.png<br>desktop-legal-terms.png</td></tr><tr>
+    <td class="num">mobile-legal-terms.png</td></tr><tr>
     <td class="num">G5</td>
     <td><a href="legal-privacy.html" style="color:var(--accent)">นโยบายความเป็นส่วนตัว</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
     <td class="num">mobile-legal-privacy.png</td></tr><tr>
     <td class="num">G6</td>
-    <td><a href="legal-membership.html" style="color:var(--accent)">เงื่อนไขสมาชิก</a></td>
-    <td><span class="dim">default</span></td>
-    <td class="num">R2</td>
-    <td class="num">mobile-legal-membership.png</td></tr><tr>
-    <td class="num">G7</td>
     <td><a href="legal-cookies.html" style="color:var(--accent)">นโยบายคุกกี้</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
     <td class="num">mobile-legal-cookies.png</td></tr><tr>
-    <td class="num">G8</td>
+    <td class="num">G7</td>
     <td><a href="behind-the-ai.html" style="color:var(--accent)">เบื้องหลังการสร้างด้วย AI</a></td>
     <td><span class="dim">default</span></td>
     <td class="num">R2</td>
@@ -449,13 +328,14 @@
     <td class="num">mobile-styleguide.png<br>desktop-styleguide.png<br>desktopfull-styleguide.png</td></tr></tbody></table></div></div>
     </div><footer class="foot"><div class="wrap"><div class="cols">
     <div><h4>เลือกดู</h4><nav><a href="#">ละครแนวตั้ง</a><a href="#">ละครผลไม้ AI</a><a href="#">ละครฝรั่ง</a><a href="#">สยองขวัญ</a><a href="#">ย้อนเวลา</a><a href="#">แก้แค้น</a><a href="#">ดัชนี ก–ฮ / A–Z</a><a href="#">ตารางออกตอน</a></nav></div>
-    <div><h4>บัญชี</h4><nav><a href="#">เข้าสู่ระบบ</a><a href="#">แพ็กเกจสมาชิก</a><a href="#">เติมเหรียญ</a><a href="#">รับเหรียญฟรี</a></nav></div>
+    <div><h4>ของฉัน</h4><nav><a href="#">คลังของฉัน</a><a href="#">แจ้งเตือน</a><a href="#">ตั้งค่า</a></nav></div>
     <div><h4>เกี่ยวกับ</h4><nav><a href="#">เกี่ยวกับเรา</a><a href="#">เบื้องหลังการสร้างด้วย AI</a><a href="#">ติดต่อ</a><a href="#">ช่วยเหลือ</a></nav></div>
-    <div><h4>ข้อกำหนด</h4><nav><a href="#">ข้อตกลงการใช้</a><a href="#">นโยบายความเป็นส่วนตัว</a><a href="#">เงื่อนไขสมาชิก</a><a href="#">นโยบายคุกกี้</a></nav></div>
-  </div><div class="btm">© LakornAI · lakornai.tv · ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง (mockup)</div></div></footer></main><nav class="bottom" aria-label="เมนูหลัก"><div class="in">
+    <div><h4>ข้อกำหนด</h4><nav><a href="#">ข้อตกลงการใช้</a><a href="#">นโยบายความเป็นส่วนตัว</a><a href="#">นโยบายคุกกี้</a></nav></div>
+  </div>
+  <div class="stance"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2 19 12 8 18.8z" fill="currentColor"/></svg><span>ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก</span></div>
+  <div class="btm">© LakornAI · lakornai.tv · ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง (mockup)</div></div></footer></main><nav class="bottom" aria-label="เมนูหลัก"><div class="in">
     <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg><span>หน้าแรก</span></a>
     <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 9.5l4 2.5-4 2.5z"/></svg><span>ฟีด</span></a>
     <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg><span>ค้นหา</span></a>
-    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="2"/><rect x="14" y="4" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>คลังของฉัน</span></a>
-    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg><span>บัญชี</span><i class="ndot"></i></a></div></nav>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="2"/><rect x="14" y="4" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>คลังของฉัน</span></a></div></nav>
 </body></html>
