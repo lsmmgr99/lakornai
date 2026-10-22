@@ -185,6 +185,21 @@ try {
   check('ลิงก์เก่า watch/<slug>.html#ep5 ถูกส่งต่อไป /ep-5/',
     await evaluate(`location.pathname`) === '/watch/ceo-cold/ep-5/', await evaluate(`location.pathname`));
 
+  /* ---- แท็บติดตามและประวัติ ---- */
+  await go('/series/mirror-bride/');
+  await evaluate(`document.querySelector('[data-follow]').click()`);
+  await go('/library/?tab=following');
+  check('กดติดตามแล้วโผล่ในแท็บ "ติดตาม"',
+    await evaluate(`/เจ้าสาวในกระจก/.test(document.getElementById('libPanel').textContent)`));
+  await go('/library/?tab=history');
+  check('แท็บ "ประวัติ" มีรายการที่เพิ่งดู',
+    await evaluate(`document.querySelectorAll('#libPanel .ep-row').length > 0`),
+    String(await evaluate(`document.querySelectorAll('#libPanel .ep-row').length`)));
+  await go('/');
+  check('หน้าแรกโชว์ชั้น "ติดตามไว้" เมื่อมีเรื่องที่ติดตาม',
+    await evaluate(`!document.getElementById('followSec').hidden
+      && document.querySelectorAll('#followRail .card').length === 1`));
+
   /* ---- ล้างข้อมูลแล้วต้องกลับไปหน้าว่าง ไม่พัง ---- */
   await go('/');
   await evaluate('localStorage.clear()');
