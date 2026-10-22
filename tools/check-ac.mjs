@@ -70,8 +70,25 @@ if (process.env.SKIP_BROWSER) {
 }
 const hand = PAGES.filter(f => /(ดูไปแล้ว \d+%|ดูต่อ EP\.\d+|EP\.\d+\/\d+ ·)/.test(read(f)));
 ok(hand.length === 0, `หน้าที่ยังมีเปอร์เซ็นต์/เลขตอนของ "ดูต่อ" เขียนมือใน HTML: ${hand.length} ไฟล์${hand.length ? ' → ' + hand.slice(0, 3).map(rel) : ''}`);
-const data = read(path.join(ROOT, 'assets/data.js'));
-ok(!/"cont"\s*:/.test(data), 'assets/data.js ไม่มี seed `cont` ที่เขียนมืออีกแล้ว');
+/* ข้อมูลรันไทม์ของเว็บจริงคือ assets/content.js (ผลผลิตของ build)
+   ส่วน assets/data.js เป็นชุดข้อมูลตั้งต้นของชั้นออกแบบที่ design/v2/lib.mjs อ่าน
+   ทั้งสองไฟล์ต้องไม่มี seed ความคืบหน้าการดู และเว็บจริงต้องไม่อ่านไฟล์ของชั้นออกแบบ */
+const runtimeData = read(path.join(ROOT, 'assets/content.js'));
+ok(!/"cont"\s*:/.test(runtimeData), 'assets/content.js ไม่มี seed `cont` ที่เขียนมือ');
+ok(!/"(following|subs)"\s*:/.test(runtimeData),
+  'assets/content.js ไม่มี `following`/`subs` ของชั้นออกแบบปนเข้ามา (ADR-001 §6.6 · V9)');
+ok(!/"cont"\s*:/.test(read(path.join(ROOT, 'assets/data.js'))),
+  'assets/data.js (ชุดของชั้นออกแบบ) ไม่มี seed `cont` ที่เขียนมือ');
+const readsDataJs = PAGES.filter(f => /assets\/data\.js/.test(read(f)));
+ok(readsDataJs.length === 0,
+  `หน้าเว็บจริงที่ยังโหลด assets/data.js: ${readsDataJs.length} หน้า (ต้องเป็น assets/content.js)`);
+
+/* ม็อกอัพที่ลูกค้าอนุมัติต้องสร้างซ้ำได้จากรีโป — รันเจนเนอเรเตอร์จริงในสำเนาแยกแล้วเทียบไฟล์
+   ด่านนี้คือสิ่งที่จับไม่ได้ด้วย `git status` เพราะไฟล์จะเพี้ยนตอนมีคนรันเจนเนอเรเตอร์ ไม่ใช่ตอน build */
+head('ม็อกอัพที่อนุมัติ · design/v2/ ต้องสร้างซ้ำได้เหมือนเดิม');
+const mock = spawnSync(process.execPath, [path.join(ROOT, 'tools/check-mockup.mjs')], { encoding: 'utf8' });
+ok(mock.status === 0, ((mock.stdout || mock.stderr || '').trim().split('\n')[0] || 'รัน tools/check-mockup.mjs ไม่สำเร็จ').replace(/^[✓✗]\s*/, ''));
+if (mock.status !== 0) (mock.stdout + mock.stderr).trim().split('\n').slice(1, 8).forEach(l => console.log('     ' + l));
 
 /* ---------------- AC-3 ---------------- */
 head('AC-3 · ไม่มีถ้อยคำ paywall/สมาชิกเหลือในเว็บจริง');
@@ -180,6 +197,49 @@ ok(/location\.hash\.match\(\/\^#ep/.test(app), 'มีการแมป #ep<n> 
 ok(STUBS.length > 0 && STUBS.every(f => /noindex/.test(read(f))),
   `ไฟล์ส่งต่อ URL เก่า ${STUBS.length} ไฟล์ · ทุกไฟล์เป็น noindex · ตาราง 301 อยู่ที่ redirects.map`);
 
+/* ---------------- กฎ V12 / V13 ของ ADR-001 §12.3 (เจ้าของ: Dev-Claude) ----------------
+   ตรวจจาก "ไฟล์ที่ส่งมอบจริง" ซ้ำอีกชั้นนอกเหนือจากยามใน build/build.mjs
+   เพราะรอบที่แล้วบทเรียนคือยามตอน build ปล่อยของพวกนี้ผ่านหมด */
+head('ADR-001 §12.3 · V12 ป้ายยอดวิวกำพร้า / V13 การอ้างว่ามีการวัดผู้ชม');
+const cj = path.join(ROOT, 'content.json');
+const viewsSource = fs.existsSync(cj) ? (JSON.parse(read(cj)).meta || {}).viewsSource || 'none' : 'none';
+console.log(`  ℹ meta.viewsSource = "${viewsSource}"`);
+if (viewsSource === 'none') {
+  /* `(?<!รี)วิว` จับทั้งป้ายที่มีเลขและป้ายกำพร้าในครั้งเดียว และปล่อยคำว่า "รีวิว" ผ่าน */
+  const orphan = PAGES.filter(f => /(?<!รี)วิว/.test(read(f).replace(/<script[\s\S]*?<\/script>/g, '')));
+  ok(orphan.length === 0,
+    `V12 · หน้าที่ยังมีคำว่า "วิว" ขณะไม่มีระบบวัด: ${orphan.length} ไฟล์${orphan.length ? ' → ' + orphan.slice(0, 4).map(rel) : ''}`);
+  const unit = PAGES.filter(f => /\d[\d.,]*\s*(ล้าน|[KM])(?![ก-๙A-Za-z0-9])/
+    .test(read(f).replace(/<script[\s\S]*?<\/script>/g, '')));
+  ok(unit.length === 0, `V12 · หน้าที่มีตัวเลข+หน่วยย่อในบริบทยอดวิว: ${unit.length} ไฟล์`);
+  const CLAIM = [/คนดูมากที่สุด/, /ยอดนิยม[^<]{0,12}สัปดาห์/, /TOP\s*10[^<]{0,8}สัปดาห์/i,
+    /อันดับจากยอดวิว/, /most\s+watched|trending/i];
+  const claims = PAGES.filter(f => CLAIM.some(re => re.test(read(f))));
+  ok(claims.length === 0,
+    `V13 · หน้าที่อ้างว่ามีการวัดผู้ชม: ${claims.length} ไฟล์${claims.length ? ' → ' + claims.slice(0, 4).map(rel) : ''}`);
+  const appClaims = [...CLAIM, /(?<!รี)วิว/].filter(re => re.test(app));
+  ok(appClaims.length === 0, `V12/V13 · assets/app.js (ข้อความที่ JS เขียนลงหน้าตอนรันไทม์): ${appClaims.length} จุด`);
+}
+
+/* ---------------- หน้าเปิดดัชนีต้องไม่เป็นหน้าเปล่า (AIO-19 §9.3) ---------------- */
+head('หน้าที่เปิดให้ Google เก็บ ต้องมีข้อความนำและ JSON-LD ที่ไม่ว่าง');
+const emptyLead = indexable.filter(f => (read(f).match(/<p class="lead"[^>]*>([\s\S]*?)<\/p>/g) || [])
+  .some(m => !m.replace(/<[^>]+>/g, '').trim()));
+ok(emptyLead.length === 0,
+  `<p class="lead"> ว่างเปล่าในหน้าเปิดดัชนี: ${emptyLead.length} ไฟล์${emptyLead.length ? ' → ' + emptyLead.slice(0, 6).map(rel) : ''}`);
+const emptyLd = [];
+for (const f of indexable) {
+  for (const block of read(f).match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g) || []) {
+    const raw = block.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '');
+    if (/"(name|description|headline)"\s*:\s*""/.test(raw)) { emptyLd.push(rel(f)); break; }
+  }
+}
+ok(emptyLd.length === 0,
+  `JSON-LD ที่มี name/description/headline เป็นค่าว่าง: ${emptyLd.length} ไฟล์${emptyLd.length ? ' → ' + emptyLd.slice(0, 6) : ''}`);
+const genreLeads = indexable.filter(f => /^genre\/[^/]+\/index\.html$/.test(rel(f)))
+  .filter(f => (read(f).match(/<p class="lead"[^>]*>([\s\S]*?)<\/p>/) || [, ''])[1].replace(/<[^>]+>/g, '').trim().length >= 80);
+ok(genreLeads.length === 6, `หน้าแนวที่มีข้อความนำยาว ≥80 ตัวอักษร: ${genreLeads.length}/6 หน้า`);
+
 /* ---------------- AC-7 ---------------- */
 head('AC-7 · เทมเพลตภาพแชร์ 1200×630');
 const shareDir = path.join(ROOT, 'assets/share');
@@ -192,7 +252,15 @@ head('แผงหลังบ้าน admin/ · ไม่นับเป็น
 const adminDir = path.join(ROOT, 'admin');
 if (!fs.existsSync(adminDir)) console.log('  ℹ ยังไม่มีโฟลเดอร์ admin/ ในรีโป (งาน AIO-23)');
 else {
-  const adminHtml = fs.readdirSync(adminDir).filter(f => f.endsWith('.html')).map(f => path.join(adminDir, f));
+  /* เดินลึกทุกชั้น ไม่ใช่ชั้นเดียว — ถ้า AIO-23 เพิ่มหน้าในโฟลเดอร์ย่อย ด่านนี้ต้องเห็น */
+  const walkAll = (d, out = []) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const f = path.join(d, e.name);
+      if (e.isDirectory()) walkAll(f, out); else if (e.name.endsWith('.html')) out.push(f);
+    }
+    return out;
+  };
+  const adminHtml = walkAll(adminDir);
   ok(adminHtml.length > 0 && adminHtml.every(f => /content="noindex/.test(read(f))),
     `หน้าใน admin/ ${adminHtml.length} ไฟล์ · เป็น noindex ทุกไฟล์`);
   const sm = read(path.join(ROOT, 'sitemap.xml'));

@@ -2,6 +2,7 @@
 import {
   D, U, SERIES, BY, TOP10, OPEN_TAGS, CAST, genreLabel, genreOf,
   seriesOfGenre, similar, isDaily, isAiring, tropesOf, isOpenTag, CAST_PAGES,
+  HAS_VIEWS, RANK_BASIS_TEXT,
 } from './content.mjs';
 import {
   definePage, shell, pageHead, crumbs, rail, section, poster, card, rankCard, epRow,
@@ -9,6 +10,16 @@ import {
   localNote, FREE_LINE,
 } from './ui.mjs';
 import { collectionLd, websiteLd, breadcrumb, shareImage, coverUrl } from './seo.mjs';
+
+/* ---------- ถ้อยคำของอันดับ (ADR-001 §12.2 C3/C4 · กฎ V13) ----------
+   ห้ามอ้างว่าลำดับมาจากการวัดผู้ชมขณะที่ยังไม่มีระบบวัด · ที่ทำได้คือบอกเกณฑ์ที่ใช้จริง
+   คำว่า "ยอดนิยม" ที่เป็นป้ายเมนู/หัวข้อหมวด ไม่ถูกห้าม (ADR ระบุไว้ชัด) จึงคงไว้
+   ส่วน "สัปดาห์นี้" ถูกถอดถาวร — เราไม่เคยคำนวณหน้าต่างรายสัปดาห์เลย แม้วันที่มี views
+   หมายเหตุใต้อันดับผูกกับ viewsSource ไม่เขียนตายไว้ (C4) */
+const TOP10_LABEL = 'TOP 10 ในคลัง';
+const rankNote = () => sampleNote(HAS_VIEWS
+  ? 'ยอดวิวและอันดับเป็นตัวเลขตัวอย่าง ยังไม่ได้ต่อระบบวัดผลจริง'
+  : `ยังไม่ได้ต่อระบบวัดจำนวนผู้ชม — ลำดับในหน้านี้${RANK_BASIS_TEXT}`);
 
 const wrap = inner => `<main id="main" class="page"><div class="wrap">${inner}</div></main>`;
 const wrapF = (L, inner) => `<main id="main" class="page"><div class="wrap">${inner}</div>${footer(L)}</main>`;
@@ -67,9 +78,8 @@ export function buildHome() {
         </button>
       </div></section>`;
 
-    const top = section('TOP 10 สัปดาห์นี้',
-      rail(L, TOP10.map((s, i) => rankCard(L, s, i + 1)).join('')) +
-      sampleNote('ยอดวิวและอันดับเป็นตัวเลขตัวอย่าง ยังไม่ได้ต่อระบบวัดผลจริง'),
+    const top = section(TOP10_LABEL,
+      rail(L, TOP10.map((s, i) => rankCard(L, s, i + 1)).join('')) + rankNote(),
       { more: ['ดูอันดับทั้งหมด', U.popular], L });
 
     /* ตอนใหม่ล่าสุด — ตอนล่าสุดของ 6 เรื่องที่ออกตอนใหม่ */
@@ -140,7 +150,7 @@ export function buildFeed() {
           </div>
           <div class="pstack">
             <div class="pfoot"><div class="ptext">
-              <p class="sub-t" id="feedSub"></p>
+              ${/* ไม่มีบรรทัดซับไตเติล — เหตุผลเดียวกับหน้ารับชม (ไม่มีไฟล์วิดีโอ/ไม่มีซับในสัญญา) */ ''}
               <div class="pbody">
                 <h2 id="feedTitle">${esc(first.title)} <span class="num" lang="en">EP.1</span></h2>
                 <p class="hk" id="feedHook">${esc(first.hook)}</p>
@@ -219,7 +229,7 @@ export function buildSearch() {
 /* ============================ A6 ฮับเลือกดู ============================ */
 export function buildBrowse() {
   const entries = [
-    ['chart', 'TOP 10 สัปดาห์นี้', 'อันดับจากยอดวิวสะสม', U.popular],
+    ['chart', TOP10_LABEL, RANK_BASIS_TEXT, U.popular],
     ['sparkle', 'ตอนใหม่ล่าสุด', 'ตอนที่เพิ่งปล่อย', U.newEp],
     ['calendar', 'ตารางออกตอน', 'เรื่องไหนออกวันไหน', U.schedule],
     ['list', 'ดัชนี ก–ฮ / A–Z', `ทุกเรื่องในคลัง ${SERIES.length} เรื่อง`, U.az],
@@ -254,28 +264,56 @@ export function buildBrowse() {
 }
 
 /* ============================ A4 หน้าแนว ============================ */
-/* title/description คัดลอกจาก onpage-audit (AIO-19) §5.1 ตรงตัว
-   genre-western แก้ title/h1 ให้ตรงกับ anchor ในเว็บตาม S8 */
+/* [title, description, h1, lead] ต่อหนึ่งแนว
+   title/description คัดลอกจาก onpage-audit (AIO-19) §5.1 ตรงตัว
+   genre-western แก้ title/h1 ให้ตรงกับ anchor ในเว็บตาม S8
+
+   `lead` = ข้อความนำบนหน้า ย้ายมาอยู่ที่นี่ในรอบนี้ · เหตุ: ก่อนหน้านี้มันอาศัย
+   `genres[].intro` ซึ่งไม่ได้อยู่ในสัญญา §6 เลย พอ content.json เข้ามาเป็นแหล่งความจริง
+   ข้อความทั้ง 6 ชุดจึงหายเงียบ ๆ และ 6 หน้าที่เปิดให้ Google เก็บกลายเป็น thin content
+   (AIO-19 §9.3 เตือนไว้ตรงตัว) · ข้อความนำเป็นคอนเทนต์ของ generator แบบเดียวกับ
+   title/description/h1 ที่อยู่ในตารางนี้แล้ว จึงอยู่ที่นี่ ไม่ใช่ในไฟล์ข้อมูล
+   ถ้าวันหน้าสัญญาเพิ่ม `genres[].intro` ค่าจาก content.json จะทับค่าในตารางนี้ให้เอง
+   (ดู genreLead ข้างล่าง) · ฝ่ายคอนเทนต์ยังต้องตรวจข้อความ 6 ชุดนี้ตามที่แจ้งไว้รอบแรก */
 const GENRE_SEO = {
   vertical: ['ละครแนวตั้ง — ละครสั้น AI ดูฟรีทุกตอน · LakornAI',
     'รวมละครแนวตั้ง AI ภาษาไทย ดูจบตอนละ 1–3 นาที บนมือถือแนวตั้ง ฟรีทุกตอน ไม่ต้องสมัครสมาชิก เลือกจากละครสั้นแนวตั้งที่เรียงตอนครบทุกเรื่อง',
-    'ละครแนวตั้ง'],
+    'ละครแนวตั้ง',
+    'ละครแนวตั้งคือละครที่ถ่ายและตัดมาให้ดูบนมือถือโดยเฉพาะ จอเต็มแนวตั้ง ตอนละไม่เกิน 3 นาที และจบความทุกตอน ในคลังของ LakornAI หมวดนี้เป็นหมวดที่ใหญ่ที่สุด รวมทั้งเรื่องออฟฟิศอย่างประธานเย็นชากับเลขาตัวแสบ ไปจนถึงเรื่องข้ามภพอย่างข้ามภพมาเป็นนางร้าย ทุกเรื่องดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก'],
   fruit: ['ละครผลไม้ AI — ดราม่าผลไม้ ดูฟรีทุกตอน · LakornAI',
     'ละครสั้น AI ที่ตัวละครเป็นผลไม้ไทย รัก หักหลัง ชิงสวน ทุเรียน มังคุด ลำไย ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก มีให้ดู 3 เรื่อง เรียงตอนครบ',
-    'ละครผลไม้ AI'],
+    'ละครผลไม้ AI',
+    'ละครผลไม้ AI เป็นแนวที่ LakornAI สร้างขึ้นเอง ตัวละครทุกตัวเป็นผลไม้ไทยที่มีชื่อ มีศักดิ์ศรี และมีเรื่องให้แค้นกันข้ามรุ่น ตั้งแต่ทุเรียนที่ถูกโค่นทิ้งกลางสวน ลำไยลูกเดียวที่ไม่มีเมล็ด ไปจนถึงมังคุดที่ตกหลุมรักคนบ้านศัตรู เป็นหมวดที่ดูจบง่ายที่สุดในคลังและเป็นหมวดที่คนจำเราได้'],
   western: ['ละครฝรั่ง — ละครสั้น AI พากย์ไทย ดูฟรีทุกตอน · LakornAI',
     'ละครสั้น AI สไตล์ฝรั่ง พากย์ไทยและมีซับไทย ทายาท มาเฟีย รักข้ามชนชั้น ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก เรียงตอนครบตั้งแต่ตอนแรกถึงตอนจบ',
-    'ละครฝรั่ง — ละครสั้น AI พากย์ไทย'],
+    'ละครฝรั่ง — ละครสั้น AI พากย์ไทย',
+    'ละครฝรั่งของ LakornAI คือเรื่องที่ตัวละครและฉากเป็นสากล แต่บทและการพากย์เป็นไทยทั้งหมด หมวดนี้รวมเรื่องทายาทตระกูลดัง มาเฟีย และรักข้ามชนชั้น ที่เดินเรื่องเร็วแบบละครสั้น ไม่ต้องรอตอนยาว ดูฟรีทุกตอนตั้งแต่ตอนแรกถึงตอนจบ'],
   horror: ['ละครสยองขวัญ AI — ผี บ้านร้าง คำสาป ดูฟรี · LakornAI',
     'ละครสั้นสยองขวัญ AI ภาษาไทย ผี บ้านร้าง คำสาป ดูจบไวตอนละไม่กี่นาที ฟรีทุกตอน ไม่ต้องสมัครสมาชิก แนะนำให้ดูตอนกลางคืนแบบมีเพื่อน',
-    'ละครสยองขวัญ AI'],
+    'ละครสยองขวัญ AI',
+    'ละครสยองขวัญของเราเล่นกับความกลัวแบบไทย ๆ ที่คนไทยรู้จักดี ผีที่สิงอยู่ในของ บ้านเช่าราคาถูกผิดปกติ และซอยที่ไม่มีเลขบ้าน ตอนสั้นทำให้ความกลัวมาเร็วและไม่ยืดเยื้อ เหมาะกับการดูกลางคืนแบบรวดเดียวจบ ทุกตอนดูฟรี ไม่ต้องสมัครสมาชิก'],
   timetravel: ['ละครย้อนเวลา AI — ข้ามภพ เกิดใหม่ ดูฟรีทุกตอน · LakornAI',
     'ละครสั้น AI แนวย้อนเวลา ข้ามภพ เกิดใหม่ แก้ไขอดีตให้รักครั้งนี้ไม่พัง ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก เรียงตอนครบ ดูต่อจากตอนที่ค้างไว้ได้',
-    'ละครย้อนเวลา AI'],
+    'ละครย้อนเวลา AI',
+    'ละครย้อนเวลาและข้ามภพคือหมวดที่ตัวละครได้โอกาสครั้งที่สอง ไม่ว่าจะเป็นนักโบราณคดีที่ตื่นมาในปี พ.ศ. 2310 หรือคนอ่านนิยายที่ตื่นมาเป็นนางร้ายซึ่งรู้ล่วงหน้าว่าตัวเองจะตายตอนไหน หมวดนี้เดินเรื่องด้วยคำถามเดียวคือ รู้อนาคตแล้วจะเปลี่ยนมันได้ไหม'],
   revenge: ['ละครแก้แค้น AI — ทวงคืนทุกอย่าง ดูฟรีทุกตอน · LakornAI',
     'ละครสั้น AI แนวแก้แค้น ถูกหักหลังจนหมดตัวแล้วกลับมาทวงคืนทุกอย่าง ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก มีให้ดู 4 เรื่อง เรียงตอนครบทุกเรื่อง',
-    'ละครแก้แค้น AI'],
+    'ละครแก้แค้น AI',
+    'ละครแก้แค้นคือหมวดที่คนดูละครสั้นไทยค้นหามากที่สุด สูตรของมันตรงไปตรงมา ถูกหักหลังจนหมดตัว หายไปพักหนึ่ง แล้วกลับมาทวงคืนทีละอย่าง ในคลังของเรามีทั้งแบบสวนผลไม้ แบบออฟฟิศ และแบบตระกูลมหาเศรษฐี ทุกเรื่องดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก'],
 };
+
+/* ข้อความนำของหน้าแนว — ข้อมูลทับโค้ด แต่ห้ามว่าง
+   ว่าง/ไม่มี = ล้ม build พร้อมชื่อแนว ไม่ใช่ปล่อยให้ได้ <p class="lead"></p> แล้วส่งขึ้น sitemap */
+function genreLead(g) {
+  const fromCode = (GENRE_SEO[g.slug] || [])[3];
+  const lead = g.intro || fromCode;
+  if (!lead) {
+    throw new Error(`genre "${g.slug}": ไม่มีข้อความนำ — เพิ่ม lead ลง GENRE_SEO ที่ `
+      + `build/pages-discovery.mjs หรือใส่ genres[].intro ใน content.json `
+      + `(หน้าแนวเปิดให้ Google เก็บและอยู่ใน sitemap ห้ามเป็นหน้าที่ไม่มีข้อความเฉพาะตัว · AIO-19 §9.3)`);
+  }
+  return lead;
+}
 
 function catalogBody(L, { h1, intro, items, crumbItems, tagChips = false }) {
   return wrapF(L, `${crumbs(L, crumbItems)}
@@ -292,18 +330,23 @@ function catalogBody(L, { h1, intro, items, crumbItems, tagChips = false }) {
 export function buildGenres() {
   for (const g of D.genres) {
     const items = seriesOfGenre(g.slug);
+    if (!GENRE_SEO[g.slug]) {
+      throw new Error(`genre "${g.slug}" ไม่มีชุด title/description/h1/lead ใน GENRE_SEO — `
+        + `แนวใหม่ต้องมีถ้อยคำของตัวเองก่อนเปิดหน้า ไม่ใช่ได้หน้าที่หัวข้อและ title ว่าง`);
+    }
     const [title, desc, h1] = GENRE_SEO[g.slug];
+    const intro = genreLead(g);
     definePage({
       out: `genre/${g.slug}/index.html`, url: U.genre(g.slug),
       title, desc,
       jsonLd: [
-        collectionLd({ url: U.genre(g.slug), name: h1, description: g.intro, items }),
+        collectionLd({ url: U.genre(g.slug), name: h1, description: intro, items }),
         breadcrumb([['หน้าแรก', U.home], ['เลือกดู', U.browse], [g.label, U.genre(g.slug)]]),
       ],
       body: L => shell(L, {
         active: 'browse',
         main: catalogBody(L, {
-          h1, intro: g.intro, items, tagChips: true,
+          h1, intro, items, tagChips: true,
           crumbItems: [['หน้าแรก', U.home], ['เลือกดู', U.browse], [g.label, null]],
         }),
       }),
@@ -345,19 +388,27 @@ export function buildPopular() {
   const top3 = TOP10.slice(0, 3), rest = TOP10.slice(3);
   definePage({
     out: 'popular/index.html', url: U.popular,
-    title: 'ละครสั้น AI ยอดนิยมสัปดาห์นี้ TOP 10 · LakornAI',
-    desc: 'อันดับละครสั้น AI ภาษาไทยที่คนดูมากที่สุดในสัปดาห์นี้ 10 อันดับ พร้อมจำนวนตอนและสถานะออกตอน ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก',
-    jsonLd: [collectionLd({ url: U.popular, name: 'ยอดนิยม TOP 10', description: 'อันดับละครสั้น AI ที่คนดูมากที่สุด', items: TOP10 })],
+    /* ถ้อยคำสามจุดที่ Google เห็น (title · description · JSON-LD) ต้องบอกเกณฑ์ที่ใช้จริง
+       ไม่ใช่ "คนดูมากที่สุดในสัปดาห์นี้" ซึ่งเป็นการอ้างการวัดที่ไม่มีอยู่ (V13) */
+    title: `${TOP10_LABEL} ละครสั้น AI ดูฟรีทุกตอน · LakornAI`,
+    desc: HAS_VIEWS
+      ? 'อันดับละครสั้น AI ภาษาไทย 10 อันดับจากยอดวิวสะสมในคลัง พร้อมจำนวนตอนและสถานะออกตอน ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก'
+      : `สิบเรื่องแรกของคลังละครสั้น AI ภาษาไทย ${RANK_BASIS_TEXT} ยังไม่ได้ต่อระบบวัดจำนวนผู้ชม ทุกเรื่องดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`,
+    jsonLd: [collectionLd({
+      url: U.popular, name: `ยอดนิยม ${TOP10_LABEL}`,
+      description: `สิบเรื่องแรกของคลังละครสั้น AI ภาษาไทย ${RANK_BASIS_TEXT}`,
+      items: TOP10,
+    })],
     body: L => shell(L, {
       active: 'popular',
-      main: wrapF(L, `${pageHead('ยอดนิยม TOP 10', 'อันดับจากยอดวิวสะสมในคลัง')}
+      main: wrapF(L, `${pageHead(`ยอดนิยม ${TOP10_LABEL}`, RANK_BASIS_TEXT)}
         <div class="top3row">${top3.map((s, i) => rankCard(L, s, i + 1)).join('')}</div>
-        ${sampleNote('ยอดวิวทุกตัวเลขในหน้านี้เป็นตัวเลขตัวอย่าง ยังไม่ได้ต่อระบบวัดผลจริง')}
+        ${rankNote()}
         ${section('อันดับ 4–10', `<div class="list">${rest.map((s, i) => `<a class="ep-row" href="${L(U.series(s.slug))}">
           <span class="rkn num">${i + 4}</span>
           <span class="th">${coverImg(L, s)}</span>
           <span class="bd"><span class="h"><b class="tt">${esc(s.title)}</b>${s.status === 'จบแล้ว' ? doneBadge : newBadge}</span>
-            <span class="st">${esc(s.views)} วิว · ${s.eps} ตอน · ${s.genres.map(genreLabel).join(' · ')}</span></span>
+            <span class="st">${HAS_VIEWS && s.views != null ? `${esc(s.views)} วิว · ` : ''}${s.eps} ตอน · ${s.genres.map(genreLabel).join(' · ')}</span></span>
           <span class="r">${ic('right', 'sm')}</span></a>`).join('')}</div>`)}`),
     }),
   });

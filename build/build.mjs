@@ -3,7 +3,7 @@
    เขียนออกเป็นไฟล์เว็บจริงที่ราก · ไม่แตะไฟล์ใด ๆ ใต้ design/v2/ (Visual เป็นเจ้าของ) */
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, SERIES, U, OPEN_TAGS, CAST_PAGES, D } from './content.mjs';
+import { ROOT, SERIES, U, OPEN_TAGS, CAST_PAGES, D, VIEWS_SOURCE, HAS_VIEWS, RANK_BASIS } from './content.mjs';
 import { PAGES } from './ui.mjs';
 import { robotsTxt, sitemapXml, PUBLISHED, SITE_ORIGIN, shareMisses } from './seo.mjs';
 import * as A from './pages-discovery.mjs';
@@ -62,6 +62,28 @@ const BANNED_LD = [
   [/datePublished|uploadDate/, 'วันเผยแพร่ที่ไม่มีข้อมูลจริง'],
 ];
 
+/* ---------- กฎ V12 / V13 (ADR-001 §12.3 · เจ้าของ: Dev-Claude) ----------
+   มีผลเฉพาะขณะ `meta.viewsSource === "none"` คือวันที่ยังไม่มีระบบวัดจำนวนผู้ชม
+   V12 — ห้ามมีป้ายยอดวิวในไฟล์ที่ build ออกมา ไม่ว่าจะมีเลขหรือเป็นป้ายกำพร้า
+         `(?<!รี)วิว` ครอบทั้งสองกรณีในครั้งเดียว และปล่อยคำว่า "รีวิว" ผ่าน
+         บวกหน่วยย่อที่ติดกับตัวเลข (เผื่อมีใครโชว์ "7.8 ล้าน" โดยไม่มีคำว่าวิว)
+         — `พันล้าน` ในชื่อเรื่อง "แม่ม่ายพันล้าน" ไม่ติด เพราะหน้า `ล้าน` เป็นอักษรไทยไม่ใช่เลข
+   V13 — ห้ามถ้อยคำที่อ้างว่ามีการวัดผู้ชม ใน title / description / JSON-LD / ข้อความบนหน้า
+         ไม่ห้าม URL `/popular` ไม่ห้ามคำว่า "ยอดนิยม" ที่เป็นป้ายเมนูหรือหัวข้อหมวด
+         และไม่ห้ามการโชว์เลขอันดับ 1–10 (ADR เขียนขอบเขตไว้ชัด) */
+const VIEWS_CLAIM = [
+  [/(?<!รี)วิว/, 'ป้าย/คำว่า "วิว" ขณะที่ไม่มีระบบวัดจำนวนผู้ชม (V12)'],
+  [/\bviews?\b/i, 'คำว่า views ขณะที่ไม่มีระบบวัดจำนวนผู้ชม (V12)'],
+  [/\d[\d.,]*\s*(ล้าน|[KM])(?![ก-๙A-Za-z0-9])/, 'ตัวเลขพร้อมหน่วยย่อในบริบทยอดวิว (V12)'],
+];
+const MEASURE_CLAIM = [
+  [/คนดูมากที่สุด/, '"คนดูมากที่สุด"'],
+  [/ยอดนิยม[^<]{0,12}สัปดาห์/, '"ยอดนิยม…สัปดาห์"'],
+  [/TOP\s*10[^<]{0,8}สัปดาห์/i, '"TOP 10 สัปดาห์นี้"'],
+  [/อันดับจากยอดวิว/, '"อันดับจากยอดวิว"'],
+  [/most\s+watched|trending/i, 'most watched / trending'],
+];
+
 for (const p of PAGES) {
   if (seenOut.has(p.out)) errors.push(`เขียนไฟล์ซ้ำ: ${p.out}`);
   seenOut.add(p.out);
@@ -111,8 +133,53 @@ for (const p of PAGES) {
   /* structured data */
   for (const block of p.html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g) || []) {
     for (const [re, what] of BANNED_LD) if (re.test(block)) errors.push(`${p.out}: ${what}`);
-    try { JSON.parse(block.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '')); }
+    const raw = block.replace(/^<script[^>]*>/, '').replace(/<\/script>$/, '');
+    let ld = null;
+    try { ld = JSON.parse(raw); }
     catch (e) { errors.push(`${p.out}: JSON-LD parse ไม่ผ่าน — ${e.message}`); }
+    /* ช่องว่างเงียบ ๆ ใน structured data — ด่านเดิมจับได้แค่ "ซ้ำ" ไม่จับ "ว่าง"
+       หน้าแนว 6 หน้าเคยหลุดมาด้วย description:"" ทั้งที่เปิดดัชนีและอยู่ใน sitemap */
+    if (ld) walkLd(ld, (k, v, at) => {
+      if (['name', 'description', 'headline'].includes(k) && typeof v === 'string' && !v.trim()) {
+        errors.push(`${p.out}: JSON-LD ${at}.${k} เป็นค่าว่าง`);
+      }
+    });
+  }
+
+  /* หน้าที่เปิดให้ Google เก็บ ต้องมีข้อความนำที่ไม่ว่าง (AIO-19 §9.3 thin content) */
+  if (!/noindex/.test(p.robots || '')) {
+    for (const lead of p.html.match(/<p class="lead"[^>]*>([\s\S]*?)<\/p>/g) || []) {
+      if (!lead.replace(/<[^>]+>/g, '').trim()) {
+        errors.push(`${p.out}: <p class="lead"> ว่างเปล่า — หน้าเปิดดัชนีต้องมีข้อความเฉพาะตัว`);
+      }
+    }
+  }
+
+  /* V12 — ตรวจบนตัวหน้า (ถอดบล็อก <script> ออกก่อน เพราะ ISO duration "PT3M20S"
+     ไม่ใช่ยอดวิว และ structured data มีด่านของตัวเองที่ BANNED_LD อยู่แล้ว) */
+  if (!HAS_VIEWS) {
+    const visible = p.html.replace(/<script[\s\S]*?<\/script>/g, '');
+    for (const [re, what] of VIEWS_CLAIM) {
+      const m = visible.match(re);
+      if (m) errors.push(`${p.out}: พบ${what} → "${m[0]}" (meta.viewsSource = "${VIEWS_SOURCE}")`);
+    }
+    /* V13 — title/description/JSON-LD/ข้อความบนหน้า */
+    for (const [re, what] of MEASURE_CLAIM) {
+      for (const [where, text] of [['title', p.title], ['description', p.desc], ['หน้า', p.html]]) {
+        const m = String(text).match(re);
+        if (m) { errors.push(`${p.out}: ${where} อ้างการวัดผู้ชม ${what} → "${m[0]}" (V13)`); break; }
+      }
+    }
+  }
+}
+
+/* เดินทุกคีย์ของ JSON-LD รวมทั้งที่ซ้อนในอาเรย์/อ็อบเจกต์ */
+function walkLd(node, fn, at = '$') {
+  if (Array.isArray(node)) { node.forEach((v, i) => walkLd(v, fn, `${at}[${i}]`)); return; }
+  if (!node || typeof node !== 'object') return;
+  for (const [k, v] of Object.entries(node)) {
+    fn(k, v, at);
+    if (v && typeof v === 'object') walkLd(v, fn, `${at}.${k}`);
   }
 }
 
@@ -178,16 +245,35 @@ write('assets/favicon.svg',
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0E0D12"/>` +
   `<path d="M12 9.5 23 16l-11 6.5z" fill="#F5C451"/></svg>\n`);
 
-/* 4.5 ถ้ามี content.json ของหลังบ้านแล้ว ให้ assets/data.js เป็น "ผลผลิตของ build"
-   ที่สร้างจากไฟล์นั้น เบราว์เซอร์จะได้ข้อมูลชุดเดียวกับที่หน้า HTML ถูกสร้างมา */
-if (fs.existsSync(R('content.json'))) {
-  write('assets/data.js',
-    '/* สร้างโดย build/build.mjs จาก content.json (ADR-001 §6) — อย่าแก้ไฟล์นี้ตรง ๆ */\n'
-    + 'window.LAKORN = ' + JSON.stringify(D, null, 1) + ';\n');
-}
+/* 4.5 ข้อมูลรันไทม์ของเว็บจริง — ผลผลิตของ build เสมอ
+   เบราว์เซอร์จะได้ข้อมูลชุดเดียวกับที่หน้า HTML ถูกสร้างมา (ผ่านอะแดปเตอร์ตัวเดียวกัน)
+
+   ⚠️ ชื่อไฟล์คือ assets/content.js ไม่ใช่ assets/data.js และต้องไม่เปลี่ยนกลับ
+   รอบที่แล้วไฟล์นี้เขียนทับ `assets/data.js` ซึ่ง `design/v2/lib.mjs:10` อ่านอยู่
+   ผลคือรันเจนเนอเรเตอร์ม็อกอัพซ้ำแล้วได้ไฟล์ไม่เหมือนเดิม — `watch.html` ขึ้นคำว่า
+   `undefined` และรายการติดตามหายทั้งบล็อก เพราะสัญญา §6 ไม่มี `subs`/`following`
+   ม็อกอัพที่ลูกค้าอนุมัติต้องสร้างซ้ำได้จากรีโปตลอด · ด่านตรวจ: tools/check-mockup.mjs */
+write('assets/content.js',
+  '/* สร้างโดย build/build.mjs จาก ' + (fs.existsSync(R('content.json')) ? 'content.json (ADR-001 §6)' : 'assets/data.js')
+  + ' — อย่าแก้ไฟล์นี้ตรง ๆ */\n'
+  + 'window.LAKORN = ' + JSON.stringify(D, null, 1) + ';\n');
 
 /* 4.6 app.js — โค้ดรันไทม์ของเว็บจริง (ดูต่อ/ติดตาม/เพลเยอร์/คลัง) */
 fs.copyFileSync(R('build/app.src.js'), R('assets/app.js'));
+
+/* 4.7 V12/V13 บนไฟล์ที่ไม่ใช่ HTML ด้วย — app.js ใส่ข้อความลงหน้าตอนรันไทม์
+   ถ้าตรวจแค่ HTML ที่ส่งออก ป้ายที่ JS เขียนเองจะรอดด่านไป */
+if (!HAS_VIEWS) {
+  const app = fs.readFileSync(R('assets/app.js'), 'utf8');
+  for (const [re, what] of [...VIEWS_CLAIM, ...MEASURE_CLAIM.map(([r, w]) => [r, `ถ้อยคำอ้างการวัดผู้ชม ${w} (V13)`])]) {
+    const m = app.match(re);
+    if (m) { console.error(`✗ assets/app.js: พบ${what} → "${m[0]}"`); process.exit(1); }
+  }
+  /* assets/content.js มีชื่อฟิลด์ `views` ตามสัญญาอยู่แล้ว ตรวจที่ "ค่า" ไม่ใช่ที่ตัวอักษร */
+  if (D.viewsSource !== 'none' || D.series.some(s => s.views != null)) {
+    console.error('✗ assets/content.js: viewsSource/views ไม่ตรงกัน (กฎ V10)'); process.exit(1);
+  }
+}
 
 /* ============================ 5. robots + sitemap ============================ */
 write('robots.txt', robotsTxt());

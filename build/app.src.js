@@ -384,7 +384,7 @@
     else if (saved && saved.ep === ep && saved.sec > 2 && saved.sec < dur - 2) t = saved.sec;
     if (t > 0) toast('ดูต่อจากนาทีที่ ' + fmt(t));
 
-    var bar = $('#bar'), barWrap = $('#barWrap'), tNow = $('#tNow'), subLine = $('#subLine');
+    var bar = $('#bar'), barWrap = $('#barWrap'), tNow = $('#tNow');
     var playBtn = $('#playBtn'), muteBtn = $('#muteBtn');
     var nextUp = $('#nextUp'), endCard = $('#endCard');
 
@@ -393,8 +393,8 @@
       if (bar) bar.style.width = pct + '%';
       if (barWrap) barWrap.setAttribute('aria-valuenow', String(Math.round(pct)));
       if (tNow) tNow.textContent = fmt(t);
-      if (subLine) subLine.textContent = timer && D.subs.length
-        ? D.subs[(ep + Math.floor(t / 4)) % D.subs.length] : '';
+      /* ไม่มีบรรทัดซับไตเติล — ไม่มีไฟล์วิดีโอและไม่มีข้อความซับในสัญญาข้อมูล
+         ประโยคตัวอย่างที่ม็อกอัพใช้อยู่ที่ assets/data.js ซึ่งเป็นของชั้นออกแบบเท่านั้น */
     }
 
     /* 9.3 — เขียนความคืบหน้ากลับ localStorage
@@ -559,12 +559,12 @@
       var hit = function (sel) { return tgt.closest ? !!tgt.closest(sel) : false; };
       if (/input|textarea|select/i.test(tgt.tagName || '') || hit('input, textarea, select, [contenteditable]')) return;
       var k = ev.key.toLowerCase();
-      /* Space/Enter บนปุ่มหรือลิงก์ที่โฟกัสอยู่เป็นของตัวมันเอง ห้ามแย่ง
+      /* Space บนปุ่มหรือลิงก์ที่โฟกัสอยู่เป็นของตัวมันเอง ห้ามแย่ง
          ไม่งั้นปุ่ม "ยกเลิก" ในการ์ดตอนถัดไป (UX §6.26 = ทางออกจากการเด้งอัตโนมัติ)
          จะกดด้วยคีย์บอร์ดไม่ได้ เพราะ Space ถูก preventDefault ไปเล่น/หยุดเพลเยอร์แทน
-         (ลูกศรไม่อยู่ในข้อนี้ — ปุ่ม/ลิงก์ไม่ได้ใช้ลูกศรเอง การเลื่อนเวลาด้วย ←/→
-          หลังกดปุ่มเล่นจึงยังทำงานตาม UX §7.4) */
-      if ((k === ' ' || k === 'k') && hit('button, a[href]')) return;
+         ข้อนี้มีแค่ Space — ไม่มีปุ่มหรือลิงก์ไหนใช้ `k`, `n`, `m` หรือลูกศรเอง
+         ปุ่มลัดเหล่านั้นจึงต้องทำงานต่อแม้โฟกัสค้างอยู่ที่ปุ่มหลังคลิกด้วยเมาส์ (UX §7.4) */
+      if (k === ' ' && hit('button, a[href]')) return;
       /* ตอนนี้ดูจบแล้ว → การ์ดตอนถัดไป/การ์ดจบเรื่องเปิดอยู่ ลูกศรเป็นปุ่มสำรวจการ์ด
          ไม่ใช่ปุ่มเลื่อนเวลา · จะดูตอนนี้ซ้ำให้กดที่แถบเวลา หรือเปิดตอนนั้นใหม่ */
       if (ended && (ev.key === 'ArrowRight' || ev.key === 'ArrowLeft')) return;
@@ -597,7 +597,7 @@
 
   var EMPTIES = {
     continue: ['playf', 'ยังไม่มีเรื่องที่ดูค้าง', 'กดดูสักตอน แล้วเว็บจะจำตอนและเวลาที่ค้างไว้ให้เอง — เก็บในเครื่องนี้เท่านั้น', 'เริ่มเลื่อนดูฟีด', 'feed/'],
-    following: ['heart', 'ยังไม่ได้ติดตามเรื่องไหน', 'กดหัวใจที่เรื่องไหนก็ได้ แล้วเราจะเตือนเมื่อมีตอนใหม่', 'ดู TOP 10 สัปดาห์นี้', 'popular/'],
+    following: ['heart', 'ยังไม่ได้ติดตามเรื่องไหน', 'กดหัวใจที่เรื่องไหนก็ได้ แล้วเราจะเตือนเมื่อมีตอนใหม่', 'ดู TOP 10 ในคลัง', 'popular/'],
     done: ['checkc', 'ยังไม่มีเรื่องที่ดูจบ', 'เรื่องที่ดูครบทุกตอนจะมาอยู่ตรงนี้ ไว้ย้อนดูอีกครั้ง', 'ดูเรื่องที่สั้นที่สุด', 'az/'],
     history: ['clock', 'ไม่มีประวัติการดู', 'ประวัติเก็บในเครื่องนี้เท่านั้น และลบได้ตลอดเวลา', 'เริ่มจากหน้าแรก', '']
   };
@@ -794,7 +794,6 @@
     var i = 0, list = D.series;
     var img = box.querySelector('img');
     var bar = box.querySelector('.bar i');
-    var subT = $('#feedSub');
     var tick = null, t = 0;
 
     function show(n) {
@@ -820,7 +819,6 @@
       tick = setInterval(function () {
         t = (t + 1) % dur;
         bar.style.width = (t / dur * 100) + '%';
-        if (subT && D.subs.length) subT.textContent = D.subs[Math.floor(t / 4) % D.subs.length];
       }, 1000 / 6);
     }
     $('#feedNext').addEventListener('click', function () { show(i + 1); });

@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  D, U, SERIES, genreLabel, tropesOf, isOpenTag, isDaily,
+  D, U, SERIES, genreLabel, tropesOf, isOpenTag, isDaily, HAS_VIEWS,
 } from './content.mjs';
 import { headTags, esc, FREE_LINE, coverUrl, COVER_W, COVER_H } from './seo.mjs';
 import { ROOT } from './content.mjs';
@@ -90,12 +90,16 @@ export const newBadge = `<span class="tag tag-new">ใหม่</span>`;
 export const doneBadge = `<span class="tag tag-done">จบแล้ว</span>`;
 export const freeBadge = `<span class="tag tag-free">ดูฟรีทุกตอน</span>`;
 
+/* ป้ายยอดวิวบนปก — แสดงเฉพาะเมื่อมีข้อมูลจริง
+   ไม่มีข้อมูล = ไม่มีป้าย ไม่ใช่ป้ายเปล่า และไม่ใช่ "0 วิว" (ADR-001 §12.2 C1 · กฎ V12)
+   `showViews` ยังคุมพื้นไล่สีไว้เหมือนเดิม เพื่อให้หน้าตาปกไม่เพี้ยนจากแบบที่อนุมัติ */
 export function poster(L, s, { badges = [], showViews = true, lazy = true, alt = null } = {}) {
+  const hasViews = showViews && HAS_VIEWS && s.views != null;
   return `<span class="poster" style="--c1:${s.c1};--c2:${s.c2}">
     ${coverImg(L, s, { lazy, alt })}
     ${showViews ? '<span class="scrim"></span>' : ''}
     ${badges.length ? `<span class="tl">${badges.join('')}</span>` : ''}
-    ${showViews ? `<span class="bl"><span class="views">${ic('eye', 'sm')}<span class="num">${esc(s.views)}</span></span></span>` : ''}
+    ${hasViews ? `<span class="bl"><span class="views">${ic('eye', 'sm')}<span class="num">${esc(s.views)}</span></span></span>` : ''}
   </span>`;
 }
 
@@ -113,7 +117,7 @@ export function rankCard(L, s, n) {
   return `<a class="card rankcard${n <= 3 ? ' top3' : ''}" href="${L(U.series(s.slug))}" aria-label="อันดับ ${n} ${esc(s.title)}">
     <span class="pw">${poster(L, s, { badges: [aiBadge] })}<span class="rk num" aria-hidden="true">${n}</span></span>
     <span class="t">${esc(s.title)}</span>
-    <span class="m">${esc(s.views)} วิว · ${s.eps} ตอน</span>
+    <span class="m">${HAS_VIEWS && s.views != null ? `${esc(s.views)} วิว · ` : ''}${s.eps} ตอน</span>
   </a>`;
 }
 
@@ -240,7 +244,7 @@ ${headTags({ url, title, desc, robots, og, jsonLd, rel })}
 <a class="skip" href="#main">ข้ามไปเนื้อหาหลัก</a>
 ${typeof body === 'function' ? body(L) : body}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="${rel}assets/data.js"></script>
+<script src="${rel}assets/content.js"></script>
 <script src="${rel}assets/app.js"></script>
 </body>
 </html>

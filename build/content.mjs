@@ -1,6 +1,11 @@
-/* ชั้นข้อมูลของ generator ตัวจริง — อ่าน assets/data.js แหล่งเดียว (AIO-22)
-   เมื่อ ADR ของ CTO (AIO-21) ล็อก schema ของ content.json แล้ว
-   ให้เปลี่ยนเฉพาะฟังก์ชัน load() ข้างล่าง ส่วนที่เหลือของเว็บไม่ต้องแก้ */
+/* ชั้นข้อมูลของ generator ตัวจริง (AIO-22)
+   แหล่งความจริงคือ `content.json` ที่ราก (ADR-001 §6) · ถ้ายังไม่มีไฟล์นั้น
+   ถอยไปอ่าน `assets/data.js` ซึ่งเป็นชุดข้อมูลตัวอย่างของชั้นออกแบบ (ดู fromDataJs)
+
+   ⚠️ `assets/data.js` เป็นของชั้นออกแบบ ไม่ใช่ข้อมูลรันไทม์ของเว็บจริง
+      `design/v2/lib.mjs:10` อ่านไฟล์นี้เพื่อสร้างม็อกอัพที่ลูกค้าอนุมัติ
+      build จึง **ห้ามเขียนทับไฟล์นี้** — ข้อมูลรันไทม์ของเว็บจริงไปอยู่ที่ assets/content.js
+      (ด่านตรวจ: tools/check-mockup.mjs รันเจนเนอเรเตอร์ของม็อกอัพในสำเนาแยกแล้วเทียบไฟล์) */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -36,21 +41,72 @@ function dayOf(slug, releaseDay, ended) {
   return releaseDay;
 }
 const mmss = sec => Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
-const thViews = n => n == null ? '' : (n >= 1e6 ? (n / 1e6).toFixed(1) + ' ล้าน' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n));
+/* ยอดวิวเป็นจำนวนเต็มในสัญญา (§6.3) — แปลงเป็นข้อความไทยที่ปลายทางเท่านั้น
+   `null` ต้องคืน `null` ไม่ใช่สตริงว่าง: สตริงว่างคือป้ายกำพร้าที่ C1 ห้าม */
+const thViews = n => n == null ? null
+  : (n >= 1e6 ? (n / 1e6).toFixed(1) + ' ล้าน' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n));
+
+/* ---------- ฟิลด์บังคับ vs ฟิลด์ที่ไม่บังคับ ----------
+   รีวิวด่าน 1 รอบ 2 ชี้ถูกว่า `dayOf()` ล้มดังแล้ว แต่ `intro`/`subs`/`views` ยังใช้ `||`
+   กลบเงียบ ๆ จนกลายเป็นช่องว่างในหน้าที่เปิดให้ Google เก็บ · จึงแยกให้ชัดตรงนี้:
+
+   บังคับ (หายแล้ว build ล้มพร้อมชื่อเรื่องและชื่อฟิลด์)
+     slug · title · hook · synopsis · genres · eps · episodes[] · releaseDay/status
+   ไม่บังคับจริง (หายแล้ว "ไม่ render ส่วนนั้นเลย" ไม่ใช่ render เป็นช่องว่าง)
+     views  → `null` ⇒ ไม่มีบรรทัด/ป้ายยอดวิวในหน้าใดเลย (ADR-001 §12.2 C1 · กฎ V12)
+     tropes → `[]`   ⇒ ไม่มีชิปแท็ก (ADR-001 §6.5 ข้อ 2)
+     cover  → ถอยไปใช้พาธตามแบบแผน
+   ไม่อยู่ในสัญญาและไม่อยู่ในรูปข้อมูลของเว็บจริงเลย
+     subs · following · cont — ดู §6.6/V9 และหมายเหตุที่ท้ายไฟล์นี้ */
+const REQUIRED_SERIES = ['slug', 'title', 'hook', 'synopsis', 'genres', 'eps', 'episodes'];
+function requireFields(s) {
+  for (const k of REQUIRED_SERIES) {
+    const v = s[k];
+    const empty = v == null || v === '' || (Array.isArray(v) && !v.length);
+    if (empty) {
+      throw new Error(`${s.slug || '(ไม่มี slug)'}: ขาดฟิลด์บังคับ "${k}" `
+        + `(= ${JSON.stringify(v)}) — ฟิลด์นี้ถูกใช้ในหน้าที่เปิดให้ Google เก็บ `
+        + `จึงห้ามกลายเป็นค่าว่างเงียบ ๆ (ADR-001 §6.3)`);
+    }
+  }
+  if (s.eps !== s.episodes.length) {
+    throw new Error(`${s.slug}: eps = ${s.eps} แต่ episodes มี ${s.episodes.length} รายการ — `
+      + `สองค่านี้ต้องตรงกัน (สมมติฐานของ assets/app.js ที่รีวิวด่าน 1 ชี้ไว้)`);
+  }
+}
+
+/* V10 ฝั่ง build: `meta.viewsSource` กับฟิลด์ `views` ต้องตรงกันเสมอ
+   แยกจากกันได้คือช่องที่ "เลขตัวอย่าง" จะเล็ดลอดเข้ามาเป็นคำกล่าวอ้าง (ADR-001 §12.2 ข A5) */
+function checkViewsSource(src, series) {
+  const withViews = series.filter(s => s.views != null).length;
+  if (src === 'none' && withViews) {
+    throw new Error(`meta.viewsSource = "none" แต่มี views ที่ไม่ใช่ null ${withViews} เรื่อง — `
+      + `ขัดกฎ V10 (ADR-001 §6.4)`);
+  }
+  if (src !== 'none' && withViews !== series.length) {
+    throw new Error(`meta.viewsSource = ${JSON.stringify(src)} แต่มี views ครบแค่ `
+      + `${withViews}/${series.length} เรื่อง — ขัดกฎ V10 ต้องครบทุกเรื่องใน commit เดียวกัน`);
+  }
+}
 
 function fromContentJson(j) {
   if (!KNOWN_VERSIONS.includes(j.version)) {
     throw new Error(`content.json version ${j.version} — generator นี้รู้จักแค่ ${KNOWN_VERSIONS.join(',')} (ADR-001 กฎ V1)`);
   }
+  const viewsSource = (j.meta || {}).viewsSource || 'none';
+  checkViewsSource(viewsSource, j.series);
   return {
-    genres: j.genres.map(g => ({ ...g, intro: g.intro || '' })),
+    viewsSource,
+    /* `intro` ไม่อยู่ในสัญญา §6 — ข้อความนำของหน้าแนวเป็นคอนเทนต์ของ generator
+       (อยู่ชุดเดียวกับ title/description/h1 ที่ GENRE_SEO) · ถ้าวันหน้าสัญญาเพิ่มฟิลด์นี้
+       ค่าจาก content.json จะทับค่าในโค้ดให้เอง · `null` = "ยังไม่มีจากข้อมูล" ไม่ใช่ "ว่าง" */
+    genres: j.genres.map(g => ({ ...g, intro: g.intro || null })),
     tropes: (j.tropes || []).map(t => ({
       ...t,
       items: t.items || j.series.filter(s => (s.tropes || []).includes(t.slug)).map(s => s.slug),
     })),
-    subs: j.subs || [],
-    following: [],
     series: j.series.map(s => {
+      requireFields(s);
       const day = dayOf(s.slug, s.releaseDay, s.status === 'ended');
       return {
       slug: s.slug, title: s.title, genres: s.genres, tropes: s.tropes || [], eps: s.eps,
@@ -66,20 +122,31 @@ function fromContentJson(j) {
 }
 
 /* ชั้นแปลงของเก่า: assets/data.js เก็บวันออกตอนเป็นข้อความไทยอยู่แล้ว
-   จุดนี้เป็นที่เดียวที่อ่านข้อความแล้วได้ enum กลับ และถ้าอ่านไม่ออกต้องล้ม ไม่ใช่เงียบ */
+   จุดนี้เป็นที่เดียวที่อ่านข้อความแล้วได้ enum กลับ และถ้าอ่านไม่ออกต้องล้ม ไม่ใช่เงียบ
+
+   ไฟล์นี้เป็น "ชุดข้อมูลตัวอย่างของชั้นออกแบบ" (design/v2/lib.mjs อ่านมันอยู่)
+   จึงมีของที่ห้ามไหลเข้าเว็บจริง 3 อย่าง — ตัดทิ้งที่นี่ทางเดียว ไม่ให้เลือกได้:
+     views (สตริงไทยตัวอย่าง) → ตัด · ADR-001 §7.1 ห้ามเอาเลขตัวอย่างมาเป็นคำกล่าวอ้าง
+                                 และ §12.2 ค ชี้ชัดว่า data.js คือแหล่งที่จะเล็ดลอดเข้ามา
+     following / cont          → ตัด · §6.6 + กฎ V9 (ของผู้ใช้อยู่ที่ localStorage)
+     subs (ซับไตเติลสมมติ)     → ตัด · ยังไม่มีไฟล์วิดีโอและไม่มีไฟล์ซับในสัญญา */
 function fromDataJs(d) {
+  const series = d.series.map(s => {
+    requireFields(s);
+    const ended = s.status === 'จบแล้ว';
+    const th = String(s.status).replace(/^ตอนใหม่/, '');
+    const day = ended ? null : DAY_ENUM[th];
+    if (!ended && !day) {
+      throw new Error(`${s.slug}: assets/data.js มี status = ${JSON.stringify(s.status)} `
+        + `ซึ่งถอดวันออกตอนไม่ได้ — ต้องเป็น "จบแล้ว" หรือ "ตอนใหม่ทุก<วัน>"`);
+    }
+    return { ...s, day: day, status: statusText(day), airtime: airtimeText(day), views: null };
+  });
   return {
-    ...d,
-    series: d.series.map(s => {
-      const ended = s.status === 'จบแล้ว';
-      const th = String(s.status).replace(/^ตอนใหม่/, '');
-      const day = ended ? null : DAY_ENUM[th];
-      if (!ended && !day) {
-        throw new Error(`${s.slug}: assets/data.js มี status = ${JSON.stringify(s.status)} `
-          + `ซึ่งถอดวันออกตอนไม่ได้ — ต้องเป็น "จบแล้ว" หรือ "ตอนใหม่ทุก<วัน>"`);
-      }
-      return { ...s, day: day, status: statusText(day), airtime: airtimeText(day) };
-    }),
+    viewsSource: 'none',
+    genres: d.genres.map(g => ({ slug: g.slug, label: g.label, intro: g.intro || null })),
+    tropes: d.tropes || [],
+    series,
   };
 }
 
@@ -91,6 +158,10 @@ function load() {
   return fromDataJs(win.LAKORN);
 }
 export const D = load();
+/* ที่มาของยอดวิว — ทุกหน้าที่คิดจะโชว์ยอดวิวต้องถามค่านี้ ไม่ใช่เดาจาก `s.views` ว่าง
+   `'none'` = ยังไม่มีระบบวัด ⇒ ห้ามแสดงยอดวิว ห้ามอ้างว่าอันดับมาจากการวัด (V12/V13) */
+export const VIEWS_SOURCE = D.viewsSource;
+export const HAS_VIEWS = VIEWS_SOURCE !== 'none';
 
 export const SERIES = D.series;
 export const BY = Object.fromEntries(SERIES.map(s => [s.slug, s]));
@@ -122,15 +193,25 @@ export const OPEN_TAGS = D.tropes.filter(t =>
   t.items.length >= TAG_MIN_ITEMS && genreOverlap(t.items) <= TAG_MAX_GENRE_OVERLAP);
 export const isOpenTag = slug => OPEN_TAGS.some(t => t.slug === slug);
 
-/* ---------- อันดับยอดนิยม ----------
-   ยังไม่มีระบบวัดผลจริง — เรียงจาก views ที่เก็บในข้อมูล (ตัวเลขตัวอย่าง)
-   โชว์ในหน้าได้ แต่ห้ามส่งเข้า structured data (AIO-19 C-02 · มติลูกค้า 22 ต.ค.) */
+/* ---------- อันดับในหน้า /popular ----------
+   ADR-001 §12.2 C2: ขณะ `viewsSource === "none"` การจัดลำดับต้องมาจาก "เกณฑ์ที่ประกาศได้
+   และตรวจย้อนได้จากข้อมูลจริง" ไม่ใช่ลำดับบรรทัดใน content.json ที่เผอิญเป็น
+   (เดิมเรียงด้วย viewsNum ซึ่งคืน 0 ทุกเรื่องเมื่อไม่มีข้อมูล ⇒ sort เสถียร ⇒ ได้ลำดับไฟล์)
+   เกณฑ์ที่ใช้แทน: จำนวนตอนมาก→น้อย แล้วตัดเสมอด้วย slug — ทั้งสองค่ามาจากข้อมูลจริง
+   และหน้าต้องเขียนบอกเกณฑ์นี้ตรง ๆ (ดู RANK_BASIS_TEXT ที่หน้า /popular ใช้) */
 export function viewsNum(s) {
   const m = String(s.views).match(/^([\d.]+)\s*(ล้าน|K)?$/);
   if (!m) return 0;
   return parseFloat(m[1]) * (m[2] === 'ล้าน' ? 1e6 : m[2] === 'K' ? 1e3 : 1);
 }
-export const TOP10 = [...SERIES].sort((a, b) => viewsNum(b) - viewsNum(a)).slice(0, 10);
+export const RANK_BASIS = HAS_VIEWS ? 'views' : 'eps';
+export const RANK_BASIS_TEXT = HAS_VIEWS
+  ? 'เรียงตามยอดวิวสะสมในคลัง'
+  : 'เรียงตามจำนวนตอนจากมากไปน้อย';
+const byRank = HAS_VIEWS
+  ? (a, b) => viewsNum(b) - viewsNum(a) || a.slug.localeCompare(b.slug)
+  : (a, b) => b.eps - a.eps || a.slug.localeCompare(b.slug);
+export const TOP10 = [...SERIES].sort(byRank).slice(0, 10);
 
 /* ---------- เวลา ---------- */
 export const epSecs = dur => { const p = String(dur).split(':'); return (+p[0]) * 60 + (+p[1]); };
@@ -149,7 +230,8 @@ export function similar(s, n = 6) {
     + (x.tropes || []).filter(t => (s.tropes || []).includes(t)).length;
   return SERIES.filter(x => x.slug !== s.slug)
     .map(x => [x, score(x)])
-    .sort((a, b) => b[1] - a[1] || viewsNum(b[0]) - viewsNum(a[0]))
+    /* ตัดเสมอด้วย slug ปิดท้าย — ไม่งั้นเมื่อไม่มี views ลำดับจะกลายเป็นลำดับบรรทัดในไฟล์ */
+    .sort((a, b) => b[1] - a[1] || viewsNum(b[0]) - viewsNum(a[0]) || a[0].slug.localeCompare(b[0].slug))
     .slice(0, n).map(x => x[0]);
 }
 

@@ -1,7 +1,7 @@
 /* กลุ่ม B — รายละเอียดเรื่อง (12 หน้า) + หน้ารับชม (418 หน้า)
    เทมเพลตเดียวต่อกลุ่ม ตาม ux-spec §2.3 */
 import {
-  U, SERIES, genreLabel, similar, tropesOf, isOpenTag, D, epSecs, hasCastPage,
+  U, SERIES, genreLabel, similar, tropesOf, isOpenTag, D, epSecs, hasCastPage, HAS_VIEWS,
 } from './content.mjs';
 import {
   definePage, shell, pageHead, crumbs, rail, section, poster, card, epGrid, epTabs,
@@ -57,7 +57,9 @@ export function buildSeries() {
               <span>${s.genres.map(genreLabel).join(' · ')}</span>
               <span class="num">${s.eps} ตอน</span>
               <span>${esc(s.status)}</span>
-              <span class="views">${ic('eye', 'sm')}<span class="num">${esc(s.views)}</span> วิว</span>
+              ${/* ไม่มีระบบวัดผู้ชม = ไม่มีบรรทัดยอดวิวเลย (ADR-001 §12.2 C1 · V12) */ ''}
+              ${HAS_VIEWS && s.views != null
+                ? `<span class="views">${ic('eye', 'sm')}<span class="num">${esc(s.views)}</span> วิว</span>` : ''}
             </div>
             <div class="btn-row">
               <a class="btn btn-accent btn-main" href="${L(U.watch(s.slug, 1))}" data-resume="${s.slug}">${ic('playf', 'sm')} <span data-resume-label>เริ่มดู EP.1</span></a>
@@ -77,7 +79,9 @@ export function buildSeries() {
               return hasCastPage(c) ? `<a href="${L(U.cast(c))}">${inner}</a>` : `<span class="castone">${inner}</span>`;
             }).join('')}</div>`)}
             ${section('เรื่องที่คล้ายกัน', rail(L, similar(s).map(x => card(L, x)).join('')))}
-            ${sampleNote('ยอดวิวเป็นตัวเลขตัวอย่าง ยังไม่ได้ต่อระบบวัดผลจริง')}
+            ${/* หมายเหตุผูกกับ viewsSource ไม่เขียนตายไว้ (ADR-001 §12.2 C4)
+                 — ไม่มียอดวิวบนหน้าแล้ว หมายเหตุที่พูดถึงยอดวิวจึงไม่มีสิ่งอ้างอิง */ ''}
+            ${HAS_VIEWS ? sampleNote('ยอดวิวเป็นตัวเลขตัวอย่าง ยังไม่ได้ต่อระบบวัดผลจริง') : ''}
           </div>
         </div>`),
       }),
@@ -136,7 +140,10 @@ export function buildWatch() {
                   <button class="bigplay" id="playBtn" aria-label="เล่น">${ic('playf', 'lg')}</button>
                   <div class="pstack">
                     <div class="pfoot">
-                      <div class="ptext"><p class="sub-t" id="subLine"></p></div>
+                      ${/* ไม่มีช่องซับไตเติลในสัญญา §6 และยังไม่มีไฟล์วิดีโอ จึงไม่มีบรรทัดซับ
+                           (ม็อกอัพใช้ประโยคตัวอย่างจาก assets/data.js ซึ่งเป็นของชั้นออกแบบ)
+                           `.ptext` คงไว้เป็นช่องยืดของ flex ให้แถวล่างวางตัวเหมือนแบบที่อนุมัติ */ ''}
+                      <div class="ptext"></div>
                       <div class="side">
                         <button class="b on" id="muteBtn" aria-label="เปิดเสียง (ตอนนี้ปิดเสียงอยู่)">${ic('mute')}</button>
                         <span class="lb">ปิดเสียง</span>
