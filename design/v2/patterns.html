@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="th"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>แพตเทิร์นกลาง — loading / empty / error · LakornAI v2 (ม็อกอัพเสนอแบบ)</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="v2.css">
+</head><body class="">
+<a class="skip" href="#main">ข้ามไปเนื้อหาหลัก</a>
+<header class="top"><div class="wrap">
+    <a class="logo" href="#"><b lang="en">Lakorn</b><i lang="en">AI</i></a>
+    <nav class="topnav" aria-label="เมนูบนสุด"><a href="#">หน้าแรก</a><a href="#">ฟีด</a><a href="#">หมวด<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></a><a href="#">ตอนใหม่</a><a href="#">ยอดนิยม</a><a href="#">คลังของฉัน</a></nav>
+    <div class="spacer"></div>
+    <button class="icon-btn" aria-label="ค้นหา"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></button>
+    <button class="coin-btn" aria-label="กระเป๋าเหรียญ 1250 เหรียญ" style="margin-left:8px">
+           <span class="c" aria-hidden="true">฿</span><span class="num">1,250</span></button>
+         <button class="avatar" aria-label="บัญชีของฉัน" style="margin-left:8px">ก</button>
+  </div></header><main id="main" class="page"><div class="wrap">
+      <div class="page-head"><h1>แพตเทิร์นกลาง: โหลด / ว่าง / ผิดพลาด</h1>
+        <p>UX 6.14 — ออกแบบครั้งเดียว ใช้กับ 60 ช่องสถานะที่เหลือทั้งเว็บ</p></div>
+
+      <section class="sec"><div class="sec-h"><h2>1. Skeleton 4 แบบ</h2></div>
+        <p class="sec-sub">ใช้ <code>pulse opacity</code> ไม่ใช่ gradient วิ่ง เพื่อให้เคารพ <code>prefers-reduced-motion</code></p>
+        <div style="display:grid;gap:var(--s5);grid-template-columns:repeat(auto-fit,minmax(240px,1fr))">
+          <div><div class="note-ex" style="margin-bottom:10px">การ์ด 2:3</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s3)"><div class="skelcard"><div class="skel p"></div><div class="skel l w90"></div><div class="skel l w45"></div></div><div class="skelcard"><div class="skel p"></div><div class="skel l w90"></div><div class="skel l w45"></div></div></div></div>
+          <div><div class="note-ex" style="margin-bottom:10px">การ์ดดูต่อ 16:9</div>
+            <div class="skelcard"><div class="skel c"></div><div class="skel l w90"></div><div class="skel l w45"></div></div></div>
+          <div><div class="note-ex" style="margin-bottom:10px">แถวตอน</div>
+            <div style="display:grid;gap:10px"><div class="skelrow"><div class="skel th"></div><div style="flex:1;display:grid;gap:8px"><div class="skel l w45"></div><div class="skel l w90"></div></div></div><div class="skelrow"><div class="skel th"></div><div style="flex:1;display:grid;gap:8px"><div class="skel l w45"></div><div class="skel l w90"></div></div></div></div></div>
+          <div><div class="note-ex" style="margin-bottom:10px">บล็อกข้อความ</div>
+            <div style="display:grid;gap:10px"><div class="skel l" style="height:22px;width:60%"></div>
+              <div class="skel l w90"></div><div class="skel l w90"></div><div class="skel l w70"></div></div></div>
+        </div></section>
+
+      <section class="sec"><div class="sec-h"><h2>2. Empty — ต้องมีปุ่มพาไปต่อเสมอ</h2></div>
+        <p class="sec-sub">ไอคอน + หัวข้อ + 1 ประโยค + ปุ่ม — ห้ามเป็นทางตัน</p>
+        <div style="display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+          <div class="panel"><div class="empty">
+  <div class="ill"><svg class="ico lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2 19 12 8 18.8z" fill="currentColor"/></svg></div><h3>ยังไม่มีเรื่องที่ดูค้าง</h3><p>เริ่มจากฟีดแนวตั้ง ปัดดูทีละเรื่อง</p>
+  <a class="btn btn-ghost btn-md" href="#">เริ่มเลื่อนดูฟีด</a></div></div>
+          <div class="panel"><div class="empty">
+  <div class="ill"><svg class="ico lg" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></div><h3>ไม่พบเรื่องที่ตรงกับคำค้น</h3><p>ลองคำอื่น หรือเลือกจากคำค้นยอดนิยม</p>
+  <a class="btn btn-ghost btn-md" href="#">ดูทุกเรื่องในคลัง</a></div></div>
+          <div class="panel"><div class="empty">
+  <div class="ill"><svg class="ico lg" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 9a6 6 0 1 0-12 0c0 5-2 6.5-2 6.5h16S18 14 18 9z"/><path d="M10.4 19.5a2 2 0 0 0 3.2 0"/></svg></div><h3>ยังไม่มีการแจ้งเตือน</h3><p>เมื่อเรื่องที่ติดตามปล่อยตอนใหม่ เราจะแจ้งที่นี่</p>
+  <a class="btn btn-ghost btn-md" href="#">ไปติดตามเรื่องที่ชอบ</a></div></div>
+        </div></section>
+
+      <section class="sec"><div class="sec-h"><h2>3. Error ในหน้า</h2></div>
+        <p class="sec-sub">ไอคอน + “โหลดไม่ได้” + ปุ่มลองใหม่ · ใช้ซ้ำได้ทุกบล็อกที่โหลดข้อมูล</p>
+        <div style="display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+          <div class="errorbox">
+  <div class="ill"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5 21 19.5H3z"/><path d="M12 10v4M12 17h.01"/></svg></div><h3 style="font-size:var(--t-h2);font-weight:600">โหลดข้อมูลไม่ได้</h3>
+  <p style="color:var(--muted);font-size:var(--t-sub)">การเชื่อมต่อขัดข้อง ลองใหม่อีกครั้ง</p>
+  <button class="btn btn-ghost btn-md"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11a8.5 8.5 0 1 0-.7 4.5"/><path d="M20.5 5v6h-6"/></svg> ลองใหม่</button></div>
+          <div class="errorbox">
+  <div class="ill"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5 21 19.5H3z"/><path d="M12 10v4M12 17h.01"/></svg></div><h3 style="font-size:var(--t-h2);font-weight:600">เล่นตอนนี้ไม่ได้</h3>
+  <p style="color:var(--muted);font-size:var(--t-sub)">ไฟล์วิดีโอขัดข้อง ลองใหม่หรือข้ามไปตอนถัดไป</p>
+  <button class="btn btn-ghost btn-md"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11a8.5 8.5 0 1 0-.7 4.5"/><path d="M20.5 5v6h-6"/></svg> ลองใหม่</button></div>
+        </div></section>
+
+      <section class="sec"><div class="sec-h"><h2>4. Toast</h2></div>
+        <div style="position:relative;height:120px;border:1px dashed var(--line-2);border-radius:var(--r-lg);background:var(--surface)">
+          <div class="toast" style="position:absolute;bottom:20px">
+            <span class="ic"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8.2 12.2 2.6 2.6 5-5.4"/></svg></span><span>ติดตาม “ทุเรียนทวงแค้น” แล้ว</span>
+            <button>เลิกทำ</button></div></div></section>
+    </div><footer class="foot"><div class="wrap"><div class="cols">
+    <div><h4>เลือกดู</h4><nav><a href="#">ละครแนวตั้ง</a><a href="#">ละครผลไม้ AI</a><a href="#">ละครฝรั่ง</a><a href="#">สยองขวัญ</a><a href="#">ย้อนเวลา</a><a href="#">แก้แค้น</a><a href="#">ดัชนี ก–ฮ / A–Z</a><a href="#">ตารางออกตอน</a></nav></div>
+    <div><h4>บัญชี</h4><nav><a href="#">เข้าสู่ระบบ</a><a href="#">แพ็กเกจสมาชิก</a><a href="#">เติมเหรียญ</a><a href="#">รับเหรียญฟรี</a></nav></div>
+    <div><h4>เกี่ยวกับ</h4><nav><a href="#">เกี่ยวกับเรา</a><a href="#">เบื้องหลังการสร้างด้วย AI</a><a href="#">ติดต่อ</a><a href="#">ช่วยเหลือ</a></nav></div>
+    <div><h4>ข้อกำหนด</h4><nav><a href="#">ข้อตกลงการใช้</a><a href="#">นโยบายความเป็นส่วนตัว</a><a href="#">เงื่อนไขสมาชิก</a><a href="#">นโยบายคุกกี้</a></nav></div>
+  </div><div class="btm">© LakornAI · lakornai.tv · ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง (mockup)</div></div></footer></main><nav class="bottom" aria-label="เมนูหลัก"><div class="in">
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg><span>หน้าแรก</span></a>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 9.5l4 2.5-4 2.5z"/></svg><span>ฟีด</span></a>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg><span>ค้นหา</span></a>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="2"/><rect x="14" y="4" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>คลังของฉัน</span></a>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg><span>บัญชี</span><i class="ndot"></i></a></div></nav>
+</body></html>

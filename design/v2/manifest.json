@@ -1,0 +1,875 @@
+[
+  {
+    "id": "A1",
+    "name": "หน้าแรก",
+    "state": "",
+    "tier": "R1",
+    "file": "home.html",
+    "shots": [
+      "mobile-home.png",
+      "desktop-home.png",
+      "mobilefull-home.png",
+      "desktopfull-home.png"
+    ]
+  },
+  {
+    "id": "A1",
+    "name": "หน้าแรก",
+    "state": "ยังไม่ล็อกอิน",
+    "tier": "R1",
+    "file": "home-guest.html",
+    "shots": [
+      "mobile-home-guest.png",
+      "desktop-home-guest.png"
+    ]
+  },
+  {
+    "id": "A1",
+    "name": "หน้าแรก",
+    "state": "ไม่มีเรื่องที่ดูค้าง (empty)",
+    "tier": "R1",
+    "file": "home-empty.html",
+    "shots": [
+      "mobile-home-empty.png"
+    ]
+  },
+  {
+    "id": "A1",
+    "name": "หน้าแรก",
+    "state": "กำลังโหลด (skeleton)",
+    "tier": "R1",
+    "file": "home-loading.html",
+    "shots": [
+      "mobile-home-loading.png",
+      "desktop-home-loading.png"
+    ]
+  },
+  {
+    "id": "A2",
+    "name": "ฟีดแนวตั้ง",
+    "state": "",
+    "tier": "R1",
+    "file": "feed.html",
+    "shots": [
+      "mobile-feed.png",
+      "desktop-feed.png"
+    ]
+  },
+  {
+    "id": "A2",
+    "name": "ฟีดแนวตั้ง",
+    "state": "ดูครบแล้ว (empty)",
+    "tier": "R1",
+    "file": "feed-empty.html",
+    "shots": [
+      "mobile-feed-empty.png"
+    ]
+  },
+  {
+    "id": "A2",
+    "name": "ฟีดแนวตั้ง",
+    "state": "เล่นไม่ได้ (error)",
+    "tier": "R1",
+    "file": "feed-error.html",
+    "shots": [
+      "mobile-feed-error.png"
+    ]
+  },
+  {
+    "id": "A2",
+    "name": "ฟีดแนวตั้ง",
+    "state": "กำลังโหลด",
+    "tier": "R1",
+    "file": "feed-loading.html",
+    "shots": [
+      "mobile-feed-loading.png"
+    ]
+  },
+  {
+    "id": "A3",
+    "name": "ค้นหา",
+    "state": "มีผลลัพธ์",
+    "tier": "R1",
+    "file": "search.html",
+    "shots": [
+      "mobile-search.png",
+      "desktop-search.png"
+    ]
+  },
+  {
+    "id": "A3",
+    "name": "ค้นหา",
+    "state": "ยังไม่พิมพ์ (ประวัติ+คำค้นฮิต)",
+    "tier": "R1",
+    "file": "search-idle.html",
+    "shots": [
+      "mobile-search-idle.png"
+    ]
+  },
+  {
+    "id": "A3",
+    "name": "ค้นหา",
+    "state": "ไม่พบผลลัพธ์ (empty)",
+    "tier": "R1",
+    "file": "search-empty.html",
+    "shots": [
+      "mobile-search-empty.png"
+    ]
+  },
+  {
+    "id": "A3",
+    "name": "ค้นหา",
+    "state": "ยังไม่ล็อกอิน (ไม่มีประวัติ)",
+    "tier": "R1",
+    "file": "search-guest.html",
+    "shots": [
+      "mobile-search-guest.png"
+    ]
+  },
+  {
+    "id": "A4",
+    "name": "หน้าแนว",
+    "state": "",
+    "tier": "R1",
+    "file": "genre.html",
+    "shots": [
+      "mobile-genre.png",
+      "desktop-genre.png"
+    ]
+  },
+  {
+    "id": "A4",
+    "name": "หน้าแนว",
+    "state": "แนวนี้ยังไม่มีเรื่อง (empty)",
+    "tier": "R1",
+    "file": "genre-empty.html",
+    "shots": [
+      "mobile-genre-empty.png"
+    ]
+  },
+  {
+    "id": "A5",
+    "name": "หน้าแท็ก trope",
+    "state": "",
+    "tier": "R3",
+    "file": "tag.html",
+    "shots": [
+      "mobile-tag.png"
+    ]
+  },
+  {
+    "id": "A6",
+    "name": "ฮับเลือกดู",
+    "state": "",
+    "tier": "R2",
+    "file": "browse.html",
+    "shots": [
+      "mobile-browse.png",
+      "desktop-browse.png",
+      "mobilefull-browse.png"
+    ]
+  },
+  {
+    "id": "A7",
+    "name": "ยอดนิยม TOP 10",
+    "state": "",
+    "tier": "R1",
+    "file": "popular.html",
+    "shots": [
+      "mobile-popular.png",
+      "desktop-popular.png",
+      "mobilefull-popular.png"
+    ]
+  },
+  {
+    "id": "A8",
+    "name": "ตอนใหม่",
+    "state": "",
+    "tier": "R2",
+    "file": "new.html",
+    "shots": [
+      "mobile-new.png"
+    ]
+  },
+  {
+    "id": "A8",
+    "name": "ตอนใหม่",
+    "state": "ไม่มีตอนใหม่ (empty)",
+    "tier": "R2",
+    "file": "new-empty.html",
+    "shots": [
+      "mobile-new-empty.png"
+    ]
+  },
+  {
+    "id": "A9",
+    "name": "ตารางออกตอน",
+    "state": "",
+    "tier": "R2",
+    "file": "schedule.html",
+    "shots": [
+      "mobile-schedule.png"
+    ]
+  },
+  {
+    "id": "A10",
+    "name": "ดัชนี ก–ฮ / A–Z",
+    "state": "",
+    "tier": "R2",
+    "file": "az.html",
+    "shots": [
+      "mobile-az.png"
+    ]
+  },
+  {
+    "id": "B1",
+    "name": "รายละเอียดเรื่อง",
+    "state": "",
+    "tier": "R1",
+    "file": "series.html",
+    "shots": [
+      "mobile-series.png",
+      "desktop-series.png",
+      "mobilefull-series.png",
+      "desktopfull-series.png"
+    ]
+  },
+  {
+    "id": "B1",
+    "name": "รายละเอียดเรื่อง",
+    "state": "ยังไม่ล็อกอิน",
+    "tier": "R1",
+    "file": "series-guest.html",
+    "shots": [
+      "mobile-series-guest.png"
+    ]
+  },
+  {
+    "id": "B1",
+    "name": "รายละเอียดเรื่อง",
+    "state": "กำลังโหลด (skeleton)",
+    "tier": "R1",
+    "file": "series-loading.html",
+    "shots": [
+      "mobile-series-loading.png"
+    ]
+  },
+  {
+    "id": "B2",
+    "name": "หน้ารับชม",
+    "state": "",
+    "tier": "R1",
+    "file": "watch.html",
+    "shots": [
+      "mobile-watch.png",
+      "desktop-watch.png",
+      "mobilefull-watch.png"
+    ]
+  },
+  {
+    "id": "B2",
+    "name": "หน้ารับชม",
+    "state": "กำลังโหลด",
+    "tier": "R1",
+    "file": "watch-loading.html",
+    "shots": [
+      "mobile-watch-loading.png"
+    ]
+  },
+  {
+    "id": "B2",
+    "name": "หน้ารับชม",
+    "state": "เล่นไม่ได้ (error)",
+    "tier": "R1",
+    "file": "watch-error.html",
+    "shots": [
+      "mobile-watch-error.png"
+    ]
+  },
+  {
+    "id": "B3",
+    "name": "ชีตเลือกตอนในเพลเยอร์",
+    "state": "",
+    "tier": "R3",
+    "file": "watch-episodes.html",
+    "shots": [
+      "mobile-watch-episodes.png",
+      "desktop-watch-episodes.png"
+    ]
+  },
+  {
+    "id": "B4",
+    "name": "Paywall",
+    "state": "a · เหรียญพอ",
+    "tier": "R1",
+    "file": "paywall-coins-ok.html",
+    "shots": [
+      "mobile-paywall-coins-ok.png",
+      "desktop-paywall-coins-ok.png"
+    ]
+  },
+  {
+    "id": "B4",
+    "name": "Paywall",
+    "state": "b · เหรียญไม่พอ",
+    "tier": "R1",
+    "file": "paywall-coins-low.html",
+    "shots": [
+      "mobile-paywall-coins-low.png"
+    ]
+  },
+  {
+    "id": "B4",
+    "name": "Paywall",
+    "state": "c · ยังไม่ล็อกอิน",
+    "tier": "R1",
+    "file": "paywall-guest.html",
+    "shots": [
+      "mobile-paywall-guest.png"
+    ]
+  },
+  {
+    "id": "B4",
+    "name": "Paywall",
+    "state": "กำลังยืนยัน (loading)",
+    "tier": "R1",
+    "file": "paywall-busy.html",
+    "shots": [
+      "mobile-paywall-busy.png"
+    ]
+  },
+  {
+    "id": "B4",
+    "name": "Paywall",
+    "state": "ปลดล็อกไม่สำเร็จ (error)",
+    "tier": "R1",
+    "file": "paywall-error.html",
+    "shots": [
+      "mobile-paywall-error.png"
+    ]
+  },
+  {
+    "id": "E3",
+    "name": "แถบอธิบาย paywall ครั้งแรก",
+    "state": "",
+    "tier": "R3",
+    "file": "paywall-first.html",
+    "shots": [
+      "mobile-paywall-first.png"
+    ]
+  },
+  {
+    "id": "B5",
+    "name": "แลนดิ้งแชร์ตอน",
+    "state": "",
+    "tier": "R3",
+    "file": "share-landing.html",
+    "shots": [
+      "mobile-share-landing.png",
+      "desktop-share-landing.png"
+    ]
+  },
+  {
+    "id": "B6",
+    "name": "ตัวละคร/นักแสดง",
+    "state": "",
+    "tier": "R2",
+    "file": "cast.html",
+    "shots": [
+      "mobile-cast.png"
+    ]
+  },
+  {
+    "id": "B6",
+    "name": "ตัวละคร/นักแสดง",
+    "state": "ไม่มีเรื่อง (empty)",
+    "tier": "R2",
+    "file": "cast-empty.html",
+    "shots": [
+      "mobile-cast-empty.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "แท็บ ดูต่อ",
+    "tier": "R1",
+    "file": "library.html",
+    "shots": [
+      "mobile-library.png",
+      "desktop-library.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "แท็บ ติดตาม",
+    "tier": "R1",
+    "file": "library-following.html",
+    "shots": [
+      "mobile-library-following.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "แท็บ ดูจบแล้ว",
+    "tier": "R1",
+    "file": "library-done.html",
+    "shots": [
+      "mobile-library-done.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "แท็บ ประวัติ",
+    "tier": "R1",
+    "file": "library-history.html",
+    "shots": [
+      "mobile-library-history.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "ยังไม่ล็อกอิน",
+    "tier": "R1",
+    "file": "library-guest.html",
+    "shots": [
+      "mobile-library-guest.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "empty 1/4 ดูต่อ",
+    "tier": "R1",
+    "file": "library-empty-continue.html",
+    "shots": [
+      "mobile-library-empty-continue.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "empty 2/4 ติดตาม",
+    "tier": "R1",
+    "file": "library-empty-following.html",
+    "shots": [
+      "mobile-library-empty-following.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "empty 3/4 ดูจบแล้ว",
+    "tier": "R1",
+    "file": "library-empty-done.html",
+    "shots": [
+      "mobile-library-empty-done.png"
+    ]
+  },
+  {
+    "id": "C1",
+    "name": "คลังของฉัน",
+    "state": "empty 4/4 ประวัติ",
+    "tier": "R1",
+    "file": "library-empty-history.html",
+    "shots": [
+      "mobile-library-empty-history.png"
+    ]
+  },
+  {
+    "id": "D1",
+    "name": "เข้าสู่ระบบ / สมัคร",
+    "state": "",
+    "tier": "R1",
+    "file": "login.html",
+    "shots": [
+      "mobile-login.png",
+      "desktop-login.png"
+    ]
+  },
+  {
+    "id": "D1",
+    "name": "เข้าสู่ระบบ / สมัคร",
+    "state": "เบอร์ไม่ถูกต้อง (error)",
+    "tier": "R1",
+    "file": "login-error.html",
+    "shots": [
+      "mobile-login-error.png"
+    ]
+  },
+  {
+    "id": "D1",
+    "name": "เข้าสู่ระบบ / สมัคร",
+    "state": "กำลังส่ง OTP (loading)",
+    "tier": "R1",
+    "file": "login-busy.html",
+    "shots": [
+      "mobile-login-busy.png"
+    ]
+  },
+  {
+    "id": "D2",
+    "name": "ยืนยัน OTP",
+    "state": "",
+    "tier": "R2",
+    "file": "otp.html",
+    "shots": [
+      "mobile-otp.png"
+    ]
+  },
+  {
+    "id": "D2",
+    "name": "ยืนยัน OTP",
+    "state": "รหัสผิด (error)",
+    "tier": "R2",
+    "file": "otp-error.html",
+    "shots": [
+      "mobile-otp-error.png"
+    ]
+  },
+  {
+    "id": "D2",
+    "name": "ยืนยัน OTP",
+    "state": "กำลังตรวจสอบ (loading)",
+    "tier": "R2",
+    "file": "otp-busy.html",
+    "shots": [
+      "mobile-otp-busy.png"
+    ]
+  },
+  {
+    "id": "D3",
+    "name": "โปรไฟล์ / บัญชี",
+    "state": "สมาชิก VIP",
+    "tier": "R1",
+    "file": "account.html",
+    "shots": [
+      "mobile-account.png",
+      "desktop-account.png"
+    ]
+  },
+  {
+    "id": "D3",
+    "name": "โปรไฟล์ / บัญชี",
+    "state": "ยังไม่ล็อกอิน",
+    "tier": "R1",
+    "file": "account-guest.html",
+    "shots": [
+      "mobile-account-guest.png"
+    ]
+  },
+  {
+    "id": "D4",
+    "name": "กระเป๋าเหรียญ",
+    "state": "",
+    "tier": "R2",
+    "file": "wallet.html",
+    "shots": [
+      "mobile-wallet.png"
+    ]
+  },
+  {
+    "id": "D4",
+    "name": "กระเป๋าเหรียญ",
+    "state": "ยังไม่มีประวัติ (empty)",
+    "tier": "R2",
+    "file": "wallet-empty.html",
+    "shots": [
+      "mobile-wallet-empty.png"
+    ]
+  },
+  {
+    "id": "D5",
+    "name": "เติมเหรียญ",
+    "state": "",
+    "tier": "R1",
+    "file": "topup.html",
+    "shots": [
+      "mobile-topup.png",
+      "desktop-topup.png"
+    ]
+  },
+  {
+    "id": "D6",
+    "name": "แพ็กเกจสมาชิก VIP",
+    "state": "",
+    "tier": "R1",
+    "file": "vip.html",
+    "shots": [
+      "mobile-vip.png",
+      "desktop-vip.png",
+      "mobilefull-vip.png"
+    ]
+  },
+  {
+    "id": "D7",
+    "name": "ยืนยันการชำระ",
+    "state": "",
+    "tier": "R2",
+    "file": "checkout.html",
+    "shots": [
+      "mobile-checkout.png"
+    ]
+  },
+  {
+    "id": "D7",
+    "name": "ยืนยันการชำระ",
+    "state": "กำลังดำเนินการ (loading)",
+    "tier": "R2",
+    "file": "checkout-busy.html",
+    "shots": [
+      "mobile-checkout-busy.png"
+    ]
+  },
+  {
+    "id": "D8",
+    "name": "ผลการชำระ",
+    "state": "สำเร็จ",
+    "tier": "R2",
+    "file": "result-success.html",
+    "shots": [
+      "mobile-result-success.png"
+    ]
+  },
+  {
+    "id": "D8",
+    "name": "ผลการชำระ",
+    "state": "ไม่สำเร็จ (error)",
+    "tier": "R2",
+    "file": "result-fail.html",
+    "shots": [
+      "mobile-result-fail.png"
+    ]
+  },
+  {
+    "id": "D9",
+    "name": "รับเหรียญฟรี",
+    "state": "",
+    "tier": "R2",
+    "file": "earn.html",
+    "shots": [
+      "mobile-earn.png"
+    ]
+  },
+  {
+    "id": "D9",
+    "name": "รับเหรียญฟรี",
+    "state": "ภารกิจครบแล้ว (empty)",
+    "tier": "R2",
+    "file": "earn-empty.html",
+    "shots": [
+      "mobile-earn-empty.png"
+    ]
+  },
+  {
+    "id": "D10",
+    "name": "ตั้งค่า",
+    "state": "",
+    "tier": "R2",
+    "file": "settings.html",
+    "shots": [
+      "mobile-settings.png"
+    ]
+  },
+  {
+    "id": "D11",
+    "name": "ศูนย์แจ้งเตือน",
+    "state": "",
+    "tier": "R2",
+    "file": "notifications.html",
+    "shots": [
+      "mobile-notifications.png"
+    ]
+  },
+  {
+    "id": "D11",
+    "name": "ศูนย์แจ้งเตือน",
+    "state": "ยังไม่มีแจ้งเตือน (empty)",
+    "tier": "R2",
+    "file": "notifications-empty.html",
+    "shots": [
+      "mobile-notifications-empty.png"
+    ]
+  },
+  {
+    "id": "E1",
+    "name": "เลือกแนวที่ชอบ",
+    "state": "เลือกแล้ว 2",
+    "tier": "R1",
+    "file": "welcome.html",
+    "shots": [
+      "mobile-welcome.png",
+      "desktop-welcome.png"
+    ]
+  },
+  {
+    "id": "E1",
+    "name": "เลือกแนวที่ชอบ",
+    "state": "ยังไม่ได้เลือก (ปุ่ม disabled)",
+    "tier": "R1",
+    "file": "welcome-empty.html",
+    "shots": [
+      "mobile-welcome-empty.png"
+    ]
+  },
+  {
+    "id": "E2",
+    "name": "Coach mark ฟีด",
+    "state": "",
+    "tier": "R3",
+    "file": "feed-coach.html",
+    "shots": [
+      "mobile-feed-coach.png"
+    ]
+  },
+  {
+    "id": "F1",
+    "name": "404 ไม่พบหน้า",
+    "state": "",
+    "tier": "R2",
+    "file": "404.html",
+    "shots": [
+      "mobile-404.png",
+      "desktop-404.png"
+    ]
+  },
+  {
+    "id": "F2",
+    "name": "ออฟไลน์",
+    "state": "",
+    "tier": "R2",
+    "file": "offline.html",
+    "shots": [
+      "mobile-offline.png"
+    ]
+  },
+  {
+    "id": "F3",
+    "name": "แพตเทิร์นกลาง loading/empty/error",
+    "state": "",
+    "tier": "R3",
+    "file": "patterns.html",
+    "shots": [
+      "mobile-patterns.png",
+      "desktop-patterns.png",
+      "desktopfull-patterns.png"
+    ]
+  },
+  {
+    "id": "G1",
+    "name": "เกี่ยวกับเรา",
+    "state": "",
+    "tier": "R2",
+    "file": "about.html",
+    "shots": [
+      "mobile-about.png"
+    ]
+  },
+  {
+    "id": "G2",
+    "name": "ติดต่อ",
+    "state": "",
+    "tier": "R2",
+    "file": "contact.html",
+    "shots": [
+      "mobile-contact.png"
+    ]
+  },
+  {
+    "id": "G2",
+    "name": "ติดต่อ",
+    "state": "ช่องไม่ถูกต้อง (error)",
+    "tier": "R2",
+    "file": "contact-error.html",
+    "shots": [
+      "mobile-contact-error.png"
+    ]
+  },
+  {
+    "id": "G2",
+    "name": "ติดต่อ",
+    "state": "กำลังส่ง (loading)",
+    "tier": "R2",
+    "file": "contact-busy.html",
+    "shots": [
+      "mobile-contact-busy.png"
+    ]
+  },
+  {
+    "id": "G3",
+    "name": "ช่วยเหลือ / FAQ",
+    "state": "",
+    "tier": "R2",
+    "file": "help.html",
+    "shots": [
+      "mobile-help.png"
+    ]
+  },
+  {
+    "id": "G4",
+    "name": "ข้อตกลงการใช้",
+    "state": "",
+    "tier": "R2",
+    "file": "legal-terms.html",
+    "shots": [
+      "mobile-legal-terms.png",
+      "desktop-legal-terms.png"
+    ]
+  },
+  {
+    "id": "G5",
+    "name": "นโยบายความเป็นส่วนตัว",
+    "state": "",
+    "tier": "R2",
+    "file": "legal-privacy.html",
+    "shots": [
+      "mobile-legal-privacy.png"
+    ]
+  },
+  {
+    "id": "G6",
+    "name": "เงื่อนไขสมาชิก",
+    "state": "",
+    "tier": "R2",
+    "file": "legal-membership.html",
+    "shots": [
+      "mobile-legal-membership.png"
+    ]
+  },
+  {
+    "id": "G7",
+    "name": "นโยบายคุกกี้",
+    "state": "",
+    "tier": "R2",
+    "file": "legal-cookies.html",
+    "shots": [
+      "mobile-legal-cookies.png"
+    ]
+  },
+  {
+    "id": "G8",
+    "name": "เบื้องหลังการสร้างด้วย AI",
+    "state": "",
+    "tier": "R2",
+    "file": "behind-the-ai.html",
+    "shots": [
+      "mobile-behind-the-ai.png"
+    ]
+  },
+  {
+    "id": "DS",
+    "name": "Design system (token + component)",
+    "state": "",
+    "tier": "—",
+    "file": "styleguide.html",
+    "shots": [
+      "mobile-styleguide.png",
+      "desktop-styleguide.png",
+      "desktopfull-styleguide.png"
+    ]
+  }
+]

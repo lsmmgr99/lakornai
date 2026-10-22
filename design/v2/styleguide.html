@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="th"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Design system — LakornAI v2 · LakornAI v2 (ม็อกอัพเสนอแบบ)</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="v2.css">
+</head><body class="">
+<a class="skip" href="#main">ข้ามไปเนื้อหาหลัก</a>
+<header class="top"><div class="wrap">
+    <a class="logo" href="#"><b lang="en">Lakorn</b><i lang="en">AI</i></a>
+    <nav class="topnav" aria-label="เมนูบนสุด"><a href="#">หน้าแรก</a><a href="#">ฟีด</a><a href="#">หมวด<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></a><a href="#">ตอนใหม่</a><a href="#">ยอดนิยม</a><a href="#">คลังของฉัน</a></nav>
+    <div class="spacer"></div>
+    <button class="icon-btn" aria-label="ค้นหา"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg></button>
+    <button class="coin-btn" aria-label="กระเป๋าเหรียญ 1250 เหรียญ" style="margin-left:8px">
+           <span class="c" aria-hidden="true">฿</span><span class="num">1,250</span></button>
+         <button class="avatar" aria-label="บัญชีของฉัน" style="margin-left:8px">ก</button>
+  </div></header><main id="main" class="page"><div class="wrap">
+    <div class="page-head" style="padding-top:var(--s7)">
+      <span style="display:inline-flex;align-items:center;gap:7px;color:var(--accent);font-size:var(--t-meta);font-weight:600">
+        <svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 13.8 9 19.5 10.8 13.8 12.6 12 18.2 10.2 12.6 4.5 10.8 10.2 9z"/><path d="M18.6 16.4 19.4 18.6 21.6 19.4 19.4 20.2 18.6 22.4 17.8 20.2 15.6 19.4 17.8 18.6z"/></svg> LakornAI v2 · ม่านทอง (Golden Curtain)</span>
+      <h1 style="margin-top:8px">ระบบดีไซน์ที่ dev เอาไปใช้ได้ตรง ๆ</h1>
+      <p>ทุกค่าในหน้านี้อยู่ใน <code>design/v2/tokens.css</code> คัดลอกไปวางใน <code>:root</code> ของ <code>assets/style.css</code> ได้ทันทีหลังอนุมัติ</p></div>
+
+    <section class="sg-sec"><h2>1. สี — พื้นผิว</h2>
+      <p>เก็บแรมป์เดิมทั้งหมดเพราะ UX วัด contrast ไว้แล้ว (AIO-16 §7.1) เพิ่มแค่ <code>--surface-3</code> สำหรับชีต/โมดัล</p>
+      <div class="sg-grid">
+        <div class="sw">
+  <div class="chip-c" style="background:#0E0D12"></div>
+  <div class="meta"><b>--bg</b><code>#0E0D12</code><div style="color:var(--dim);margin-top:3px">พื้นเวที</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#17151D"></div>
+  <div class="meta"><b>--surface</b><code>#17151D</code><div style="color:var(--dim);margin-top:3px">การ์ด/แผง ชั้น 1</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#1C1A23"></div>
+  <div class="meta"><b>--surface-2</b><code>#1C1A23</code><div style="color:var(--dim);margin-top:3px">input · chip · ช่องตอน</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#23212C"></div>
+  <div class="meta"><b>--surface-3</b><code>#23212C</code><div style="color:var(--dim);margin-top:3px">ใหม่ — ชีต/โมดัล</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#141219"></div>
+  <div class="meta"><b>--nav</b><code>#141219</code><div style="color:var(--dim);margin-top:3px">แถบนำทาง</div></div></div>
+      </div></section>
+
+    <section class="sg-sec"><h2>2. สี — สัญญาณ</h2>
+      <p>ระบบสองแกน: <b style="color:var(--accent)">ทอง = ของที่ต้องจ่าย/แบรนด์/โฟกัส</b> และ
+        <b class="free-c">มรกต = ของที่ได้ฟรี/สำเร็จ/ความคืบหน้า</b> — ทำให้เรื่อง paywall อ่านออกจากสีได้โดยไม่ต้องอ่านตัวอักษร</p>
+      <div class="sg-grid">
+        <div class="sw">
+  <div class="chip-c" style="background:#F5C451"></div>
+  <div class="meta"><b>--accent</b><code>#F5C451</code><div style="color:var(--dim);margin-top:3px">ทอง · 11.89:1 บน bg</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#FFD877"></div>
+  <div class="meta"><b>--accent-hi</b><code>#FFD877</code><div style="color:var(--dim);margin-top:3px">hover · 14.14:1</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#DCAD3D"></div>
+  <div class="meta"><b>--accent-press</b><code>#DCAD3D</code><div style="color:var(--dim);margin-top:3px">กด · 9.30:1</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#4FD6A6"></div>
+  <div class="meta"><b>--free</b><code>#4FD6A6</code><div style="color:var(--dim);margin-top:3px">ฟรี/สำเร็จ · 10.60:1</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#FF6F91"></div>
+  <div class="meta"><b>--hot</b><code>#FF6F91</code><div style="color:var(--dim);margin-top:3px">ใหม่/มาแรง · 7.31:1</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#FF7A6B"></div>
+  <div class="meta"><b>--danger</b><code>#FF7A6B</code><div style="color:var(--dim);margin-top:3px">ผิดพลาด · 7.60:1</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#726E7D"></div>
+  <div class="meta"><b>--border-i</b><code>#726E7D</code><div style="color:var(--dim);margin-top:3px">ขอบ UI · 3.91 / 3.65 / 3.47 / 3.20 ✅ 1.4.11</div></div></div>
+        <div class="sw">
+  <div class="chip-c" style="background:#2A2733"></div>
+  <div class="meta"><b>--line-2</b><code>#2A2733</code><div style="color:var(--dim);margin-top:3px">เส้นคั่นตกแต่งเท่านั้น</div></div></div>
+      </div>
+      <div class="panel" style="margin-top:var(--s5)">
+        <h3>ค่า contrast ที่วัดแล้วของสีใหม่ (WCAG 2.1 relative luminance)</h3>
+        <div class="tbl"><table class="cmp" style="margin-top:var(--s3)">
+          <thead><tr><th>token</th><th>bg<br>#0E0D12</th><th>surface<br>#17151D</th><th>surface-2<br>#1C1A23</th><th>surface-3<br>#23212C</th><th>ผล</th></tr></thead>
+          <tbody>
+            <tr><td><code>--border-i</code> #726E7D</td><td class="num">3.91</td><td class="num">3.65</td><td class="num">3.47</td><td class="num">3.20</td><td class="free-c">ผ่าน 3:1 ทุกพื้น</td></tr>
+            <tr><td><code>--free</code> #4FD6A6</td><td class="num">10.60</td><td class="num">9.90</td><td class="num">9.42</td><td class="num">8.68</td><td class="free-c">AAA</td></tr>
+            <tr><td><code>--hot</code> #FF6F91</td><td class="num">7.31</td><td class="num">6.83</td><td class="num">6.50</td><td class="num">5.99</td><td class="free-c">AAA (ข้อความปกติ)</td></tr>
+            <tr><td><code>--accent-hi</code> #FFD877</td><td class="num">14.14</td><td class="num">13.21</td><td class="num">12.56</td><td class="num">11.57</td><td class="free-c">AAA</td></tr>
+            <tr><td><code>--accent-press</code> #DCAD3D</td><td class="num">9.30</td><td class="num">8.69</td><td class="num">8.26</td><td class="num">7.61</td><td class="free-c">AAA</td></tr>
+            <tr><td>ทอง #F5C451 + ตัวอักษร #141217</td><td class="num" colspan="4">11.43</td><td class="free-c">ปุ่มหลักปลอดภัย</td></tr>
+            <tr><td><code>--surface-3</code> #23212C บน bg</td><td class="num" colspan="4">1.32</td><td class="dim">พื้นผิว ไม่อยู่ใต้ 1.4.11</td></tr>
+          </tbody></table></div>
+        <p class="note-ex" style="margin-top:var(--s3)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          <span><code>--faint</code> #6F6B7C (3.75:1) ใช้กับกราฟิกเท่านั้น — <b>ห้ามใช้กับข้อความ</b> ตามกฎใน UX §7.1</span></p></div>
+    </section>
+
+    <section class="sg-sec"><h2>3. ตัวอักษร</h2>
+      <p>Kanit (500/600) สำหรับหัวเรื่องและตัวเลข · IBM Plex Sans Thai (400/500/600) สำหรับเนื้อหา —
+        <b>ไม่เพิ่มน้ำหนักใหม่</b> จากที่เว็บโหลดอยู่แล้ว ค่าทั้งหมดบังคับตาม UX §7.2</p>
+      <div class="panel">
+        <div class="kv" style="align-items:flex-start;gap:var(--s5)">
+            <span class="k" style="flex:none;width:150px"><b style="display:block;color:var(--fg-2)">hero h2</b>
+              <span class="num">30 / 36px · lh 1.25</span></span>
+            <span style="flex:1;font-family:var(--display);font-size:30px;line-height:1.25;color:var(--fg)">ประธานเย็นชากับเลขาตัวแสบ</span></div><div class="kv" style="align-items:flex-start;gap:var(--s5)">
+            <span class="k" style="flex:none;width:150px"><b style="display:block;color:var(--fg-2)">h1 หน้า</b>
+              <span class="num">24 / 30px · lh 1.3</span></span>
+            <span style="flex:1;font-family:var(--display);font-size:24px;line-height:1.3;color:var(--fg)">ยอดนิยมสัปดาห์นี้</span></div><div class="kv" style="align-items:flex-start;gap:var(--s5)">
+            <span class="k" style="flex:none;width:150px"><b style="display:block;color:var(--fg-2)">h1 เรื่อง</b>
+              <span class="num">28px · lh 1.25</span></span>
+            <span style="flex:1;font-family:var(--display);font-size:28px;line-height:1.25;color:var(--fg)">ข้ามภพมาเป็นนางร้าย</span></div><div class="kv" style="align-items:flex-start;gap:var(--s5)">
+            <span class="k" style="flex:none;width:150px"><b style="display:block;color:var(--fg-2)">h2 section</b>
+              <span class="num">20px · lh 1.35</span></span>
+            <span style="flex:1;font-family:var(--display);font-size:20px;line-height:1.35;color:var(--fg)">ตอนใหม่ล่าสุด</span></div><div class="kv" style="align-items:flex-start;gap:var(--s5)">
+            <span class="k" style="flex:none;width:150px"><b style="display:block;color:var(--fg-2)">เนื้อหา (ฐาน)</b>
+              <span class="num">17px · lh 1.6</span></span>
+            <span style="flex:1;font-family:var(--body);font-size:17px;line-height:1.6;color:var(--fg)">เลขาคนใหม่ทำกาแฟหกใส่ประธาน 3 วันติด แต่เขาไม่ไล่เธอออก</span></div><div class="kv" style="align-items:flex-start;gap:var(--s5)">
+            <span class="k" style="flex:none;width:150px"><b style="display:block;color:var(--fg-2)">เนื้อหารอง</b>
+              <span class="num">15px · lh 1.55</span></span>
+            <span style="flex:1;font-family:var(--body);font-size:15px;line-height:1.55;color:var(--fg)">ละครแนวตั้ง · 60 ตอน · จบแล้ว · 12.4M วิว</span></div><div class="kv" style="align-items:flex-start;gap:var(--s5)">
+            <span class="k" style="flex:none;width:150px"><b style="display:block;color:var(--fg-2)">ป้าย/เมตา (เล็กสุด)</b>
+              <span class="num">13px · lh 1.5</span></span>
+            <span style="flex:1;font-family:var(--body);font-size:13px;line-height:1.5;color:var(--fg)">ตอน 1–10 ดูฟรี · ตอน 11 ขึ้นไปสำหรับสมาชิก</span></div>
+        <p class="note-ex" style="margin-top:var(--s4)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5 21 19.5H3z"/><path d="M12 10v4M12 17h.01"/></svg>
+          <span>ฐาน 15→17px และ lh 1.5→1.6 ทำให้บล็อกข้อความสูงขึ้นรวม ~20% — ทุกการ์ดในม็อกอัพเผื่อพื้นที่ใต้ปกไว้แล้ว</span></p>
+        <p class="note-ex"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5 21 19.5H3z"/><path d="M12 10v4M12 17h.01"/></svg>
+          <span><code>letter-spacing</code> ของบล็อกไทยต้องเป็น 0 เสมอ · ที่ใช้ค่าลบได้มีที่เดียวคือโลโก้ “Lakorn” ซึ่งเป็นละตินล้วน</span></p>
+      </div></section>
+
+    <section class="sg-sec"><h2>4. ระยะ · มุมโค้ง · ความสูง</h2>
+      <div style="display:grid;gap:var(--s5);grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+        <div class="panel"><h3>ระยะ (4pt)</h3>
+          <div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s1</code>
+            <span style="height:12px;width:4px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">4px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s2</code>
+            <span style="height:12px;width:8px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">8px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s3</code>
+            <span style="height:12px;width:12px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">12px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s4</code>
+            <span style="height:12px;width:16px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">16px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s5</code>
+            <span style="height:12px;width:20px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">20px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s6</code>
+            <span style="height:12px;width:24px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">24px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s7</code>
+            <span style="height:12px;width:32px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">32px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s8</code>
+            <span style="height:12px;width:40px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">40px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s9</code>
+            <span style="height:12px;width:56px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">56px</span></div><div style="display:flex;align-items:center;gap:var(--s3);margin-bottom:7px">
+            <code style="width:42px;color:var(--muted);font-size:13px">--s10</code>
+            <span style="height:12px;width:72px;background:var(--accent);border-radius:3px"></span>
+            <span class="num" style="color:var(--dim);font-size:var(--t-meta)">72px</span></div></div>
+        <div class="panel"><h3>มุมโค้ง</h3>
+          <div style="display:flex;gap:var(--s3);flex-wrap:wrap">
+            <div style="text-align:center">
+              <div style="width:62px;height:62px;background:var(--surface-2);border:1px solid var(--border-i);border-radius:8px"></div>
+              <code style="font-size:13px;color:var(--dim);display:block;margin-top:6px">xs 8</code></div><div style="text-align:center">
+              <div style="width:62px;height:62px;background:var(--surface-2);border:1px solid var(--border-i);border-radius:10px"></div>
+              <code style="font-size:13px;color:var(--dim);display:block;margin-top:6px">sm 10</code></div><div style="text-align:center">
+              <div style="width:62px;height:62px;background:var(--surface-2);border:1px solid var(--border-i);border-radius:14px"></div>
+              <code style="font-size:13px;color:var(--dim);display:block;margin-top:6px">md 14</code></div><div style="text-align:center">
+              <div style="width:62px;height:62px;background:var(--surface-2);border:1px solid var(--border-i);border-radius:20px"></div>
+              <code style="font-size:13px;color:var(--dim);display:block;margin-top:6px">lg 20</code></div><div style="text-align:center">
+              <div style="width:62px;height:62px;background:var(--surface-2);border:1px solid var(--border-i);border-radius:28px"></div>
+              <code style="font-size:13px;color:var(--dim);display:block;margin-top:6px">xl 28</code></div></div>
+          <h3 style="margin-top:var(--s5)">ความสูง (elevation)</h3>
+          <div style="display:flex;gap:var(--s4);flex-wrap:wrap;margin-top:var(--s3)">
+            
+              <div style="text-align:center"><div style="width:84px;height:56px;background:var(--surface);border-radius:var(--r-md);box-shadow:var(--e1)"></div>
+              <code style="font-size:13px;color:var(--dim);display:block;margin-top:8px">e1 · การ์ด</code></div>
+              <div style="text-align:center"><div style="width:84px;height:56px;background:var(--surface);border-radius:var(--r-md);box-shadow:var(--e2)"></div>
+              <code style="font-size:13px;color:var(--dim);display:block;margin-top:8px">e2 · hover · hero</code></div>
+              <div style="text-align:center"><div style="width:84px;height:56px;background:var(--surface);border-radius:var(--r-md);box-shadow:var(--e3)"></div>
+              <code style="font-size:13px;color:var(--dim);display:block;margin-top:8px">e3 · ชีต/โมดัล</code></div></div>
+          <p class="note-ex" style="margin-top:var(--s4)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+            <span>ทุกระดับมีเส้นสว่าง 1px ด้านในขอบบน (<code>inset</code>) — เป็นสิ่งที่ทำให้การ์ดบนพื้นดำไม่ “จม”</span></p></div>
+      </div></section>
+
+    <section class="sg-sec"><h2>5. Motion</h2>
+      <div class="panel">
+        <div class="kv"><span class="k">ease มาตรฐาน</span><span class="v"><code>cubic-bezier(.2,.7,.2,1)</code></span></div>
+        <div class="kv"><span class="k">hover / กดปุ่ม</span><span class="v num">120ms</span></div>
+        <div class="kv"><span class="k">เปลี่ยนสถานะ · การ์ดยกตัว</span><span class="v num">180ms</span></div>
+        <div class="kv"><span class="k">เปิด dropdown · toast</span><span class="v num">240ms</span></div>
+        <div class="kv"><span class="k">ชีตเลื่อนขึ้น</span><span class="v num">280ms</span></div>
+        <p class="note-ex" style="margin-top:var(--s3)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          <span><code>prefers-reduced-motion: reduce</code> → ทุกค่าเหลือ 1ms, carousel ไม่เลื่อนเอง, skeleton ใช้ pulse ไม่ใช่ gradient วิ่ง, ชีตใช้ fade</span></p></div></section>
+
+    <section class="sg-sec"><h2>6. สัดส่วนภาพ — กฎเหล็ก</h2>
+      <div style="display:grid;gap:var(--s4);grid-template-columns:repeat(3,1fr);max-width:620px">
+        <div><div style="aspect-ratio:2/3;border-radius:var(--r-md);overflow:hidden"><img src="../../assets/covers/ceo-cold.webp" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+          <div style="margin-top:8px"><b style="font-size:var(--t-sub)">2 : 3</b>
+            <div style="color:var(--muted);font-size:var(--t-meta);line-height:1.5">ปกทุกที่ในเว็บ — ตรงกับไฟล์จริง 1024×1536 ไม่ต้องสร้างใหม่</div></div></div>
+        <div><div style="aspect-ratio:9/16;border-radius:var(--r-md);overflow:hidden"><img src="../../assets/covers/durian-revenge.webp" alt="" style="width:100%;height:100%;object-fit:cover"></div>
+          <div style="margin-top:8px"><b style="font-size:var(--t-sub)">9 : 16</b>
+            <div style="color:var(--muted);font-size:var(--t-meta);line-height:1.5">เพลเยอร์และฟีดเท่านั้น — ห้ามใช้กับการ์ดในกริด</div></div></div>
+        <div><div style="aspect-ratio:16/9;border-radius:var(--r-md);overflow:hidden"><img src="../../assets/covers/villainess-reborn.webp" alt="" style="width:100%;height:100%;object-fit:cover;object-position:center 28%"></div>
+          <div style="margin-top:8px"><b style="font-size:var(--t-sub)">16 : 9</b>
+            <div style="color:var(--muted);font-size:var(--t-meta);line-height:1.5">การ์ด “ดูต่อ” เท่านั้น เพราะต้องมีที่ให้แถบความคืบหน้า</div></div></div>
+      </div>
+      <p class="note-ex" style="margin-top:var(--s4)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5 21 19.5H3z"/><path d="M12 10v4M12 17h.01"/></svg>
+        <span>คลาส <code>.v916</code> ที่เว็บปัจจุบันใช้อยู่ 22 ไฟล์ ต้องถอดออกจากทุกที่ที่ไม่ใช่เพลเยอร์/ฟีด (UX §1.2 ก)</span></p></section>
+
+    <section class="sg-sec"><h2>7. ปุ่ม — ทุกสถานะ (6.17)</h2>
+      <div class="panel">
+        <div class="sg-label">ขนาด lg 48px · md 44px · sm 36px</div>
+        <div class="sg-row"><button class="btn btn-accent">ปุ่มหลัก</button>
+          <button class="btn">ปุ่มรอง</button>
+          <button class="btn btn-ghost">ghost</button>
+          <button class="btn btn-danger">อันตราย</button>
+          <button class="btn btn-link">ลิงก์ข้อความ</button></div>
+        <div class="sg-label">hover · กด · โฟกัส · ปิดใช้งาน · กำลังโหลด</div>
+        <div class="sg-row">
+          <button class="btn btn-accent" style="background:linear-gradient(170deg,#FFE6A3,var(--accent-hi) 50%,var(--accent))">hover</button>
+          <button class="btn btn-accent" style="transform:translateY(1px);background:var(--accent-press)">กด</button>
+          <button class="btn btn-accent is-focus">โฟกัส</button>
+          <button class="btn btn-accent is-disabled">ปิดใช้งาน</button>
+          <button class="btn btn-accent"><span class="spin"></span> กำลังบันทึก…</button></div>
+        <div class="sg-row"><button class="btn btn-ghost">ghost</button>
+          <button class="btn btn-ghost" style="border-color:var(--border-i-hover);background:rgba(255,255,255,.03)">hover</button>
+          <button class="btn btn-ghost is-focus">โฟกัส</button>
+          <button class="btn btn-ghost" aria-pressed="true"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3S3.8 15.2 3.8 9.6A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 8.2 2.2c0 5.6-8.2 10.7-8.2 10.7z" fill="currentColor"/></svg> ติดตามแล้ว</button>
+          <button class="btn btn-ghost is-disabled">ปิดใช้งาน</button></div>
+        <div class="sg-row"><button class="btn btn-md btn-accent">md 44</button><button class="btn btn-sm btn-ghost">sm 36</button>
+          <span class="note-ex" style="align-self:center">sm ใช้ได้เฉพาะปุ่มที่ไม่ใช่ปุ่มหลัก และต้องมีพื้นที่แตะรอบรวม ≥44px</span></div>
+      </div></section>
+
+    <section class="sg-sec"><h2>8. chip (6.6) · ฟอร์ม (6.21) — รวมสถานะโฟกัส</h2>
+      <div style="display:grid;gap:var(--s4);grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+        <div class="panel"><h3>chip</h3>
+          <div class="sg-row"><button class="chip">ปกติ</button>
+            <button class="chip" style="border-color:var(--border-i-hover)">hover</button>
+            <button class="chip is-focus">โฟกัส</button>
+            <button class="chip" aria-pressed="true">เลือกแล้ว</button>
+            <button class="chip" disabled>ปิดใช้งาน</button></div>
+          <p class="note-ex" style="margin-top:var(--s3)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+            <span>ขอบ chip ใช้ <code>--border-i</code> 3.47:1 บน surface-2 — เดิม <code>--border</code> อยู่ที่ 1.65:1 ซึ่งตก 1.4.11</span></p></div>
+        <div class="panel"><h3>ช่องกรอก</h3>
+          <label class="field"><span>ปกติ</span><input value="081 234 5678"></label>
+          <label class="field"><span>โฟกัส</span><input class="is-focus" value="081 234 5678"></label>
+          <label class="field bad"><span>ผิดพลาด</span><input value="08123" aria-invalid="true">
+            <span class="err"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5 21 19.5H3z"/><path d="M12 10v4M12 17h.01"/></svg> เบอร์มือถือไม่ถูกต้อง ต้องมี 10 หลัก</span></label>
+          <label class="field"><span>ช่อง OTP 6 หลัก</span>
+            <span class="otp"><i class="on">4</i><i class="on">8</i><i class="on">1</i><i class="caret"></i><i></i><i></i></span></label></div>
+      </div></section>
+
+    <section class="sg-sec"><h2>9. ช่องตอน (6.9) — 4 สถานะ + โฟกัส</h2>
+      <div class="panel">
+        <div style="display:flex;gap:var(--s3);flex-wrap:wrap;align-items:center">
+          <a class="ep" style="width:64px" href="#"><span class="num">12</span></a>
+          <a class="ep done" style="width:64px" href="#"><span class="num">9</span></a>
+          <a class="ep cur" style="width:64px" href="#"><span class="num">12</span></a>
+          <a class="ep lock" style="width:64px" href="#"><span class="num">14</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a>
+          <a class="ep is-focus" style="width:64px" href="#"><span class="num">15</span></a>
+          <span class="note-ex" style="align-self:center">ยังไม่ดู · ดูแล้ว · กำลังดู · ล็อก · โฟกัส</span></div>
+        <div class="legend">
+  <i class="d">ดูแล้ว</i><i class="c">กำลังดู</i><i class="l">ล็อก · ต้องปลดล็อก</i></div>
+        <p class="note-ex" style="margin-top:var(--s3)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5 21 19.5H3z"/><path d="M12 10v4M12 17h.01"/></svg>
+          <span>ของเดิมใช้จุด 6px บอกสถานะล็อก — เล็กเกินกว่าจะสื่อความ เปลี่ยนเป็นไอคอนกุญแจ + ขอบประ และทุกช่องมี
+          <code>aria-label</code> เต็ม เช่น “ตอนที่ 14 ประตูที่ห้ามเปิด · ล็อก ต้องปลดล็อก”</span></p>
+        <div style="margin-top:var(--s4)"><div class="ep-tabs" role="tablist" aria-label="ช่วงตอน"><button role="tab" aria-selected="true" class="num">1-20</button><button role="tab" aria-selected="false" class="num">21-40</button><button role="tab" aria-selected="false" class="num">41-60</button></div><div class="eps"><a class="ep done" href="#" aria-label="ตอนที่ 1 กาแฟแก้วแรก · ดูแล้ว"><span class="num">1</span></a><a class="ep done" href="#" aria-label="ตอนที่ 2 ข้อตกลงหนึ่งคืน · ดูแล้ว"><span class="num">2</span></a><a class="ep done" href="#" aria-label="ตอนที่ 3 คืนก่อนวันสำคัญ · ดูแล้ว"><span class="num">3</span></a><a class="ep done" href="#" aria-label="ตอนที่ 4 คนที่ยืนข้างหลัง · ดูแล้ว"><span class="num">4</span></a><a class="ep done" href="#" aria-label="ตอนที่ 5 แผนที่ไม่มีใครเห็น · ดูแล้ว"><span class="num">5</span></a><a class="ep done" href="#" aria-label="ตอนที่ 6 สิ่งที่ซ่อนอยู่ในห้องนั้น · ดูแล้ว"><span class="num">6</span></a><a class="ep done" href="#" aria-label="ตอนที่ 7 เส้นที่ข้ามไม่ได้ · ดูแล้ว"><span class="num">7</span></a><a class="ep done" href="#" aria-label="ตอนที่ 8 เขารู้ตั้งแต่แรก · ดูแล้ว"><span class="num">8</span></a><a class="ep done" href="#" aria-label="ตอนที่ 9 ใครคือคนทรยศ · ดูแล้ว"><span class="num">9</span></a><a class="ep done" href="#" aria-label="ตอนที่ 10 เปิดหน้ากาก · ดูแล้ว"><span class="num">10</span></a><a class="ep done" href="#" aria-label="ตอนที่ 11 ประตูที่ห้ามเปิด · ดูแล้ว"><span class="num">11</span></a><a class="ep cur" href="#" aria-label="ตอนที่ 12 หลักฐานชิ้นที่สอง · กำลังดู"><span class="num">12</span></a><a class="ep lock" href="#" aria-label="ตอนที่ 13 คำสัญญาที่ผิด · ล็อก ต้องปลดล็อก"><span class="num">13</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a><a class="ep lock" href="#" aria-label="ตอนที่ 14 ของขวัญที่ไม่ควรรับ · ล็อก ต้องปลดล็อก"><span class="num">14</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a><a class="ep lock" href="#" aria-label="ตอนที่ 15 ราคาของความจริง · ล็อก ต้องปลดล็อก"><span class="num">15</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a><a class="ep lock" href="#" aria-label="ตอนที่ 16 คืนที่ทุกอย่างพังลง · ล็อก ต้องปลดล็อก"><span class="num">16</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a><a class="ep lock" href="#" aria-label="ตอนที่ 17 คำโกหกครั้งแรก · ล็อก ต้องปลดล็อก"><span class="num">17</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a><a class="ep lock" href="#" aria-label="ตอนที่ 18 ไม่มีทางย้อนกลับ · ล็อก ต้องปลดล็อก"><span class="num">18</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a><a class="ep lock" href="#" aria-label="ตอนที่ 19 คนที่ไม่ควรรู้ความลับ · ล็อก ต้องปลดล็อก"><span class="num">19</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a><a class="ep lock" href="#" aria-label="ตอนที่ 20 พยานคนสุดท้าย · ล็อก ต้องปลดล็อก"><span class="num">20</span><span class="lk"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg></span></a></div></div>
+      </div></section>
+
+    <section class="sg-sec"><h2>10. การ์ดปก (6.1) — ป้ายซ้อนทุกแบบ</h2>
+      <div class="grid" style="grid-template-columns:repeat(4,1fr);max-width:860px">
+        <a class="card " href="#">
+    <div class="poster" style="--c1:#4F452A;--c2:#7a6a2c" role="img" aria-label="ปก ทุเรียนทวงแค้น">
+    <img src="../../assets/covers/durian-revenge.webp" alt="" loading="lazy">
+    <div class="scrim"></div>
+    <div class="tl"><span class="tag tag-ai">AI</span><span class="tag tag-new">ใหม่</span></div>
+    <div class="tr"></div>
+    <div class="bl"><span class="views"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="num">8.9M</span></span></div>
+  </div>
+    <div class="t">ทุเรียนทวงแค้น</div>
+    <div class="m">ละครผลไม้ AI · 24 ตอน</div>
+    
+  </a>
+        <a class="card " href="#">
+    <div class="poster" style="--c1:#2A3D52;--c2:#3d5a7a" role="img" aria-label="ปก ประธานเย็นชากับเลขาตัวแสบ">
+    <img src="../../assets/covers/ceo-cold.webp" alt="" loading="lazy">
+    <div class="scrim"></div>
+    <div class="tl"><span class="tag tag-ai">AI</span><span class="tag tag-done">จบแล้ว</span></div>
+    <div class="tr"></div>
+    <div class="bl"><span class="views"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="num">12.4M</span></span></div>
+  </div>
+    <div class="t">ประธานเย็นชากับเลขาตัวแสบ</div>
+    <div class="m">ละครแนวตั้ง · 60 ตอน</div>
+    
+  </a>
+        <a class="card " href="#">
+    <div class="poster" style="--c1:#3B2A4D;--c2:#5a3a78" role="img" aria-label="ปก ข้ามภพมาเป็นนางร้าย">
+    <img src="../../assets/covers/villainess-reborn.webp" alt="" loading="lazy">
+    <div class="scrim"></div>
+    <div class="tl"><span class="tag tag-free">ดูฟรี 10 ตอน</span></div>
+    <div class="tr"><span class="tag tag-lock"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 8 0V10"/></svg> สมาชิก</span></div>
+    <div class="bl"><span class="views"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="num">6.8M</span></span></div>
+  </div>
+    <div class="t">ข้ามภพมาเป็นนางร้าย</div>
+    <div class="m">ย้อนเวลา · 45 ตอน</div>
+    
+  </a>
+        <a class="card is-hover" href="#"><div class="poster" style="--c1:#45304F;--c2:#6b3f6e" role="img" aria-label="ปก แม่ม่ายพันล้าน">
+    <img src="../../assets/covers/billion-widow.webp" alt="" loading="lazy">
+    <div class="scrim"></div>
+    <div class="tl"><span class="tag tag-new">มาแรง</span></div>
+    <div class="tr"></div>
+    <div class="bl"><span class="views"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="num">7.2M</span></span></div>
+  </div>
+          <div class="t">แม่ม่ายพันล้าน</div><div class="m">แก้แค้น · 50 ตอน</div>
+          <div class="hook">งานศพสามี ทุกคนมาแย่งมรดก ยกเว้นคนที่ฆ่าเขา</div></a>
+      </div>
+      <p class="note-ex" style="margin-top:var(--s3)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+        <span>ใบขวาสุดคือสถานะ hover — ยกขึ้น 4px เผย hook 1–2 บรรทัด และขอบทอง · บนมือถือไม่มี hover
+        จึงห้ามซ่อนข้อมูลสำคัญไว้ใน hover (UX 6.7)</span></p></section>
+
+    <section class="sg-sec"><h2>11. แถบสิทธิ์ · แถบ mock (6.15)</h2>
+      <div style="display:grid;gap:var(--s3);max-width:720px">
+        <div class="perm"><span class="ic"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="4.5" y="10" width="15" height="10.5" rx="2.6"/><path d="M8 10V7.4a4 4 0 0 1 7.6-1.7"/></svg></span>
+          <span><b>ตอน 1–10 ดูฟรี</b> · ตอน 11 ขึ้นไปสำหรับสมาชิก หรือปลดล็อกทีละตอน 15 เหรียญ</span></div>
+        <div class="note-mock"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>
+  <b>ตัวอย่างระบบสมาชิก</b> — ยังไม่มีการตัดเงินจริง ทุกยอดและทุกรายการในหน้านี้เป็นข้อมูลสมมติ</span></div>
+        <p class="note-ex"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>ตัวเลขยอดวิว ราคา และยอดเหรียญทุกจุดในม็อกอัพเป็นตัวเลขตัวอย่าง</span></p></div>
+      <p class="note-ex" style="margin-top:var(--s4)"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5 21 19.5H3z"/><path d="M12 10v4M12 17h.01"/></svg>
+        <span>แถบ mock เป็น<b>ข้อบังคับ</b>บนทุกหน้ากลุ่ม D (D1–D9) และบนชีต paywall B4</span></p></section>
+
+    <section class="sg-sec"><h2>12. โฟกัสริงบนพื้นสว่าง</h2>
+      <p>ปกบางใบสว่างมาก วงโฟกัสทองเดี่ยว ๆ จะจมหาย จึงใช้ <code>outline 2px</code> + <code>box-shadow 0 0 0 4px rgba(14,13,18,.65)</code> เป็นวงนอกสีเข้มเสมอ</p>
+      <div style="display:flex;gap:var(--s4);flex-wrap:wrap">
+        <a class="card is-focus" href="#" style="width:150px"><div class="poster" style="--c1:#4a2a3f;--c2:#6e2f5c" role="img" aria-label="ปก มังคุดหัวใจแหลก">
+    <img src="../../assets/covers/mangosteen-heart.webp" alt="" loading="lazy">
+    <div class="scrim"></div>
+    <div class="tl"></div>
+    <div class="tr"></div>
+    <div class="bl"><span class="views"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="num">2.3M</span></span></div>
+  </div>
+          <div class="t">มังคุดหัวใจแหลก</div></a>
+        <a class="card is-focus" href="#" style="width:150px"><div class="poster" style="--c1:#4D3329;--c2:#7a4a2c" role="img" aria-label="ปก ลำไยไร้เมล็ด">
+    <img src="../../assets/covers/seedless-longan.webp" alt="" loading="lazy">
+    <div class="scrim"></div>
+    <div class="tl"></div>
+    <div class="tr"></div>
+    <div class="bl"><span class="views"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></svg><span class="num">1.4M</span></span></div>
+  </div>
+          <div class="t">ลำไยไร้เมล็ด</div></a></div></section>
+    </div><footer class="foot"><div class="wrap"><div class="cols">
+    <div><h4>เลือกดู</h4><nav><a href="#">ละครแนวตั้ง</a><a href="#">ละครผลไม้ AI</a><a href="#">ละครฝรั่ง</a><a href="#">สยองขวัญ</a><a href="#">ย้อนเวลา</a><a href="#">แก้แค้น</a><a href="#">ดัชนี ก–ฮ / A–Z</a><a href="#">ตารางออกตอน</a></nav></div>
+    <div><h4>บัญชี</h4><nav><a href="#">เข้าสู่ระบบ</a><a href="#">แพ็กเกจสมาชิก</a><a href="#">เติมเหรียญ</a><a href="#">รับเหรียญฟรี</a></nav></div>
+    <div><h4>เกี่ยวกับ</h4><nav><a href="#">เกี่ยวกับเรา</a><a href="#">เบื้องหลังการสร้างด้วย AI</a><a href="#">ติดต่อ</a><a href="#">ช่วยเหลือ</a></nav></div>
+    <div><h4>ข้อกำหนด</h4><nav><a href="#">ข้อตกลงการใช้</a><a href="#">นโยบายความเป็นส่วนตัว</a><a href="#">เงื่อนไขสมาชิก</a><a href="#">นโยบายคุกกี้</a></nav></div>
+  </div><div class="btm">© LakornAI · lakornai.tv · ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง (mockup)</div></div></footer></main><nav class="bottom" aria-label="เมนูหลัก"><div class="in">
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/></svg><span>หน้าแรก</span></a>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.5 9.5l4 2.5-4 2.5z"/></svg><span>ฟีด</span></a>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.2-3.2"/></svg><span>ค้นหา</span></a>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="7" height="7" rx="2"/><rect x="14" y="4" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>คลังของฉัน</span></a>
+    <a href="#"><svg class="ico " viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c1.4-3.6 4.2-5.4 7.5-5.4s6.1 1.8 7.5 5.4"/></svg><span>บัญชี</span><i class="ndot"></i></a></div></nav>
+</body></html>

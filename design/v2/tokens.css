@@ -1,0 +1,126 @@
+/* ============================================================================
+   LakornAI v2 — Design Tokens  ("ม่านทอง / Golden Curtain")
+   AIO-17 · Visual-Designer · 23 ต.ค. 2026
+   ไฟล์นี้เป็นไฟล์เสนอแบบ อยู่ใต้ design/v2/ เท่านั้น ไม่แตะ production
+   ค่าทุกตัวคัดลอกไปใส่ assets/style.css :root ได้ตรง ๆ หลังอนุมัติ
+   ========================================================================== */
+
+/* ---- ฟอนต์ (subset ไทย+ละติน เก็บไว้ในเครื่อง เรนเดอร์ได้แบบออฟไลน์) ---- */
+@font-face{font-family:'Kanit';font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/Kanit-500-thai.woff2) format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;}
+@font-face{font-family:'Kanit';font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/Kanit-500-latin.woff2) format('woff2');}
+@font-face{font-family:'Kanit';font-style:normal;font-weight:600;font-display:swap;
+  src:url(fonts/Kanit-600-thai.woff2) format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;}
+@font-face{font-family:'Kanit';font-style:normal;font-weight:600;font-display:swap;
+  src:url(fonts/Kanit-600-latin.woff2) format('woff2');}
+@font-face{font-family:'IBM Plex Sans Thai';font-style:normal;font-weight:400;font-display:swap;
+  src:url(fonts/IBMPlexSansThai-400-thai.woff2) format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;}
+@font-face{font-family:'IBM Plex Sans Thai';font-style:normal;font-weight:400;font-display:swap;
+  src:url(fonts/IBMPlexSansThai-400-latin.woff2) format('woff2');}
+@font-face{font-family:'IBM Plex Sans Thai';font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/IBMPlexSansThai-500-thai.woff2) format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;}
+@font-face{font-family:'IBM Plex Sans Thai';font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/IBMPlexSansThai-500-latin.woff2) format('woff2');}
+@font-face{font-family:'IBM Plex Sans Thai';font-style:normal;font-weight:600;font-display:swap;
+  src:url(fonts/IBMPlexSansThai-600-thai.woff2) format('woff2');unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;}
+@font-face{font-family:'IBM Plex Sans Thai';font-style:normal;font-weight:600;font-display:swap;
+  src:url(fonts/IBMPlexSansThai-600-latin.woff2) format('woff2');}
+
+:root{
+  color-scheme:dark;
+
+  /* ---------- 1. พื้นผิว (เก็บค่าเดิมทั้งหมด — UX วัด contrast ไว้แล้วใน 7.1) ---------- */
+  --bg:#0E0D12;          /* พื้นเวที */
+  --surface:#17151D;     /* การ์ด/แผง ชั้น 1 */
+  --surface-2:#1C1A23;   /* input, chip, ช่องตอน */
+  --surface-3:#23212C;   /* ใหม่: ชีต/โมดัล/การ์ดลอย ชั้น 2 */
+  --nav:#141219;         /* แถบนำทาง */
+  --scrim:rgba(8,7,11,.72);  /* ฉากหลังโมดัล */
+
+  /* ---------- 2. เส้น ---------- */
+  --line:#221F2A;        /* เส้นคั่นตกแต่ง (ไม่อยู่ใต้ 1.4.11) */
+  --line-2:#2A2733;      /* เส้นคั่นหนา/ขอบแถบนำทาง */
+  --border-i:#726E7D;    /* ใหม่: ขอบ UI ที่โต้ตอบได้ — 3.91 bg / 3.65 surface / 3.47 surface-2 / 3.20 surface-3 ✅ 1.4.11 */
+  --border-i-hover:#8C889A;  /* 5.63 / 5.26 / 5.00 / 4.61 */
+
+  /* ---------- 3. ตัวอักษร ---------- */
+  --fg:#F4F2F7;          /* 17.41:1 บน bg */
+  --fg-2:#D6D2DE;        /* 13.03:1 */
+  --fg-3:#C9C5D2;        /* 11.43:1 */
+  --chip-fg:#E4E1EA;     /* 14.98:1 */
+  --muted:#A9A6B5;       /* 8.12:1 */
+  --dim:#8C889A;         /* 5.63:1 — เล็กสุดที่ใช้กับข้อความได้ */
+  --faint:#6F6B7C;       /* 3.75:1 — กราฟิกเท่านั้น ห้ามใช้กับข้อความ */
+
+  /* ---------- 4. สีสัญญาณ ---------- */
+  --accent:#F5C451;          /* ทอง — แบรนด์ / ปุ่มหลัก / โฟกัสริง · 11.89:1 บน bg */
+  --accent-hi:#FFD877;       /* ทองสว่าง — hover · 14.14:1 */
+  --accent-press:#DCAD3D;    /* ทองกด · 9.30:1 */
+  --on-accent:#141217;       /* ตัวอักษรบนทอง · 11.43:1 */
+  --accent-soft:rgba(245,196,81,.14);
+  --accent-line:rgba(245,196,81,.34);
+
+  --free:#4FD6A6;            /* มรกต — "ดูฟรี/สำเร็จ/ความคืบหน้า" · 10.60:1 บน bg */
+  --free-soft:rgba(79,214,166,.13);
+  --free-line:rgba(79,214,166,.32);
+
+  --hot:#FF6F91;             /* ชมพูชาด — "มาแรง/ใหม่" · 7.31:1 บน bg */
+  --hot-soft:rgba(255,111,145,.14);
+
+  --danger:#FF7A6B;          /* 7.60:1 */
+  --danger-soft:rgba(255,122,107,.14);
+
+  --lock:#C9C5D2;            /* ล็อก = เทาสว่าง ไม่ใช่สีร้อน (ล็อกไม่ใช่ error) */
+
+  --vip-1:#FFE6A3; --vip-2:#F5C451; --vip-3:#E08A3C;   /* ไล่สีทอง VIP */
+
+  /* ---------- 5. ตัวอักษร: ครอบครัว + สเกล (บังคับตาม UX 7.2) ---------- */
+  --display:'Kanit','Sukhumvit Set','Leelawadee UI',sans-serif;
+  --body:'IBM Plex Sans Thai','Sukhumvit Set','Leelawadee UI',system-ui,sans-serif;
+
+  --t-hero:30px;      --lh-hero:1.25;   /* hero h2 (lg: 36px) */
+  --t-h1:24px;        --lh-h1:1.3;      /* h1 หน้า (lg: 30px) */
+  --t-h1-series:28px; --lh-h1s:1.25;
+  --t-h2:20px;        --lh-h2:1.35;     /* หัว section */
+  --t-body:17px;      --lh-body:1.6;    /* ฐาน */
+  --t-long:17px;      --lh-long:1.7;    /* เนื้อหายาว */
+  --t-sub:15px;       --lh-sub:1.55;    /* เนื้อหารอง */
+  --t-meta:13px;      --lh-meta:1.5;    /* เมตา/ป้าย — เล็กที่สุดในเว็บ */
+  --t-ep:16px;                           /* ตัวเลขช่องตอน */
+  --t-btn:17px;
+
+  /* ---------- 6. ระยะ (สเกล 4pt) ---------- */
+  --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px;
+  --s6:24px; --s7:32px; --s8:40px; --s9:56px; --s10:72px;
+  --gutter-l:max(16px,env(safe-area-inset-left,0px));
+  --gutter-r:max(16px,env(safe-area-inset-right,0px));
+  --navh:66px;
+  --wrap:1280px;
+
+  /* ---------- 7. มุมโค้ง ---------- */
+  --r-xs:8px; --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:28px; --r-pill:999px;
+
+  /* ---------- 8. ความสูง (elevation) — เงา + เส้นสว่างด้านบน 1px ---------- */
+  --e0:none;
+  --e1:0 1px 0 rgba(255,255,255,.045) inset, 0 2px 8px rgba(0,0,0,.42);
+  --e2:0 1px 0 rgba(255,255,255,.06) inset, 0 10px 28px rgba(0,0,0,.52);
+  --e3:0 1px 0 rgba(255,255,255,.07) inset, 0 24px 64px rgba(0,0,0,.62);
+  --e-accent:0 6px 20px rgba(245,196,81,.22);
+
+  /* ---------- 9. Motion ---------- */
+  --ease:cubic-bezier(.2,.7,.2,1);
+  --d-fast:120ms; --d-base:180ms; --d-slow:240ms; --d-sheet:280ms;
+
+  /* ---------- 10. สัดส่วนภาพ (บังคับ) ---------- */
+  --ar-poster:2/3;   /* ปกทุกที่ในเว็บ */
+  --ar-reel:9/16;    /* เพลเยอร์ + ฟีด เท่านั้น */
+  --ar-cont:16/9;    /* การ์ดดูต่อ เท่านั้น */
+}
+
+@media (min-width:960px){
+  :root{ --t-hero:36px; --t-h1:30px; }
+}
+@media (prefers-reduced-motion:reduce){
+  :root{ --d-fast:1ms; --d-base:1ms; --d-slow:1ms; --d-sheet:1ms; }
+}
