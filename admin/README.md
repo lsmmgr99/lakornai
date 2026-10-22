@@ -82,7 +82,7 @@ commit สร้าง blobs/tree/commit รวม JSON และปกในค
 ไม่มีการรีเฟรช provider token: หมดอายุให้เข้าสู่ระบบใหม่
 
 Session เป็นคุกกี้ HttpOnly/SameSite=Strict ไม่มีวันหมดอายุถาวร
-หน้าเว็บส่ง heartbeat ทุก 20 วินาทีและเมื่อกลับมาเปิดแท็บ; pagehide ขอ logout และถ้าขาด heartbeat เกิน 5 นาที
+หน้าเว็บส่ง heartbeat ทุก 20 วินาทีและเมื่อกลับมาเปิดแท็บ; pagehide แจ้งปิดเฉพาะแท็บนั้น (session ใช้ร่วมกัน); เมื่อแท็บสุดท้ายปิดจะล้าง session และถ้าขาด heartbeat เกิน 5 นาที
 broker จะล้าง session (รวมกรณี browser crash) อายุสูงสุด 8 ชั่วโมงหรือเท่า token หากสั้นกว่า
 ปิดโปรเซสจะล้างทั้งหมด ไม่มี token/device code/refresh token เข้าดิสก์หรือส่งกลับ browser
 โปรเซสไม่อ่าน PAPERCLIP_GITHUB_* หรือ credential ของ harness
@@ -98,7 +98,7 @@ static navigation ไม่ส่ง Origin ตามปกติ จึงต�
 provider path allowlist (รวม .github/, build/, assets/*.js), unknown request fields, force:false, device polling/slow_down/denial/session expiry;
 unit validation/cover/tar; Chromium offline export; admin/check.mjs
 ยังไม่ทดสอบจริง: App installation, user consent, read-only user, token revocation,
-device-flow error ที่ตอบ HTTP non-2xx, hidden-tab throttling ในเบราว์เซอร์จริง,
+device flow กับ App จริง,
 GitHub commit attribution, concurrent remote updates, และ CI branch publish
 ต้องผ่าน Reviewer-Claude/Reviewer-Codex อิสระ + QA + Security ก่อน merge
 หากรีวิวขัดกันให้ CTO ตัดสิน ไม่ถือว่า mock tests เป็น live sign-off
@@ -106,4 +106,18 @@ GitHub commit attribution, concurrent remote updates, และ CI branch publis
 รอบแก้ review: mock commit ปก+JSON ผ่าน /api/commit, ปฏิเสธปกซ้ำ/slug ที่ไม่มี/ไบต์ผิด,
 heartbeat/logout ระหว่าง commit และ busy 409; client test แบบจำลอง DOM ตรวจการไม่โหลดทับร่าง
 แล้วยังบันทึกด้วย remote head และแยก heartbeat 409 จาก session 403
-ทดสอบทั้งหมด 25/25 ผ่าน; Chromium ทดสอบเฉพาะเส้นส่งออก offline ไม่ใช่ OAuth จริง
+ผลรอบก่อน 25/25 ผ่าน; Chromium ทดสอบเฉพาะเส้นส่งออก offline ไม่ใช่ OAuth จริง
+
+รอบแก้ QA Q1–Q4: ลงทะเบียนแท็บแยกกันและปิดเฉพาะแท็บด้วย CSRF; logout โดยผู้ใช้ยังล้างทุกแท็บ
+กรณี crash/ส่ง close-tab ไม่ถึง ใช้ idle timeout 5 นาทีเดิม; กลับจาก bfcache ลงทะเบียนใหม่และให้ login ก่อน save
+คำขอ commit ที่เริ่มแล้วอาจจบหลังปิดแท็บ/logout ต้องให้ Security ยืนยัน B5 เช่นเดิม
+validate ก่อน save แจ้งฟิลด์ที่ผิด; เมื่อ commit สำเร็จล้างเฉพาะปกใน snapshot ที่ยังไม่ถูกแก้ระหว่างรอ
+จำ path ปกที่บันทึกสำเร็จไว้สำหรับ JSON export แม้ checkout ในเครื่องยังไม่มีไฟล์จาก branch ร่าง
+body เกิน 18,000,000 ไบต์ถูกอ่านทิ้งจนจบโดยไม่สะสมเพิ่ม แล้วตอบ 413 พร้อมข้อความขนาด ไม่ทำลาย keep-alive
+`node admin/broker-browser-test.mjs` ใช้ Chromium + provider จำลอง ตรวจสองแท็บ/validation/ปกหลัง save/JSON export
+QA เคยยืนยัน hidden-tab throttling 420 วินาทีบน cd29402 แล้ว; รอบนี้ไม่ได้วัด 420 วินาทีซ้ำ
+ตรวจ GitHub Docs URL ข้างต้นอีกครั้ง: หัวข้อ device flow ระบุ HTTP 200 พร้อม error ระหว่างรอ user code ชัดเจน
+จึงปิดข้อสงสัยสมมติฐาน status ด้วยเอกสารได้ แต่ยังไม่ใช่ live OAuth sign-off
+
+ผลตรวจรอบนี้: node --test admin/*.test.mjs ผ่าน 29/29, admin/check.mjs ผ่าน,
+Chromium offline export และ broker-browser-test ผ่าน; git diff --check ผ่าน

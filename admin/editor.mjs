@@ -2,6 +2,7 @@ import {connectBroker} from './broker-client.mjs';
 import {validate} from './validate.mjs';
 import {inspectCover,exportArchive,MAX_COVER_BYTES} from './covers.mjs';
 const covers=new Map();
+const committedCovers=new Set();
 let data;
 let selected=0;
 const $=id=>document.getElementById(id);
@@ -41,7 +42,7 @@ function render(){
 $('series').onchange=()=>{selected=Number($('series').value);render();};
 $('add').onclick=()=>{if(!data)return;const slug=prompt('รหัสเรื่องใหม่ เช่น new-series');if(!slug||!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)||data.series.some(s=>s.slug===slug)){message('รหัสไม่ถูกต้องหรือซ้ำ');return;}data.series.push({slug,title:'เรื่องใหม่',hook:'',synopsis:'',genres:[],tropes:[],eps:1,status:'ongoing',releaseDay:'daily',cover:`assets/covers/${slug}.webp`,views:null,episodes:[{n:1,title:'ตอนแรก',durationSec:90}]});selected=data.series.length-1;render();};
 $('import').onchange=async e=>{try{const candidate=JSON.parse(await e.target.files[0].text());const errors=validate(candidate);if(errors.length)throw Error(errors.join('\n'));if(covers.size&&!confirm('เปิดร่างใหม่และล้างปกที่ยังไม่ได้ส่งออก?'))return;covers.clear();data=candidate;selected=0;render();message('เปิดร่างแล้ว');}catch(e){message(e.message);}};
-async function exportDraft(bundle=false){if(!data)return;data.generatedAt=new Date().toISOString();const errors=validate(data);for(const s of data.series){if(covers.has(s.cover))continue;try{const r=await fetch('/'+s.cover,{method:'HEAD'});if(!r.ok)errors.push(`${s.slug}: ไม่พบปก`);}catch{errors.push(`${s.slug}: ตรวจปกไม่ได้`);}}if(errors.length){message(errors.join('\n'));return;}if(!bundle&&data.series.some(s=>covers.has(s.cover))){message('มีปกใหม่ในร่าง กรุณาส่งออกชุดข้อมูลพร้อมปก');return;}
+async function exportDraft(bundle=false){if(!data)return;data.generatedAt=new Date().toISOString();const errors=validate(data);for(const s of data.series){if(covers.has(s.cover)||committedCovers.has(s.cover))continue;try{const r=await fetch('/'+s.cover,{method:'HEAD'});if(!r.ok)errors.push(`${s.slug}: ไม่พบปก`);}catch{errors.push(`${s.slug}: ตรวจปกไม่ได้`);}}if(errors.length){message(errors.join('\n'));return;}if(!bundle&&data.series.some(s=>covers.has(s.cover))){message('มีปกใหม่ในร่าง กรุณาส่งออกชุดข้อมูลพร้อมปก');return;}
 const blob=bundle?exportArchive(data,covers):new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'});
 const url=URL.createObjectURL(blob);const a=element('a');a.href=url;a.download=bundle?'lakorn-content.tar':'content.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);message('ส่งออกร่างแล้ว ยังไม่ได้บันทึกเข้ารีโป');}
 $('export').onclick=()=>exportDraft();
@@ -50,4 +51,4 @@ window.addEventListener('beforeunload',e=>{if(covers.size){e.preventDefault();e.
 
 try{const response=await fetch('../content.json');if(!response.ok)throw Error('โหลดข้อมูลไม่สำเร็จ');data=await response.json();const errors=validate(data);if(errors.length)throw Error(errors.join('\n'));render();}catch(e){message(e.message);}
 
-connectBroker({getDraft:()=>({content:data,covers}),loadDraft:remote=>{const errors=validate(remote);if(errors.length)throw Error(errors.join('\n'));data=remote;covers.clear();selected=0;render();},message});
+connectBroker({getDraft:()=>{const errors=validate(data);if(errors.length)throw Error(errors.join('\n'));return {content:data,covers};},onSaved:({covers:saved})=>{for(const [path,cover] of saved){committedCovers.add(path);if(covers.get(path)===cover)covers.delete(path);}render();},loadDraft:remote=>{const errors=validate(remote);if(errors.length)throw Error(errors.join('\n'));data=remote;covers.clear();selected=0;render();},message});

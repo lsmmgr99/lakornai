@@ -35,16 +35,17 @@ export function createBroker(config,{provider,now=Date.now}={}){
       }
       // API uses POST even for reads, so Origin is always present in browsers.
       if(req.method!=='POST'||req.headers.origin!==origin||req.headers['content-type']!=='application/json')fail(403);
-      const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size>18000000)fail(413);chunks.push(chunk);}let body;try{body=JSON.parse(Buffer.concat(chunks,size).toString('utf8'));}catch{fail(400);}
+      const chunks=[];let size=0;for await(const chunk of req){size+=chunk.length;if(size<=18000000)chunks.push(chunk);}if(size>18000000)fail(413);let body;try{body=JSON.parse(Buffer.concat(chunks,size).toString('utf8'));}catch{fail(400);}
       let id=req.headers.cookie?.split(/;\s*/).find(x=>x.startsWith('lakorn_session='))?.slice(15),s=sessions.get(id);
       if(s&&(now()-s.seen>300000||now()>s.expires)){sessions.delete(id);s=null;}
       if(p==='/api/session'){
-        if(!s){if(sessions.size>=32)fail(429);id=nonce();s={csrf:nonce(),seen:now(),expires:now()+8*3600000};sessions.set(id,s);}
+        if(!s){if(sessions.size>=32)fail(429);id=nonce();s={csrf:nonce(),seen:now(),expires:now()+8*3600000,tabs:new Set()};sessions.set(id,s);}
         res.setHeader('Set-Cookie',`lakorn_session=${id}; HttpOnly; SameSite=Strict; Path=/`);
-        send(200,{csrf:s.csrf,branch:config.branch});return;
+        if(s.tabs.size>=64)fail(429);const tab=nonce();s.tabs.add(tab);send(200,{csrf:s.csrf,tab,branch:config.branch});return;
       }
       if(!s||req.headers['x-csrf-token']!==s.csrf)fail(403);
       s.seen=now();
+      if(p==='/api/close-tab'){if(!s.tabs.delete(body.tab))fail(403);if(!s.tabs.size)sessions.delete(id);send(200,{});return;}
         if(p==='/api/logout'){sessions.delete(id);res.setHeader('Set-Cookie','lakorn_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');send(200,{});return;}
         if(p==='/api/heartbeat'){send(200,{});return;}
       if(s.busy)fail(409);s.busy=true;
@@ -84,7 +85,7 @@ export function createBroker(config,{provider,now=Date.now}={}){
         }
         fail(404);
       }finally{s.busy=false;}
-    }catch(e){send(e.status||502,{error:e.status===409?'ข้อมูลเปลี่ยนหรือคำขอก่อนหน้ายังทำงาน กรุณาโหลดใหม่':'คำขอไม่สำเร็จ กรุณาตรวจการตั้งค่าหรือเข้าสู่ระบบใหม่'});}
+    }catch(e){send(e.status||502,{error:e.status===413?'ร่างและปกมีขนาดรวมเกิน 18 MB กรุณาลดจำนวนปกแล้วลองใหม่':e.status===409?'ข้อมูลเปลี่ยนหรือคำขอก่อนหน้ายังทำงาน กรุณาโหลดใหม่':'คำขอไม่สำเร็จ กรุณาตรวจการตั้งค่าหรือเข้าสู่ระบบใหม่'});}
   });
   server.on('close',()=>{sessions.clear();clearInterval(sweep);});
   return server;

@@ -17,7 +17,11 @@ test('HTTP trust boundary, device timing, permission, conflict, allowlist, logou
  assert.equal((await call('session',{}, {Origin:'http://evil.test'})).status,403);
  assert.equal(await new Promise((resolve,reject)=>{const req=http.request(origin+'/api/session',{method:'POST',headers:{Host:'evil.test',Origin:origin,'Content-Type':'application/json'}},r=>{r.resume();resolve(r.statusCode);});req.on('error',reject);req.end('{}');}),403);
  assert.equal((await call('session',{}, {Origin:''})).status,403);
- const session=await call('session');cookie=session.headers.get('set-cookie').split(';')[0];assert.match(session.headers.get('set-cookie'),/HttpOnly; SameSite=Strict/);csrf=(await session.json()).csrf;
+ const session=await call('session');cookie=session.headers.get('set-cookie').split(';')[0];assert.match(session.headers.get('set-cookie'),/HttpOnly; SameSite=Strict/);const firstTab=await session.json();csrf=firstTab.csrf;
+ const secondTab=await(await call('session')).json();
+ assert.equal((await call('close-tab',{tab:secondTab.tab})).status,200);
+ assert.equal((await call('heartbeat')).status,200);
+ assert.equal((await call('close-tab',{tab:'invalid'})).status,403);
  assert.equal((await call('login',{}, {'X-CSRF-Token':'bad'})).status,403);
  const login=await (await call('login')).text();assert.ok(!login.includes('PRIVATE'));await call('poll');assert.equal(polls,0);time+=5000;
  const auth=await(await call('poll')).text();assert.ok(!auth.includes('PRIVATE'));assert.match(auth,/true/);
@@ -46,12 +50,14 @@ test('HTTP trust boundary, device timing, permission, conflict, allowlist, logou
  const beforePending=commits;
  let release;hold=new Promise(r=>release=r);const pending=call('commit',body);
  while(commits<=beforePending)await new Promise(r=>setImmediate(r));
- assert.equal((await call('heartbeat')).status,200);
+ try{assert.equal((await call('heartbeat')).status,200);
  assert.equal((await call('commit',body)).status,409);
  assert.equal((await call('logout')).status,200);
- release();assert.equal((await pending).status,200);
+ }finally{release();}assert.equal((await pending).status,200);
 
  await call('logout');assert.equal((await call('load')).status,403);
+ const fresh=await call('session');cookie=fresh.headers.get('set-cookie').split(';')[0];const tab=await fresh.json();csrf=tab.csrf;
+ assert.equal((await call('close-tab',{tab:tab.tab})).status,200);assert.equal((await call('heartbeat')).status,403);
 });
 test('provider only updates an existing draft ref with force false',async()=>{
  const calls=[];const mock=async(url,options)=>{calls.push({url,...options});return {ok:true,json:async()=>({sha:'abc'})};};
@@ -72,4 +78,15 @@ test('slow_down, denied authorization and abandoned session expire without leaki
  time=15000;answer={error:'access_denied',error_description:'secret'};const denied=await call('poll');assert.equal(denied.status,401);assert.ok(!(await denied.text()).includes('secret'));
  time=76000;assert.equal((await call('heartbeat')).status,200);
  time=376001;assert.equal((await call('heartbeat')).status,403);
+});
+
+test('oversize request drains body and preserves the keep-alive connection',async t=>{
+ const server=createBroker(config,{provider:{}});await new Promise(r=>server.listen(0,'127.0.0.1',r));
+ const agent=new http.Agent({keepAlive:true,maxSockets:1});t.after(()=>{agent.destroy();server.close();});
+ const origin=`http://127.0.0.1:${server.address().port}`;
+ const call=body=>new Promise((resolve,reject)=>{const req=http.request(origin+'/api/session',{agent,method:'POST',headers:{Origin:origin,'Content-Type':'application/json','Content-Length':Buffer.byteLength(body)}},res=>{let text='';res.on('data',c=>text+=c);res.on('end',()=>resolve({status:res.statusCode,text,socket:req.socket}));});req.on('error',reject);req.end(body);});
+ const rejected=await call(' '.repeat(18000001));assert.equal(rejected.status,413);assert.match(rejected.text,/18 MB/);
+ const next=await call('{}');assert.equal(next.status,200);assert.equal(next.socket,rejected.socket);
+ const session=JSON.parse(next.text);
+ const closed=await fetch(origin+'/api/close-tab',{method:'POST',headers:{Origin:origin,'Content-Type':'application/json','X-CSRF-Token':session.csrf},body:JSON.stringify({tab:session.tab})});assert.equal(closed.status,403);
 });
