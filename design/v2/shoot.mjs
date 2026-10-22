@@ -3,7 +3,10 @@
    ทำให้ --window-size=390 ได้เลย์เอาต์ 500px แล้วครอป ซึ่งไม่ใช่ภาพมือถือจริง
    CDP + Emulation.setDeviceMetricsOverride ให้ viewport ตรงตามที่ขอเป๊ะ
 
-   รัน: node design/v2/shoot.mjs [filter]      (จาก root ของ repo) */
+   รัน: node design/v2/shoot.mjs [filter]           → PNG ต้นฉบับลง shots/
+        node design/v2/shoot.mjs [filter] --jpeg    → JPEG q82 ลง shots-jpeg/
+   โหมด --jpeg มีไว้ทำ "เด็คเบา" สำหรับแนบบนบอร์ด (ลิมิต attachment 10 MB)
+   PNG ใน shots/ ยังเป็นต้นฉบับที่ใช้ส่งงานจริง ไม่ถูกแทนที่ */
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
@@ -11,8 +14,10 @@ import { DIR } from './lib.mjs';
 
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
 const PORT = 9333;
-const OUT = path.join(DIR, 'shots');
-const filter = process.argv[2] || '';
+const args = process.argv.slice(2);
+const jpeg = args.includes('--jpeg');
+const filter = args.find(a => !a.startsWith('--')) || '';
+const OUT = path.join(DIR, jpeg ? 'shots-jpeg' : 'shots');
 const shots = JSON.parse(fs.readFileSync(path.join(DIR, 'shots.json'), 'utf8'))
   .filter(s => !filter || s.out.includes(filter));
 
@@ -93,8 +98,11 @@ for (const s of shots) {
       await sleep(260);
     }
 
-    const { data } = await send('Page.captureScreenshot', { format: 'png', optimizeForSpeed: false });
-    fs.writeFileSync(path.join(OUT, s.out), Buffer.from(data, 'base64'));
+    const { data } = jpeg
+      ? await send('Page.captureScreenshot', { format: 'jpeg', quality: 82 })
+      : await send('Page.captureScreenshot', { format: 'png', optimizeForSpeed: false });
+    const out = jpeg ? s.out.replace(/\.png$/, '.jpg') : s.out;
+    fs.writeFileSync(path.join(OUT, out), Buffer.from(data, 'base64'));
     n++;
     process.stdout.write(`\r[${n}/${shots.length}] ${s.out}`.padEnd(78));
   } catch (e) {
