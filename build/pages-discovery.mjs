@@ -1,7 +1,7 @@
 /* กลุ่ม A — การค้นพบ: หน้าแรก ฟีด ค้นหา ฮับ แนว แท็ก ยอดนิยม ตอนใหม่ ตาราง A–Z ตัวละคร */
 import {
   D, U, SERIES, BY, TOP10, OPEN_TAGS, CAST, genreLabel, genreOf,
-  seriesOfGenre, similar, releaseDay, tropesOf, isOpenTag, CAST_PAGES,
+  seriesOfGenre, similar, isDaily, isAiring, tropesOf, isOpenTag, CAST_PAGES,
 } from './content.mjs';
 import {
   definePage, shell, pageHead, crumbs, rail, section, poster, card, rankCard, epRow,
@@ -390,8 +390,8 @@ export function buildNew() {
 
 /* ============================ A9 ตารางออกตอน ============================ */
 export function buildSchedule() {
-  const daily = SERIES.filter(s => releaseDay(s) === 'ทุกวัน');
-  const weekly = SERIES.filter(s => releaseDay(s) && releaseDay(s) !== 'ทุกวัน');
+  const daily = SERIES.filter(isDaily);
+  const weekly = SERIES.filter(s => isAiring(s) && !isDaily(s));
   definePage({
     out: 'schedule/index.html', url: U.schedule,
     title: 'ตารางออกตอน — ละครสั้น AI เรื่องไหนออกวันไหน · LakornAI',
@@ -415,7 +415,7 @@ export function buildSchedule() {
               <span class="st">${esc(s.airtime)} · ${s.eps} ตอน · ${s.genres.map(genreLabel).join(' · ')}</span></span>
             <span class="r">${ic('right', 'sm')}</span></a>`).join('')}</div>`)}
         ${section('จบแล้ว ไม่มีตอนใหม่',
-          `<div class="grid">${SERIES.filter(s => !releaseDay(s)).map(s => card(L, s)).join('')}</div>`)}`),
+          `<div class="grid">${SERIES.filter(s => !isAiring(s)).map(s => card(L, s)).join('')}</div>`)}`),
     }),
   });
 }

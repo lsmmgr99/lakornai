@@ -70,7 +70,9 @@
                       <div class="times"><span class="num" id="tNow">0:00</span><span class="num" id="tDur">1:29</span></div>
                     </div>
                   </div>
-                  <section class="nextup" id="nextUp" role="region" aria-live="polite" hidden></section>
+                  <!-- aria-atomic=false: ประกาศการ์ดครั้งเดียวตอนโผล่ ตัวเลขนับถอยหลังอยู่ในวง
+                       aria-hidden จึงไม่ถูกประกาศซ้ำทุกวินาที (ดู showNextUp ใน app.src.js) -->
+                  <section class="nextup" id="nextUp" role="region" aria-live="polite" aria-atomic="false" hidden></section>
                   <div class="endcard" id="endCard" role="dialog" aria-modal="true" aria-labelledby="ec-h" hidden></div>
                 </div>
                 <p class="note-ex player-note"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><span>ยังไม่มีไฟล์วิดีโอในระบบ — ตัวเล่นนี้เดินเวลาแบบจำลองเพื่อให้ทดสอบการจำตอนที่ดูค้างได้จริง</span></p>

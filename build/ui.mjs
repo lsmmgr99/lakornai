@@ -8,7 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {
-  D, U, SERIES, genreLabel, tropesOf, isOpenTag, releaseDay,
+  D, U, SERIES, genreLabel, tropesOf, isOpenTag, isDaily,
 } from './content.mjs';
 import { headTags, esc, FREE_LINE, coverUrl, COVER_W, COVER_H } from './seo.mjs';
 import { ROOT } from './content.mjs';
@@ -100,7 +100,7 @@ export function poster(L, s, { badges = [], showViews = true, lazy = true, alt =
 }
 
 export function card(L, s, opt = {}) {
-  const badges = opt.badges || [aiBadge, ...(s.status === 'ตอนใหม่ทุกวัน' ? [newBadge] : [])];
+  const badges = opt.badges || [aiBadge, ...(isDaily(s) ? [newBadge] : [])];
   return `<a class="card ${opt.cls || ''}" href="${L(U.series(s.slug))}">
     ${poster(L, s, { ...opt, badges })}
     <span class="t">${esc(s.title)}</span>

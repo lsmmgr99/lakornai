@@ -13,7 +13,28 @@ export const ROOT = path.resolve(DIR, '..');
    วันนี้ยังไม่มีไฟล์ → ถอยไปอ่าน assets/data.js ตามที่โจทย์สั่ง ("ไม่ต้องรอ schema")
    วันที่ไฟล์มา ให้วางที่ราก แล้ว build ใหม่ — ไม่ต้องแก้หน้าใดเลย */
 const KNOWN_VERSIONS = [1];
+
+/* วันออกตอนเก็บเป็น enum ของสัญญา (ADR-001 §6.3.1) ทุกชั้นภายใน — ฟิลด์ `day`
+   ข้อความไทยเป็น "ผลลัพธ์ปลายทาง" เท่านั้น ห้ามถอดวันกลับจากข้อความ
+   (เส้นทาง ข้อมูล → ข้อความ → ถอดกลับเป็นข้อมูล คือต้นเหตุที่ ADR §6.3.1 เตือนไว้:
+    วันที่ตารางถอดกลับขาดคีย์ เรื่องจะหลุดไปอยู่ใต้ "จบแล้ว" เงียบ ๆ โดยไม่มี error) */
+/* ชื่อวันล้วน ใช้จัดกลุ่มในหน้าตารางออกตอน */
 const DAY_TH = { daily: 'ทุกวัน', mon: 'จันทร์', tue: 'อังคาร', wed: 'พุธ', thu: 'พฤหัสบดี', fri: 'ศุกร์', sat: 'เสาร์', sun: 'อาทิตย์' };
+/* วลีรอบปล่อยตอน — `daily` คือ "ทุกวัน" อยู่แล้ว ห้ามเติม "ทุก" ซ้ำเป็น "ทุกทุกวัน" */
+const cadenceTH = day => (day === 'daily' ? 'ทุกวัน' : 'ทุก' + DAY_TH[day]);
+const statusText = day => (day ? 'ตอนใหม่' + cadenceTH(day) : 'จบแล้ว');
+const airtimeText = day => (day ? cadenceTH(day) : '');
+const DAY_ENUM = Object.fromEntries(Object.keys(DAY_TH).map(k => [cadenceTH(k), k]));
+
+/* enum → ฟิลด์ที่ทุกหน้าใช้ · ค่าที่ไม่รู้จักต้องล้ม build ไม่ใช่กลายเป็น null เงียบ ๆ */
+function dayOf(slug, releaseDay, ended) {
+  if (ended) return null;
+  if (!releaseDay || !DAY_TH[releaseDay]) {
+    throw new Error(`${slug}: releaseDay = ${JSON.stringify(releaseDay)} ไม่อยู่ในชุดที่รู้จัก `
+      + `(${Object.keys(DAY_TH).join(',')}) — เรื่องที่ยังออกตอนต้องระบุวัน (ADR-001 §6.3.1)`);
+  }
+  return releaseDay;
+}
 const mmss = sec => Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
 const thViews = n => n == null ? '' : (n >= 1e6 ? (n / 1e6).toFixed(1) + ' ล้าน' : n >= 1e3 ? Math.round(n / 1e3) + 'K' : String(n));
 
@@ -29,16 +50,36 @@ function fromContentJson(j) {
     })),
     subs: j.subs || [],
     following: [],
-    series: j.series.map(s => ({
+    series: j.series.map(s => {
+      const day = dayOf(s.slug, s.releaseDay, s.status === 'ended');
+      return {
       slug: s.slug, title: s.title, genres: s.genres, tropes: s.tropes || [], eps: s.eps,
-      status: s.status === 'ended' ? 'จบแล้ว' : 'ตอนใหม่ทุก' + (DAY_TH[s.releaseDay] || 'วัน'),
-      airtime: s.releaseDay ? 'ทุก' + (DAY_TH[s.releaseDay] || 'วัน') : '',
+      day: day, status: statusText(day), airtime: airtimeText(day),
       views: thViews(s.views),
       c1: (s.theme || {}).c1 || '#2a2733', c2: (s.theme || {}).c2 || '#4a4556',
       cast: s.cast || [], hook: s.hook, synopsis: s.synopsis,
       cover: s.cover || `assets/covers/${s.slug}.webp`,
       episodes: s.episodes.map(e => [e.title, mmss(e.durationSec)]),
-    })),
+      };
+    }),
+  };
+}
+
+/* ชั้นแปลงของเก่า: assets/data.js เก็บวันออกตอนเป็นข้อความไทยอยู่แล้ว
+   จุดนี้เป็นที่เดียวที่อ่านข้อความแล้วได้ enum กลับ และถ้าอ่านไม่ออกต้องล้ม ไม่ใช่เงียบ */
+function fromDataJs(d) {
+  return {
+    ...d,
+    series: d.series.map(s => {
+      const ended = s.status === 'จบแล้ว';
+      const th = String(s.status).replace(/^ตอนใหม่/, '');
+      const day = ended ? null : DAY_ENUM[th];
+      if (!ended && !day) {
+        throw new Error(`${s.slug}: assets/data.js มี status = ${JSON.stringify(s.status)} `
+          + `ซึ่งถอดวันออกตอนไม่ได้ — ต้องเป็น "จบแล้ว" หรือ "ตอนใหม่ทุก<วัน>"`);
+      }
+      return { ...s, day: day, status: statusText(day), airtime: airtimeText(day) };
+    }),
   };
 }
 
@@ -47,7 +88,7 @@ function load() {
   if (fs.existsSync(cj)) return fromContentJson(JSON.parse(fs.readFileSync(cj, 'utf8')));
   const win = {};
   new Function('window', fs.readFileSync(path.join(ROOT, 'assets/data.js'), 'utf8'))(win);
-  return win.LAKORN;
+  return fromDataJs(win.LAKORN);
 }
 export const D = load();
 
@@ -95,9 +136,12 @@ export const TOP10 = [...SERIES].sort((a, b) => viewsNum(b) - viewsNum(a)).slice
 export const epSecs = dur => { const p = String(dur).split(':'); return (+p[0]) * 60 + (+p[1]); };
 export const iso8601 = dur => { const s = epSecs(dur); return `PT${Math.floor(s / 60)}M${s % 60}S`; };
 
-/* ---------- วันออกตอน ---------- */
-const DAY = { 'ตอนใหม่ทุกวัน': 'ทุกวัน', 'ตอนใหม่ทุกศุกร์': 'ศุกร์', 'ตอนใหม่ทุกเสาร์': 'เสาร์', 'ตอนใหม่ทุกอังคาร': 'อังคาร' };
-export const releaseDay = s => DAY[s.status] || null;
+/* ---------- วันออกตอน ----------
+   อ่านจากฟิลด์ `day` (enum ของสัญญา) ไม่ใช่ถอดจากข้อความ status อีกแล้ว
+   ครบทั้ง 8 ค่าโดยอัตโนมัติ — เพิ่มวันใหม่ในสัญญาแล้วไม่ต้องแก้ตารางที่นี่ */
+export const releaseDay = s => (s.day ? DAY_TH[s.day] : null);
+export const isDaily = s => s.day === 'daily';
+export const isAiring = s => !!s.day;
 
 /* ---------- เรื่องที่คล้ายกัน ---------- */
 export function similar(s, n = 6) {

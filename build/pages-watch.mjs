@@ -151,7 +151,9 @@ export function buildWatch() {
                       <div class="times"><span class="num" id="tNow">0:00</span><span class="num" id="tDur">${e[1]}</span></div>
                     </div>
                   </div>
-                  <section class="nextup" id="nextUp" role="region" aria-live="polite" hidden></section>
+                  <!-- aria-atomic=false: ประกาศการ์ดครั้งเดียวตอนโผล่ ตัวเลขนับถอยหลังอยู่ในวง
+                       aria-hidden จึงไม่ถูกประกาศซ้ำทุกวินาที (ดู showNextUp ใน app.src.js) -->
+                  <section class="nextup" id="nextUp" role="region" aria-live="polite" aria-atomic="false" hidden></section>
                   <div class="endcard" id="endCard" role="dialog" aria-modal="true" aria-labelledby="ec-h" hidden></div>
                 </div>
                 <p class="note-ex player-note">${ic('info', 'sm')}<span>ยังไม่มีไฟล์วิดีโอในระบบ — ตัวเล่นนี้เดินเวลาแบบจำลองเพื่อให้ทดสอบการจำตอนที่ดูค้างได้จริง</span></p>

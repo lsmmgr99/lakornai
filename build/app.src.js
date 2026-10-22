@@ -375,7 +375,12 @@
     var qs = new URLSearchParams(location.search);
     var fromQuery = parseInt(qs.get('t'), 10);
     var saved = Progress.get(slug);
-    if (!isNaN(fromQuery) && fromQuery > 0) t = Math.min(fromQuery, dur - 1);
+    /* ค่าที่ขอมาต้องอยู่ในช่วงของตอนนี้จริง ถ้าเกินความยาวตอน = ลิงก์หมดอายุ
+       (วันที่มีไฟล์วิดีโอจริง ความยาวตอนจะเปลี่ยน ลิงก์ที่คนแชร์ไว้จะเกินทั้งหมด)
+       ปฏิเสธทิ้งไปเลย ถอยไปใช้ค่าที่บันทึกไว้ — ถ้าหนีบเป็น dur-1 ตอนนั้นจะกลายเป็น
+       "ดูไปแล้ว 99%" ทันทีที่เปิดหน้า ทั้งที่ผู้ใช้ไม่ได้ดู */
+    var wanted = (!isNaN(fromQuery) && fromQuery > 0 && fromQuery < dur) ? fromQuery : 0;
+    if (wanted) t = wanted;
     else if (saved && saved.ep === ep && saved.sec > 2 && saved.sec < dur - 2) t = saved.sec;
     if (t > 0) toast('ดูต่อจากนาทีที่ ' + fmt(t));
 
@@ -396,6 +401,12 @@
        throttle 2 ชั้น: อย่างน้อย 5 วินาทีของเนื้อหา และอย่างน้อย 1 วินาทีจริง
        (เพลเยอร์จำลองเดิน 6 เฟรม/วินาที — เขียนทุก tick คือ 6 ครั้ง/วินาที ซึ่งมากเกินจำเป็น) */
     function persist(force) {
+      /* ยามด่านเดียวของทุกเส้นทางที่เขียนความคืบหน้าของ "ตอนนี้" กลับ
+         ถ้าตอนนี้ดูจบไปแล้ว จุดค้างถูกเลื่อนไปต้นตอนถัดไป (หรือเรื่องถูกย้ายไป "ดูจบแล้ว") แล้ว
+         เขียนทับกลับจะดึงผู้ใช้ย้อนไปตอนที่ดูจบแล้ว และลบเรื่องออกจากชั้น "ดูจบแล้ว"
+         วางยามไว้ที่นี่ที่เดียว ไม่แปะทีละตัวจัดการ — เส้นทางที่ "ตั้งใจดูตอนนี้ซ้ำ"
+         ต้องปลดธง epDone ก่อนเอง (ดูตัวจัดการคลิกแถบเวลา) จึงจะเขียนได้ */
+      if (epDone) return;
       var now = Date.now();
       if (!force && (now - lastWrite < 1000 || Math.abs(t - lastWriteSec) < 5)) return;
       lastWrite = now; lastWriteSec = t;
@@ -448,28 +459,36 @@
       var auto = settings().autoplay
         && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      function render() {
-        nextUp.setAttribute('aria-label', 'ตอนถัดไป EP.' + (ep + 1) + (auto ? ' เริ่มใน ' + left + ' วินาที' : ''));
-        nextUp.innerHTML = '<div class="nh">'
-          + (auto ? '<span class="ring" style="--p:' + ((5 - left) / 5 * 100) + '%" aria-hidden="true"><b class="num">' + left + '</b></span>' : '')
-          + '<span class="thumb"><img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async"></span>'
-          + '<span class="nt"><b class="num">ตอนถัดไป · EP.' + (ep + 1) + '</b><span>' + esc(nx[0]) + ' · ' + nx[1] + ' นาที</span></span>'
-          + '</div><div class="na">'
-          + '<a class="btn btn-accent" href="' + nextHref + '">เล่นเลย</a>'
-          + '<button class="btn btn-ghost" id="nuCancel">' + (auto ? 'ยกเลิก' : 'ปิด') + '</button></div>';
-        /* ยกเลิก = หยุดนับถอยหลังและเก็บการ์ด แต่ "ตอนนี้ดูจบแล้ว" ยังเป็นจริง
-           จึงไม่ปลด epDone — ไม่งั้นตอนออกจากหน้าจะเขียนทับจุดค้างกลับไปที่ตอนเดิม */
-        $('#nuCancel').addEventListener('click', function () {
-          if (tick) clearInterval(tick);
-          nextUp.hidden = true;
-        });
-      }
+      /* สร้างโครงครั้งเดียว แล้วอัปเดตเฉพาะตัวเลขนับถอยหลัง
+         ถ้า re-render ทั้งก้อนทุกวินาที โหนดปุ่มจะถูกทิ้งและสร้างใหม่ → โฟกัสเด้งไป <body>
+         ทุกวินาที คนใช้คีย์บอร์ด Tab มาถึงปุ่ม "ยกเลิก" แล้วกด Enter ไม่ทัน
+         ทั้งที่ UX §6.26 ให้ปุ่มนี้เป็นทางออกจากการเด้งอัตโนมัติ
+         และ #nextUp เป็น aria-live จะประกาศการ์ดซ้ำ 5 รอบใน 5 วินาที
+         ตัวเลขที่เดินอยู่ในวง aria-hidden → อัปเดตแล้วไม่ถูกประกาศซ้ำ */
+      var tick = null;
+      nextUp.setAttribute('aria-label', 'ตอนถัดไป EP.' + (ep + 1) + (auto ? ' เริ่มใน ' + left + ' วินาที' : ''));
+      nextUp.innerHTML = '<div class="nh">'
+        + (auto ? '<span class="ring" id="nuRing" style="--p:0%" aria-hidden="true"><b class="num" id="nuLeft">' + left + '</b></span>' : '')
+        + '<span class="thumb"><img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async"></span>'
+        + '<span class="nt"><b class="num">ตอนถัดไป · EP.' + (ep + 1) + '</b><span>' + esc(nx[0]) + ' · ' + nx[1] + ' นาที</span></span>'
+        + '</div><div class="na">'
+        + '<a class="btn btn-accent" href="' + nextHref + '">เล่นเลย</a>'
+        + '<button class="btn btn-ghost" id="nuCancel">' + (auto ? 'ยกเลิก' : 'ปิด') + '</button></div>';
+
+      /* ยกเลิก = หยุดนับถอยหลังและเก็บการ์ด แต่ "ตอนนี้ดูจบแล้ว" ยังเป็นจริง
+         จึงไม่ปลด epDone — ไม่งั้นตอนออกจากหน้าจะเขียนทับจุดค้างกลับไปที่ตอนเดิม */
+      var ring = $('#nuRing'), leftNum = $('#nuLeft');
+      $('#nuCancel').addEventListener('click', function () {
+        if (tick) clearInterval(tick);
+        nextUp.hidden = true;
+      });
       nextUp.hidden = false;
-      render();
-      var tick = auto ? setInterval(function () {
+
+      tick = auto ? setInterval(function () {
         left -= 1;
         if (left <= 0) { clearInterval(tick); location.href = nextHref; return; }
-        render();
+        if (leftNum) leftNum.textContent = left;
+        if (ring) ring.style.setProperty('--p', ((5 - left) / 5 * 100) + '%');
       }, 1000) : null;
     }
 
@@ -520,8 +539,12 @@
       if (lb && lb.classList.contains('lb')) lb.textContent = on ? 'ปิดเสียง' : 'เปิดเสียง';
     });
 
-    /* ลากแถบเวลาได้ (UX §6.12) */
+    /* ลากแถบเวลาได้ (UX §6.12)
+       เลื่อนเวลา = "ตั้งใจดูตอนนี้ (ซ้ำ)" จึงปลดธง ended/epDone แล้วเขียนกลับได้
+       ยกเว้นตอนการ์ดจบเรื่องเปิดอยู่: ตอนนั้นเรื่องถูกย้ายไป "ดูจบแล้ว" แล้ว
+       และการ์ดเป็น dialog คลุมเพลเยอร์อยู่ คลิกที่ลอดมาถึงแถบเวลาไม่ใช่เจตนาของผู้ใช้ */
     if (barWrap) barWrap.addEventListener('click', function (ev) {
+      if (endCard && !endCard.hidden) return;
       var r = barWrap.getBoundingClientRect();
       t = Math.max(0, Math.min(dur - 1, Math.round((ev.clientX - r.left) / r.width * dur)));
       ended = false; epDone = false;
@@ -531,8 +554,18 @@
 
     /* คีย์บอร์ด (UX §7.4) */
     document.addEventListener('keydown', function (ev) {
-      if (/input|textarea|select/i.test((ev.target.tagName || ''))) return;
+      if (ev.defaultPrevented || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      /* อย่าแย่งคีย์จากสิ่งที่กดได้ด้วยตัวเอง — ปุ่ม "ยกเลิก" ในการ์ดตอนถัดไป (UX §6.26)
+         และลิงก์ในการ์ดจบเรื่องต้องกด Enter/Space/ลูกศรได้ตามปกติ */
+      var tgt = ev.target;
+      if (tgt && tgt.closest
+        ? tgt.closest('input, textarea, select, button, a[href], [contenteditable]')
+        : /input|textarea|select/i.test((tgt && tgt.tagName) || '')) return;
       var k = ev.key.toLowerCase();
+      var seek = ev.key === 'ArrowRight' || ev.key === 'ArrowLeft';
+      /* ตอนนี้ดูจบแล้ว → การ์ดตอนถัดไป/การ์ดจบเรื่องเปิดอยู่ ลูกศรเป็นปุ่มสำรวจการ์ด
+         ไม่ใช่ปุ่มเลื่อนเวลา · จะดูตอนนี้ซ้ำให้กดที่แถบเวลา หรือเปิดตอนนั้นใหม่ */
+      if (ended && seek) return;
       if (k === ' ' || k === 'k') { ev.preventDefault(); timer ? stop() : play(); }
       else if (ev.key === 'ArrowRight') { t = Math.min(dur - 1, t + 5); persist(true); paint(); }
       else if (ev.key === 'ArrowLeft') { t = Math.max(0, t - 5); persist(true); paint(); }
@@ -540,9 +573,9 @@
       else if (k === 'm' && muteBtn) muteBtn.click();
     });
 
-    /* เขียนกลับเมื่อออกจากหน้า — กันกรณีปิดแท็บกลางคัน */
-    /* ถ้าตอนนี้ดูจบไปแล้ว จุดค้างถูกเลื่อนไปตอนถัดไปแล้ว — ห้ามเขียนทับกลับ */
-    function flush() { if (!epDone) Progress.set(slug, ep, t, dur); }
+    /* เขียนกลับเมื่อออกจากหน้า — กันกรณีปิดแท็บกลางคัน
+       (ยาม epDone อยู่ใน persist() แล้ว ไม่ต้องเช็กซ้ำที่นี่) */
+    function flush() { persist(true); }
     window.addEventListener('pagehide', flush);
     document.addEventListener('visibilitychange', function () {
       if (document.visibilityState === 'hidden') { if (timer) stop(); else flush(); }
