@@ -1,0 +1,4 @@
+.paperclip-repositories/
+.DS_Store
+Thumbs.db
+*.log

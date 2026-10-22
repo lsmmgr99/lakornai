@@ -1,0 +1,53 @@
+{
+  "tool": "built-in image_gen",
+  "prompts": [
+    {
+      "slug": "durian-revenge",
+      "prompt": "Use case: ads-marketing. Asset type: portrait 2:3 streaming series poster artwork for a Thai drama website. A formidable anthropomorphic durian hero with spiked green husk, expressive resolute face and dark coat, standing in a storm-ravaged Thai durian orchard, a small glowing seed in his hand, fallen trees, rain and golden backlight. Epic revenge drama, premium detailed 3D animated film key art. Olive green and molten gold. Composition: striking readable central subjects, faces in upper middle, visual storytelling and rich cinematic depth, leave lower 18 percent naturally dark for HTML title overlay. Full bleed single poster, no borders, no montage grid. No text, no letters, no typography, no logos, no watermark."
+    },
+    {
+      "slug": "ceo-cold",
+      "prompt": "Use case: ads-marketing. Asset type: portrait 2:3 streaming series poster artwork for a Thai drama website. Thai romantic comedy drama: handsome stern Thai CEO in a tailored navy suit and a lively beautiful adult Thai female secretary in cream office blouse, holding a coffee cup, playful romantic tension in an elegant Bangkok glass high-rise office. Cool blue window light and warm amber highlights. Photoreal cinematic editorial key art. Composition: striking readable central subjects, faces in upper middle, visual storytelling and rich cinematic depth, leave lower 18 percent naturally dark for HTML title overlay. Full bleed single poster, no borders, no montage grid. No text, no letters, no typography, no logos, no watermark."
+    },
+    {
+      "slug": "mirror-bride",
+      "prompt": "Use case: ads-marketing. Asset type: portrait 2:3 streaming series poster artwork for a Thai drama website. Thai supernatural horror: adult Thai bride wearing an intricate vintage ivory wedding gown in an abandoned dim dressing room, looking towards an antique mirror whose reflection shows a veiled sinister bride facing the viewer. Atmospheric eerie red and desaturated teal, candlelight, fine lace and mist. Photoreal premium film key art, no gore. Composition: striking readable central subjects, faces in upper middle, visual storytelling and rich cinematic depth, leave lower 18 percent naturally dark for HTML title overlay. Full bleed single poster, no borders, no montage grid. No text, no letters, no typography, no logos, no watermark."
+    },
+    {
+      "slug": "ayutthaya-love",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Thai time travel romance: beautiful adult Thai woman wearing traditional Thai silk and handsome Ayutthaya nobleman, tender gaze, golden temple spires and ancient river city at sunset, luminous antique hairpin, photoreal historical romance, gold and jade. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    },
+    {
+      "slug": "billion-widow",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Thai mystery revenge: sophisticated adult Thai widow in luxurious black dress and pearls, commanding gaze, holding sealed inheritance envelope, funeral flowers and opulent mansion with suspicious relatives blurred behind. Photoreal luxury thriller, plum black and gold. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    },
+    {
+      "slug": "one-night-bangkok",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Crime romance: beautiful adult Thai woman and handsome adult British man in dark suit standing close in rain-soaked Bangkok Chinatown alley, blurred neon, danger and romantic tension, photoreal thriller key art, ruby and cyan. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    },
+    {
+      "slug": "seedless-longan",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Heartwarming Thai fruit drama: adorable anthropomorphic golden longan fruit with hopeful expressive eyes, small arms and legs, natural translucent chest revealing softly glowing empty seedless heart, standing apart from a cluster of longan fruit characters in lush Thai orchard. Premium detailed 3D animated film, honey gold and green. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    },
+    {
+      "slug": "house-13",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Thai haunted house horror: decaying two-storey Thai wooden rental house at night, lone adult woman with suitcase at half open gate, upstairs window glowing ominous red, damp ground, creeping roots, blue fog and moonlight. Photoreal cinematic, no gore. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    },
+    {
+      "slug": "villainess-reborn",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Thai reincarnation fantasy: captivating adult Thai woman as powerful palace villainess in ornate burgundy purple silk dress and gold jewelry, holding an open novel whose pages dissolve into luminous butterflies, handsome prince and palace softly behind. Defiant knowing gaze. Photoreal fantasy romance, plum and gold. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    },
+    {
+      "slug": "undercover-tycoon",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Thai undercover billionaire drama: dignified older Thai man in simple green janitor uniform holding mop in luxurious marble corporate lobby, his glass reflection wears a perfectly tailored suit, arrogant young manager blurred behind. Wise confident smile, photoreal cinematic emerald and gold. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    },
+    {
+      "slug": "heir-returns",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Western billionaire revenge: striking adult British male heir in charcoal tailored suit and long coat, confident gaze, grand estate and city skyline behind, beautiful adult woman in champagne dress behind him, discarded wedding invitation in foreground. Photoreal cinematic bronze gold and charcoal. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    },
+    {
+      "slug": "mangosteen-heart",
+      "prompt": "Use case: ads-marketing. Portrait 2:3 premium streaming series poster artwork for Thai drama website. Thai forbidden fruit romance: beautiful anthropomorphic purple mangosteen queen with green leaf crown and tender eyes touching hands with noble anthropomorphic durian prince, tropical orchard divided by ominous shadows of rival fruit families, floating petals at twilight. Premium detailed 3D animated film, violet plum and rose gold. Striking central subjects, faces upper middle, cinematic depth, naturally dark lower 18% for HTML title overlay. Full bleed single poster. No text, no letters, no typography, no logos, no watermark, no collage."
+    }
+  ]
+}
