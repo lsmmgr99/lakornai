@@ -15,6 +15,7 @@ node tools/serve.mjs          # เปิดดูที่ http://127.0.0.1:417
 node tools/check-ac.mjs       # ตรวจเกณฑ์ตรวจรับ AIO-22 จากไฟล์ที่ส่งมอบจริง
 node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 20 ข้อ
 node tools/smoke.mjs          # เปิดทุกชนิดหน้าในเบราว์เซอร์ เช็ก error + เก็บภาพ
+node ci/rehearse.mjs --head   # ซ้อม CI ทุกขั้นในสำเนาชั่วคราว (ตรวจ V1–V13 → artifact)
 ```
 
 > **ต้องเปิดผ่าน `tools/serve.mjs`** URL ของเว็บเป็นโฟลเดอร์ (`/series/ceo-cold/`) ไม่ใช่ `.html`
@@ -36,6 +37,8 @@ node tools/smoke.mjs          # เปิดทุกชนิดหน้าใ
 | `tools/` | เซิร์ฟเวอร์ดูงาน · ชุดทดสอบ · เครื่องมือย้ายข้อมูล |
 | `assets/` | `data.js` `app.js` `site.css` `tokens.css` `covers/` `fonts/` `share/` |
 | `design/v2/` | **ม็อกอัพที่อนุมัติ · Visual เป็นเจ้าของ · ห้ามแก้** |
+| `ci/` | **ด่าน CI + ตัวจัด build artifact · DevOps เป็นเจ้าของ** · ดู `ci/README.md` |
+| `.github/workflows/` | ตัวปลุก CI — commit ที่แตะ `content.json`/ปก → ตรวจ V1–V13 → artifact |
 | `docs/adr/` | ADR ของ CTO |
 
 ไฟล์ที่ `build.mjs` เขียนทับทุกครั้ง: `index.html`, `*/index.html` ทั้งหมด,
