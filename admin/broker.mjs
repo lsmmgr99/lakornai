@@ -16,7 +16,7 @@ export function checkConfig(c){
 export function createBroker(config,{provider,now=Date.now}={}){
   checkConfig(config);provider??=github(config);
   const sessions=new Map();
-  const sweep=setInterval(()=>{for(const [id,s]of sessions)if(now()-s.seen>60000||now()>s.expires)sessions.delete(id);},10000);sweep.unref();
+  const sweep=setInterval(()=>{for(const [id,s]of sessions)if(now()-s.seen>300000||now()>s.expires)sessions.delete(id);},10000);sweep.unref();
   const server=http.createServer(async(req,res)=>{
     const send=(status,body)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'}).end(JSON.stringify(body));};
     try{
@@ -36,8 +36,8 @@ export function createBroker(config,{provider,now=Date.now}={}){
       // API uses POST even for reads, so Origin is always present in browsers.
       if(req.method!=='POST'||req.headers.origin!==origin||req.headers['content-type']!=='application/json')fail(403);
       let raw='';for await(const chunk of req){raw+=chunk;if(Buffer.byteLength(raw)>18000000)fail(413);}let body;try{body=JSON.parse(raw);}catch{fail(400);}
-      let id=req.headers.cookie?.split('; ').find(x=>x.startsWith('lakorn_session='))?.slice(15),s=sessions.get(id);
-      if(s&&(now()-s.seen>60000||now()>s.expires)){sessions.delete(id);s=null;}
+      let id=req.headers.cookie?.split(/;\s*/).find(x=>x.startsWith('lakorn_session='))?.slice(15),s=sessions.get(id);
+      if(s&&(now()-s.seen>300000||now()>s.expires)){sessions.delete(id);s=null;}
       if(p==='/api/session'){
         if(!s){if(sessions.size>=32)fail(429);id=nonce();s={csrf:nonce(),seen:now(),expires:now()+8*3600000};sessions.set(id,s);}
         res.setHeader('Set-Cookie',`lakorn_session=${id}; HttpOnly; SameSite=Strict; Path=/`);
@@ -45,10 +45,10 @@ export function createBroker(config,{provider,now=Date.now}={}){
       }
       if(!s||req.headers['x-csrf-token']!==s.csrf)fail(403);
       s.seen=now();
-      if(s.busy)fail(409);s.busy=true;
-      try{
         if(p==='/api/logout'){sessions.delete(id);res.setHeader('Set-Cookie','lakorn_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');send(200,{});return;}
         if(p==='/api/heartbeat'){send(200,{});return;}
+      if(s.busy)fail(409);s.busy=true;
+      try{
         if(p==='/api/login'){
           delete s.token;delete s.device;
           const d=await provider.start();

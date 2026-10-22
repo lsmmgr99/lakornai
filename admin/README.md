@@ -75,14 +75,14 @@ node admin/broker.mjs
 ```
 
 เปิด http://127.0.0.1:4190/admin/ กดเข้าสู่ระบบ แล้วเปิด github.com/login/device
-ใส่ user code ด้วยตนเอง จากนั้นโหลดข้อมูล branch ร่างก่อนบันทึก
+ใส่ user code ด้วยตนเอง จากนั้นเลือกโหลดข้อมูล branch ร่างหรือเก็บร่างในหน้าไว้ก่อนบันทึก
 ปุ่มบันทึกเปิดหลังตรวจ permissions.push และตรวจซ้ำก่อนเขียน
 commit สร้าง blobs/tree/commit รวม JSON และปกในครั้งเดียว อัปเดต ref ด้วย force:false
 หากหัว branch เปลี่ยน จะปฏิเสธร่างเก่า ให้ส่งออกเก็บไว้แล้วโหลดข้อมูลล่าสุดก่อนปรับใหม่
 ไม่มีการรีเฟรช provider token: หมดอายุให้เข้าสู่ระบบใหม่
 
 Session เป็นคุกกี้ HttpOnly/SameSite=Strict ไม่มีวันหมดอายุถาวร
-หน้าเว็บส่ง heartbeat ทุก 20 วินาที; pagehide ขอ logout และถ้าขาด heartbeat เกิน 60 วินาที
+หน้าเว็บส่ง heartbeat ทุก 20 วินาทีและเมื่อกลับมาเปิดแท็บ; pagehide ขอ logout และถ้าขาด heartbeat เกิน 5 นาที
 broker จะล้าง session (รวมกรณี browser crash) อายุสูงสุด 8 ชั่วโมงหรือเท่า token หากสั้นกว่า
 ปิดโปรเซสจะล้างทั้งหมด ไม่มี token/device code/refresh token เข้าดิสก์หรือส่งกลับ browser
 โปรเซสไม่อ่าน PAPERCLIP_GITHUB_* หรือ credential ของ harness
@@ -95,9 +95,15 @@ static navigation ไม่ส่ง Origin ตามปกติ จึงต�
 - https://docs.github.com/en/rest/git/refs#update-a-reference
 
 ผลที่ทดสอบจริง: mock HTTP trust boundary/CSRF, permissions.push, stale head,
-path allowlist, force:false, device polling/slow_down/denial/session expiry;
+provider path allowlist (รวม .github/, build/, assets/*.js), unknown request fields, force:false, device polling/slow_down/denial/session expiry;
 unit validation/cover/tar; Chromium offline export; admin/check.mjs
 ยังไม่ทดสอบจริง: App installation, user consent, read-only user, token revocation,
+device-flow error ที่ตอบ HTTP non-2xx, hidden-tab throttling ในเบราว์เซอร์จริง,
 GitHub commit attribution, concurrent remote updates, และ CI branch publish
 ต้องผ่าน Reviewer-Claude/Reviewer-Codex อิสระ + QA + Security ก่อน merge
 หากรีวิวขัดกันให้ CTO ตัดสิน ไม่ถือว่า mock tests เป็น live sign-off
+
+รอบแก้ review: mock commit ปก+JSON ผ่าน /api/commit, ปฏิเสธปกซ้ำ/slug ที่ไม่มี/ไบต์ผิด,
+heartbeat/logout ระหว่าง commit และ busy 409; client test แบบจำลอง DOM ตรวจการไม่โหลดทับร่าง
+แล้วยังบันทึกด้วย remote head และแยก heartbeat 409 จาก session 403
+ทดสอบทั้งหมด 25/25 ผ่าน; Chromium ทดสอบเฉพาะเส้นส่งออก offline ไม่ใช่ OAuth จริง
