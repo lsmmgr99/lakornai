@@ -100,6 +100,31 @@ try {
   check('กดลูกศร → ขณะโฟกัสอยู่ที่ปุ่มเล่น ยังเลื่อนเวลาได้ (UX §7.4)',
     tAfter !== tBefore, `${tBefore} → ${tAfter}`);
 
+  /* ยามเดียวกันเคยกลืนปุ่มลัด `k` ไปพร้อม Space ทั้งที่ไม่มีปุ่ม/ลิงก์ไหนใช้ `k` เอง
+     ผล: คลิกปุ่มเล่นด้วยเมาส์ (โฟกัสค้างที่ปุ่ม) แล้วกด `k` จะไม่หยุดเล่น — ไม่สม่ำเสมอกับลูกศร */
+  const kKey = `document.getElementById('playBtn').dispatchEvent(
+    new KeyboardEvent('keydown',{key:'k',bubbles:true,cancelable:true}))`;
+  await evaluate(`document.getElementById('playBtn').focus(); document.getElementById('playBtn').click()`);
+  await sleep(600);
+  await evaluate(kKey + ', true');                                  /* k = หยุด */
+  await sleep(700);
+  const kStopped = await evaluate(`document.getElementById('tNow').textContent`);
+  await sleep(700);
+  const kStill = await evaluate(`document.getElementById('tNow').textContent`);
+  check('กด k ขณะโฟกัสอยู่ที่ปุ่มเล่น แล้วหยุดเล่นได้จริง (UX §7.4)',
+    kStopped === kStill, `${kStopped} → ${kStill}`);
+  await evaluate(kKey + ', true');                                  /* k = เล่นต่อ */
+  await sleep(700);
+  check('กด k อีกครั้ง แล้วกลับมาเล่นต่อ',
+    (await evaluate(`document.getElementById('tNow').textContent`)) !== kStill);
+  await evaluate(`document.getElementById('playBtn').click()`);     /* หยุด → บังคับเขียน */
+
+  /* ไม่มีบรรทัดซับไตเติลในเว็บจริง — ไม่มีไฟล์วิดีโอและไม่มีช่องซับในสัญญาข้อมูล
+     (ม็อกอัพใช้ประโยคตัวอย่างจาก assets/data.js ซึ่งเป็นของชั้นออกแบบ ห้ามไหลเข้าเว็บจริง) */
+  check('หน้ารับชมไม่มีบรรทัดซับไตเติลสมมติ (ไม่มี #subLine และไม่มี .sub-t ที่มีข้อความ)',
+    await evaluate(`document.getElementById('subLine') === null
+      && Array.from(document.querySelectorAll('.sub-t')).every(n => !n.textContent.trim())`));
+
   /* ---- ดูอีกเรื่องให้มีสองรายการ แล้วตรวจลำดับ ---- */
   await go('/watch/durian-revenge/ep-3/');
   await evaluate(`document.getElementById('playBtn').click()`);

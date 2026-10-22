@@ -3,7 +3,7 @@
 ละครสั้น AI ภาษาไทย 12 เรื่อง 418 ตอน · **ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก**
 
 เว็บชุดนี้ถูก **สร้างจาก generator** ไม่ได้เขียน HTML ทีละไฟล์
-แหล่งความจริงคือ `build/` + `assets/data.js` · ไฟล์ `.html` ที่ราก **เป็นผลผลิต อย่าแก้ตรง ๆ**
+แหล่งความจริงคือ `build/` + `content.json` · ไฟล์ `.html` ที่ราก **เป็นผลผลิต อย่าแก้ตรง ๆ**
 
 ---
 
@@ -13,7 +13,8 @@
 node build/build.mjs          # สร้างเว็บทั้งเว็บใหม่ (460 หน้า) — ล้มทันทีถ้าตกเกณฑ์ on-page
 node tools/serve.mjs          # เปิดดูที่ http://127.0.0.1:4173
 node tools/check-ac.mjs       # ตรวจเกณฑ์ตรวจรับ AIO-22 จากไฟล์ที่ส่งมอบจริง
-node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 20 ข้อ
+node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 44 ข้อ
+node tools/check-mockup.mjs   # ม็อกอัพที่อนุมัติต้องสร้างซ้ำได้เหมือนเดิม (0 ไฟล์เปลี่ยน)
 node tools/smoke.mjs          # เปิดทุกชนิดหน้าในเบราว์เซอร์ เช็ก error + เก็บภาพ
 node ci/rehearse.mjs --head   # ซ้อม CI ทุกขั้นในสำเนาชั่วคราว (ตรวจ V1–V13 → artifact)
 ```
@@ -28,21 +29,24 @@ node ci/rehearse.mjs --head   # ซ้อม CI ทุกขั้นในส�
 | ที่อยู่ | คืออะไร |
 |---|---|
 | `build/` | **generator ตัวจริง** · ย้ายฐานมาจาก `design/v2/` ของ Visual |
-| `build/content.mjs` | ชั้นข้อมูล — อ่าน `content.json` ถ้ามี ไม่งั้นอ่าน `assets/data.js` |
+| `build/content.mjs` | ชั้นข้อมูล — อ่าน `content.json` ถ้ามี ไม่งั้นถอยไปอ่าน `assets/data.js` |
 | `build/seo.mjs` | `SITE_ORIGIN`, canonical/og/JSON-LD, robots.txt, sitemap.xml, ช่องภาพแชร์ |
 | `build/ui.mjs` | โครงหน้า + คอมโพเนนต์ร่วม (header/footer/การ์ด/ตารางตอน) |
 | `build/pages-*.mjs` | เทมเพลตของแต่ละกลุ่มหน้า |
 | `build/app.src.js` | ต้นฉบับของ `assets/app.js` — **หัวใจของ "ดูต่อ"** |
 | `build/site-extra.css` | CSS ส่วนเพิ่มของเว็บจริง ต่อท้าย `v2.css` ของ Visual |
 | `tools/` | เซิร์ฟเวอร์ดูงาน · ชุดทดสอบ · เครื่องมือย้ายข้อมูล |
-| `assets/` | `data.js` `app.js` `site.css` `tokens.css` `covers/` `fonts/` `share/` |
+| `assets/content.js` | **ข้อมูลรันไทม์ของเว็บจริง** · ผลผลิตของ build · หน้าเว็บโหลดไฟล์นี้ |
+| `assets/data.js` | **ชุดข้อมูลตั้งต้นของชั้นออกแบบ** · `design/v2/lib.mjs` อ่าน · build **ห้ามเขียนทับ** |
+| `assets/` | `content.js` `data.js` `app.js` `site.css` `tokens.css` `covers/` `fonts/` `share/` |
 | `design/v2/` | **ม็อกอัพที่อนุมัติ · Visual เป็นเจ้าของ · ห้ามแก้** |
 | `ci/` | **ด่าน CI + ตัวจัด build artifact · DevOps เป็นเจ้าของ** · ดู `ci/README.md` |
 | `.github/workflows/` | ตัวปลุก CI — commit ที่แตะ `content.json`/ปก → ตรวจ V1–V13 → artifact |
 | `docs/adr/` | ADR ของ CTO |
 
 ไฟล์ที่ `build.mjs` เขียนทับทุกครั้ง: `index.html`, `*/index.html` ทั้งหมด,
-`assets/{app.js,site.css,tokens.css,favicon.svg,fonts/}`, `robots.txt`, `sitemap.xml`, `redirects.map`
+`assets/{content.js,app.js,site.css,tokens.css,favicon.svg,fonts/}`, `robots.txt`, `sitemap.xml`, `redirects.map`
+**ไฟล์ที่ `build.mjs` ต้องไม่แตะ:** `assets/data.js` (ชั้นออกแบบอ่านอยู่ · ด่าน `tools/check-mockup.mjs` คุมไว้)
 และไฟล์ส่งต่อ URL เก่า 38 ไฟล์
 
 ---
@@ -59,8 +63,12 @@ node ci/rehearse.mjs --head   # ซ้อม CI ทุกขั้นในส�
 ตอนที่ 2 ขึ้นไปเป็น `noindex,follow` เพราะชื่อตอนทั้งเว็บมีแค่ 32 ชื่อที่ไม่ซ้ำกันจาก 418 ตอน
 ปลดเป็น `index` ได้ทันทีที่มีชื่อตอนจริง — แก้ที่ `build/pages-watch.mjs` บรรทัดที่เขียน `robots:`
 
-**ข้อมูล** วันนี้มาจาก `assets/data.js` · วันที่หลังบ้านส่ง `content.json` ตาม ADR-001 §6
-ให้วางไฟล์ที่ราก แล้ว build ใหม่ — `build/content.mjs` รับได้ทั้งสองรูปโดยไม่ต้องแก้หน้าใด
+**ข้อมูล** วันนี้มาจาก `content.json` ที่ราก (ADR-001 §6) · ถ้าไม่มีไฟล์นั้น `build/content.mjs`
+ถอยไปอ่าน `assets/data.js` ซึ่งเป็นชุดของชั้นออกแบบ โดยตัด `views`/`following`/`subs` ออกให้
+
+**ยอดวิว** `meta.viewsSource = "none"` ⇒ ไม่มีป้ายยอดวิวในหน้าใดเลย และหน้า `/popular`
+บอกเกณฑ์ที่ใช้จริง (จำนวนตอน) ไม่อ้างว่าวัดผู้ชมมา — บังคับด้วยกฎ V12/V13 ใน `build/build.mjs`
+วันที่มีระบบวัดจริง ให้ตั้ง `meta.viewsSource` พร้อม `views` ครบทุกเรื่องใน commit เดียวกัน (V10)
 
 ---
 
