@@ -171,27 +171,92 @@ export const seriesOfGenre = g => SERIES.filter(s => s.genres.includes(g));
 export const tropeOf = slug => D.tropes.find(t => t.slug === slug);
 export const tropesOf = s => (s.tropes || []).map(tropeOf).filter(Boolean);
 
-/* ---------- แท็ก trope ที่ "เปิดเป็นหน้าได้" ----------
+/* ---------- แท็ก (facet) ที่ "เปิดเป็นหน้าได้" ----------
    เกณฑ์ 2 ข้อ ไม่ใช่ข้อเดียว:
    1) UX §2.1 — ต้องมี ≥3 เรื่อง ไม่งั้นได้หน้าโหลงเหลง
    2) SEO AIO-19 §9.1 — ถ้าชุดเรื่องซ้อนกับหมวดใดเกิน 80% จะเป็นหน้าซ้ำ ห้ามเปิด
    ผลวันนี้ (คลัง 12 เรื่อง): `แก้แค้น` และ `ละครผลไม้` ตกข้อ 2 (ซ้อนหมวด 100%)
-   เหลือ 2 แท็กที่ผ่านทั้งสองข้อ · Research AIO-20 ยืนยันตัวเลขทุกตัวแล้ว
-   แท็กที่เหลือเก็บไว้ในข้อมูล จะโผล่เป็นหน้าเองเมื่อคลังโตพอ ไม่ต้องแก้โค้ด */
+   ⇒ trope ล้วนผ่านแค่ 2 ตัว ตั้งแถว chip ไม่ได้ (AIO-20 ยืนยันตัวเลขทุกตัวแล้ว)
+   แท็กที่ตกเก็บไว้ในข้อมูล จะโผล่เป็นหน้าเองเมื่อคลังโตพอ ไม่ต้องแก้โค้ด
+
+   ค่าคงที่สองตัวข้างล่างคือด่าน · AIO-33 เติม facet เข้าด่านเดิมโดยไม่ลดเกณฑ์
+   (ลด TAG_MIN_ITEMS หรือดัน TAG_MAX_GENRE_OVERLAP ขึ้น = รื้อด่าน ไม่ใช่เพิ่มแท็ก) */
 export const TAG_MIN_ITEMS = 3;
 export const TAG_MAX_GENRE_OVERLAP = 0.8;
-function genreOverlap(items) {
+
+/* ---------- facet ที่ไม่ใช่ trope — ประกาศที่เดียวตรงนี้ (AIO-33) ----------
+   ลูกค้าเลือกทาง (ข) "chip ผสม" เมื่อ 23 ต.ค. 2026 หลัง Research AIO-20 ชี้ว่า
+   trope ล้วนไม่พอตั้งแถว · ชั้นที่สองซ้อนบนหมวดจึงไม่ได้มีแค่ปมเรื่อง
+   แต่รวม "สถานะออกตอน" กับ "ความยาว" ซึ่งเป็นสองเกณฑ์ที่คนเลือกเรื่องในคลังใช้จริง
+   และไม่ใช่การพูดซ้ำกับหมวด (ต่างจาก `แก้แค้น`/`ละครผลไม้` ที่ซ้อนหมวดเต็ม 100%)
+
+   ⚠️ แต่ละตัวบอกได้แค่ "เรื่องไหนเข้าข่าย" (match) เท่านั้น
+      จำนวนเรื่อง · overlap · จะได้เปิดหน้าไหม — คำนวณจาก content.json ตอน build ทุกตัว
+      ห้ามเขียนรายชื่อเรื่องลงไฟล์นี้ วันหน้าเพิ่มเรื่องที่ 13 แถว chip ต้องขยับเอง
+      และ facet ใหม่ต้องผ่านด่าน 2 ข้อข้างบน "ด้วยค่าคงที่เดิม" ไม่ใช่ลดเกณฑ์ลงมารับ
+   ⚠️ ถ้อยคำของป้าย (label/lead) เป็นงานเขียนเนื้อหา ลูกค้าเป็นผู้รับหรือแก้
+      ห้ามเติมคำโฆษณาที่ไม่มีตัวเลขรองรับ ("ฮิตที่สุด"/"ห้ามพลาด") ลงมาที่นี่ */
+const SHORT_EPS = 20;
+const LONG_EPS = 45;
+/* ส่วนขยายในประโยคนำของหน้าแท็ก — "…รวม <N> <lead> ได้แก่ …" */
+const TROPE_LEAD = 'เรื่องที่เล่าปมเดียวกันแม้จะอยู่คนละแนว';
+export const FACETS = [
+  /* `day === null` ⇔ `status === "ended"` ตามสัญญา §6.3.1 (ดู dayOf) — อ่าน enum ไม่อ่านข้อความไทย */
+  { slug: 'ended', kind: 'status', label: 'จบแล้ว',
+    lead: 'เรื่องที่ปล่อยตอนครบแล้ว ดูจบได้เลยไม่ต้องรอตอนใหม่',
+    match: s => s.day === null },
+  { slug: 'daily', kind: 'status', label: 'ออกตอนใหม่ทุกวัน',
+    lead: 'เรื่องที่ยังปล่อยตอนใหม่ทุกวัน',
+    match: s => s.day === 'daily' },
+  { slug: 'quick-watch', kind: 'length', label: `ดูจบไว ≤${SHORT_EPS} ตอน`,
+    lead: `เรื่องที่มีไม่เกิน ${SHORT_EPS} ตอน`,
+    match: s => s.eps <= SHORT_EPS },
+  { slug: 'long-run', kind: 'length', label: `เรื่องยาว ≥${LONG_EPS} ตอน`,
+    lead: `เรื่องที่มี ${LONG_EPS} ตอนขึ้นไป`,
+    match: s => s.eps >= LONG_EPS },
+];
+
+function genreOverlap(d, items) {
   let worst = 0;
-  for (const g of D.genres) {
-    const set = new Set(seriesOfGenre(g.slug).map(s => s.slug));
+  for (const g of d.genres) {
+    const set = new Set(d.series.filter(s => s.genres.includes(g.slug)).map(s => s.slug));
     const hit = items.filter(k => set.has(k)).length;
     worst = Math.max(worst, hit / items.length);
   }
   return worst;
 }
-export const OPEN_TAGS = D.tropes.filter(t =>
-  t.items.length >= TAG_MIN_ITEMS && genreOverlap(t.items) <= TAG_MAX_GENRE_OVERLAP);
+
+/* ด่านเดียวกันสำหรับ trope และ facet — รับชั้นข้อมูลเข้ามาเป็นพารามิเตอร์
+   เพื่อให้ tools/test-tags.mjs ป้อนคลังสมมติเข้ามาพิสูจน์ได้ว่า "คำนวณ" จริง ไม่ใช่ท่องรายชื่อ */
+export function computeOpenTags(d) {
+  const candidates = [
+    ...(d.tropes || []).map(t => ({
+      slug: t.slug, kind: 'trope', label: t.label, lead: TROPE_LEAD, items: t.items,
+    })),
+    ...FACETS.map(f => ({
+      slug: f.slug, kind: f.kind, label: f.label, lead: f.lead,
+      items: d.series.filter(f.match).map(s => s.slug),
+    })),
+  ];
+  const genreSlugs = new Set(d.genres.map(g => g.slug));
+  const seen = new Set();
+  for (const c of candidates) {
+    /* slug ชนกันแปลว่าสอง facet จะเขียนหน้า /tag/<slug>/ ทับกัน — ต้องล้ม build ไม่ใช่เงียบ */
+    if (seen.has(c.slug)) throw new Error(`แท็ก/facet slug ซ้ำ: "${c.slug}" — /tag/${c.slug}/ มีเจ้าของได้ตัวเดียว`);
+    seen.add(c.slug);
+    if (genreSlugs.has(c.slug)) {
+      throw new Error(`facet slug "${c.slug}" ชนกับ slug ของหมวด — chip จะพูดซ้ำกับหมวด `
+        + `ซึ่งเป็นสิ่งที่ด่าน overlap มีไว้กัน (AIO-19 §9.1)`);
+    }
+  }
+  return candidates.filter(c =>
+    c.items.length >= TAG_MIN_ITEMS && genreOverlap(d, c.items) <= TAG_MAX_GENRE_OVERLAP);
+}
+
+export const OPEN_TAGS = computeOpenTags(D);
 export const isOpenTag = slug => OPEN_TAGS.some(t => t.slug === slug);
+/* แท็กที่เปิดแล้วและครอบเรื่องนี้ — ใช้กับแถว chip ในหน้าเรื่อง (เดิมเป็น trope ล้วน) */
+export const openTagsOf = s => OPEN_TAGS.filter(t => t.items.includes(s.slug));
 
 /* ---------- อันดับในหน้า /popular ----------
    ADR-001 §12.2 C2: ขณะ `viewsSource === "none"` การจัดลำดับต้องมาจาก "เกณฑ์ที่ประกาศได้

@@ -1,7 +1,7 @@
 /* กลุ่ม B — รายละเอียดเรื่อง (12 หน้า) + หน้ารับชม (418 หน้า)
    เทมเพลตเดียวต่อกลุ่ม ตาม ux-spec §2.3 */
 import {
-  U, SERIES, genreLabel, similar, tropesOf, isOpenTag, D, epSecs, hasCastPage, HAS_VIEWS,
+  U, SERIES, genreLabel, similar, openTagsOf, D, epSecs, hasCastPage, HAS_VIEWS,
 } from './content.mjs';
 import {
   definePage, shell, pageHead, crumbs, rail, section, poster, card, epGrid, epTabs,
@@ -37,7 +37,9 @@ function watchDesc(s, n, e) {
 export function buildSeries() {
   for (const s of SERIES) {
     const g0 = s.genres[0];
-    const tags = tropesOf(s);
+    /* แถว chip ของหน้าเรื่อง = หมวด + "แท็กที่เปิดแล้วและครอบเรื่องนี้"
+       เดิมเป็น trope ล้วน · AIO-33 ทำให้รวม facet สถานะ/ความยาวด้วย (ชุดเดียวกับแถวหน้าแรก) */
+    const tags = openTagsOf(s);
     definePage({
       out: `series/${s.slug}/index.html`, url: U.series(s.slug), page: 'series', slug: s.slug,
       title: seriesTitle(s),
@@ -71,7 +73,7 @@ export function buildSeries() {
             <p class="syn">${esc(s.synopsis)}</p>
             <div class="chips">
               ${s.genres.map(g => `<a class="chip" href="${L(U.genre(g))}">${genreLabel(g)}</a>`).join('')}
-              ${tags.filter(t => isOpenTag(t.slug)).map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.label}</a>`).join('')}
+              ${tags.map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.label}</a>`).join('')}
             </div>
             ${section('เลือกตอน', `${epTabs(s)}${epGrid(L, s)}${legend}`)}
             ${section('ตัวละคร', `<div class="castrow">${s.cast.map(c => {

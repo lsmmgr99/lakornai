@@ -358,7 +358,7 @@ export function buildGenres() {
 export function buildTags() {
   for (const t of OPEN_TAGS) {
     const items = t.items.map(k => BY[k]);
-    const intro = `แท็ก “${t.label}” เป็นชั้นที่สองซ้อนบน 6 แนวหลัก รวม ${items.length} เรื่องที่เล่าปมเดียวกันแม้จะอยู่คนละแนว `
+    const intro = `แท็ก “${t.label}” เป็นชั้นที่สองซ้อนบน 6 แนวหลัก รวม ${items.length} ${t.lead} `
       + `ได้แก่ ${items.map(s => s.title).join(' · ')} — ทุกเรื่องดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`;
     /* กฎตัดเดียวกับ onpage-audit §5.2 — ยาวเกินเกณฑ์ให้ตัดวรรคท้ายออกก่อน */
     let title = `${t.label} — ละครสั้น AI ${items.length} เรื่อง ดูฟรี · LakornAI`;
