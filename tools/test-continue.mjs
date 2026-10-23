@@ -1,175 +1,22 @@
 /* ทดสอบ "ดูต่อจากรายการค้างล่าสุด" ด้วยเบราว์เซอร์จริง — AIO-22 AC-2
    รัน:  node tools/test-continue.mjs
-   ต้องมี tools/serve.mjs ทำงานอยู่ (สคริปต์นี้เปิดให้เอง) และ Chromium ของ playwright ในเครื่อง
+   ต้องมี Chromium ของ playwright ในเครื่อง (สคริปต์นี้ยก tools/serve.mjs + เบราว์เซอร์ให้เอง)
 
    ไล่ทุกบูลเล็ตของ AC-2 ด้วยพฤติกรรมจริง ข้อไหนตกจะ exit 1 พร้อมบอกว่าข้อไหน
-   ค่าตั้งต้นขอพอร์ตว่างจาก OS เอง · ตั้งทับได้ด้วย AC2_PORT / AC2_CDP */
-import { spawn } from 'node:child_process';
-import fs from 'node:fs';
-import net from 'node:net';
-import os from 'node:os';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+   ค่าตั้งต้นขอพอร์ตว่างจาก OS เอง · ตั้งทับได้ด้วย AC2_PORT / AC2_CDP
+   การยกเซิร์ฟเวอร์/เบราว์เซอร์ เพดานเวลา และการเก็บกวาด อยู่ที่ tools/cdp-gate.mjs
+   (ไฟล์นี้กับ tools/test-contrast.mjs เคยมีโค้ดก้อนนั้นคนละสำเนา แล้วแก้ไม่สมมาตร — AIO-45 C2) */
+import { startGate } from './cdp-gate.mjs';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
-/* พอร์ต — workspace นี้แชร์กับ run อื่น · พอร์ตตายตัวทำให้ด่านค้างเมื่อมีคนถืออยู่ (AIO-42)
-   ⇒ ขอพอร์ตว่างจาก OS เป็นค่าตั้งต้น · ตั้งทับด้วย AC2_PORT / AC2_CDP ได้เหมือนเดิม
-   ขอทีเดียวทุกตัวแล้วค่อยปล่อยคืนพร้อมกัน: ถ้าปล่อยทีละตัว OS คืนเลขเดิมซ้ำได้
-   แล้ว serve.mjs กับ chrome จะไปชนกันเอง (โปรไฟล์เบราว์เซอร์แยกทุกรันอยู่แล้วด้านล่าง) */
-async function freePorts(envNames) {
-  const held = [], ports = [];
-  for (const name of envNames) {
-    if (process.env[name]) { ports.push(+process.env[name]); continue; }
-    const s = await new Promise((res, rej) => {
-      const srv = net.createServer();
-      srv.once('error', rej);
-      srv.listen(0, '127.0.0.1', () => res(srv));
-    });
-    held.push(s); ports.push(s.address().port);
-  }
-  await Promise.all(held.map(s => new Promise(r => s.close(r))));
-  return ports;
-}
-const [PORT, CDP] = await freePorts(['AC2_PORT', 'AC2_CDP']);
-const PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-ac2-'));
-const BASE = `http://127.0.0.1:${PORT}`;
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)],
-  { stdio: ['ignore', 'pipe', 'ignore'] });
-/* เก็บโค้ดตอนออกไว้บอกสาเหตุตอนแดง (ทางที่เจอบ่อยคือ listen ไม่ติดเพราะพอร์ตถูกถือ
-   แต่ tools/serve.mjs:38 อ่านไฟล์ในตัวจัดการ request โดยไม่มี try ⇒ ตายกลางทางก็ได้) */
-let serverExit = null;
-server.on('exit', code => { serverExit = code === null ? -1 : code; });
-/* หลักฐานว่าพอร์ตเป็นของลูกตัวนี้จริง = บรรทัดที่ tools/serve.mjs:40 พิมพ์หลัง listen สำเร็จ
-   ของเดิมถือว่า "มีใครตอบ HTTP ที่พอร์ตนั้น" = พร้อม ⇒ เซิร์ฟเวอร์ของ run อื่น (คนละ checkout)
-   ทำให้ด่านเขียวจากไฟล์ของคนอื่นได้ ทั้งที่ลูกของเราไม่ได้พอร์ตเลย (รีวิว AIO-44 ข้อ 2 · AIO-43 N3) */
-let ready = false, serverOut = '';
-server.stdout.on('data', d => {
-  serverOut += d;
-  if (serverOut.includes(`http://127.0.0.1:${PORT}/`)) ready = true;
+const { BASE, send, evaluate, until, cleanup, sleep } = await startGate({
+  envPorts: ['AC2_PORT', 'AC2_CDP'], profilePrefix: 'lakorn-ac2-',
 });
-const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dbus',
-  `--user-data-dir=${PROFILE}`, `--remote-debugging-port=${CDP}`, '--remote-allow-origins=*', 'about:blank'],
-  { stdio: 'ignore' });
-
-function cleanup(code) {
-  try { server.kill('SIGTERM'); } catch {}
-  try { chrome.kill('SIGTERM'); } catch {}
-  try { fs.rmSync(PROFILE, { recursive: true, force: true }); } catch {}
-  process.exit(code);
-}
-
-/* รอให้ serve.mjs ของเราขึ้นจริงก่อนเปิดหน้า — ถ้ามีคนถือพอร์ตนั้นอยู่ serve.mjs จะตายทันที
-   แล้ว Page.navigate จะค้างไม่มีกำหนด (เซิร์ฟเวอร์ของคนอื่นรับ connection แต่ไม่ตอบ)
-   นี่คืออาการที่ทำให้ check-ac.mjs นับ AC-2 เป็น "ตก" ตอนหมดเวลา 480 วิ (AIO-42)
-   ⇒ แดงเร็วพร้อมบอกสาเหตุ ดีกว่าค้างยาวแล้วแดงแบบไม่มีเหตุผล
-   เงื่อนไขพร้อมคือ "ลูกของเราพิมพ์บรรทัดพร้อม" ไม่ใช่ "พอร์ตนั้นมีใครตอบ" · ด่าน: tools/test-ports.mjs */
-const upBy = Date.now() + 10000;
-while (!ready && serverExit === null && Date.now() < upBy) await sleep(50);
-if (!ready) {
-  console.error(`✗ เปิด tools/serve.mjs ที่พอร์ต ${PORT} ไม่ได้` +
-    (serverExit === null
-      ? ' (หมดเวลา 10 วินาที — ไม่ได้บรรทัดพร้อมจาก serve.mjs ของรันนี้)'
-      : ` (serve.mjs ออกด้วยโค้ด ${serverExit} — น่าจะมีคนถือพอร์ตอยู่ · ตั้ง AC2_PORT เลือกเองได้)`));
-  cleanup(1);
-}
-
-/* ทุก fetch ต้องมี timeout: พอร์ต CDP ที่ "รับ connection แต่ไม่ตอบ" ทำให้ค้างไม่มีกำหนด
-   เหมือนพอร์ต HTTP เป๊ะ ๆ (รีวิว AIO-43 R1 · AIO-44 ข้อ 1 — ทำซ้ำได้ด้วย AC2_CDP ชี้ไปพอร์ตแบบนั้น)
-   และต้องมีเพดานรวมด้วย: นับแต่จำนวนรอบไม่ได้จำกัดเวลาของแต่ละรอบ */
-const CDP_WAIT_MS = 20000;
-async function wsUrl() {
-  const until = Date.now() + CDP_WAIT_MS;
-  while (Date.now() < until) {
-    try {
-      const r = await fetch(`http://127.0.0.1:${CDP}/json/new?about:blank`,
-        { method: 'PUT', signal: AbortSignal.timeout(1000) });
-      const j = await r.json();
-      if (j.webSocketDebuggerUrl) return j.webSocketDebuggerUrl;
-    } catch { /* ยังไม่ขึ้น */ }
-    await sleep(250);
-  }
-  throw new Error(`เชื่อมต่อ chrome ที่พอร์ต ${CDP} ไม่ได้ใน ${CDP_WAIT_MS / 1000} วินาที` +
-    ' (ถ้าตั้ง AC2_CDP ทับ อาจมีคนถือพอร์ตนั้นอยู่)');
-}
-
-/* ต่อ CDP ไม่ติดต้องเก็บกวาดด้วย — ปล่อย chrome/serve ค้างไว้คือไปถือพอร์ตให้รันถัดไปแดงต่อ */
-let ws, wsDead = null;
-try {
-  ws = new WebSocket(await wsUrl());
-  await new Promise((res, rej) => {
-    const t = setTimeout(() => rej(new Error('ต่อ WebSocket ของ CDP ไม่ติดใน 10 วินาที')), 10000);
-    const done = fn => (...a) => { clearTimeout(t); fn(...a); };
-    ws.onopen = done(res);
-    ws.onerror = done(() => rej(new Error('WebSocket ของ CDP ล้มตอนเปิด')));
-    ws.onclose = done(() => rej(new Error('chrome ปิดการเชื่อมต่อ CDP ก่อนเริ่มใช้งาน')));
-  });
-} catch (e) {
-  console.error('ทดสอบล้ม: ' + (e.message || e));
-  cleanup(1);
-}
-let id = 0; const pending = new Map();
-/* chrome ตายกลางทางเกิดขึ้นจริงในกล่องนี้ (หลาย run ขนานกัน · OOM-kill) ⇒ ws ปิด
-   ของเดิมไม่มี onclose/timeout ⇒ promise ใน pending ไม่ถูก settle ตลอดกาล ด่านค้างเงียบ
-   แล้ว check-ac.mjs นับเป็น "ตก" ตอนหมดเวลา 480 วิ — อาการเดียวกับที่ AIO-42 ถูกเปิด (รีวิว AIO-43 R2) */
-function wsDie(msg) {
-  wsDead = wsDead || new Error(msg);
-  for (const { rej } of pending.values()) rej(wsDead);
-  pending.clear();
-}
-ws.onclose = () => wsDie('chrome ปิดการเชื่อมต่อ CDP กลางทาง');
-ws.onerror = () => wsDie('การเชื่อมต่อ CDP ล้มกลางทาง');
-ws.onmessage = ev => {
-  const m = JSON.parse(ev.data);
-  if (m.id && pending.has(m.id)) {
-    const { res, rej } = pending.get(m.id); pending.delete(m.id);
-    m.error ? rej(new Error(m.error.message)) : res(m.result);
-  }
-};
-const SEND_TIMEOUT_MS = 30000;
-const send = (method, params = {}) => new Promise((res, rej) => {
-  if (wsDead) { rej(wsDead); return; }
-  const i = ++id;
-  const t = setTimeout(() => {
-    if (pending.delete(i)) rej(new Error(`CDP ไม่ตอบคำสั่ง ${method} ใน ${SEND_TIMEOUT_MS / 1000} วินาที`));
-  }, SEND_TIMEOUT_MS);
-  pending.set(i, { res: v => { clearTimeout(t); res(v); }, rej: e => { clearTimeout(t); rej(e); } });
-  try { ws.send(JSON.stringify({ id: i, method, params })); }
-  catch (e) { clearTimeout(t); pending.delete(i); rej(e); }
-});
-await send('Page.enable'); await send('Runtime.enable');
-
-async function evaluate(expr) {
-  const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
-  if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || 'js error');
-  return r.result.value;
-}
-async function go(p) {
-  await send('Page.navigate', { url: BASE + p });
-  for (let i = 0; i < 100; i++) {
-    /* ลูปนี้กลืน error โดยเจตนา (หน้ากำลังเปลี่ยน) — แต่ถ้า ws ตายไปแล้วต้องโยนสาเหตุจริงออก
-       ไม่ใช่วน 100 รอบแล้วบอกว่า "โหลดหน้าไม่เสร็จ" ซึ่งชี้ผิดทาง */
-    try { if (await evaluate("document.readyState === 'complete' && !!window.LakornProgress")) return; }
-    catch (e) { if (wsDead) throw e; }
-    await sleep(60);
-  }
-  throw new Error('โหลดหน้าไม่เสร็จ: ' + p);
-}
+const go = p => until(p, "document.readyState === 'complete' && !!window.LakornProgress");
 /* เปิดหน้าโดยรอแค่ readyState — ห้ามรอ window.LakornProgress
    บล็อก "ค่าเสียรูปใน localStorage" (AIO-34) ต้องวัดได้ว่า LakornProgress หายไปหรือไม่
    ถ้ารอตัวแปรนั้นก่อน การถอยการแก้ออกจะกลายเป็น "ตัวทดสอบล้ม" แทนที่จะเป็น "ข้อนั้นแดง"
    (assets/app.js เป็น <script> ท้าย body แบบบล็อก ⇒ complete = สคริปต์รันจบแล้วแน่) */
-async function goRaw(p) {
-  await send('Page.navigate', { url: BASE + p });
-  for (let i = 0; i < 100; i++) {
-    try { if (await evaluate("document.readyState === 'complete'")) return; }
-    catch (e) { if (wsDead) throw e; }
-    await sleep(60);
-  }
-  throw new Error('โหลดหน้าไม่เสร็จ: ' + p);
-}
+const goRaw = p => until(p, "document.readyState === 'complete'");
 
 let pass = 0, fail = 0;
 function check(name, ok, detail = '') {
@@ -632,8 +479,8 @@ try {
     await evaluate(`/ยังไม่มีเรื่องที่ดูค้าง/.test(document.getElementById('libPanel').textContent)`));
 
   console.log(`\nผล: ผ่าน ${pass} · ตก ${fail}`);
-  cleanup(fail ? 1 : 0);
+  await cleanup(fail ? 1 : 0);
 } catch (e) {
   console.error('ทดสอบล้ม: ' + e.message);
-  cleanup(1);
+  await cleanup(1);
 }

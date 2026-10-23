@@ -67,13 +67,29 @@ for (const m of adminSrv.matchAll(/'(\/[^']*\.mjs)'/g)) {
 }
 
 /* ---------- 3. เซิร์ฟเวอร์ ---------- */
-const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)], { stdio: 'ignore' });
+/* เงื่อนไขพร้อม = บรรทัดที่ลูกของรันนี้พิมพ์หลัง listen สำเร็จ ไม่ใช่ "มีใครตอบที่พอร์ตนั้น"
+   (เซิร์ฟเวอร์ของ run อื่นคนละ checkout ทำให้ด่านเขียวจากไฟล์ของคนอื่นได้ — AIO-42)
+   และทุก fetch ต้องมีเพดาน: พอร์ตที่รับ connection แต่ไม่ตอบทำให้ค้างไม่มีกำหนด
+   ของเดิมถูกคุมแค่จากข้างนอกด้วย timeout ของ check-ac (รีวิว AIO-45 C8) */
+const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)],
+  { stdio: ['ignore', 'pipe', 'ignore'] });
+/* ลูกอยู่ใน process group เดียวกับตัวด่านโดยเจตนา — ตัวที่ครอบ (check-ac) ต้องเก็บกวาด
+   ทั้งตระกูลได้ด้วย kill(-pid) เมื่อตัวด่านค้าง · ไม่ใช่ปล่อย serve.mjs ไปถือพอร์ตต่อ */
 const stop = c => { try { server.kill('SIGTERM'); } catch { /* ตายไปแล้ว */ } process.exit(c); };
-let up = false;
-for (let i = 0; i < 80; i++) {
-  try { await fetch(BASE + '/404/'); up = true; break; } catch { await sleep(125); }
+process.on('exit', () => { try { server.kill('SIGKILL'); } catch { /* ตายไปแล้ว */ } });
+for (const sg of ['SIGINT', 'SIGTERM', 'SIGHUP']) process.on(sg, () => stop(1));
+let srvCode = null, srvOut = '', up = false;
+server.on('exit', (c, sig) => { srvCode = c === null ? `สัญญาณ ${sig}` : c; });
+server.stdout.on('data', d => { srvOut += d; if (srvOut.includes(`http://127.0.0.1:${PORT}/`)) up = true; });
+const upBy = Date.now() + 10000;
+while (!up && srvCode === null && Date.now() < upBy) await sleep(25);
+if (!up) {
+  console.error(`✗ เปิด tools/serve.mjs ที่พอร์ต ${PORT} ไม่ได้` + (srvCode === null
+    ? ' (หมดเวลา 10 วินาที — ไม่ได้บรรทัดพร้อมจาก serve.mjs ของรันนี้)'
+    : ` (serve.mjs ออกด้วยโค้ด ${srvCode} — น่าจะมีคนถือพอร์ตอยู่ · ตั้ง SV_PORT เลือกเองได้)`));
+  stop(1);
 }
-if (!up) { console.error(`✗ เปิด tools/serve.mjs ที่พอร์ต ${PORT} ไม่ได้`); stop(1); }
+const get = u => fetch(BASE + u, { signal: AbortSignal.timeout(10000) });
 
 let pass = 0, fail = 0;
 function check(name, ok, detail = '') {
@@ -89,7 +105,7 @@ const queue = [...seeds.entries()].map(([u, from]) => ({ u, from }));
 while (queue.length) {
   const { u, from } = queue.shift();
   if (got.has(u)) continue;
-  const r = await fetch(BASE + u);
+  const r = await get(u);
   const type = r.headers.get('content-type') || '';
   const body = await r.text();
   got.set(u, { status: r.status, type, from });
@@ -133,7 +149,7 @@ const EXPECT = [['/assets/app.js', 'text/javascript'], ['/assets/site.css', 'tex
   ['/admin/', 'text/html'], ['/content.json', 'application/json'], ['/sitemap.xml', 'application/xml'],
   ['/robots.txt', 'text/plain']];
 for (const [u, want] of EXPECT) {
-  const r = await fetch(BASE + u);
+  const r = await get(u);
   const type = r.headers.get('content-type') || '';
   check(`${u} · content-type ${type || '(ว่าง)'}`, r.status === 200 && type.startsWith(want),
     `ต้องเป็น 200 + ขึ้นต้นด้วย ${want}`);

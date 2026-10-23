@@ -33,6 +33,14 @@ const read = f => fs.readFileSync(f, 'utf8');
 let fail = 0;
 const ok = (c, msg) => { console.log(`  ${c ? '✓' : '✗'} ${msg}`); if (!c) fail++; };
 const head = t => console.log('\n' + t);
+/* ด่านลูกที่แดงก่อนพิมพ์บรรทัด "ผล: ..." เคยถูกรายงานว่า "ต้องมี Chromium" ทุกกรณี
+   ทั้งที่เหตุจริงอาจเป็นพอร์ตถูกคนอื่นถือ · chrome ตายกลางทาง · หรือ serve.mjs ตาย
+   ⇒ ข้อความดี ๆ ที่ด่านลูกพิมพ์ไว้ต้องไปถึงคนอ่านผล check-ac (รีวิว AIO-45 C6) */
+const why = (r, out) => {
+  const last = out.trim().split('\n').filter(l => l.trim()).slice(-3).map(l => l.trim());
+  return ` · ตัวด่านออกด้วย ${r.status === null ? 'สัญญาณ ' + r.signal : 'โค้ด ' + r.status}`
+    + (last.length ? ` · ท้ายผลที่พิมพ์: ${last.join(' / ')}` : ' · ไม่ได้พิมพ์อะไรเลย');
+};
 
 /* ---------------- AC-1 ---------------- */
 head('AC-1 · ทุกหน้าที่ให้ Google เก็บ ต้องมี <h1> ที่มีข้อความจริงใน HTML');
@@ -65,8 +73,9 @@ if (process.env.SKIP_BROWSER) {
   const out = (r.stdout || '') + (r.stderr || '');
   const m = out.match(/ผล: ผ่าน (\d+) · ตก (\d+)/);
   ok(!!m && r.status === 0,
-    m ? `tools/test-continue.mjs · ผ่าน ${m[1]} ตก ${m[2]}` : 'รัน tools/test-continue.mjs ไม่สำเร็จ (ต้องมี Chromium ของ playwright ในเครื่อง)');
-  if (m && +m[2] > 0) out.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
+    m ? `tools/test-continue.mjs · ผ่าน ${m[1]} ตก ${m[2]}`
+      : 'รัน tools/test-continue.mjs ไม่สำเร็จ (ต้องมี Chromium ของ playwright ในเครื่อง)' + why(r, out));
+  if (!m || +m[2] > 0) out.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
 }
 const hand = PAGES.filter(f => /(ดูไปแล้ว \d+%|ดูต่อ EP\.\d+|EP\.\d+\/\d+ ·)/.test(read(f)));
 ok(hand.length === 0, `หน้าที่ยังมีเปอร์เซ็นต์/เลขตอนของ "ดูต่อ" เขียนมือใน HTML: ${hand.length} ไฟล์${hand.length ? ' → ' + hand.slice(0, 3).map(rel) : ''}`);
@@ -144,9 +153,9 @@ if (process.env.SKIP_BROWSER) {
   ok(!!m && c.status === 0,
     m ? `tools/test-contrast.mjs · ผ่าน ${m[1]} ตก ${m[2]}`
       + (low ? ` · คอนทราสต์ placeholder ต่ำสุด ${low[1]}:1 ที่ ${low[2]}` : '')
-      : 'รัน tools/test-contrast.mjs ไม่สำเร็จ (ต้องมี Chromium ของ playwright ในเครื่อง)');
+      : 'รัน tools/test-contrast.mjs ไม่สำเร็จ (ต้องมี Chromium ของ playwright ในเครื่อง)' + why(c, out));
   out.split('\n').filter(l => /^\s+[✓✗] \//.test(l)).forEach(l => console.log('     ' + l.trim()));
-  if (m && +m[2] > 0) out.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
+  if (!m || +m[2] > 0) out.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
 }
 
 /* ---------------- AC-5 ---------------- */
@@ -297,9 +306,9 @@ const srv = spawnSync(process.execPath, [path.join(ROOT, 'tools/test-serve.mjs')
 const srvOut = (srv.stdout || '') + (srv.stderr || '');
 const srvM = srvOut.match(/ผล: ผ่าน (\d+) · ตก (\d+)/);
 ok(!!srvM && srv.status === 0,
-  srvM ? `tools/test-serve.mjs · ผ่าน ${srvM[1]} ตก ${srvM[2]}` : 'รัน tools/test-serve.mjs ไม่สำเร็จ');
+  srvM ? `tools/test-serve.mjs · ผ่าน ${srvM[1]} ตก ${srvM[2]}` : 'รัน tools/test-serve.mjs ไม่สำเร็จ' + why(srv, srvOut));
 srvOut.split('\n').filter(l => /content-type/.test(l) && /\.mjs/.test(l)).forEach(l => console.log('     ' + l.trim()));
-if (srvM && +srvM[2] > 0) srvOut.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
+if (!srvM || +srvM[2] > 0) srvOut.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
 
 console.log(`\n${fail ? '✗ ตก ' + fail + ' ข้อ' : '✓ ผ่านทุกข้อ'} · ตรวจ ${PAGES.length} หน้าจริง + ${STUBS.length} ไฟล์ส่งต่อ (ไม่รวม admin/)`);
 process.exit(fail ? 1 : 0);
