@@ -251,12 +251,15 @@ await caseOf('ทางปกติ (ไม่ตั้ง env อะไรเ�
 });
 
 /* ---------- 1. พอร์ต HTTP ถูกคนอื่นถือและเงียบ ---------- */
+/* want บังคับให้มี "ท้ายล็อก" ของ serve.mjs ติดมาด้วย: stdio ของ serve.mjs เคยเป็น 'ignore'
+   ⇒ เหตุจริง (EADDRINUSE · 500 จากไฟล์ถูกเขียนทับ) ไปไม่ถึงคนอ่าน (รีวิว AIO-47 C3) */
 await caseOf('พอร์ต HTTP ถูกถือไว้โดยเซิร์ฟเวอร์ที่รับ connection แต่ไม่ตอบ', async () => {
   const s = await silentPort();
   try {
     for (const g of GATES) {
       expectRed(`${g.http} ชี้ไปพอร์ตที่ถูกถือ`,
-        await runGate(g, { [g.http]: String(s.port) }, 20000), 20000, 'เปิด tools/serve.mjs');
+        await runGate(g, { [g.http]: String(s.port) }, 20000), 20000,
+        /เปิด tools\/serve\.mjs[\s\S]*serve\.mjs · ท้ายล็อก/);
     }
   } finally { s.close(); }
 });
@@ -382,7 +385,10 @@ await caseOf('chrome ถูก SIGSTOP ขณะด่านกำลังร�
         const p = ctx.chrome();
         if (p) { try { process.kill(p, 'SIGSTOP'); stopped = p; } catch { /* ตายแล้ว */ } }
       });
-      if (WANT.test(r.out)) break;
+      /* ต้องไม่ใช่ทางที่ลูปกลืนแล้วไปจบที่เพดานของหน้า — ข้อความของทางนั้นก็มีคำว่า
+         Runtime.evaluate ติดมาด้วย (เพราะ fail() พา "เหตุล่าสุดระหว่างรอ" ไปด้วย)
+         ⇒ ถ้าดูแค่คำนั้น เคสจะเขียวทั้งที่ถอดป้าย fatal ออกแล้ว (เจอตอนรันมิวเทชัน M12) */
+      if (WANT.test(r.out) && !/โหลดหน้าไม่เสร็จ/.test(r.out)) break;
     }
     check(`${r.file} · หยุด chrome ได้ก่อนข้อแรกผ่าน (คือขณะรอหน้าแรก)`, stopped > 0, `pid=${stopped}`);
     expectRed(`CDP เงียบขณะรอหน้าแรก (ฉีดตกในลูปที่ครั้งที่ ${tries})`, r, 75000, WANT);
@@ -532,6 +538,23 @@ await g.cleanup(1);
   expectStop('serve ตายกลางคำสั่ง', r, /serve\.mjs ตายกลางทาง/, 3000);
   check('cdp-gate · ไม่รับค่าที่วัดจากเซิร์ฟเวอร์ที่ตายแล้วไปใช้',
     !/รับค่า /.test(r.out), JSON.stringify(r.out.slice(-200)));
+});
+
+/* 14ข. นิพจน์ของด่านเขียนผิด = ผิดถาวร ⇒ ห้ามกลืนแล้วส่งซ้ำจนครบเพดานของหน้า
+   (ลูปกลืน error ได้เฉพาะตระกูล "ชั่วคราวตอนหน้ากำลังเปลี่ยน" · รีวิว AIO-48 C4) */
+await caseOf('นิพจน์ที่ผิดถาวร (SyntaxError) ต้องหยุดทันที ไม่ใช่วนจนครบเพดานของหน้า', async () => {
+  const src = fixture(`
+T.PAGE = 20000;
+const g = await startGate(${AC2});
+const t0 = Date.now();
+try { await g.until('/', 'this is not valid js('); console.log('ไม่ควรสำเร็จ'); }
+catch (e) { console.log('หยุดรอที่ ' + (Date.now() - t0) + ' ms · ' + e.message); }
+await g.cleanup(1);
+`);
+  const r = await runGate({ src, name: 'cdp-gate · นิพจน์ผิดถาวร', env: {} }, {}, 60000);
+  expectStop('นิพจน์ผิดถาวร', r, /SyntaxError/, 3000);
+  check('cdp-gate · ไม่ไปจบที่ "โหลดหน้าไม่เสร็จ" ซึ่งกลบเหตุจริง',
+    !/โหลดหน้าไม่เสร็จ/.test(r.out), JSON.stringify(r.out.slice(-200)));
 });
 
 /* ---------- 15. ตัวจับบรรทัด DevTools: ห้ามเชื่อบรรทัดที่ยังไม่ครบ (รีวิว AIO-48 C1) ----------
