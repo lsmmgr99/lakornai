@@ -194,24 +194,31 @@ export const TAG_MAX_GENRE_OVERLAP = 0.8;
       จำนวนเรื่อง · overlap · จะได้เปิดหน้าไหม — คำนวณจาก content.json ตอน build ทุกตัว
       ห้ามเขียนรายชื่อเรื่องลงไฟล์นี้ วันหน้าเพิ่มเรื่องที่ 13 แถว chip ต้องขยับเอง
       และ facet ใหม่ต้องผ่านด่าน 2 ข้อข้างบน "ด้วยค่าคงที่เดิม" ไม่ใช่ลดเกณฑ์ลงมารับ
-   ⚠️ ถ้อยคำของป้าย (label/lead) เป็นงานเขียนเนื้อหา ลูกค้าเป็นผู้รับหรือแก้
-      ห้ามเติมคำโฆษณาที่ไม่มีตัวเลขรองรับ ("ฮิตที่สุด"/"ห้ามพลาด") ลงมาที่นี่ */
+   ⚠️ ถ้อยคำของป้าย (label/chip/lead) เป็นงานเขียนเนื้อหา ลูกค้าเป็นผู้รับหรือแก้
+      ห้ามเติมคำโฆษณาที่ไม่มีตัวเลขรองรับ ("ฮิตที่สุด"/"ห้ามพลาด") ลงมาที่นี่
+
+   ---- ป้ายมีสองแบบ ไม่ใช่แบบเดียว (คำตัดสินของ CEO 23 ต.ค. 2026 · AIO-34) ----
+   `chip`  ป้ายบน chip — **ไม่มีเลขเกณฑ์** เพราะข้าง chip มีป้ายจำนวนเรื่องอยู่แล้ว
+           สองเลขติดกันอ่านเป็น "ดูจบไว ≤20 ตอน 3" ซึ่งซ้อนกันเกิน
+   `label` ป้ายเต็ม — **ต้องมีเลขเกณฑ์** ใช้ที่ <h1>/<title>/breadcrumb/JSON-LD name
+           และในประโยคนำของหน้าแท็ก · เลขเกณฑ์ห้ามหายไปจากหน้า
+   แท็กที่เป็น trope ไม่มีเลขอยู่แล้ว จึงใช้ค่าเดียวกันทั้งสองช่อง (ดู computeOpenTags) */
 const SHORT_EPS = 20;
 const LONG_EPS = 45;
 /* ส่วนขยายในประโยคนำของหน้าแท็ก — "…รวม <N> <lead> ได้แก่ …" */
 const TROPE_LEAD = 'เรื่องที่เล่าปมเดียวกันแม้จะอยู่คนละแนว';
 export const FACETS = [
   /* `day === null` ⇔ `status === "ended"` ตามสัญญา §6.3.1 (ดู dayOf) — อ่าน enum ไม่อ่านข้อความไทย */
-  { slug: 'ended', kind: 'status', label: 'จบแล้ว',
+  { slug: 'ended', kind: 'status', label: 'จบแล้ว', chip: 'จบแล้ว',
     lead: 'เรื่องที่ปล่อยตอนครบแล้ว ดูจบได้เลยไม่ต้องรอตอนใหม่',
     match: s => s.day === null },
-  { slug: 'daily', kind: 'status', label: 'ออกตอนใหม่ทุกวัน',
+  { slug: 'daily', kind: 'status', label: 'ออกตอนใหม่ทุกวัน', chip: 'ออกตอนใหม่ทุกวัน',
     lead: 'เรื่องที่ยังปล่อยตอนใหม่ทุกวัน',
     match: s => s.day === 'daily' },
-  { slug: 'quick-watch', kind: 'length', label: `ดูจบไว ≤${SHORT_EPS} ตอน`,
+  { slug: 'quick-watch', kind: 'length', label: `ดูจบไว ≤${SHORT_EPS} ตอน`, chip: 'ดูจบไว',
     lead: `เรื่องที่มีไม่เกิน ${SHORT_EPS} ตอน`,
     match: s => s.eps <= SHORT_EPS },
-  { slug: 'long-run', kind: 'length', label: `เรื่องยาว ≥${LONG_EPS} ตอน`,
+  { slug: 'long-run', kind: 'length', label: `เรื่องยาว ≥${LONG_EPS} ตอน`, chip: 'เรื่องยาว',
     lead: `เรื่องที่มี ${LONG_EPS} ตอนขึ้นไป`,
     match: s => s.eps >= LONG_EPS },
 ];
@@ -230,11 +237,12 @@ function genreOverlap(d, items) {
    เพื่อให้ tools/test-tags.mjs ป้อนคลังสมมติเข้ามาพิสูจน์ได้ว่า "คำนวณ" จริง ไม่ใช่ท่องรายชื่อ */
 export function computeOpenTags(d) {
   const candidates = [
+    /* trope ไม่มีเลขเกณฑ์ในป้าย ⇒ chip กับ label เป็นข้อความเดียวกัน */
     ...(d.tropes || []).map(t => ({
-      slug: t.slug, kind: 'trope', label: t.label, lead: TROPE_LEAD, items: t.items,
+      slug: t.slug, kind: 'trope', label: t.label, chip: t.label, lead: TROPE_LEAD, items: t.items,
     })),
     ...FACETS.map(f => ({
-      slug: f.slug, kind: f.kind, label: f.label, lead: f.lead,
+      slug: f.slug, kind: f.kind, label: f.label, chip: f.chip || f.label, lead: f.lead,
       items: d.series.filter(f.match).map(s => s.slug),
     })),
   ];

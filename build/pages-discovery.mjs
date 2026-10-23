@@ -101,7 +101,7 @@ export function buildHome() {
       }).join('')}</div>
       ${OPEN_TAGS.length ? `<div class="chips" style="margin-top:var(--s4)">
         <span class="chips-lb">แท็ก</span>
-        ${OPEN_TAGS.map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.label}<span class="n num">${t.items.length}</span></a>`).join('')}
+        ${OPEN_TAGS.map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.chip}<span class="n num">${t.items.length}</span></a>`).join('')}
       </div>` : ''}`);
 
     const follows = `<section class="sec" id="followSec" hidden><div class="sec-h"><h2>ติดตามไว้</h2>
@@ -245,7 +245,7 @@ export function buildBrowse() {
       ${OPEN_TAGS.length
         ? section('แท็กที่เปิดแล้ว',
             `<div class="chip-row">${OPEN_TAGS.map(t =>
-              `<a class="chip" href="${L(U.tag(t.slug))}">${t.label}<span class="n num">${t.items.length}</span></a>`).join('')}</div>`,
+              `<a class="chip" href="${L(U.tag(t.slug))}">${t.chip}<span class="n num">${t.items.length}</span></a>`).join('')}</div>`,
             { sub: 'เปิดเฉพาะแท็กที่มีเรื่อง 3 เรื่องขึ้นไป และไม่ซ้ำกับหมวดที่มีอยู่แล้ว — แท็กจะเพิ่มขึ้นตามคลัง' })
         : ''}
       ${section('ทางเข้าอื่น', `<div class="rowlist">${entries.map(([i, t, s, u]) =>
@@ -320,7 +320,7 @@ function catalogBody(L, { h1, intro, items, crumbItems, tagChips = false }) {
     ${pageHead(h1)}
     <p class="lead">${esc(intro)}</p>
     ${tagChips && OPEN_TAGS.length ? `<div class="chips"><span class="chips-lb">แท็ก</span>
-      ${OPEN_TAGS.map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.label}<span class="n num">${t.items.length}</span></a>`).join('')}</div>` : ''}
+      ${OPEN_TAGS.map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.chip}<span class="n num">${t.items.length}</span></a>`).join('')}</div>` : ''}
     <p class="res-count"><b class="num">${items.length}</b> เรื่อง</p>
     ${items.length
       ? `<div class="grid">${items.map(s => card(L, s, { hook: true })).join('')}</div>`
@@ -355,16 +355,35 @@ export function buildGenres() {
 }
 
 /* ============================ A5 หน้าแท็ก ============================ */
+/* กฎตัดเดียวกับ onpage-audit §5.2 — เลือกแบบแรกที่ยังไม่เกินเกณฑ์ความยาว
+   ลำดับคือ "ยาวสุดที่อยากได้" → "สั้นสุดที่ยังครบความ" · ของเดิมเขียนเป็น if สองชั้นต่อหนึ่งช่อง
+   รูปนี้เพิ่มชั้นที่สามได้โดยไม่ซ้อน if และกันคำเตือน "description ยาว" ตอนคลังโต */
+const fit = (max, ...variants) => variants.find(v => v.length <= max) || variants[variants.length - 1];
+
 export function buildTags() {
   for (const t of OPEN_TAGS) {
     const items = t.items.map(k => BY[k]);
+    const names = items.map(s => s.title);
+    /* ประโยคนำยังใช้ `label` ⇒ เลขเกณฑ์ (≤20 / ≥45) ยังอยู่ในเนื้อหน้าตามคำตัดสินของ CEO */
     const intro = `แท็ก “${t.label}” เป็นชั้นที่สองซ้อนบน 6 แนวหลัก รวม ${items.length} ${t.lead} `
-      + `ได้แก่ ${items.map(s => s.title).join(' · ')} — ทุกเรื่องดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`;
-    /* กฎตัดเดียวกับ onpage-audit §5.2 — ยาวเกินเกณฑ์ให้ตัดวรรคท้ายออกก่อน */
-    let title = `${t.label} — ละครสั้น AI ${items.length} เรื่อง ดูฟรี · LakornAI`;
-    if (title.length > 60) title = `${t.label} — ละครสั้น AI ${items.length} เรื่อง · LakornAI`;
-    let desc = `รวมละครสั้น AI ภาษาไทยแท็ก ${t.label} ${items.length} เรื่อง ${items.map(s => s.title).join(' ')} ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`;
-    if (desc.length > 160) desc = `รวมละครสั้น AI ภาษาไทยแท็ก ${t.label} ${items.length} เรื่อง ${items.map(s => s.title).join(' ')} ดูฟรีทุกตอน`;
+      + `ได้แก่ ${names.join(' · ')} — ทุกเรื่องดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`;
+    const title = fit(60,
+      `${t.label} — ละครสั้น AI ${items.length} เรื่อง ดูฟรี · LakornAI`,
+      `${t.label} — ละครสั้น AI ${items.length} เรื่อง · LakornAI`);
+    /* ---- คำโปรย: facet ที่ไม่ใช่ trope ใช้เทมเพลตคนละแบบ (CEO 23 ต.ค. 2026 · AIO-34) ----
+       รูปเดิม "แท็ก <ป้าย> N เรื่อง" ใช้ได้กับชื่อปม ("แท็ก กลับมาเอาคืน 4 เรื่อง")
+       แต่กับ facet มันอ่านเป็น "แท็ก จบแล้ว 4 เรื่อง" ซึ่งไม่เป็นประโยคไทย
+       facet บอก "สถานะ/ความยาว" จึงเอาประโยคนำของแท็กนั้นขึ้นเป็นแกนแทน
+       ยังไม่ซ้ำกันทุกหน้า: ประโยคนำต่างกันทุก facet (ด่าน build/build.mjs:95 เป็นตัวบังคับ)
+       และแบบสุดท้ายที่ไม่มีชื่อเรื่องก็ยังต่างกันด้วยประโยคนำอยู่ดี */
+    const desc = t.kind === 'trope'
+      ? fit(160,
+          `รวมละครสั้น AI ภาษาไทยแท็ก ${t.label} ${items.length} เรื่อง ${names.join(' ')} ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`,
+          `รวมละครสั้น AI ภาษาไทยแท็ก ${t.label} ${items.length} เรื่อง ${names.join(' ')} ดูฟรีทุกตอน`)
+      : fit(160,
+          `${t.lead} — ละครสั้น AI ${items.length} เรื่อง ${names.join(' ')} ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`,
+          `${t.lead} — ละครสั้น AI ${items.length} เรื่อง ${names.join(' ')} ดูฟรีทุกตอน`,
+          `${t.lead} — ละครสั้น AI ${items.length} เรื่อง ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก`);
     definePage({
       out: `tag/${t.slug}/index.html`, url: U.tag(t.slug),
       title, desc,

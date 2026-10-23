@@ -73,7 +73,7 @@ export function buildSeries() {
             <p class="syn">${esc(s.synopsis)}</p>
             <div class="chips">
               ${s.genres.map(g => `<a class="chip" href="${L(U.genre(g))}">${genreLabel(g)}</a>`).join('')}
-              ${tags.map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.label}</a>`).join('')}
+              ${tags.map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.chip}</a>`).join('')}
             </div>
             ${section('เลือกตอน', `${epTabs(s)}${epGrid(L, s)}${legend}`)}
             ${section('ตัวละคร', `<div class="castrow">${s.cast.map(c => {
