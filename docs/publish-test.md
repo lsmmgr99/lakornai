@@ -48,7 +48,7 @@ node ci/publish-gate.mjs _artifact --expect-noindex  # ตรวจชุดท�
 
 > **ห้าม: Pages แบบ "Deploy from a branch → `main` → `/ (root)`"**
 > รีโปนี้เป็น public และเก็บทั้งเว็บและของทีมไว้ด้วยกัน ถ้าเสิร์ฟรากรีโป `/admin/` จะเปิดได้จากเบราว์เซอร์ของใครก็ได้
-> แผงหลังบ้านเป็น client-side ล้วน (`admin/editor.mjs:52` อ่าน `../content.json`, `admin/editor.mjs:47-49` ส่งออกด้วย Blob)
+> แผงหลังบ้านเป็น client-side ล้วน (`admin/editor.mjs:52` อ่าน `../content.json`, `admin/editor.mjs:46-47` ส่งออกด้วย Blob)
 > มันเขียนกลับรีโปไม่ได้เพราะไม่มี `LAKORN_*` แต่มัน **เปิดได้และดูเหมือนของจริง** — รับไม่ได้
 > `/docs` ก็ใช้ไม่ได้ เพราะ `docs/` คือเอกสารภายใน (รวมไฟล์นี้)
 
@@ -171,7 +171,7 @@ done
 
 ## 6. `PUBLISHED` และ robots.txt — ใครเปลี่ยนตอนไหน
 
-วันนี้ `build/seo.mjs:225` คือ `PUBLISHED = false` → `robots.txt` มี `Disallow: /` ทั้งเว็บ และไม่มีบรรทัด `Sitemap:`
+วันนี้ `build/seo.mjs:248` คือ `PUBLISHED = false` → `robots.txt` มี `Disallow: /` ทั้งเว็บ และไม่มีบรรทัด `Sitemap:`
 **รอบทดสอบต้องคงค่านี้** เพราะนี่คือการทดสอบการใช้งาน ไม่ใช่การเปิดตัว — ไม่ต้องการให้ Google เก็บ URL ชั่วคราวนี้
 
 | เงื่อนไข | ใครตัดสิน | ต้องทำอะไร |
