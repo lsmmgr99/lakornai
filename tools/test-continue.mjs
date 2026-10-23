@@ -72,6 +72,18 @@ async function go(p) {
   }
   throw new Error('โหลดหน้าไม่เสร็จ: ' + p);
 }
+/* เปิดหน้าโดยรอแค่ readyState — ห้ามรอ window.LakornProgress
+   บล็อก "ค่าเสียรูปใน localStorage" (AIO-34) ต้องวัดได้ว่า LakornProgress หายไปหรือไม่
+   ถ้ารอตัวแปรนั้นก่อน การถอยการแก้ออกจะกลายเป็น "ตัวทดสอบล้ม" แทนที่จะเป็น "ข้อนั้นแดง"
+   (assets/app.js เป็น <script> ท้าย body แบบบล็อก ⇒ complete = สคริปต์รันจบแล้วแน่) */
+async function goRaw(p) {
+  await send('Page.navigate', { url: BASE + p });
+  for (let i = 0; i < 100; i++) {
+    try { if (await evaluate("document.readyState === 'complete'")) return; } catch {}
+    await sleep(60);
+  }
+  throw new Error('โหลดหน้าไม่เสร็จ: ' + p);
+}
 
 let pass = 0, fail = 0;
 function check(name, ok, detail = '') {
@@ -413,6 +425,118 @@ try {
   check('?t= ที่ไม่ใช่ตัวเลข → เริ่มที่ 0:00', await evaluate(`document.getElementById('tNow').textContent`) === '0:00');
   await go('/watch/house-13/ep-1/?t=-50');
   check('?t= ติดลบ → เริ่มที่ 0:00', await evaluate(`document.getElementById('tNow').textContent`) === '0:00');
+
+  /* ================ AIO-34 · ค่าเสียรูปใน localStorage (บั๊ก 1–3 ของ QA) ================
+     ยัดค่าเสียรูปลง storage จริง แล้ววัดจาก "หน้าที่ render จริง" ไม่ใช่จากซอร์ส
+     ทุกข้อในบล็อกนี้ต้องแดงเมื่อถอยการแก้ที่ build/app.src.js ออก (ดูตารางมิวเทชันในใบงาน) */
+  const putRaw = (key, raw) => evaluate(
+    `localStorage.setItem('lakorn.' + ${JSON.stringify(key)}, ${JSON.stringify(raw)}), true`);
+  const reset = async () => { await go('/'); await evaluate('localStorage.clear()'); };
+
+  /* ---- บั๊ก 1 · สเกลาร์ ----
+     `cont[slug] = …` บนสตริงโยน TypeError ใน strict mode → initWatch ล้ม
+     → IIFE ไม่ถึงบรรทัด window.LakornProgress = Progress → JS ของหน้าตายทั้งหน้า */
+  await reset();
+  await putRaw('cont', '"พัง"');
+  await putRaw('done', '"พัง"');
+  await goRaw('/watch/ceo-cold/ep-5/');
+  check('บั๊ก 1 · lakorn.cont/done เป็นสเกลาร์ → JS หน้ารับชมยังทำงาน (LakornProgress ไม่หายทั้งก้อน)',
+    await evaluate('!!window.LakornProgress'),
+    'LakornProgress = ' + await evaluate('typeof window.LakornProgress'));
+  check('บั๊ก 1 · เพลเยอร์ยังเดินได้หลังเจอค่าเสียรูป (เวลาเริ่มที่ 0:00 ไม่ใช่หน้าค้าง)',
+    await evaluate(`(document.getElementById('tNow')||{}).textContent`) === '0:00');
+  const afterScalar = await evaluate(`JSON.parse(localStorage.getItem('lakorn.cont')||'null')`);
+  check('บั๊ก 1 · ค่าเสียรูปถูกเขียนทับด้วยคลังจริง ไม่ใช่ throw (ของดีทับของเสียได้)',
+    !!afterScalar && typeof afterScalar === 'object' && !Array.isArray(afterScalar)
+      && !!afterScalar['ceo-cold'] && afterScalar['ceo-cold'].ep === 5,
+    JSON.stringify(afterScalar));
+
+  /* ---- บั๊ก 2 · อาร์เรย์ ----
+     ไม่โยน แต่ JSON.stringify ทิ้งคีย์ที่เป็นชื่อ ⇒ บันทึกแล้วหายทุกครั้งอย่างเงียบ ๆ */
+  await reset();
+  await putRaw('cont', '[1,2,3]');
+  await goRaw('/watch/ceo-cold/ep-5/');
+  check('บั๊ก 2 · lakorn.cont เป็นอาร์เรย์ → JS หน้ารับชมยังทำงาน',
+    await evaluate('!!window.LakornProgress'));
+  const afterArray = await evaluate(`JSON.parse(localStorage.getItem('lakorn.cont')||'null')`);
+  check('บั๊ก 2 · บันทึกแล้วได้ object จริง ไม่ใช่อาร์เรย์ที่คีย์หายไป',
+    !!afterArray && !Array.isArray(afterArray) && !!afterArray['ceo-cold'],
+    JSON.stringify(afterArray));
+  await goRaw('/library/?tab=continue');
+  check('บั๊ก 2 · หน้าคลังเห็นรายการค้างนั้นจริง (ความคืบหน้าไม่หายเงียบ ๆ)',
+    await evaluate(`document.querySelectorAll('#libPanel .controw').length === 1`),
+    'แถว = ' + await evaluate(`document.querySelectorAll('#libPanel .controw').length`));
+
+  /* ---- บั๊ก 3 · sec/dur/ep ที่ไม่ใช่ตัวเลข ----
+     `e.sec || 0` ปล่อย 'abc' ผ่านไปหาร ⇒ "ดูไปแล้ว NaN%" และ style="width:NaN%"
+     ค่าที่คาดหวังคำนวณใหม่ในเบราว์เซอร์จาก window.LAKORN ไม่ได้เอามาจากโค้ดที่กำลังตรวจ */
+  await reset();
+  await putRaw('cont', JSON.stringify({
+    'ceo-cold': { ep: 3, sec: 'abc', dur: 200, ts: 3000 },
+    'house-13': { ep: '2', sec: '50', dur: '200', ts: 2000 },
+    'mirror-bride': { ep: 2, sec: 30, dur: 'เสีย', ts: 1000 },
+  }));
+  await goRaw('/library/?tab=continue');
+  check('บั๊ก 3 · lakorn.cont ที่ sec/dur/ep เสียรูป → หน้าคลังยังทำงาน',
+    await evaluate('!!window.LakornProgress'));
+  const rows34 = await evaluate(`(function () {
+    var ser = {}; (window.LAKORN.series || []).forEach(function (s) { ser[s.slug] = s; });
+    function secs(x) { var p = String(x).split(':'); return (+p[0]) * 60 + (+p[1]); }
+    return Array.prototype.slice.call(document.querySelectorAll('#libPanel .controw')).map(function (a) {
+      var slug = (a.getAttribute('href').match(/watch\\/([^\\/]+)\\//) || [])[1];
+      var s = ser[slug], fill = a.querySelector('.pbar i');
+      /* dur ที่ควรได้: ค่าที่ใช้ได้จาก storage ถ้ามี ไม่งั้นความยาวตอนนั้นจากคลัง */
+      var raw = JSON.parse(localStorage.getItem('lakorn.cont') || '{}')[slug] || {};
+      var ep = Math.min(Math.max(Math.round(Number(raw.ep)) || 1, 1), s.eps);
+      var d = Math.round(Number(raw.dur));
+      if (!(d > 0)) d = secs(s.episodes[ep - 1][1]);
+      var sc = Math.round(Number(raw.sec));
+      if (!isFinite(sc) || sc < 0) sc = 0;
+      return {
+        slug: slug, text: a.querySelector('.st').textContent.trim(),
+        bar: fill ? fill.style.width : null,
+        aria: a.querySelector('.pbar').getAttribute('aria-valuenow'),
+        wantEp: ep, wantPct: Math.max(0, Math.min(100, Math.round(sc / d * 100)))
+      };
+    });
+  })()`);
+  check('บั๊ก 3 · ไม่มีคำว่า NaN เหลือบนหน้าคลังเลย',
+    rows34.length === 3 && !/NaN/.test(rows34.map(r => r.text + r.bar + r.aria).join(' ')),
+    JSON.stringify(rows34));
+  const bad34 = rows34.filter(r => !(r.text.indexOf('EP.' + r.wantEp + '/') === 0
+    && r.text.indexOf('ดูไปแล้ว ' + r.wantPct + '%') > -1
+    && r.bar === r.wantPct + '%' && +r.aria === r.wantPct));
+  check('บั๊ก 3 · ทุกแถวแสดงเปอร์เซ็นต์/เลขตอนที่คำนวณจาก sec,dur,ep ที่หนีบเป็นตัวเลขแล้ว',
+    rows34.length === 3 && bad34.length === 0, JSON.stringify(bad34.length ? bad34 : rows34));
+  /* dur ที่ใช้ไม่ได้ ('เสีย') ต้องถอยไปใช้ความยาวตอนจากคลัง ไม่ใช่กลายเป็น 0 หรือ NaN */
+  const mb = rows34.find(r => r.slug === 'mirror-bride');
+  check('บั๊ก 3 · dur ที่ใช้ไม่ได้ → ถอยไปใช้ความยาวตอนจากคลัง แถบจึงมีความกว้างที่คิดได้',
+    !!mb && /^\d+%$/.test(mb.bar) && mb.bar !== '0%', JSON.stringify(mb));
+
+  /* ep ที่ไม่ใช่ตัวเลขเคยไหลตรงเข้าป้ายปุ่ม ("ดูต่อ EP.abc") เพราะ resumeLabel ต่อสตริงดิบ */
+  await reset();
+  await putRaw('cont', JSON.stringify({ 'ceo-cold': { ep: 'abc', sec: 10, dur: 200, ts: 5000 } }));
+  await goRaw('/series/ceo-cold/');
+  const lbl34 = await evaluate(`(document.querySelector('[data-resume-label]')||{}).textContent`);
+  check('บั๊ก 3 · ep ที่ไม่ใช่ตัวเลข → ป้ายปุ่มไม่โชว์ "EP.abc"',
+    lbl34 === 'ดูต่อ EP.1', 'ป้าย = ' + JSON.stringify(lbl34));
+  check('บั๊ก 3 · ลิงก์ดูต่อยังชี้ตอนที่มีจริง',
+    /\/watch\/ceo-cold\/ep-1\//.test(await evaluate(`document.querySelector('[data-resume]').getAttribute('href')`)),
+    await evaluate(`document.querySelector('[data-resume]').getAttribute('href')`));
+
+  /* ประวัติเก็บ ep ไว้อีกที่หนึ่ง — รายการที่เป็น null ทำให้ x.slug โยนตั้งแต่ใน pushHistory */
+  await reset();
+  await putRaw('history', JSON.stringify([{ slug: 'ceo-cold', ep: 'abc', ts: 9000 }, null, 'พัง']));
+  await goRaw('/library/?tab=history');
+  const hist34 = await evaluate(`Array.prototype.slice.call(
+    document.querySelectorAll('#libPanel .ep-row')).map(function (a) {
+      return { href: a.getAttribute('href'), text: a.textContent.replace(/\\s+/g, ' ').trim() };
+    })`);
+  check('บั๊ก 3 · ประวัติที่ ep เสียรูป/มีรายการ null → หน้าคลังยังทำงาน',
+    await evaluate('!!window.LakornProgress'));
+  check('บั๊ก 3 · ประวัติไม่โชว์ "EP.abc" และลิงก์ชี้ตอนที่มีจริง',
+    hist34.length === 1 && /EP\.1\b/.test(hist34[0].text) && /\/watch\/ceo-cold\/ep-1\//.test(hist34[0].href),
+    JSON.stringify(hist34));
 
   /* ---- ล้างข้อมูลแล้วต้องกลับไปหน้าว่าง ไม่พัง ---- */
   await go('/');

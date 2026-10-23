@@ -70,31 +70,86 @@
   save('v', 1);
 
   /* ======================= 2. ความคืบหน้าการดู (AC-2) ======================= */
-  var Progress = {
-    all: function () { return read('cont', {}) || {}; },
-    done: function () { return read('done', {}) || {}; },
 
-    get: function (slug) {
-      var e = this.all()[slug];
-      return e && BY[slug] ? e : null;
-    },
+  /* ---- ยามชนิดข้อมูลของค่าที่อ่านกลับจาก localStorage (AIO-34 บั๊ก 1–3) ----
+     ค่าใน localStorage ไม่ใช่ของที่ไฟล์นี้ควบคุม — ผู้ใช้แก้เองจาก devtools ได้
+     ส่วนขยายเบราว์เซอร์เขียนทับได้ และเว็บเวอร์ชันหน้าอาจเปลี่ยนรูปข้อมูล
+     ยามทั้งสองตัว "คืนค่าถอย" ไม่ใช่ throw — ของเสียต้องถูกเขียนทับด้วยค่าที่ดีได้ตามปกติ
+
+     dict()  คลัง slug → รายการ · ผ่านได้แค่ plain object
+             สเกลาร์ ('พัง') ทำให้ `cont[slug] = …` ใน set() โยน TypeError (ไฟล์นี้ strict mode)
+             → initWatch ล้ม → IIFE ไม่ถึงบรรทัดสุดท้าย → window.LakornProgress = undefined
+             = JS ของหน้ารับชมตายทั้งหน้า
+             อาร์เรย์ ([1,2,3]) ไม่โยน แต่ JSON.stringify ทิ้งคีย์ที่เป็นชื่อทั้งหมด
+             → ความคืบหน้าหายเงียบ ๆ ทุกครั้งที่บันทึก โดยไม่มีอาการให้เห็น
+     num()   ตัวเลขจำกัดค่า · 'abc' → NaN และสตริงล้นช่วง → Infinity รอดยาม `|| 0` ได้ทั้งคู่
+             แล้วไหลไปโผล่บนหน้าเป็น "ดูไปแล้ว NaN%" กับ style="width:NaN%" */
+  function dict(key) {
+    var v = read(key, null);
+    return (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+  }
+  function num(v, dflt) {
+    var n = Number(v);
+    return isFinite(n) ? n : dflt;
+  }
+  /* อาร์เรย์ — ยามรูปเดียวกันคนละชนิด ใช้กับ lakorn.history ซึ่งเก็บ `ep` ไว้ด้วย
+     (บั๊ก 3 สั่งไล่ "ทุกที่ที่อ่าน ep" และ ep ตัวที่สองของสัญญาข้อมูลอยู่ในคลังนี้
+      ถ้าคลังเป็นสเกลาร์ `.filter` จะโยนตั้งแต่ใน pushHistory ซึ่งอยู่บนเส้นทางบันทึก
+      ของหน้ารับชม = อาการเดียวกับบั๊ก 1)
+     คีย์ที่เหลือซึ่งยังอ่านด้วย read() ตรง ๆ — follows / prefs / set — อยู่นอกขอบเขต AIO-34 */
+  function arr(key) {
+    var v = read(key, null);
+    return Array.isArray(v) ? v : [];
+  }
+  /* เลขตอนในรูปที่ใช้ต่อได้ — หนีบเข้าช่วง 1..eps ของเรื่องนั้นเสมอ */
+  function epNum(s, v) { return Math.min(Math.max(Math.round(num(v, 1)), 1), s.eps); }
+  /* ความยาวตอน: ต้อง >0 เพราะเป็นตัวหารของ pct · ไม่มี/เสีย → ถอยไปใช้ค่าจากคลัง */
+  function durOf(s, v, ep) {
+    var d = Math.round(num(v, 0));
+    if (!(d > 0)) d = Math.round(num(secs(s.episodes[ep - 1][1]), 0));
+    return Math.max(1, d);
+  }
+
+  /* รายการค้างหนึ่งรายการในรูปที่ทุกจุดใช้ต่อได้ — ที่เดียวที่แปลงค่าดิบจาก storage เป็นตัวเลข
+     คืน null เมื่อใช้ไม่ได้: ไม่ใช่อ็อบเจกต์ หรือ slug ไม่อยู่ในคลังของ build นี้
+     ไม่หนีบ sec ให้ ≤ dur โดยพลการ — เหตุผลเดียวกับหมายเหตุ ?t= ในข้อ 9.2
+     (หนีบแล้วตอนนั้นจะกลายเป็น "ดูไปแล้ว 100%" ทั้งที่ผู้ใช้ไม่ได้ดู) */
+  function entry(slug, raw) {
+    var s = BY[slug];
+    if (!s || !raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
+    var ep = epNum(s, raw.ep);
+    return {
+      ep: ep,
+      sec: Math.max(0, Math.round(num(raw.sec, 0))),
+      dur: durOf(s, raw.dur, ep),
+      ts: Math.max(0, Math.round(num(raw.ts, 0)))
+    };
+  }
+
+  var Progress = {
+    all: function () { return dict('cont'); },
+    done: function () { return dict('done'); },
+
+    get: function (slug) { return entry(slug, this.all()[slug]); },
 
     /* เขียนกลับทั้ง "เลขตอน" และ "ตำแหน่งในตอน"
        เรียกเมื่อเปลี่ยนตอน และเรียกเป็นช่วง ๆ ขณะเล่น (throttle ที่ผู้เรียก) */
     set: function (slug, ep, sec, dur) {
       var s = BY[slug]; if (!s) return;
       var cont = this.all();
+      var n = epNum(s, ep);
       cont[slug] = {
-        ep: Math.min(Math.max(ep | 0, 1), s.eps),
-        sec: Math.max(0, Math.round(sec || 0)),
-        dur: Math.max(1, Math.round(dur || secs(s.episodes[ep - 1] ? s.episodes[ep - 1][1] : '1:00'))),
+        ep: n,
+        sec: Math.max(0, Math.round(num(sec, 0))),
+        dur: durOf(s, dur, n),
         ts: Date.now()
       };
       save('cont', cont);
       /* กลับมาดูใหม่หลังเคยดูจบ → ออกจากชั้น "ดูจบแล้ว" */
       var dn = this.done();
       if (dn[slug]) { delete dn[slug]; save('done', dn); }
-      this.pushHistory(slug, ep);
+      /* ส่งเลขตอนที่หนีบแล้วลงประวัติ ไม่ใช่ค่าดิบที่ผู้เรียกส่งมา */
+      this.pushHistory(slug, n);
     },
 
     /* ดูจบตอนสุดท้ายของเรื่อง → ออกจากรายการค้าง ไปโผล่ที่ "ดูจบแล้ว" */
@@ -114,23 +169,25 @@
     },
 
     pushHistory: function (slug, ep) {
-      var h = read('history', []) || [];
-      h = h.filter(function (x) { return !(x.slug === slug && x.ep === ep); });
+      var h = arr('history');
+      h = h.filter(function (x) { return !(x && x.slug === slug && num(x.ep, -1) === ep); });
       h.unshift({ slug: slug, ep: ep, ts: Date.now() });
       save('history', h.slice(0, 60));
     },
 
-    /* รายการค้าง เรียง "ล่าสุดอยู่บนสุด" — คำของลูกค้าเอง */
+    /* รายการค้าง เรียง "ล่าสุดอยู่บนสุด" — คำของลูกค้าเอง
+       ทุกค่าที่ออกจากที่นี่ผ่าน entry() มาแล้ว ⇒ pct เป็นตัวเลขเสมอ ไม่มีทางเป็น NaN */
     list: function () {
       var cont = this.all(), dn = this.done(), out = [];
       for (var slug in cont) {
         if (!Object.prototype.hasOwnProperty.call(cont, slug)) continue;
-        var s = BY[slug], e = cont[slug];
-        if (!s || !e || dn[slug]) continue;
-        var ep = Math.min(Math.max(e.ep | 0, 1), s.eps);
-        var dur = e.dur > 0 ? e.dur : secs(s.episodes[ep - 1][1]);
-        var pct = Math.max(0, Math.min(100, Math.round((e.sec || 0) / dur * 100)));
-        out.push({ s: s, ep: ep, sec: e.sec || 0, dur: dur, pct: pct, ts: e.ts || 0 });
+        if (dn[slug]) continue;
+        var e = entry(slug, cont[slug]);
+        if (!e) continue;
+        out.push({
+          s: BY[slug], ep: e.ep, sec: e.sec, dur: e.dur, ts: e.ts,
+          pct: Math.max(0, Math.min(100, Math.round(e.sec / e.dur * 100)))
+        });
       }
       return out.sort(function (a, b) { return b.ts - a.ts; });
     },
@@ -138,7 +195,10 @@
     doneList: function () {
       var dn = this.done(), out = [];
       for (var slug in dn) {
-        if (Object.prototype.hasOwnProperty.call(dn, slug) && BY[slug]) out.push({ s: BY[slug], ts: dn[slug] });
+        /* ts ที่ไม่ใช่ตัวเลขทำให้ตัวเปรียบเทียบคืน NaN แล้วลำดับกลายเป็นลำดับคีย์ที่เผอิญเป็น */
+        if (Object.prototype.hasOwnProperty.call(dn, slug) && BY[slug]) {
+          out.push({ s: BY[slug], ts: Math.max(0, Math.round(num(dn[slug], 0))) });
+        }
       }
       return out.sort(function (a, b) { return b.ts - a.ts; });
     },
@@ -146,8 +206,8 @@
     /* ลิงก์ "ดูต่อ" ของเรื่องหนึ่ง — ต่อจากตอนและตำแหน่งเดิม ไม่ใช่ต้นตอน */
     resumeHref: function (slug) {
       var e = this.get(slug);
-      var ep = e ? Math.min(Math.max(e.ep | 0, 1), BY[slug].eps) : 1;
-      var at = e && e.sec > 2 ? '?t=' + Math.round(e.sec) : '';
+      var ep = e ? e.ep : 1;
+      var at = e && e.sec > 2 ? '?t=' + e.sec : '';
       return url('watch/' + slug + '/ep-' + ep + '/') + at;
     },
     resumeLabel: function (slug) {
@@ -641,11 +701,16 @@
           }).join('') + '</div>'
         : emptyHtml('done');
     } else {
-      var h = (read('history', []) || []).filter(function (x) { return BY[x.slug]; });
+      /* ประวัติเก็บ ep มาด้วย และ ep ที่ไม่ใช่ตัวเลขจะโผล่บนหน้าเป็น "EP.abc" พร้อมลิงก์ /ep-abc/
+         จึงผ่านยามชนิดเดียวกันที่นี่ ก่อนเอาไป render (AIO-34 บั๊ก 3) */
+      var h = arr('history').map(function (x) {
+        var s = x && BY[x.slug];
+        return s ? { s: s, ep: epNum(s, x.ep), ts: Math.max(0, Math.round(num(x.ts, 0))) } : null;
+      }).filter(Boolean);
       hasData = h.length > 0;
       html = hasData
         ? '<div class="list">' + h.map(function (x) {
-            var s = BY[x.slug];
+            var s = x.s;
             return '<a class="ep-row" href="' + url('watch/' + s.slug + '/ep-' + x.ep + '/') + '">'
               + '<span class="th"><img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async"></span>'
               + '<span class="bd"><span class="h"><b class="num">EP.' + x.ep + '</b>'
@@ -857,7 +922,7 @@
     });
     var hc = $('#histCount');
     if (hc) {
-      var n = (read('history', []) || []).length;
+      var n = arr('history').length;
       hc.textContent = n ? n + ' รายการ · เก็บในเครื่องนี้เท่านั้น' : 'ยังไม่มีประวัติ · เก็บในเครื่องนี้เท่านั้น';
     }
     var ch = $('#clearHistory');
