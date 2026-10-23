@@ -25,6 +25,8 @@
 | `pages-system.mjs` | หน้า design system + หน้าดัชนี |
 | `build.mjs` | สร้างไฟล์ HTML ทุกหน้า + `manifest.json` + `shots.json` |
 | `shoot.mjs` | เรนเดอร์ PNG ทุกหน้าจอผ่าน Chrome DevTools Protocol |
+| `share-cards.mjs` | **ภาพแชร์ 1200×630 (og:image)** — สร้าง HTML แล้วเรนเดอร์ JPEG ลง `assets/share/` (AIO-32) |
+| `share-src/` | ต้นฉบับ HTML/CSS ของภาพแชร์ 13 ใบ — `share-cards.mjs` สร้างทับทุกครั้งที่รัน |
 | `index.html` | **เริ่มดูที่นี่** — ดัชนีหน้าจอทั้งหมดพร้อมลิงก์ |
 | `styleguide.html` | ระบบดีไซน์: สี ตัวอักษร ระยะ เงา motion และคอมโพเนนต์ทุกสถานะ |
 | `manifest.json` | เช็กลิสต์ **30 รหัสหน้าจอ** → ไฟล์ → ภาพ · `build.mjs` จะหยุดทำงานถ้านับได้ไม่ครบ 30 |
@@ -36,7 +38,14 @@
 node design/v2/build.mjs    # สร้าง HTML ทุกหน้า
 node design/v2/shoot.mjs    # เรนเดอร์ PNG ทุกใบลง design/v2/shots/
 node design/v2/shoot.mjs home   # เรนเดอร์เฉพาะไฟล์ที่ชื่อมีคำว่า home
+
+node design/v2/share-cards.mjs  # ภาพแชร์ 1200×630 ครบ 13 ใบ → assets/share/ (แล้ว build ใหม่)
 ```
+
+> `share-cards.mjs` เป็นสคริปต์เดียวในโฟลเดอร์นี้ที่ **เขียนไฟล์ออกนอก `design/v2/`**
+> ปลายทางคือ `assets/share/*.jpg` ซึ่งเป็นช่องเสียบที่ Dev ทำไว้ให้ (`build/seo.mjs:20-51`)
+> ไม่แตะโค้ดใน `build/**` และไม่แตะหน้า production อื่นเลย · รายละเอียดกติกาของภาพชุดนี้
+> อยู่ที่ `assets/share/README.md`
 
 ## ทำไมไม่ใช้ `chrome --screenshot` ตรง ๆ
 
