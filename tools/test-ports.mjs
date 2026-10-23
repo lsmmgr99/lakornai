@@ -129,7 +129,10 @@ const answers = async port => {
 
 /* ---------- ยิงด่านจริงแล้ววัดว่า "แดงเอง" หรือ "ถูกเราฆ่าเพราะค้าง" ---------- */
 /* watch(ctx) ถูกเรียกซ้ำทุก 40 ms ระหว่างด่านทำงาน — ใช้ฉีดความล้มเหลวตรงจังหวะที่ต้องการ
-   ctx.kid(re) = ลูกของด่านที่บรรทัดคำสั่งตรงแพตเทิร์น (chrome / serve.mjs ของด่านตัวนั้น ไม่ใช่ของ run อื่น) */
+   ctx.chrome() / ctx.serve() = ลูกของด่านตัวนั้นเอง (ไม่ใช่ของ run อื่น)
+   ห้ามเลือกด้วย "บรรทัดคำสั่งมีคำว่า chrome": ชื่อโฟลเดอร์ที่รันอยู่ก็นับด้วย ⇒ ฉีดผิดตัว
+   (เจอจริงตอนรันมิวเทชันในสำเนาชื่อ /tmp/mut/M13-both-chrome-death: ไปฆ่า serve.mjs
+   แล้วเคสไปยืนยันเหตุผิดเรื่อง) ⇒ chrome เลือกจากชื่อกระบวนการ · serve เลือกจากพาธเต็มของไฟล์ */
 async function runGate({ file, env: gateEnv }, env, deadlineMs, watch) {
   const t0 = Date.now();
   const childEnv = { ...process.env };
@@ -145,9 +148,11 @@ async function runGate({ file, env: gateEnv }, env, deadlineMs, watch) {
   }, deadlineMs);
   child.stdout.on('data', d => { out += d; });
   child.stderr.on('data', d => { out += d; });
+  const SERVE = path.join(ROOT, 'tools/serve.mjs');
   const ctx = {
     get out() { return out; },
-    kid: re => kids(child.pid).find(p => re.test(cmd(p))),
+    chrome: () => kids(child.pid).find(p => comm(p) === 'chrome'),
+    serve: () => kids(child.pid).find(p => cmd(p).includes(SERVE)),
   };
   const watcher = (async () => {
     while (running) {
@@ -258,7 +263,7 @@ await caseOf('chrome ถูกฆ่ากลางทาง (จำลอง OO
     let killed = 0;
     const r = await runGate(g, {}, 20000, ctx => {
       if (killed || !ctx.out.includes('✓')) return;          /* รอให้ CDP ทำงานแล้วจริงก่อน */
-      const p = ctx.kid(/chrome/);
+      const p = ctx.chrome();
       if (p) { killTree(p, 'SIGKILL'); killed = p; }
     });
     check(`${r.file} · ฆ่า chrome ของด่านได้จริง (ไม่ใช่เคสที่ด่านจบไปก่อน)`, killed > 0, `pid=${killed}`);
@@ -275,7 +280,7 @@ await caseOf('serve.mjs ตายกลางทางหลังพิมพ�
     let killed = 0;
     const r = await runGate(g, {}, 60000, ctx => {
       if (killed || !ctx.out.includes('✓')) return;
-      const p = ctx.kid(/serve\.mjs/);
+      const p = ctx.serve();
       if (p) { killTree(p, 'SIGKILL'); killed = p; }
     });
     check(`${r.file} · ฆ่า serve.mjs ของด่านได้จริง`, killed > 0, `pid=${killed}`);
@@ -293,7 +298,7 @@ await caseOf('chrome ถูก SIGSTOP กลางทาง (socket เปิ�
     let stopped = 0;
     const r = await runGate(g, {}, 75000, ctx => {
       if (stopped || !ctx.out.includes('✓')) return;
-      const p = ctx.kid(/chrome/);
+      const p = ctx.chrome();
       if (p) { try { process.kill(p, 'SIGSTOP'); stopped = p; } catch { /* ตายแล้ว */ } }
     });
     check(`${r.file} · หยุด chrome ของด่านได้จริง`, stopped > 0, `pid=${stopped}`);
@@ -314,7 +319,7 @@ await caseOf('chrome ถูก SIGSTOP ขณะด่านกำลังร�
     let stopped = 0;
     const r = await runGate(g, {}, 75000, ctx => {
       if (stopped || !/เบราว์เซอร์จริงที่/.test(ctx.out) || ctx.out.includes('✓')) return;
-      const p = ctx.kid(/chrome/);
+      const p = ctx.chrome();
       if (p) { try { process.kill(p, 'SIGSTOP'); stopped = p; } catch { /* ตายแล้ว */ } }
     });
     check(`${r.file} · หยุด chrome ได้ก่อนข้อแรกผ่าน (คือขณะรอหน้าแรก)`, stopped > 0, `pid=${stopped}`);
@@ -334,7 +339,7 @@ await caseOf('chrome ตายตอนเริ่มต้น CDP (ก่อ�
     const r = await runGate(g, { [g.cdp]: String(port) }, 45000, async ctx => {
       if (killed || ctx.out.includes('✓')) return;
       if (!await answers(port)) return;
-      const p = ctx.kid(/chrome/);
+      const p = ctx.chrome();
       if (p) { killTree(p, 'SIGKILL'); killed = p; }
     });
     check(`${r.file} · ฆ่า chrome ได้ก่อนข้อแรกผ่านจริง`, killed > 0, `pid=${killed}`);
