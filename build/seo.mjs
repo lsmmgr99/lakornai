@@ -5,17 +5,38 @@ import path from 'node:path';
 import { ROOT, iso8601, genreLabel } from './content.mjs';
 
 /* ============================================================
-   โดเมน — ค่าคงที่ "ที่เดียวในโค้ด"
-   โดเมนยังไม่ยืนยัน (AIO-19 คำถามข้อ 1) · เปลี่ยนโดเมน = แก้บรรทัดเดียวข้างล่าง
-   แล้ว build ใหม่ · canonical / og:url / sitemap / JSON-LD @id ตามทันทีทั้งเว็บ
+   โดเมน — ค่าตั้งต้นอยู่ที่บรรทัดเดียวข้างล่าง และตั้งทับได้จาก env ตอน build
+   โดเมนยังไม่ยืนยัน (AIO-19 คำถามข้อ 1) · เปลี่ยนโดเมนถาวร = แก้ DEFAULT_SITE_ORIGIN
+   รอบทดสอบที่ URL อื่นชั่วคราว = ส่ง env ไม่ต้องแก้โค้ด (AIO-36):
+     SITE_ORIGIN=https://lsmmgr99.github.io/lakornai node build/build.mjs
+   ทั้งสองทาง canonical / og:url / og:image / sitemap / JSON-LD @id ตามทันทีทั้งเว็บ
    ============================================================ */
-export const SITE_ORIGIN = 'https://lakornai.tv';
+export const DEFAULT_SITE_ORIGIN = 'https://lakornai.tv';
+
+/* ทำ origin ให้เป็นรูปเดียวก่อนใช้ · รองรับ origin ที่มี path ต่อท้าย (เช่น Pages ของโปรเจกต์)
+   เพราะ abs() ด้านล่างต่อ "/..." ท้าย origin ตรง ๆ จึงต้องไม่มี / ปิดท้ายและไม่มี // ซ้อนกลางพาธ
+   ค่าที่ใช้ไม่ได้ให้ล้มที่นี่ ดังกว่าเงียบ — URL เพี้ยนทั้งเว็บแพงกว่า build ที่ล้มทันที */
+export function normalizeOrigin(raw) {
+  const v = (raw ?? '').trim();
+  if (!v) return DEFAULT_SITE_ORIGIN;
+  let u;
+  try { u = new URL(v); } catch {
+    throw new Error(`SITE_ORIGIN ใช้ไม่ได้: ${JSON.stringify(raw)} — ต้องเป็น URL เต็ม เช่น https://example.com หรือ https://example.github.io/repo`);
+  }
+  if (u.protocol !== 'https:' && u.protocol !== 'http:') throw new Error(`SITE_ORIGIN ต้องเป็น http หรือ https: ${v}`);
+  if (u.search || u.hash) throw new Error(`SITE_ORIGIN ต้องไม่มี query หรือ #fragment: ${v}`);
+  if (u.username || u.password) throw new Error('SITE_ORIGIN ต้องไม่มีชื่อผู้ใช้/รหัสผ่านใน URL');
+  return u.origin + u.pathname.replace(/\/{2,}/g, '/').replace(/\/+$/, '');
+}
+
+export const SITE_ORIGIN = normalizeOrigin(process.env.SITE_ORIGIN);
 
 export const SITE_NAME = 'LakornAI';
 /* ถ้อยคำทางการที่ลูกค้าอนุมัติ — แก้ที่นี่ที่เดียว */
 export const FREE_LINE = 'ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก';
 
-export const abs = u => SITE_ORIGIN + u;
+/* ทุกจุดที่เรียกส่ง path ที่ขึ้นต้นด้วย / อยู่แล้ว · เติมให้เองอีกชั้นกันพลาด ไม่ให้เกิด // ซ้อน */
+export const abs = u => SITE_ORIGIN + (u.startsWith('/') ? u : `/${u}`);
 
 /* ============================================================
    AC-7 · ช่องเสียบเทมเพลตภาพแชร์ 1200×630
@@ -221,7 +242,9 @@ export function faqLd(items) {
    robots.txt + sitemap.xml
    ============================================================ */
 /* โดเมนยังไม่ยืนยันและเว็บยังไม่เผยแพร่ → ปิดการเก็บดัชนีไว้ก่อน (AIO-19 P1)
-   วันเผยแพร่จริง: เปลี่ยน PUBLISHED เป็น true แล้ว build ใหม่ */
+   วันเผยแพร่จริง: เปลี่ยน PUBLISHED เป็น true แล้ว build ใหม่
+   รอบ "ขึ้นทดสอบ" ต้องคงเป็น false — Disallow: / คือสิ่งที่ต้องการ เพราะเป็นการทดสอบ ไม่ใช่เปิดตัว
+   ใครเปลี่ยนตอนไหน เขียนไว้ที่ docs/publish-test.md §6 (AIO-36) */
 export const PUBLISHED = false;
 
 export function robotsTxt() {
