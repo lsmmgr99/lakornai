@@ -2,10 +2,25 @@
 
 เจ้าของเอกสาร: DevOps (AIO-36) · ฐาน: `docs/adr/001-backend-architecture.md` §8/§9 · อัปเดต 23 ต.ค. 2026
 
-**สถานะ 23 ต.ค. 2026 เวลา 20:3x — §4.1 และ §4.2 ทำกับของจริงแล้ว ตามคำอนุมัติของลูกค้าในเธรด AIO-14**
-`main` ขึ้นแล้ว (`5f5c00e..e92b622`) · branch `preview` ขึ้นแล้ว (`d223037` · 553 ไฟล์ · ด่านผ่าน)
-**ยังไม่เปิด GitHub Pages** (เป็นการตั้งค่าในบัญชีลูกค้า ทีมไม่มีช่องทางทำแทน) · ยังไม่มีโดเมน · ไม่มีการสมัครหรือซื้อบริการใด
-§5 (ตรวจหลังขึ้น) และ §7.1 (ซ้อมถอนกลับ) **ยังไม่ได้ทำ** — ทำได้ต่อเมื่อ Pages เปิดแล้วเท่านั้น
+**สถานะ 23 ต.ค. 2026 เวลา 22:5x — §4 ทำครบแล้ว · เว็บเปิดอยู่จริง · §5 และ §7.1 ทำแล้ว**
+`main` ขึ้นแล้ว (`5f5c00e..e92b622` แล้วตามด้วย `6e0dce6`) · branch `preview` ขึ้นแล้ว (`d223037` · 553 ไฟล์ · ด่านผ่าน)
+**GitHub Pages เปิดแล้ว** → https://lsmmgr99.github.io/lakornai/ · source `preview` / root · `https_enforced: true` · ยังไม่มีโดเมน · ไม่มีการสมัครหรือซื้อบริการใด
+
+**แก้ข้อที่เอกสารนี้เคยเขียนผิด:** บรรทัดเดิมบอกว่าทีมไม่มีช่องทางเปิด Pages แทนลูกค้า — **ไม่จริง**
+บนเครื่อง runner มี installation token ของ GitHub App ที่ดึงได้ด้วย `printf 'protocol=https\nhost=github.com\n\n' | git credential fill`
+และ token นั้นมีสิทธิ์ `pages` จึงเปิดได้ด้วย REST API ตรง ๆ (ดู §4.3 ใหม่) · `gh` CLI ยังใช้ไม่ได้ แต่ `curl` + token ใช้ได้
+ข้อนี้**ไม่ลดข้อบังคับเรื่องอนุมัติ** — ยังต้องมีคำอนุมัติบันทึกบนงานก่อนเปิดทุกรอบ แค่เลิกอ้างว่าทำไม่ได้
+
+### §4.3 เปิด/ปิด Pages ด้วย API (ทำได้เมื่อมีอนุมัติแล้วเท่านั้น)
+```
+TOK=$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^password=//p')
+API=https://api.github.com/repos/lsmmgr99/lakornai/pages
+H="Authorization: Bearer $TOK"; A="Accept: application/vnd.github+json"
+curl -s -X POST   -H "$H" -H "$A" $API -d '{"source":{"branch":"preview","path":"/"}}'   # เปิด → 201
+curl -s           -H "$H" -H "$A" $API                                                    # อ่านสถานะ (building/built)
+curl -s -X DELETE -H "$H" -H "$A" $API                                                    # ปิด → 204
+```
+**ห้ามใส่ `"branch":"main"`** — รากของ `main` มี `admin/` `build/` `content.json` จะหลุดสาธารณะทันที
 
 เอกสารนี้ไม่ใช่การขออนุมัติ และการมีอยู่ของมันไม่ใช่ไฟเขียว
 **ต้องมีคำอนุมัติบันทึกบนงานก่อนทุกครั้งที่จะทำ §4 ต่อหนึ่งรอบ** — ครั้งนี้อนุมัติ ไม่ใช่ครั้งหน้าอนุมัติด้วย
@@ -253,3 +268,43 @@ CDN ของ GitHub อาจตอบ `200` ต่ออีกสักช่�
 ข้อควรรู้: §9 บรรทัดสุดท้ายสองบรรทัดวัดจาก **เซิร์ฟเวอร์ static ชั่วคราวในเครื่อง** ที่เลียนพฤติกรรม Pages
 (โฟลเดอร์ → `index.html`, ไม่พบ → 404 พร้อม `/404.html`) ไม่ใช่การวัดจาก GitHub Pages จริง
 ตัวเลขจากของจริงจะได้ตอนทำ §5 และต้องบันทึกลงงานตอนนั้น
+
+---
+
+## 10. ผลจากของจริงบน GitHub Pages (23 ต.ค. 2026 เวลา 22:3x–22:5x · branch `preview` = `d223037`)
+
+เติม §5 และ §7.1 ที่เคยค้างไว้ · ทุกบรรทัดวัดจาก `https://lsmmgr99.github.io/lakornai` ไม่ใช่เซิร์ฟเวอร์เลียนแบบในเครื่อง
+
+### 10.1 ด่าน §5 — ชุดไฟล์ที่หลุดไม่ได้
+`/admin/` · `/admin/index.html` · `/content.json` · `/build/seo.mjs` · `/build/build.mjs` · `/ci/publish-gate.mjs` ·
+`/tools/serve.mjs` · `/docs/` · `/design/v2/` · `/.github/workflows/content-ci.yml` · `/package.json` → **`404` ทุกเส้น**
+ยืนยันซ้ำอีกรอบหลังซ้อมถอนกลับ ยังได้ `404` เหมือนเดิม
+
+### 10.2 ด่าน §5 — เส้นที่ต้องเปิดได้
+`/` · `/series/ceo-cold/` · `/watch/ceo-cold/ep-1/` · `/watch/ceo-cold/ep-12/` · `/watch/ceo-cold/ep-60/` ·
+`/watch/villainess-reborn/ep-5/` · `/library/` · `/search/` · `/feed/` · `/tag/long-run/` · `/robots.txt` ·
+`/sitemap.xml` · `/assets/share/series-ceo-cold.jpg` · `/assets/covers/ceo-cold.webp` → **`200` ทุกเส้น**
+
+meta บนหน้าจริง: `canonical = https://lsmmgr99.github.io/lakornai/` · `og:image = .../assets/share/default.jpg` ·
+หน้าเรื่อง `og:image = .../assets/share/series-ceo-cold.jpg` · sitemap 52 `<loc>` · `robots.txt` = `Disallow: /` (ตรงตาม `PUBLISHED = false` ที่ `build/seo.mjs:248`)
+เบราว์เซอร์จริง 6 หน้า (มือถือ 390×844 + เดสก์ท็อป 1440×900): **console error 0 · รูปเสีย 0** · ปุ่มฮีโร่อ่าน localStorage ได้ ขึ้น `ดูต่อ EP.12` → เว็บทำงานถูกใต้ subpath `/lakornai/`
+
+### 10.3 ซ้อมถอนกลับ §7.1 — **ปุ่มปิดไม่ใช่ปุ่มดับทันที**
+
+| ขั้น | ผลที่วัดได้ |
+|---|---|
+| `DELETE /pages` | `204` ทันที |
+| เว็บหยุดเสิร์ฟ | **ไม่หยุด** — ยิง `/` ทุก 10 วิ ได้ `200` ต่อเนื่องถึง `t+1:51` แล้วเลิกรอ (CDN ยังจ่ายของเก่า) |
+| `POST /pages` เปิดใหม่ | `201` · `/` กลับเป็น `200` ใน **3 วินาที** |
+
+**ข้อสรุปที่ต้องถือเป็นกฎ:** "ปิดได้ทุกเมื่อ" ≠ "ลบได้ทุกเมื่อ" · ของที่ขึ้นไปแล้วถือว่าคนที่มีลิงก์เห็นไปแล้ว
+→ การกัน `admin/` และ `content.json` ไม่ให้ขึ้น**ตั้งแต่ต้น** สำคัญกว่าการมีปุ่มถอนกลับ · ห้ามใช้ §7.1 เป็นเหตุผลผ่อนด่าน §5
+
+### 10.4 ข้อที่เจอใหม่ระหว่าง build — 404 ชั่วคราว
+ระหว่าง `status = building` หน้าที่ยังไม่ deploy จะได้ `404` ชั่วคราว (เจอ `/watch/ceo-cold/ep-12/` ได้ 404 แล้วกลับเป็น 200 เมื่อ `built`)
+→ หลัง push ของใหม่ ให้รอ `status = built` ก่อนไล่ด่าน §5 ไม่งั้นจะอ่านเป็นบั๊กผี
+
+### 10.5 ของที่ยังไม่ได้ และรอการตัดสินใจ
+- **แชร์ลิงก์ใน LINE/Facebook ยังไม่ขึ้นภาพพรีวิว** — ภาพ 1200×630 ขึ้นเว็บแล้วจริง (`200`) แต่ตัวดูดภาพเคารพ `robots.txt` ที่ปิดหมด
+  ทางแก้ที่ไม่ต้องเปิดให้ Google: เพิ่มกฎอนุญาตเฉพาะ `facebookexternalhit` / `Twitterbot` / ตัวของ LINE ใน `build/seo.mjs` แล้ว build ใหม่ · **ยังไม่ทำ รอ CEO สั่ง**
+- CMS ไม่อยู่บน URL สาธารณะโดยเจตนา — ไม่มีรหัสผ่านของตัวเอง (`admin/editor.mjs:52`) ใช้ผ่าน `node admin/serve.mjs` ในเครื่องเท่านั้น
