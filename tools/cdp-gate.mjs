@@ -78,6 +78,32 @@ export const T = {
    แยกออกมาเป็นฟังก์ชันเพื่อให้ tools/test-ports.mjs ตรวจสมบัตินี้ได้ตรง ๆ ไม่ต้องแข่งกับ chunk จริง */
 export const wsLineFrom = buf => buf.match(/DevTools listening on (ws:\/\/\S+)\r?\n/);
 
+/* ตัวเกาะบรรทัดจากสายของ chunk — ต้องเกาะใน handler 'data' ไม่ใช่ให้ลูปไปอ่าน buffer ที่ถูกตัดท้าย
+   ของเดิมคนอ่านบรรทัดนี้คือลูปที่ poll ทุก 25 ms แต่ buffer ของ stderr ตัดเหลือท้าย 16 KB
+   ⇒ ถ้า stderr ของ chrome ไหลเกิน 16 KB ภายในคาบเดียวหลังบรรทัดนั้นพิมพ์ออก บรรทัดจะถูกเบียดหาย
+   แล้วด่านรอครบ 20 วินาทีและรายงานเหตุเท็จว่า "ไม่ได้บรรทัด DevTools listening"
+   ซึ่งเป็นอาการเดียวกับที่เพิ่งกำจัดไปในรอบก่อน (รีวิว AIO-49 R6)
+   ⇒ เกาะทุก chunk แล้วล็อกผลไว้ ใครมาทีหลังก็ได้ค่าเดิม */
+export function wsLatch() {
+  let buf = '', found = null;
+  return chunk => {
+    if (found) return found;
+    buf = (buf + chunk).slice(-16384);
+    return (found = wsLineFrom(buf));
+  };
+}
+
+/* chrome ที่ตายด้วย CHECK/FATAL เขียนเหตุไว้บรรทัดต้น ๆ แล้วตามด้วย stack trace ราว 25 บรรทัด
+   ⇒ tail() พาไปแต่ก้นของ stack (กอง hex) เหตุจริงหายไป · เจอกับตัวในรอบนี้: ย้ายกล่องโปรไฟล์
+   ไปซ้อนชั้นแล้ว chrome ตายที่ "FATAL ... Socket path too long" (chrome เอา TMPDIR ไปทำ
+   SingletonSocket ซึ่งติดเพดาน 108 ไบต์ของ sockaddr_un) แต่ด่านรายงานแค่ "ออกด้วยสัญญาณ SIGABRT" */
+const fatalFrom = buf => {
+  const m = buf.match(/^.*(?:FATAL|CHECK failed)[^\n]*/m);
+  /* ตัดหัวไว้ ไม่ใช่ท้าย: เหตุอยู่ต้นบรรทัด ส่วนท้ายเป็นพาธยาว ๆ (วัดแล้ว: ตัดท้าย 200
+     ทำให้คำว่า "Socket path too long" หายไป เหลือแต่พาธ ซึ่งอ่านไม่ออกว่าเกิดอะไร) */
+  return m ? ` · เหตุที่ chrome บอกเอง: ${m[0].trim().slice(0, 240)}` : '';
+};
+
 /* ท้ายสุดของบันทึกไว้ใส่ข้อความแดง — เหตุจริงอยู่ท้ายล็อกเสมอ และล็อกเต็มยาวเกินจะพิมพ์ */
 const tail = (buf, n = 3) => {
   const lines = buf.split('\n').map(l => l.trim()).filter(Boolean).slice(-n);
@@ -118,7 +144,12 @@ async function freePorts(envNames) {
 export async function startGate({ envPorts, profilePrefix }) {
   const [httpEnv, cdpEnv] = envPorts;
   const [PORT, CDP] = await freePorts(envPorts);
-  const PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), profilePrefix));
+  /* ที่เก็บโปรไฟล์: ตั้งทับได้เพื่อให้ด่านที่ยกด่านอื่นเป็นลูก (tools/test-ports.mjs) แยกกล่อง
+     ของตัวเองได้ และรู้ได้โดยโครงสร้างว่าโปรไฟล์ไหนเป็นของรันไหน
+     ห้ามทำด้วยการขยับ TMPDIR ของลูก: chrome เอา TMPDIR ไปสร้าง
+     $TMPDIR/org.chromium.Chromium.XXXXXX/SingletonSocket ซึ่งติดเพดาน 108 ไบต์ของ sockaddr_un
+     ⇒ TMPDIR ที่ซ้อนลึกอีกชั้นทำให้ chrome ตายทันทีด้วย FATAL (วัดแล้วในกล่องนี้: พาธ 107 ตัวอักษร) */
+  const PROFILE = fs.mkdtempSync(path.join(process.env.LAKORN_GATE_TMP || os.tmpdir(), profilePrefix));
   const BASE = `http://127.0.0.1:${PORT}`;
 
   /* ---------- เก็บกวาด: ตั้งก่อนยกลูกตัวแรก ---------- */
@@ -131,14 +162,40 @@ export async function startGate({ envPorts, profilePrefix }) {
      (รีวิว AIO-48 C2) · ลูกที่ยังวิ่งได้ chrome ปิดตัวเองเป็น แต่ลูกที่ปิดตัวเองไม่ได้คือเคสที่เหลือค้าง
      starttime กันยิงผิดตัวเมื่อ pid ถูกรีไซเคิล (รีวิว AIO-47 C8) */
   const known = new Map();
+  /* จดได้เฉพาะตัวที่อ่าน starttime ได้จริง — pid ที่หลุดจาก /proc ระหว่างกวาดให้ค่า undefined
+     ถ้าจดลงไป stillOurs() จะตัดคีย์นั้นออกตลอดไปและ !known.has() กันการเขียนทับ
+     ⇒ ทะเบียนมี entry ที่แก้ตัวเองไม่ได้ (รีวิว AIO-49 R7) */
+  const remember = (p, t) => {
+    const st = t.born.get(p);
+    if (st !== undefined && !known.has(p)) known.set(p, st);
+  };
   const census = () => {
     const t = procTable();
-    for (const k of kids) for (const p of tree(k.pid, t)) if (!known.has(p)) known.set(p, t.born.get(p));
+    for (const k of kids) for (const p of tree(k.pid, t)) remember(p, t);
   };
   const poll = setInterval(census, T.CENSUS);
   poll.unref();
   /* ยังเป็นกระบวนการตัวเดิมที่เราจดไว้จริงไหม — ใช้ทั้งก่อนยิงและตอนยืนยันว่าตายแล้ว */
   const stillOurs = (p, t) => known.get(p) !== undefined && t.born.get(p) === known.get(p);
+  /* ความเป็นเจ้าของที่ "รอดการ reparent" — ทะเบียนที่จดเป็นระยะยังมีช่องกว้าง T.CENSUS:
+     ลูกที่เกิดหลัง snapshot รอบสุดท้ายแล้วแม่ตายก่อน snapshot ถัดไป จะไปอยู่ใต้ pid 1
+     โดยไม่เคยถูกจด ⇒ ไล่ต้นตอนเก็บกวาดก็ไม่พบ (รีวิว AIO-50 C1 ทำซ้ำได้ด้วย probe)
+     ลดคาบ census ไม่ปิดช่องนี้ เพราะช่องเป็นเรื่องลำดับเหตุการณ์ ไม่ใช่ความถี่
+     ที่ปิดได้คือเครื่องหมายที่ติดอยู่กับตัวกระบวนการเอง: พาธโปรไฟล์ของรันนี้มาจาก mkdtemp
+     ⇒ ไม่ซ้ำกับใครในกล่อง และ chrome ใส่ --user-data-dir ไว้ใน cmdline ของ "ทุกตัวในต้น"
+     (วัดแล้ว 12/12 ทั้ง browser/zygote/renderer/gpu/utility · ส่วน environ ใช้ไม่ได้
+     เพราะ chrome เขียนทับพื้นที่นั้นด้วยบรรทัดคำสั่งของตัวเอง — วัดได้ 1/12)
+     ⇒ หาจาก /proc ตรง ๆ ได้โดยไม่ต้องรู้ว่าใครเป็นพ่อแม่ และ pid ที่ถูกรีไซเคิลก็ไม่ติดเครื่องหมายนี้
+     ยก serve.mjs เข้าเกณฑ์เดียวกันด้วยการส่ง --mark ที่มีพาธเดียวกันไปในบรรทัดคำสั่งของมัน */
+  const ownedPids = () => {
+    const out = [];
+    for (const e of fs.readdirSync('/proc')) {
+      if (!/^\d+$/.test(e) || +e === process.pid) continue;
+      try { if (fs.readFileSync(`/proc/${e}/cmdline`, 'utf8').includes(PROFILE)) out.push(+e); }
+      catch { /* ตายไปแล้วระหว่างอ่าน หรือไม่มีสิทธิ์ = ไม่ใช่ของเรา */ }
+    }
+    return out;
+  };
   /* ทางสุดท้ายที่ทำงานแน่ไม่ว่าจะออกด้วยอะไร (รวม process.exit จากที่อื่น)
      ต้องเป็นงาน sync ทั้งหมด — ใน 'exit' ไม่มีรอบ event loop เหลือให้ await แล้ว
      ต้องไล่ฆ่าลูกหลานทั้งต้น: chrome มี renderer/zygote เป็นลูกของมันอีกชั้น
@@ -149,11 +206,21 @@ export async function startGate({ envPorts, profilePrefix }) {
   const killKnown = () => {
     census();
     const t = procTable();
+    /* ตัวที่ถือเครื่องหมายของรันนี้เข้าเกณฑ์ทันทีโดยไม่ต้องพึ่งทะเบียน — เครื่องหมายอยู่กับตัวมันเอง
+       จึงเป็นหลักฐานที่แรงกว่า starttime ของทะเบียน (pid ที่ถูกรีไซเคิลไม่ติดเครื่องหมายนี้) */
+    const targets = new Set(ownedPids());
     for (const p of known.keys()) {
-      if (!stillOurs(p, t)) continue;          /* ตายแล้ว หรือเป็นกระบวนการอื่นที่มาใช้ pid นี้ต่อ */
+      if (stillOurs(p, t)) targets.add(p);     /* ตายแล้ว หรือเป็นกระบวนการอื่นที่มาใช้ pid นี้ต่อ = ข้าม */
+    }
+    for (const p of targets) {
       try { process.kill(p, 'SIGCONT'); } catch { /* ตายแล้ว */ }   /* ตัวที่ถูก SIGSTOP ต้องปลุกก่อนจะได้ตายจริง */
       try { process.kill(p, 'SIGKILL'); } catch { /* ตายแล้ว */ }
     }
+  };
+  /* ของรันนี้ที่ยังเหลืออยู่จริง = ทะเบียนที่ยังเป็นตัวเดิม + ทุกตัวที่ถือเครื่องหมาย */
+  const leftovers = () => {
+    const t = procTable();
+    return [...new Set([...[...known.keys()].filter(p => stillOurs(p, t)), ...ownedPids()])];
   };
   const reapSync = () => {
     killKnown();
@@ -173,14 +240,11 @@ export async function startGate({ envPorts, profilePrefix }) {
     const by = Date.now() + T.REAP;
     while (kids.some(k => k.alive()) && Date.now() < by) await sleep(25);
     killKnown();
-    /* แล้วยืนยันว่า "ลูกหลานทั้งทะเบียน" ตายจริงก่อนลบโปรไฟล์ — ไม่ใช่แค่ลูกตรงสองตัว
-       (ลบโปรไฟล์ขณะยังมีคนใช้ = chrome ที่ยังไม่ตายไปเขียนไฟล์ในโฟลเดอร์ที่หายแล้ว) */
+    /* แล้วยืนยันว่า "ไม่เหลือของรันนี้" จริงก่อนลบโปรไฟล์ — ไม่ใช่แค่ลูกตรงสองตัว
+       (ลบโปรไฟล์ขณะยังมีคนใช้ = chrome ที่ยังไม่ตายไปเขียนไฟล์ในโฟลเดอร์ที่หายแล้ว)
+       นับด้วย leftovers() จึงรวมตัวที่ถูก reparent ไปใต้ pid 1 ด้วย และยิงซ้ำให้ตัวที่โผล่มาทีหลัง */
     const gone = Date.now() + T.REAP;
-    while (Date.now() < gone) {
-      const t = procTable();
-      if (![...known.keys()].some(p => stillOurs(p, t))) break;
-      await sleep(25);
-    }
+    while (leftovers().length && Date.now() < gone) { killKnown(); await sleep(100); }
     reapSync();
     process.exit(code);
   }
@@ -198,9 +262,13 @@ export async function startGate({ envPorts, profilePrefix }) {
   process.on('uncaughtException', die);
   for (const s of ['SIGINT', 'SIGTERM', 'SIGHUP']) process.on(s, () => cleanup(1));
 
+  /* เก็บโค้ดกับสัญญาณแยกกัน — ของเดิมยัดสตริงไทยลงใน code แล้วข้อความประกอบได้ว่า
+     "serve.mjs ตายกลางทาง (โค้ด สัญญาณ SIGKILL)" (รีวิว AIO-49 R9ข) */
   const track = child => {
-    const k = { pid: child.pid, child, code: null, alive: () => k.code === null };
-    child.on('exit', (c, sig) => { k.code = c === null ? `สัญญาณ ${sig}` : c; });
+    const k = { pid: child.pid, child, done: false, code: null, signal: null,
+      alive: () => !k.done,
+      how: () => (k.signal ? `สัญญาณ ${k.signal}` : `โค้ด ${k.code}`) };
+    child.on('exit', (c, sig) => { k.done = true; k.code = c; k.signal = sig; });
     kids.push(k);
     return k;
   };
@@ -210,7 +278,9 @@ export async function startGate({ envPorts, profilePrefix }) {
      แล้วเขียนเหตุไว้ที่ stderr — ถ้าโยนทิ้ง เหตุนั้นไปไม่ถึงใคร และอาการที่คนอ่านผลเห็น
      จะกลายเป็น "โหลดหน้าไม่เสร็จ" ซึ่งชี้ไปที่หน้าเว็บทั้งที่ของจริงคือเซิร์ฟเวอร์ตอบ 500
      (รีวิว AIO-47 C3 วัดได้: "! /%E0%A4%A → URI malformed" ถูก 'ignore' ทิ้ง) */
-  const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)],
+  /* --mark ไม่ใช่ตัวเลือกของ serve.mjs (มันอ่านแต่ argv[2] = พอร์ต) แต่ทำให้บรรทัดคำสั่งของมัน
+     ถือเครื่องหมายของรันนี้ไว้ ⇒ ownedPids() หา serve.mjs เจอด้วยเกณฑ์เดียวกับ chrome */
+  const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT), `--mark=${PROFILE}`],
     { stdio: ['ignore', 'pipe', 'pipe'] });
   const srv = track(server);
   let serverErr = '';
@@ -231,7 +301,7 @@ export async function startGate({ envPorts, profilePrefix }) {
     console.error(`✗ เปิด tools/serve.mjs ที่พอร์ต ${PORT} ไม่ได้` +
       (srv.alive()
         ? ` (หมดเวลา ${T.SERVE_UP / 1000} วินาที — ไม่ได้บรรทัดพร้อมจาก serve.mjs ของรันนี้)`
-        : ` (serve.mjs ออกด้วยโค้ด ${srv.code} — น่าจะมีคนถือพอร์ตอยู่ · ตั้ง ${httpEnv} เลือกเองได้)`) +
+        : ` (serve.mjs ออกด้วย${srv.how()} — น่าจะมีคนถือพอร์ตอยู่ · ตั้ง ${httpEnv} เลือกเองได้)`) +
       serveTail());
     await cleanup(1);
   }
@@ -248,8 +318,12 @@ export async function startGate({ envPorts, profilePrefix }) {
     `--user-data-dir=${PROFILE}`, `--remote-debugging-port=${CDP}`, '--remote-allow-origins=*', 'about:blank'],
     { stdio: ['ignore', 'ignore', 'pipe'] });
   const chr = track(chrome);
-  let chromeErr = '';
-  chrome.stderr.on('data', d => { chromeErr = (chromeErr + d).slice(-16384); });
+  let chromeErr = '', latched = null;
+  const latch = wsLatch();
+  chrome.stderr.on('data', d => {
+    chromeErr = (chromeErr + d).slice(-16384);     /* ไว้ใส่ท้ายข้อความแดง — ตัดได้ ไม่ใช่ของที่ต้องครบ */
+    latched = latched || latch(d);                 /* ส่วนบรรทัด DevTools เกาะที่ chunk ไม่ใช่ที่ buffer ที่ถูกตัด */
+  });
   /* ต้องรอ "บรรทัดครบ" (มี \n ปิดท้าย) ก่อนเชื่อ URL — `\S+` รับ guid ที่ขาดกลางได้ทันที
      ถ้า chunk แบ่งตรงกลาง guid พอดี ด่านจะไปต่อ ws ด้วย URL ที่ยังไม่ครบ แล้วแดงเทียม
      ทั้งที่เบราว์เซอร์ปกติดี (รีวิว AIO-48 C1 ทำซ้ำได้ · วัดซ้ำที่ระดับ regex แล้วจริง)
@@ -258,7 +332,7 @@ export async function startGate({ envPorts, profilePrefix }) {
      ⇒ รับทุก host แล้วตัดสินทีหลัง · ห้ามยอมใช้ host อื่น (รีวิว AIO-47 C2) */
   const cdpBy = Date.now() + T.CHROME_UP;
   let found = null;
-  while (!(found = wsLineFrom(chromeErr)) && chr.alive() && Date.now() < cdpBy) await sleep(25);
+  while (!(found = latched) && chr.alive() && Date.now() < cdpBy) await sleep(25);
   if (found && !found[1].startsWith(`ws://127.0.0.1:${CDP}/devtools/browser/`)) {
     /* chrome พิมพ์ทุกอย่างที่ต้องรู้ใน ~60 ms: "bind() failed: Address already in use (98)"
        แล้วไปขึ้นที่ [::1] ⇒ แดงทันทีพร้อมเหตุจริง ไม่ใช่รอครบเพดานแล้วเดา */
@@ -273,7 +347,7 @@ export async function startGate({ envPorts, profilePrefix }) {
       (chr.alive()
         ? ` (หมดเวลา ${T.CHROME_UP / 1000} วินาที — ไม่ได้บรรทัด DevTools listening จาก chrome ของรันนี้` +
           ` · ถ้าตั้ง ${cdpEnv} ทับ อาจมีคนถือพอร์ตนั้นอยู่)`
-        : ` (chrome ออกด้วยโค้ด ${chr.code})`) + tail(chromeErr, 2));
+        : ` (chrome ออกด้วย${chr.how()})`) + fatalFrom(chromeErr) + tail(chromeErr, 2));
     await cleanup(1);
   }
 
@@ -352,10 +426,21 @@ export async function startGate({ envPorts, profilePrefix }) {
   await send('Page.enable');
   await send('Runtime.enable');
 
+  /* "ผิดถาวร" วัดจากโครงของ exceptionDetails ไม่ใช่จับคำในข้อความ:
+     นิพจน์ที่คอมไพล์ไม่ผ่านไม่มี stackTrace เลย (โค้ดยังไม่ได้เริ่มเดิน) ส่วนนิพจน์ที่เดินแล้วโยน
+     มี callFrames ติดมาด้วย — วัดกับ chrome ตัวนี้แล้ว: 'this is not valid js(' → ไม่มี stackTrace ·
+     "JSON.parse('{')" → 1 frame · ทั้งคู่ className = SyntaxError
+     ⇒ จับคำว่า SyntaxError จะตีนิพจน์ที่อ่านข้อมูลของหน้า (เช่น JSON.parse ของ localStorage
+     ที่ test-continue ใช้อยู่ 65 จุด) ว่าผิดถาวร ทั้งที่เป็นของชั่วคราวตอนหน้ากำลังเปลี่ยน
+     (รีวิว AIO-49 R8 · AIO-50 เห็นตรงกันว่า regex ไม่ใช่ whitelist ของ error ชั่วคราว) */
   async function evaluate(expr, deadline) {
     const r = await send('Runtime.evaluate',
       { expression: expr, returnByValue: true, awaitPromise: true }, deadline);
-    if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || 'js error');
+    const d = r.exceptionDetails;
+    if (d) {
+      throw Object.assign(new Error(d.exception?.description || d.text || 'js error'),
+        { permanent: !d.stackTrace });
+    }
     return r.result.value;
   }
 
@@ -365,8 +450,8 @@ export async function startGate({ envPorts, profilePrefix }) {
      (รีวิว AIO-45 C5 · AIO-46 R2 — เคสจริงคือมีคนเข้ามาแทนที่พอร์ตนั้นต่อแล้วด่านเขียวจากของคนอื่น) */
   function alive() {
     if (wsDead) throw wsDead;
-    if (!srv.alive()) throw Object.assign(new Error(`serve.mjs ตายกลางทาง (โค้ด ${srv.code})`), { fatal: true });
-    if (!chr.alive()) throw Object.assign(new Error(`chrome ตายกลางทาง (โค้ด ${chr.code})`), { fatal: true });
+    if (!srv.alive()) throw Object.assign(new Error(`serve.mjs ตายกลางทาง (${srv.how()})`), { fatal: true });
+    if (!chr.alive()) throw Object.assign(new Error(`chrome ตายกลางทาง (${chr.how()})`), { fatal: true });
   }
 
   /* เปิดหน้าแล้วรอจนเงื่อนไขที่ส่งมาเป็นจริง · expr ต่างกันไปตามด่าน
@@ -376,19 +461,22 @@ export async function startGate({ envPorts, profilePrefix }) {
     let last = null;
     /* ข้อความแดงต้องพา "เหตุล่าสุดที่เจอระหว่างรอ" ไปด้วย — error ที่ลูปกลืนไว้คือเหตุจริง
        ของเดิมกลืนแล้วทิ้ง คนอ่านได้แต่ "โหลดหน้าไม่เสร็จ" ซึ่งเป็นอาการ ไม่ใช่เหตุ (AIO-48 C4) */
-    const fail = () => new Error(`โหลดหน้าไม่เสร็จใน ${T.PAGE / 1000} วินาที: ${p}` +
-      (last ? ` · เหตุล่าสุดระหว่างรอ: ${last.message}` : '') + serveTail());
+    /* cause: error ที่ทำให้หมดอายุ — ของเดิมกิ่ง pageDeadline โยน e ทิ้งทั้งก้อนแล้วใช้ last
+       ซึ่งถูกตั้งเฉพาะในกิ่งที่ลูปกลืน ⇒ "CDP ค้างที่คำสั่งไหน" กับ "เงื่อนไขไม่เคยเป็นจริง"
+       ได้ข้อความเท่ากันทุกไบต์ (รีวิว AIO-49 R2 วัดแล้ว) ทั้งที่เป็นเหตุต่างกันคนละเรื่อง */
+    const fail = cause => new Error(`โหลดหน้าไม่เสร็จใน ${T.PAGE / 1000} วินาที: ${p}` +
+      ((cause || last) ? ` · เหตุล่าสุดระหว่างรอ: ${(cause || last).message}` : '') + serveTail());
     try { await send('Page.navigate', { url: BASE + p }, by); }
-    catch (e) { throw e.pageDeadline ? fail() : e; }
+    catch (e) { throw e.pageDeadline ? fail(e) : e; }
     while (Date.now() < by) {
       /* กลืน error ได้เฉพาะตอนหน้ากำลังเปลี่ยน (context ถูกทิ้ง) — ตัวที่ติดป้าย fatal ห้ามกลืน */
       try { if (await evaluate(expr, by)) return; }
       catch (e) {
-        if (e.pageDeadline) throw fail();
+        if (e.pageDeadline) throw fail(e);
         if (e.fatal) throw e;
-        /* SyntaxError คือนิพจน์ของด่านเองเขียนผิด = ผิดถาวร ส่งซ้ำอีกกี่รอบก็เท่าเดิม
+        /* นิพจน์ที่คอมไพล์ไม่ผ่าน = ของด่านเองเขียนผิด ส่งซ้ำอีกกี่รอบก็เท่าเดิม
            ปล่อยให้กลืนคือรอครบเพดานแล้วรายงานอาการที่ไม่เกี่ยวกับเหตุ */
-        if (/SyntaxError/.test(e.message)) throw Object.assign(e, { fatal: true });
+        if (e.permanent) throw Object.assign(e, { fatal: true });
         last = e;
       }
       await sleep(60);

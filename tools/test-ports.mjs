@@ -30,7 +30,7 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { tree, wsLineFrom } from './cdp-gate.mjs';
+import { procTable, tree, wsLatch, wsLineFrom } from './cdp-gate.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
@@ -43,15 +43,32 @@ const GATES = [
 ];
 /* เคสที่ต้องฉีดกลางการวัดใช้ด่านที่ยาวพอให้จับจังหวะได้ — ดูเหตุผลด้านบน */
 const MID = [GATES[0]];
+/* กล่องของรันนี้: ลูกทุกตัวได้ TMPDIR ชี้มาที่นี่ ⇒ โปรไฟล์ที่ cdp-gate สร้างด้วย os.tmpdir()
+   ลงกล่องนี้ทั้งหมด · ความเป็นเจ้าของจึงเป็นเรื่องโครงสร้าง ไม่ใช่การเดาจากเวลาเกิด
+   ของเดิมใช้ "เกิดหลังไฟล์นี้เริ่มรัน + ไม่มีใครใน /proc อ้างถึง" ซึ่งรันอื่นที่เพิ่ง mkdtemp
+   แต่ยังไม่ spawn chrome เข้าเกณฑ์ทั้งสองข้อพอดี ⇒ ถูกรันนี้ลบทิ้ง และ leftProfiles
+   ก็นับโปรไฟล์ของรันนั้นเป็นเศษของรันนี้ ⇒ แดงเทียม (รีวิว AIO-50 C2 ทำซ้ำได้ด้วย probe) */
+const RUN_TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-ports-'));
 /* โปรไฟล์ chrome ของด่าน — ทางออกทุกทางต้องเก็บ ไม่ใช่แค่ไม่เหลือกระบวนการ (ราว 29 MB ต่อตัว) */
 const PROFILE_RE = /^lakorn-(ac2|ph)-/;
-const profiles = () => new Set(fs.readdirSync(os.tmpdir()).filter(e => PROFILE_RE.test(e)));
+const SWEEP_RE = /^lakorn-(ac2|ph|foreign)-/;
+const profiles = () => new Set(fs.readdirSync(RUN_TMP).filter(e => PROFILE_RE.test(e)));
+/* เก็บโปรไฟล์ที่ค้างจากการฉีดความล้มเหลว (ทาง SIGKILL ไม่มีใครได้เก็บกวาด)
+   แตะได้แค่ในกล่องของรันนี้ — เกณฑ์เวลาเกิดปิด race ของ TMPDIR ร่วมไม่ได้ (ดูเคส "ตัวกวาดโปรไฟล์") */
+function sweep(root) {
+  let swept = 0;
+  for (const e of fs.readdirSync(root)) {
+    if (!SWEEP_RE.test(e)) continue;
+    try { fs.rmSync(path.join(root, e), { recursive: true, force: true }); swept++; }
+    catch { /* ไม่มีแล้ว */ }
+  }
+  return swept;
+}
 /* เคสที่เรียกตัวร่วมตรง ๆ ในลูกของตัวเอง — ต้องเป็น URL สัมบูรณ์ เพราะลูกรันด้วย -e ไม่มีไฟล์ต้นทาง */
 const GATE = JSON.stringify(pathToFileURL(path.join(ROOT, 'tools/cdp-gate.mjs')).href);
-const fixture = body => `import { startGate, T, tree } from ${GATE};\nimport fs from 'node:fs';\n${body}`;
+const fixture = body => `import { startGate, T, procTable, tree } from ${GATE};\nimport fs from 'node:fs';\n${body}`;
 const AC2 = `{ envPorts: ['AC2_PORT', 'AC2_CDP'], profilePrefix: 'lakorn-ac2-' }`;
 
-const STARTED = Date.now();         /* ตัวกวาดท้ายไฟล์แตะได้แค่โปรไฟล์ที่เกิดหลังเวลานี้ */
 let pass = 0, fail = 0;
 function check(name, ok, detail = '') {
   if (ok) { pass++; console.log(`  ✓ ${name}`); }
@@ -91,6 +108,9 @@ function kids(pid) {                 /* ลูกตรงของ pid */
 const comm = pid => { try { return fs.readFileSync(`/proc/${pid}/comm`, 'utf8').trim(); } catch { return '?'; } };
 const cmd = pid => { try { return fs.readFileSync(`/proc/${pid}/cmdline`, 'utf8').replace(/\0/g, ' ').trim(); } catch { return ''; } };
 const killTree = (pid, sig) => { for (const p of tree(pid)) { try { process.kill(p, sig); } catch { /* ตายแล้ว */ } } };
+/* ต้องตัดคอมเมนต์ออกก่อนตรวจซอร์ส: คำอธิบายที่เอ่ยถึง tools/serve.mjs ไม่ใช่โค้ดที่ยกเซิร์ฟเวอร์
+   ด่านที่นับคอมเมนต์เป็นกฎจริงคือด่านที่แดงแบบไม่มีบั๊ก (เจอมาแล้วที่ check-ac.mjs) */
+const code = src => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 
 /* ---------- ตัวจำลอง "พอร์ตที่ run อื่นถืออยู่" ---------- */
 /* รับ connection แล้วเงียบ — คือเคสที่ทำให้ fetch/CDP ค้างไม่มีกำหนด ไม่ใช่เคส connection refused */
@@ -105,6 +125,19 @@ async function silentPort() {
 }
 async function freePort() {
   const s = await silentPort(); const p = s.port; s.close(); return p;
+}
+/* ถือพอร์ต "เลขที่ระบุ" ไว้ — ใช้กับเคสที่ต้องทำให้เลขพอร์ตตายตัวเดิมใช้ไม่ได้
+   bind ไม่ได้ก็ไม่ใช่ความล้มเหลวของเคส: แปลว่ามีคนอื่นถืออยู่แล้ว ซึ่งคือเงื่อนไขเดียวกัน */
+async function holdPort(port) {
+  const socks = [];
+  const srv = net.createServer(s => socks.push(s));
+  try {
+    await new Promise((res, rej) => { srv.once('error', rej); srv.listen(port, '127.0.0.1', res); });
+  } catch (e) {
+    try { srv.close(); } catch { /* ยังไม่ได้เปิด */ }
+    return { port, mine: false, why: e.code, close: () => {} };
+  }
+  return { port, mine: true, why: '', close: () => { for (const s of socks) s.destroy(); srv.close(); } };
 }
 
 /* เซิร์ฟเวอร์ของ "คนอื่น" ที่ตอบปกติ — ใช้พิสูจน์ว่าด่านไม่ยอมเขียวจากพอร์ตที่ไม่ใช่ลูกของตัวเอง
@@ -128,7 +161,7 @@ async function foreignServer() {
 async function foreignChrome() {
   for (let attempt = 0; attempt < 3; attempt++) {
     const port = await freePort();
-    const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-foreign-'));
+    const profile = fs.mkdtempSync(path.join(RUN_TMP, 'lakorn-foreign-'));
     const p = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dbus',
       `--user-data-dir=${profile}`, `--remote-debugging-port=${port}`, '--remote-allow-origins=*', 'about:blank'],
       { stdio: 'ignore' });
@@ -157,7 +190,10 @@ const answers = async port => {
    แล้วเคสไปยืนยันเหตุผิดเรื่อง) ⇒ chrome เลือกจากชื่อกระบวนการ · serve เลือกจากพาธเต็มของไฟล์ */
 async function runGate({ file, src, name, env: gateEnv }, env, deadlineMs, watch) {
   const t0 = Date.now();
-  const childEnv = { ...process.env };
+  /* กล่องโปรไฟล์ของลูกชี้มาที่กล่องของรันนี้ ⇒ โปรไฟล์เป็นของรันนี้โดยโครงสร้าง
+     ใช้ LAKORN_GATE_TMP ไม่ใช่ TMPDIR: TMPDIR เป็นที่ที่ chrome สร้าง SingletonSocket
+     ซึ่งติดเพดาน 108 ไบต์ของ sockaddr_un ⇒ ซ้อนอีกชั้นแล้ว chrome ตายทันที (วัดแล้วในกล่องนี้) */
+  const childEnv = { ...process.env, LAKORN_GATE_TMP: RUN_TMP };
   for (const k of PORT_ENV) delete childEnv[k];
   const before = profiles();
   const argv = src ? ['--input-type=module', '-e', src] : [path.join(ROOT, 'tools', file)];
@@ -173,16 +209,23 @@ async function runGate({ file, src, name, env: gateEnv }, env, deadlineMs, watch
   child.stdout.on('data', d => { out += d; });
   child.stderr.on('data', d => { out += d; });
   const SERVE = path.join(ROOT, 'tools/serve.mjs');
+  /* กวาด /proc รอบเดียวต่อคาบแล้วส่งตารางต่อ — ของเดิมเรียก kids() หนึ่งรอบ แล้ว tree() อีก
+     หนึ่งรอบต่อลูกตรงแต่ละตัว = 3 รอบต่อคาบ 40 ms · วัดได้ 37.7 ms (94% ของคาบ)
+     ⇒ คาบฉีดจริงราว 78 ms และยืดตามจำนวน pid ในกล่อง = "ฉีดตรงจังหวะ" ขึ้นกับภาระเครื่อง
+     (รีวิว AIO-49 R4 · บทเรียนเดียวกับที่ cdp-gate.mjs ทำไว้แล้วตอนยก census ขึ้นมาเรียกเป็นระยะ) */
+  let snap = procTable();
+  const kidsNow = () => snap.kidsOf.get(child.pid) || [];
   const ctx = {
     pid: child.pid,                      /* ตัวด่านเอง — เคสสัญญาณต้องยิง pid ตัวนี้ ไม่ใช่ -pid */
     get out() { return out; },
-    chrome: () => kids(child.pid).find(p => comm(p) === 'chrome'),
-    serve: () => kids(child.pid).find(p => cmd(p).includes(SERVE)),
+    chrome: () => kidsNow().find(p => comm(p) === 'chrome'),
+    serve: () => kidsNow().find(p => cmd(p).includes(SERVE)),
   };
   const watcher = (async () => {
     while (running) {
+      snap = procTable();
       /* จดลูกหลานทุกตัวที่เคยเห็น เพื่อตรวจทีหลังว่าด่านเก็บกวาดของตัวเองครบ */
-      for (const p of kids(child.pid)) for (const q of tree(p)) if (!seen.has(q)) seen.set(q, `${comm(q)}`);
+      for (const p of kidsNow()) for (const q of tree(p, snap)) if (!seen.has(q)) seen.set(q, `${comm(q)}`);
       if (watch) await watch(ctx);
       await sleep(40);
     }
@@ -190,7 +233,8 @@ async function runGate({ file, src, name, env: gateEnv }, env, deadlineMs, watch
   const code = await new Promise(r => child.on('exit', (c, s) => r(c === null ? `สัญญาณ ${s}` : c)));
   running = false; clearTimeout(timer);
   await watcher;
-  /* หลักฐานว่าด่านเก็บกวาดลูกของตัวเองจริง — ให้เวลาเท่าเพดาน REAP ของ cdp-gate ก่อนตัดสิน */
+  /* หลักฐานว่าด่านเก็บกวาดลูกของตัวเองจริง — ให้เวลา 2 เท่าของ T.REAP (3 วินาที) ซึ่งเป็น
+     เพดานที่ cleanup() ของ cdp-gate ใช้ได้มากสุด: รอ SIGTERM หนึ่งช่วง + ยืนยันว่าตายอีกหนึ่งช่วง */
   const by = Date.now() + 6000;
   let left = [...seen.keys()].filter(living);
   while (left.length && Date.now() < by) { await sleep(100); left = [...seen.keys()].filter(living); }
@@ -221,7 +265,7 @@ function expectRed(name, r, deadlineMs, want, maxMs) {
      (รีวิว AIO-45 C3 วัดได้ว่าทางแดงเร็วทิ้ง chrome ทั้งต้นไว้พร้อมพอร์ต CDP) */
   check(`${r.file} · ${name} → ไม่เหลือ serve.mjs/chrome ค้างหลังด่านจบ (เคยเห็นลูกหลาน ${r.seen} ตัว)`,
     r.left.length === 0, r.left.join(' '));
-  check(`${r.file} · ${name} → ไม่เหลือโปรไฟล์ chrome ค้างใน ${os.tmpdir()}`,
+  check(`${r.file} · ${name} → ไม่เหลือโปรไฟล์ chrome ค้างในกล่องของรันนี้`,
     r.leftProfiles.length === 0, r.leftProfiles.join(' '));
 }
 /* เคสที่เรียกตัวร่วมตรง ๆ: วัด "หยุดรอที่ N ms" ที่ลูกพิมพ์เอง ไม่ใช่เวลารวมของกระบวนการ
@@ -248,6 +292,31 @@ await caseOf('ทางปกติ (ไม่ตั้ง env อะไรเ�
     r.seen >= 2, `เห็น ${r.seen} ตัว`);
   check(`${r.file} · จบปกติแล้วไม่เหลือ serve.mjs/chrome ค้าง`, r.left.length === 0, r.left.join(' '));
   check(`${r.file} · จบปกติแล้วไม่เหลือโปรไฟล์ chrome ค้าง`, r.leftProfiles.length === 0, r.leftProfiles.join(' '));
+});
+
+/* ---------- 0ข. การแก้หลักของตั๋วนี้: ห้ามกลับไปผูกกับเลขพอร์ตตายตัว (รีวิว AIO-49 R1) ----------
+   AIO-42 ถูกเปิดด้วยอาการ "พอร์ตตายตัว 4188/9444 + 4189/9445 ⇒ แดงแบบสุ่มเมื่อรันขนานกัน"
+   แต่ไม่มีข้อไหนในด่านนี้มองเลขพอร์ตที่ได้มาเลย ⇒ รีวิวถอย freePorts() กลับไปเป็นค่าตายตัวเดิม
+   แล้วด่านยังเขียวครบ 112 ข้อ = ด่านรับรองสิ่งที่ตั๋วนี้ถูกเปิดมากำจัด
+   เคสนี้ทำให้สี่เลขนั้นใช้ไม่ได้ แล้วบังคับว่าทางปกติต้องยังเขียว — เป็นเคสเดียวกับที่ QA
+   ทำด้วยมือใน check-ac ต่างกันแค่ย้ายเข้ามาอยู่ในด่าน (ตรวจว่า "พอร์ตที่ได้ไม่ใช่เลขเดิม"
+   อ่อนกว่า เพราะผูกกับเลขในอดีต ไม่ใช่กับสมบัติ "ไม่ขึ้นกับเลขใดเลย") */
+const LEGACY = [4188, 9444, 4189, 9445];
+await caseOf('ทางปกติขณะพอร์ตตายตัวเดิมทั้งสี่ (4188/9444/4189/9445) ใช้ไม่ได้', async () => {
+  const holds = [];
+  for (const p of LEGACY) holds.push(await holdPort(p));
+  try {
+    check(`พอร์ตเดิมทั้งสี่ใช้ไม่ได้จริงตอนเคสนี้รัน`, holds.length === LEGACY.length,
+      holds.map(h => `${h.port}:${h.mine ? 'ถือเอง' : h.why || 'คนอื่นถือ'}`).join(' '));
+    for (const g of GATES) {
+      const r = await runGate(g, {}, 120000);
+      check(`${r.file} · ผ่านเองใน ${(r.ms / 1000).toFixed(1)} วินาที ขณะพอร์ตเดิมถูกถือไว้`,
+        r.code === 0 && /ผล: ผ่าน \d+ · ตก 0/.test(r.out),
+        `exit=${r.code} · ${JSON.stringify(r.out.slice(-200))}`);
+      check(`${r.file} · ไม่เหลือลูก/โปรไฟล์ค้าง (เคยเห็นลูกหลาน ${r.seen} ตัว)`,
+        r.left.length === 0 && r.leftProfiles.length === 0, [...r.left, ...r.leftProfiles].join(' '));
+    }
+  } finally { for (const h of holds) h.close(); }
 });
 
 /* ---------- 1. พอร์ต HTTP ถูกคนอื่นถือและเงียบ ---------- */
@@ -456,6 +525,37 @@ await caseOf('chrome แม่ถูกฆ่าขณะลูกหลาน�
   expectRed('chrome แม่ตาย ลูกหลานปิดตัวเองไม่ได้', r, 40000, /CDP|chrome/);
 });
 
+/* ---------- 10ข. ลูกหลานที่ "ไม่เคยถูกจด" แล้วถูก reparent (รีวิว AIO-50 C1) ----------
+   เคส 10 รอให้ต้นของ chrome ขึ้นมาระยะหนึ่งก่อนฉีด ⇒ ทะเบียนจดลูกหลานไว้ครบแล้ว
+   เคสที่ยังไม่มีใครวัดคือ "ลูกเกิดหลัง census รอบสุดท้าย แล้วแม่ตายก่อนรอบถัดไป"
+   ซึ่งไล่ต้นตอนเก็บกวาดก็ไม่พบ เพราะข้อมูลพ่อแม่หายไปพร้อมแม่ · ลดคาบ census ไม่ปิดช่องนี้
+   จำลองให้แน่นอนโดยไม่ต้องแข่งกับเวลา: ตั้ง T.CENSUS ให้ใหญ่กว่าอายุของเคส = ทะเบียนไม่มี
+   ลูกหลานของ chrome เลย แล้วจึง SIGSTOP ลูกหลานทั้งหมดก่อนฆ่าแม่
+   ⇒ ตัวเดียวที่หาเจอได้คือเครื่องหมายที่ติดอยู่กับตัวกระบวนการเอง (พาธโปรไฟล์ใน cmdline) */
+await caseOf('ลูกหลานที่ไม่เคยถูกจดแล้วถูก reparent ไป pid 1 (ทะเบียนที่จดเป็นระยะช่วยไม่ได้)', async () => {
+  const src = fixture(`
+T.CENSUS = 600000;
+const g = await startGate(${AC2});
+await g.until('/', 'document.readyState === "complete"');
+const comm = p => { try { return fs.readFileSync('/proc/' + p + '/comm', 'utf8').trim(); } catch { return '?'; } };
+/* ต้องเอา "ลูกตรง" ที่เป็น chrome — tree() คืนลึกสุดก่อน ⇒ find() จะได้ renderer ที่ไม่มีลูก */
+const chrome = (procTable().kidsOf.get(process.pid) || []).find(p => comm(p) === 'chrome');
+const desc = tree(chrome).filter(p => p !== chrome);
+for (const q of desc) { try { process.kill(q, 'SIGSTOP'); } catch {} }
+try { process.kill(chrome, 'SIGKILL'); } catch {}
+console.log('หยุดลูกหลานไว้ ' + desc.length + ' ตัวแล้วฆ่าแม่');
+await g.cleanup(1);
+`);
+  const r = await runGate({ src, name: 'cdp-gate · ลูกหลานไม่เคยถูกจด', env: {} }, {}, 90000);
+  const m = /หยุดลูกหลานไว้ (\d+) ตัว/.exec(r.out);
+  check(`cdp-gate · ตั้งฉากได้จริง: ลูกหลาน ${m ? m[1] : '?'} ตัวถูกหยุดไว้ก่อนแม่ตาย โดยไม่มี census คั่น`,
+    !!m && +m[1] >= 2, JSON.stringify(r.out.slice(-220)));
+  check(`cdp-gate · ไม่เหลือลูกหลานค้างหลังด่านจบ (เคยเห็นลูกหลาน ${r.seen} ตัว)`,
+    r.left.length === 0, r.left.join(' '));
+  check('cdp-gate · ไม่เหลือโปรไฟล์ค้าง (ลบได้ก็ต่อเมื่อยืนยันแล้วว่าไม่มีใครใช้)',
+    r.leftProfiles.length === 0, r.leftProfiles.join(' '));
+});
+
 /* ---------- 11–14. เคสที่ต้องผูกจังหวะแน่นอน: เรียกตัวร่วมตรง ๆ ในลูกของตัวเอง ----------
    ทั้งสี่เคสนี้คือมิวเทชันที่รอบก่อน "ไม่กัด" แล้วรายงานไว้ตรง ๆ ว่าไม่กัด
    ฝั่ง Codex ว่าควรกัดทั้งหมด (AIO-48 C5) ฝั่ง Claude ค้านว่าฉีดจากข้างนอกจะ flaky (AIO-47 §2.5)
@@ -486,7 +586,64 @@ catch (e) { console.log('หยุดรอที่ ' + (Date.now() - t0) + ' m
 await g.cleanup(1);
 `);
   const r = await runGate({ src, name: 'cdp-gate · เพดานหน้า', env: {} }, {}, 60000);
-  expectStop('คำตอบช้ากว่าเพดานของหน้า', r, /โหลดหน้าไม่เสร็จใน 2 วินาที/, 3500);
+  /* ต้องพา "คำสั่งที่ค้าง" มาด้วย ไม่ใช่รับข้อความ "โหลดหน้าไม่เสร็จ" เปล่า ๆ:
+     ของเดิมกิ่ง pageDeadline โยน error ทิ้งทั้งก้อน ⇒ เคสนี้ตรึงข้อความที่กลบเหตุไว้
+     แล้วกลายเป็นด่านที่กันการแก้ ไม่ใช่กันการถอย (รีวิว AIO-49 R2) */
+  expectStop('คำตอบช้ากว่าเพดานของหน้า', r,
+    /โหลดหน้าไม่เสร็จใน 2 วินาที[\s\S]*เหตุล่าสุดระหว่างรอ: CDP ไม่ตอบคำสั่ง Runtime\.evaluate/, 3500);
+});
+
+/* 12ข. คำตอบของ "Page.navigate" เองที่ช้า — นาฬิกาของหน้าต้องเริ่มก่อน navigate และครอบมันด้วย
+   เคส 12 ทำให้ช้าแต่ที่ Runtime.evaluate ส่วน navigate ตอบปกติ ⇒ ถอด deadline ออกจาก navigate
+   แล้วด่านทั้งชุดยังเขียว 112 ข้อ (รีวิว AIO-50 C3 ทำซ้ำได้: หยุดที่ 9031 ms ทั้งที่ PAGE = 2 วินาที)
+   หน่วงที่ชั้น WebSocket ตามหมายเลขคำสั่ง ⇒ ผูกกับ navigate ตัวนั้นแน่นอน ไม่ใช่เดาจากเวลา */
+await caseOf('คำตอบของ Page.navigate ช้ากว่าเพดานของหน้า (T.PAGE ต้องครอบ navigate ด้วย)', async () => {
+  const src = fixture(`
+T.PAGE = 2000; T.SEND = 12000;
+const Real = globalThis.WebSocket;
+globalThis.WebSocket = function (url) {
+  const real = new Real(url), self = {};
+  let navId = null;
+  self.send = d => { const m = JSON.parse(d); if (m.method === 'Page.navigate') navId = m.id; real.send(d); };
+  self.close = () => { try { real.close(); } catch {} };
+  real.onopen = e => self.onopen && self.onopen(e);
+  real.onmessage = e => {
+    const late = navId !== null && JSON.parse(e.data).id === navId;
+    if (late) setTimeout(() => self.onmessage && self.onmessage(e), 9000);
+    else if (self.onmessage) self.onmessage(e);
+  };
+  real.onclose = e => self.onclose && self.onclose(e);
+  real.onerror = e => self.onerror && self.onerror(e);
+  return self;
+};
+const g = await startGate(${AC2});
+const t0 = Date.now();
+try { await g.until('/', 'true'); console.log('ไม่ควรสำเร็จ'); }
+catch (e) { console.log('หยุดรอที่ ' + (Date.now() - t0) + ' ms · ' + e.message); }
+await g.cleanup(1);
+`);
+  const r = await runGate({ src, name: 'cdp-gate · navigate ช้า', env: {} }, {}, 60000);
+  expectStop('navigate ช้ากว่าเพดานของหน้า', r,
+    /เหตุล่าสุดระหว่างรอ: CDP ไม่ตอบคำสั่ง Page\.navigate/, 3500);
+});
+
+/* 12ค. "เงื่อนไขไม่เคยเป็นจริง" ต้องไม่ได้ข้อความเดียวกับ "CDP ค้าง" — สองเหตุคนละเรื่อง
+   (รีวิว AIO-49 R2 วัดได้ว่าเท่ากันทุกไบต์) · และทางนี้คือทางที่ serveTail() ต้องพา
+   เหตุจาก stderr ของ serve.mjs ไปถึงคนอ่าน ซึ่งไม่มีข้อไหนเคยตรวจ (รีวิว AIO-49 R5)
+   พาธที่ decodeURIComponent ไม่ผ่านทำให้ serve.mjs ตอบ 500 แล้วเขียนเหตุไว้ที่ stderr */
+await caseOf('เงื่อนไขไม่เคยเป็นจริงขณะ serve.mjs ตอบ 500 (ต้องพาท้ายล็อกไปด้วย ห้ามอ้างว่า CDP ค้าง)', async () => {
+  const src = fixture(`
+T.PAGE = 2000;
+const g = await startGate(${AC2});
+const t0 = Date.now();
+try { await g.until('/%E0%A4%A', 'false'); console.log('ไม่ควรสำเร็จ'); }
+catch (e) { console.log('หยุดรอที่ ' + (Date.now() - t0) + ' ms · ' + e.message); }
+await g.cleanup(1);
+`);
+  const r = await runGate({ src, name: 'cdp-gate · เงื่อนไขไม่เป็นจริง', env: {} }, {}, 60000);
+  expectStop('เงื่อนไขไม่เคยเป็นจริง', r, /serve\.mjs · ท้ายล็อก: ! \/%E0%A4%A → URI malformed/, 3500);
+  check('cdp-gate · ไม่อ้างเหตุที่ไม่ได้เกิด (CDP ตอบทุกคำสั่งตรงเวลา)',
+    !/CDP ไม่ตอบคำสั่ง/.test(r.out), JSON.stringify(r.out.slice(-200)));
 });
 
 /* 13. ws ปิดขณะลูกทั้งสองยังมีชีวิต — สมบัติที่มีแต่ wsDie ถือคนเดียว
@@ -557,6 +714,26 @@ await g.cleanup(1);
     !/โหลดหน้าไม่เสร็จ/.test(r.out), JSON.stringify(r.out.slice(-200)));
 });
 
+/* 14ค. ด้านกลับของ 14ข: SyntaxError ที่ "โค้ดเดินแล้วโยน" เป็นของชั่วคราวตอนหน้ากำลังเปลี่ยน
+   ห้ามตีเป็นผิดถาวร · ของเดิมตัดสินด้วยการจับคำว่า SyntaxError ในข้อความ ซึ่งแยกสองอย่างนี้ไม่ออก
+   จุดเรียก evaluate() 65 จุดใน test-continue ใช้ JSON.parse ของ localStorage อยู่แล้ว
+   ⇒ วันที่นิพจน์แบบนั้นถูกส่งเข้า until() การจับคำจะทำให้ด่านแดงทั้งที่หน้าแค่กำลังเปลี่ยน
+   (รีวิว AIO-49 R8 · AIO-50 เห็นตรงกันว่า regex ไม่ใช่ whitelist ของ error ชั่วคราว)
+   ตัวแยกที่วัดได้: นิพจน์ที่คอมไพล์ไม่ผ่าน "ไม่มี stackTrace" ส่วนตัวที่เดินแล้วโยนมี callFrames */
+await caseOf('SyntaxError ที่มาจากข้อมูลของหน้า (โค้ดเดินแล้วโยน) = ชั่วคราว ห้ามตีเป็นผิดถาวร', async () => {
+  const src = fixture(`
+T.PAGE = 2000;
+const g = await startGate(${AC2});
+const t0 = Date.now();
+try { await g.until('/', 'JSON.parse("{")'); console.log('ไม่ควรสำเร็จ'); }
+catch (e) { console.log('หยุดรอที่ ' + (Date.now() - t0) + ' ms · ' + e.message); }
+await g.cleanup(1);
+`);
+  const r = await runGate({ src, name: 'cdp-gate · SyntaxError จากข้อมูลของหน้า', env: {} }, {}, 60000);
+  expectStop('SyntaxError จากข้อมูลของหน้า', r,
+    /โหลดหน้าไม่เสร็จใน 2 วินาที[\s\S]*เหตุล่าสุดระหว่างรอ: SyntaxError/, 3500);
+});
+
 /* ---------- 15. ตัวจับบรรทัด DevTools: ห้ามเชื่อบรรทัดที่ยังไม่ครบ (รีวิว AIO-48 C1) ----------
    ช่องนี้ฉีดจากข้างนอกต้องไปแบ่ง chunk ของ chrome จริงให้ขาดตรงกลาง guid พอดี = แข่งกับเวลา
    ⇒ ตรวจที่สมบัติของตัวจับตรง ๆ แทน ไม่มีช่องเวลา ไม่มีอะไรให้ flaky */
@@ -571,6 +748,20 @@ await caseOf('ตัวจับบรรทัด DevTools จาก stderr ข
   check('บรรทัดที่ไปขึ้นที่ host อื่น → จับได้ (เอาไปบอกเหตุว่า bind 127.0.0.1 ไม่ได้)',
     wsLineFrom('DevTools listening on ws://[::1]:45787/devtools/browser/x\n')?.[1]
       === 'ws://[::1]:45787/devtools/browser/x');
+  /* ต้องเกาะที่ chunk ไม่ใช่ให้ลูปไปอ่าน buffer ที่ถูกตัดท้าย: stderr ของ chrome ที่ไหลเกิน
+     16 KB ในคาบเดียวเบียดบรรทัดนั้นหายได้ แล้วด่านรอครบ 20 วินาทีพร้อมเหตุเท็จ (รีวิว AIO-49 R6) */
+  const latch = wsLatch();
+  let got = null;
+  for (const c of [line.slice(0, 30), line.slice(30, 60), line.slice(60)]) got = got || latch(c);
+  check('บรรทัดที่มาแยกหลาย chunk → เกาะได้เมื่อบรรทัดครบ', got?.[1] === URL_, JSON.stringify(got?.[1]));
+  check('stderr ไหลท่วมหลังบรรทัดนั้น (40 KB) → ยังได้ค่าเดิม ไม่ถูกเบียดหาย',
+    latch('x'.repeat(40000))?.[1] === URL_);
+  /* ตัวเกาะจะช่วยอะไรไม่ได้ถ้า startGate กลับไปอ่านจาก buffer ที่ถูกตัด — ข้อนี้เป็นด่านเชิงโครงสร้าง
+     (จะวัดเชิงพฤติกรรมต้องบังคับให้ chrome จริงพ่น stderr ท่วมในคาบเดียว ซึ่งทำซ้ำไม่ได้แน่นอน) */
+  const gateSrc = code(fs.readFileSync(path.join(ROOT, 'tools/cdp-gate.mjs'), 'utf8'));
+  check('startGate เกาะบรรทัดด้วย wsLatch() ไม่ใช่อ่านจาก buffer ที่ถูกตัดท้าย',
+    /wsLatch\(\)/.test(gateSrc) && !/wsLineFrom\(chromeErr\)/.test(gateSrc),
+    'พบการอ่านบรรทัด DevTools จาก buffer ที่ถูกตัดท้าย');
 });
 
 /* ---------- 16. ค่า env ของพอร์ตที่ผิดต้องบอกว่าเป็นค่าที่ตั้งเอง (รีวิว AIO-47 C7) ----------
@@ -584,12 +775,21 @@ await caseOf('ค่า env ของพอร์ตที่ไม่ใช่�
   }
 });
 
+/* ---------- 16ข. chrome ตายทันทีเพราะ TMPDIR ยาวเกิน → ต้องบอกเหตุที่ chrome บอกเอง ----------
+   เจอกับตัวในรอบนี้ตอนย้ายกล่องโปรไฟล์: chrome สร้าง
+   $TMPDIR/org.chromium.Chromium.XXXXXX/SingletonSocket ⇒ ติดเพดาน 108 ไบต์ของ sockaddr_un
+   แล้วตายด้วย FATAL ทันที · ด่านรายงานแค่ "chrome ออกด้วยสัญญาณ SIGABRT" + ก้นของ stack trace
+   (กอง hex 20 บรรทัด) ⇒ เป็นแดงที่บอกเหตุผิดอีกแบบหนึ่ง ซึ่งเป็นอาการที่ตั๋วนี้ไล่ปิดอยู่ */
+await caseOf('chrome ตายทันทีเพราะ TMPDIR ยาวเกินเพดานของ sockaddr_un', async () => {
+  const long = path.join(RUN_TMP, 'z'.repeat(80));
+  fs.mkdirSync(long, { recursive: true });
+  expectRed('TMPDIR ยาวเกิน 108 ไบต์ของ sockaddr_un', await runGate(MID[0], { TMPDIR: long }, 40000),
+    40000, /เหตุที่ chrome บอกเอง:[\s\S]*Socket path too long/, 15000);
+});
+
 /* ---------- 17. ห้ามแตกสำเนาตัวร่วมกลับไปไว้ในด่าน ----------
    ที่ทำให้เคส 5–7 (ยิงด่านตัวเดียว) ยังคุ้มครองทั้งสองด่านคือ "โค้ดก้อนนั้นมีสำเนาเดียว"
    ถ้าใครก๊อปกลับเข้าไปในด่านใดด่านหนึ่ง ความคุ้มครองนั้นหายไปเงียบ ๆ ⇒ บังคับไว้ที่นี่ */
-/* ต้องตัดคอมเมนต์ออกก่อนตรวจ: คำอธิบายที่เอ่ยถึง tools/serve.mjs ไม่ใช่โค้ดที่ยกเซิร์ฟเวอร์
-   ด่านที่นับคอมเมนต์เป็นกฎจริงคือด่านที่แดงแบบไม่มีบั๊ก (เจอมาแล้วที่ check-ac.mjs) */
-const code = src => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
 await caseOf('ด่านทั้งสองยังใช้ tools/cdp-gate.mjs ร่วมกัน (ไม่มีใครแตกสำเนากลับไป)', async () => {
   for (const g of GATES) {
     const src = code(fs.readFileSync(path.join(ROOT, 'tools', g.file), 'utf8'));
@@ -598,35 +798,49 @@ await caseOf('ด่านทั้งสองยังใช้ tools/cdp-gate
     check(`${g.file} · ไม่ได้ยก serve.mjs/chrome ขึ้นเอง (ถ้ายก ต้องย้ายเคส 5–7 มายิงไฟล์นี้ด้วย)`,
       !/remote-debugging-port|tools\/serve\.mjs/.test(src),
       'พบการยกเซิร์ฟเวอร์/เบราว์เซอร์เองในไฟล์ด่าน');
-    /* สองสตริงข้างบนหลบได้ด้วยการต่อสตริง ('--remote-debugging-' + 'port') ⇒ แตกสำเนากลับไปเงียบ ๆ
-       ตรวจทางบวกแทน: "ไฟล์ด่านต้องไม่ยกกระบวนการเองเลย" เป็นสมบัติที่ต่อสตริงหลบไม่ได้
-       (spawnSync ของ build ใน test-contrast ไม่เข้าข่าย — แพตเทิร์นจับ spawn( ตัวเดียว · AIO-47 C9) */
-    check(`${g.file} · ไม่เรียก spawn( เอง (สมบัติที่หลบด้วยการต่อสตริงไม่ได้)`,
-      !/\bspawn\s*\(/.test(src), 'พบ spawn( ในไฟล์ด่าน');
+    /* สองสตริงข้างบนหลบได้ด้วยการต่อสตริง ('--remote-debugging-' + 'port') ⇒ ต้องมีข้อที่แข็งกว่า
+       ของเดิมตรวจ /\bspawn\s*\(/ แล้วอ้างว่า "หลบด้วยการต่อสตริงไม่ได้" ซึ่งไม่จริง:
+       `const up = spawn;` แล้วเรียก up(...) หลบได้ด้วยโทเคนเดียว และยังพลาด execFile( · fork( ·
+       cp['spawn']( ทั้งหมด — รีวิวแตกสำเนา serve+chrome กลับเข้าไฟล์ด่านแล้วเคสนี้เขียวครบ 6 ข้อ
+       (รีวิว AIO-49 R3) ⇒ เลิกไล่ชื่อฟังก์ชัน แล้วตรวจที่ทางเข้าเดียวของความสามารถนั้น:
+       ไฟล์ด่านห้ามดึง child_process เข้ามาเลย ยกเว้น spawnSync ของ build ที่ประกาศชื่อไว้ตรง ๆ
+       (alias ต้องมีการ import ก่อนเสมอ ⇒ สมบัตินี้หลบด้วยการเปลี่ยนชื่อไม่ได้) */
+    const CP = `['"](?:node:)?child_process['"]`;
+    const clauses = [...src.matchAll(new RegExp(String.raw`import\s+([\s\S]*?)\s+from\s*${CP}`, 'g'))]
+      .map(m => m[1].replace(/\s+/g, ''));
+    const sideways = new RegExp(String.raw`(?:require|import)\s*\(\s*${CP}`).test(src);
+    const bad = [...clauses.filter(c => c !== '{spawnSync}'), ...(sideways ? ['require()/import() ของ child_process'] : [])];
+    check(`${g.file} · ดึง child_process เข้ามาได้แค่ { spawnSync } ของ build (สมบัติที่ alias หลบไม่ได้)`,
+      bad.length === 0, `พบ: ${bad.join(' · ')}`);
   }
 });
 
-/* โปรไฟล์ที่ค้างอยู่จากการฉีดความล้มเหลว (ทาง SIGKILL ไม่มีใครได้เก็บกวาด) — ราว 29 MB ต่อตัว
-   ห้ามลบด้วยเกณฑ์ "เก่ากว่า N นาที": workspace นี้แชร์กัน โปรไฟล์ที่ run อื่นกำลังใช้จะถูกลบทิ้ง
-   ⇒ สองเงื่อนไขพร้อมกัน: (ก) เกิดหลังไฟล์นี้เริ่มรัน = เป็นของลูกของรันนี้เท่านั้น
-   (ข) ไม่มีกระบวนการไหนในเครื่องอ้างถึงอยู่แล้ว
-   ข้อ (ก) จำเป็นเพราะ "ไม่พบใน snapshot" ไม่ได้แปลว่าไม่มีเจ้าของ — ช่วงตั้งแต่ mkdtemp
-   ถึงก่อน spawn chrome ยังไม่มีใครอ้างถึง ถ้า TMPDIR ใช้ร่วมกันก็ลบของคนอื่นได้ (รีวิว AIO-48) */
-const inUse = new Set();
-for (const e of fs.readdirSync('/proc')) {
-  if (!/^\d+$/.test(e)) continue;
-  const c = cmd(+e);
-  const m = c.match(/--user-data-dir=(\S+)/);
-  if (m) inUse.add(m[1]);
-}
-let swept = 0;
-for (const e of fs.readdirSync(os.tmpdir())) {
-  if (!/^lakorn-(ac2|ph|foreign)-/.test(e)) continue;
-  const f = path.join(os.tmpdir(), e);
-  if (inUse.has(f)) continue;
-  try { if (fs.statSync(f).birthtimeMs < STARTED) continue; } catch { continue; }
-  try { fs.rmSync(f, { recursive: true, force: true }); swept++; } catch { /* ของคนอื่น ไม่มีสิทธิ์ */ }
-}
-console.log(`\nเก็บโปรไฟล์ chrome ที่ไม่มีใครใช้แล้ว ${swept} ตัว`);
+/* ---------- 18. ตัวกวาดโปรไฟล์แตะได้แค่กล่องของรันนี้ (รีวิว AIO-50 C2) ----------
+   เกณฑ์เดิม "เกิดหลังไฟล์นี้เริ่มรัน + ไม่มีใครใน /proc อ้างถึง" ปิด race ไม่ได้:
+   รันอื่นที่ mkdtemp โปรไฟล์ไว้แล้วแต่ยังไม่ spawn chrome เข้าเกณฑ์ทั้งสองข้อพอดี
+   ⇒ ใช้ความเป็นเจ้าของเชิงโครงสร้างแทน (TMPDIR ของลูกชี้มาที่กล่องของรันนี้)
+   แล้วใช้เกณฑ์เดียวกันทั้งการนับเศษและการลบ */
+await caseOf('ตัวกวาดโปรไฟล์แตะได้แค่กล่องของรันนี้ (TMPDIR ร่วมกับ run อื่นได้)', async () => {
+  const mine = fs.mkdtempSync(path.join(RUN_TMP, 'lakorn-ac2-'));
+  const other = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-ac2-otherrun-'));
+  const marker = path.join(other, 'owner');
+  try {
+    fs.writeFileSync(marker, 'โปรไฟล์ของ run อื่น');
+    const n = sweep(RUN_TMP);
+    check('ลบโปรไฟล์ที่ค้างในกล่องของรันนี้', n >= 1 && !fs.existsSync(mine), `ลบไป ${n} ตัว`);
+    check('ไม่แตะโปรไฟล์ที่อยู่นอกกล่องของรันนี้ (ของ run อื่นใน TMPDIR เดียวกัน)',
+      fs.existsSync(marker), `${other} หายไป`);
+  } finally { try { fs.rmSync(other, { recursive: true, force: true }); } catch { /* ไม่มีแล้ว */ } }
+});
+
+const swept = sweep(RUN_TMP);
+try { fs.rmSync(RUN_TMP, { recursive: true, force: true }); } catch { /* ยังมีคนใช้ = เคสข้างบนแดงแล้ว */ }
+console.log(`\nเก็บโปรไฟล์ chrome ที่ค้างในกล่องของรันนี้ ${swept} ตัว`);
 console.log(`ผล: ผ่าน ${pass} · ตก ${fail}` + (skipped ? ` · ข้ามเคสไป ${skipped} เคสเพราะตั้ง ONLY` : ''));
+/* ONLY ที่ไม่ตรงเคสไหนเลยต้องไม่คืน exit 0 พร้อม "ผ่าน 0 · ตก 0" — automation ที่ดูแต่ exit code
+   จะอ่านว่าชุดเต็มผ่าน (รีวิว AIO-50 ข้อสังเกตเรื่อง ONLY) */
+if (ONLY && pass + fail === 0) {
+  console.log(`✗ ONLY=${process.env.ONLY} ไม่ตรงกับเคสใดเลย — ไม่ได้รันอะไรทั้งนั้น`);
+  process.exit(2);
+}
 process.exit(fail ? 1 : 0);
