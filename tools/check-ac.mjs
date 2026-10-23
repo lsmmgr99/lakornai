@@ -130,6 +130,24 @@ const faintText = faintRules.filter(sel => {
 });
 ok(faintText.length === 0,
   `--faint ที่ยังใช้กับข้อความ: ${faintText.length} จุด${faintText.length ? ' → ' + faintText.join(' / ') : ''} (กราฟิกเท่านั้น · visual-design §2.2)`);
+/* AIO-34 บั๊ก 4 — ข้อข้างบนอ่าน "กฎใน CSS" ซึ่งมองไม่เห็นช่องกรอกที่ไม่โดนกฎไหนเลย
+   (ช่องนั้นได้สีเริ่มต้นของเบราว์เซอร์ ซึ่งไม่มีอยู่ในไฟล์ CSS) · จึงวัดจากหน้าที่
+   render จริงด้วย getComputedStyle ต่ออีกชั้น — คำสั่งเดียวที่ผู้ตรวจรันครอบ AC-4 ทั้งข้อ */
+if (process.env.SKIP_BROWSER) {
+  ok(false, 'ข้ามการวัดคอนทราสต์ placeholder เพราะตั้ง SKIP_BROWSER — ข้อนี้นับเป็นตก ไม่ใช่ผ่าน');
+} else {
+  const c = spawnSync(process.execPath, [path.join(ROOT, 'tools/test-contrast.mjs')],
+    { env: { ...process.env, SKIP_BUILD: '1' }, encoding: 'utf8', timeout: 300000 });
+  const out = (c.stdout || '') + (c.stderr || '');
+  const m = out.match(/ผล: ผ่าน (\d+) · ตก (\d+)/);
+  const low = out.match(/ต่ำสุด ([\d.]+):1 ที่ (\S+)/);
+  ok(!!m && c.status === 0,
+    m ? `tools/test-contrast.mjs · ผ่าน ${m[1]} ตก ${m[2]}`
+      + (low ? ` · คอนทราสต์ placeholder ต่ำสุด ${low[1]}:1 ที่ ${low[2]}` : '')
+      : 'รัน tools/test-contrast.mjs ไม่สำเร็จ (ต้องมี Chromium ของ playwright ในเครื่อง)');
+  out.split('\n').filter(l => /^\s+[✓✗] \//.test(l)).forEach(l => console.log('     ' + l.trim()));
+  if (m && +m[2] > 0) out.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
+}
 
 /* ---------------- AC-5 ---------------- */
 head('AC-5 · ปกเป็น <img> จริง');

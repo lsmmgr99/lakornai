@@ -15,8 +15,18 @@
    เว็บจริงจึงเลื่อนขึ้นเป็น --dim (#8C889A · 5.63:1) ซึ่งผ่าน AA สำหรับข้อความ
    จุดที่เป็นกราฟิกล้วน (chevron, จุดคั่น ·) ยังใช้ --faint ได้ตามกฎเดิม */
 .crumbs span{color:var(--dim)}
-.field input::placeholder,.field textarea::placeholder{color:var(--dim)}
 .notif .tm{color:var(--dim)}
+
+/* --- AIO-34 บั๊ก 4 · placeholder ของ "ทุก" ช่องกรอก ---
+   กฎเดิมผูกกับ .field เท่านั้น แต่ช่องค้นหา (search/index.html:43) อยู่ใน .search-box
+   จึงไม่โดนกฎไหนเลย → ได้สีเริ่มต้นของเบราว์เซอร์ #757575 = 3.73:1 บน --surface-2 (ตก AA)
+   บรรทัดล่างสุดเป็น "พื้น" ของทุกช่องกรอกในเว็บ ทั้งที่มีวันนี้และที่เพิ่มวันหน้า
+   — author style ชนะ UA style เสมอ จึงไม่ต้องไล่เขียน selector ทีละหน้า
+   แต่มันชนะ `.field input::placeholder{color:var(--faint)}` ของ v2.css:367 ไม่ได้
+   (specificity 0,0,2 vs 0,1,2) กฎ .field จึงยังต้องอยู่คู่กันไว้ ห้ามลบทิ้งข้อใดข้อหนึ่ง
+   วัดจากหน้าที่ render จริงด้วย tools/test-contrast.mjs — ทั้ง 4 ช่องได้ 5.00:1 */
+input::placeholder,textarea::placeholder{color:var(--dim)}
+.field input::placeholder,.field textarea::placeholder{color:var(--dim)}
 
 /* --- ปกเป็น <img> ใน <span> จึงต้องบังคับ display --- */
 .poster{display:block}
