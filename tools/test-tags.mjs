@@ -47,7 +47,7 @@ const CLOSED = ['revenge-karma', 'fruit-drama'];
 
 /* ---------------- 1 · ด่านยังเป็นค่าเดิม ---------------- */
 head('1 · facet ใหม่ต้องผ่าน "ด่านเดิม" ไม่ใช่ด่านที่ลดเกณฑ์ลงมารับ');
-ok(TAG_MIN_ITEMS === 3, `TAG_MIN_ITEMS = ${TAG_MIN_ITEMS} (ต้องเป็น 3 — build/content.mjs:181)`);
+ok(TAG_MIN_ITEMS === 3, `TAG_MIN_ITEMS = ${TAG_MIN_ITEMS} (ต้องเป็น 3 — build/content.mjs:184)`);
 ok(TAG_MAX_GENRE_OVERLAP === 0.8, `TAG_MAX_GENRE_OVERLAP = ${TAG_MAX_GENRE_OVERLAP} (ต้องเป็น 0.8)`);
 
 /* ---------------- 2 · ได้ 6 แท็กเป๊ะ ---------------- */
