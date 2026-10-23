@@ -11,9 +11,13 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.argv[2]) || 4173;
+/* .mjs ต้องอยู่ในตารางนี้: เบราว์เซอร์ปฏิเสธรัน <script type="module"> ที่ MIME ไม่ใช่ JS
+   ถ้าตกไปใช้ค่าสำรอง application/octet-stream แผงหลังบ้าน /admin/ จะขึ้นเป็นหน้าเปล่า
+   ทั้งที่ไฟล์ไม่ได้พัง · ด่าน: tools/test-serve.mjs */
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
-  '.js': 'text/javascript; charset=utf-8', '.json': 'application/json; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8', '.txt': 'text/plain; charset=utf-8',
   '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.map': 'application/json',

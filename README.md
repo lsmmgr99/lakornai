@@ -15,7 +15,8 @@ node tools/serve.mjs          # เปิดดูที่ http://127.0.0.1:417
 node tools/check-ac.mjs       # ตรวจเกณฑ์ตรวจรับ AIO-22 จากไฟล์ที่ส่งมอบจริง
 node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 66 ข้อ (AC2_PORT/AC2_CDP ตั้งทับได้)
 node tools/test-contrast.mjs  # วัดคอนทราสต์ placeholder ทุกช่องกรอกจากหน้าที่ render จริง (PH_PORT/PH_CDP)
-node tools/test-tags.mjs      # ตรวจแถว chip แท็กผสม 68 ข้อ (AIO-33 · SKIP_BUILD=1 ไม่ต้อง build ก่อน)
+node tools/test-tags.mjs      # ตรวจแถว chip แท็กผสม (AIO-33 · SKIP_BUILD=1 ไม่ต้อง build ก่อน)
+node tools/test-serve.mjs     # ยิงจริงเช็ก MIME ของ .mjs ที่ tools/serve.mjs ส่งออก (SV_PORT ตั้งทับได้)
 node tools/check-mockup.mjs   # ม็อกอัพที่อนุมัติต้องสร้างซ้ำได้เหมือนเดิม (0 ไฟล์เปลี่ยน)
 node tools/smoke.mjs          # เปิดทุกชนิดหน้าในเบราว์เซอร์ เช็ก error + เก็บภาพ
 node ci/rehearse.mjs --head   # ซ้อม CI ทุกขั้นในสำเนาชั่วคราว (ตรวจ V1–V13 → artifact)

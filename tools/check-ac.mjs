@@ -287,5 +287,19 @@ else {
     + ' — มติ "ตัดล็อกอินถาวร" (22 ต.ค.) ว่าด้วยฝั่งผู้ชม ไม่ใช่หลังบ้าน');
 }
 
+/* ---------------- เซิร์ฟเวอร์ดูงานในเครื่อง ----------------
+   ไม่ใช่ของ production แต่เป็นตัวที่ทุกคนใช้เปิดดูของก่อนส่ง — MIME ที่ผิดทำให้
+   แผงหลังบ้านขึ้นเป็นหน้าเปล่าทั้งที่โค้ดไม่พัง (AIO-34 งานเพิ่มจาก CEO)
+   ต้องยิงคำขอจริง การอ่านตาราง TYPES ด้วย regex มองไม่เห็นเส้นค่าสำรอง */
+head('tools/serve.mjs · MIME ของ ES module ที่หลังบ้านใช้');
+const srv = spawnSync(process.execPath, [path.join(ROOT, 'tools/test-serve.mjs')],
+  { encoding: 'utf8', timeout: 120000 });
+const srvOut = (srv.stdout || '') + (srv.stderr || '');
+const srvM = srvOut.match(/ผล: ผ่าน (\d+) · ตก (\d+)/);
+ok(!!srvM && srv.status === 0,
+  srvM ? `tools/test-serve.mjs · ผ่าน ${srvM[1]} ตก ${srvM[2]}` : 'รัน tools/test-serve.mjs ไม่สำเร็จ');
+srvOut.split('\n').filter(l => /content-type/.test(l) && /\.mjs/.test(l)).forEach(l => console.log('     ' + l.trim()));
+if (srvM && +srvM[2] > 0) srvOut.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
+
 console.log(`\n${fail ? '✗ ตก ' + fail + ' ข้อ' : '✓ ผ่านทุกข้อ'} · ตรวจ ${PAGES.length} หน้าจริง + ${STUBS.length} ไฟล์ส่งต่อ (ไม่รวม admin/)`);
 process.exit(fail ? 1 : 0);
