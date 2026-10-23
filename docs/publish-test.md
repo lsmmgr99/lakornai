@@ -135,9 +135,27 @@ git ls-tree --name-only HEAD | head
 git push -u origin preview
 ```
 
-**รอบถัดไป** (`preview` มีอยู่แล้ว `--orphan` จะไม่ยอม): ปิด Pages ตาม §7.2 ก่อน แล้ว
-`git push origin --delete preview` → ลบ worktree เดิม (`git worktree remove /tmp/lakornai-preview`) → ทำ 4.2 ใหม่ทั้งชุด
-ทำแบบนี้เพราะ branch ของรอบทดสอบไม่ต้องมีประวัติ และการเริ่มใหม่ทุกครั้งทำให้ไม่มีไฟล์เก่าค้างในชุดที่ส่งขึ้น
+**รอบถัดไป เมื่อ Pages เปิดอยู่แล้ว — ห้ามลบ branch** (ใช้จริงรอบ AIO-37 · `d223037` → `0200de4`)
+`preview` เป็น **source ของ Pages ที่เปิดค้างอยู่** การลบ branch ตามวิธีเดิมจะถอน source ทิ้งและต้องตั้งใหม่
+โดยไม่ได้อะไรเพิ่ม · วางชุดไฟล์ใหม่เป็นคอมมิตบน branch เดิมแทน ได้ผล "ไม่มีไฟล์เก่าค้าง" เหมือนกัน
+เพราะลบไฟล์ที่ track อยู่ออกทั้งหมดก่อนคัดลอกชุดใหม่ลงไป:
+
+```sh
+git worktree add /tmp/lakornai-preview preview
+cd /tmp/lakornai-preview
+git ls-files -z | xargs -0 rm -f                       # ล้างของเดิมให้หมดก่อน
+find . -mindepth 1 -type d -empty -not -path './.git*' -delete
+cp -a "$ART/." .
+git add -A
+git diff --cached --name-only | grep -cE '^(admin|build|ci|design|docs|tools|\.github|\.claude)/|\.mjs$|\.md$'   # ต้องได้ 0
+git commit -m "preview build $(git -C /root/projects/lsm/lakornai rev-parse --short main) (…)"
+git push origin preview
+```
+
+Pages จะ build เองหลัง push · รอ `status = built` (§4.3-api) ก่อนไล่ด่าน §5 — ระหว่าง `building`
+บางหน้าจะได้ 404 ชั่วคราว ซึ่งไม่ใช่ด่านตก
+
+**รอบแรกสุด / ตอน Pages ยังไม่เปิด** ใช้วิธี `--orphan` ข้างบนได้ตามเดิม
 
 ### 4.3 เปิด Pages — ทำได้ 2 ทาง
 
