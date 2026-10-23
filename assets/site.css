@@ -694,8 +694,10 @@ svg.ico.lg{width:26px;height:26px}
    จึงไม่โดนกฎไหนเลย → ได้สีเริ่มต้นของเบราว์เซอร์ #757575 = 3.73:1 บน --surface-2 (ตก AA)
    บรรทัดล่างสุดเป็น "พื้น" ของทุกช่องกรอกในเว็บ ทั้งที่มีวันนี้และที่เพิ่มวันหน้า
    — author style ชนะ UA style เสมอ จึงไม่ต้องไล่เขียน selector ทีละหน้า
-   แต่มันชนะ `.field input::placeholder{color:var(--faint)}` ของ v2.css:367 ไม่ได้
-   (specificity 0,0,2 vs 0,1,2) กฎ .field จึงยังต้องอยู่คู่กันไว้ ห้ามลบทิ้งข้อใดข้อหนึ่ง
+   แต่มันชนะกฎ .field input::placeholder ของ v2.css:367 (ซึ่งตั้งสีเป็น --faint) ไม่ได้
+   เพราะ specificity ต่ำกว่า (0,0,2 vs 0,1,2) กฎ .field จึงยังต้องอยู่คู่กันไว้
+   ห้ามลบทิ้งข้อใดข้อหนึ่ง · หมายเหตุ: อย่าเขียนรูปกฎ CSS เต็ม ๆ ลงในคอมเมนต์นี้
+   ด่าน --faint ที่ tools/check-ac.mjs:124 อ่านไฟล์ด้วย regex จะนับคอมเมนต์เป็นกฎจริง
    วัดจากหน้าที่ render จริงด้วย tools/test-contrast.mjs — ทั้ง 4 ช่องได้ 5.00:1 */
 input::placeholder,textarea::placeholder{color:var(--dim)}
 .field input::placeholder,.field textarea::placeholder{color:var(--dim)}
