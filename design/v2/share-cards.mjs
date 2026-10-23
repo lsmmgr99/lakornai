@@ -18,7 +18,9 @@
 
    ข้อห้ามบนภาพ (AIO-32 AC-6): ห้ามยอดวิว ห้ามดาว/คะแนน ห้ามคำว่า mockup
    → สคริปต์นี้ไม่ import `views` จาก lib.mjs และมีด่านตรวจข้อความที่ท้ายไฟล์
-   สีทั้งหมดมาจาก design/v2/tokens.css (--accent:#F5C451) ไม่มีการตั้งสีใหม่
+   สีทุกค่าที่มองเห็นมาจาก design/v2/tokens.css (--accent:#F5C451) ไม่มีการตั้งสีใหม่
+   ความโปร่งที่ต้องใช้เฉพาะงานนี้เขียนด้วย color-mix() บน token เดิม ไม่ใช่ค่า rgba ใหม่
+   (`#000` ที่เหลืออยู่ค่าเดียวอยู่ใน mask-image — เป็นค่าความทึบของ mask ไม่ใช่สีที่เห็น)
    ยกเว้นคู่สี c1/c2 ของแต่ละเรื่องที่มาจาก assets/data.js (ใช้เป็นแสงพื้นหลัง)
    ========================================================================== */
 import fs from 'node:fs';
@@ -84,11 +86,13 @@ body{font-family:var(--body);color:var(--fg);-webkit-font-smoothing:antialiased}
 /* ม่าน: ริ้วทองจาง ๆ ไล่หายไปทางซ้าย — ลายเดียวกับหัวข้อ/ขีดทองในเว็บ */
 .curtain{position:absolute;inset:0;
   background:repeating-linear-gradient(90deg,
-    rgba(245,196,81,.075) 0 2px, transparent 2px 26px);
+    color-mix(in srgb, var(--accent) 8%, transparent) 0 2px, transparent 2px 26px);
   mask-image:linear-gradient(90deg, transparent 0 34%, #000 100%);
   -webkit-mask-image:linear-gradient(90deg, transparent 0 34%, #000 100%)}
 .vig{position:absolute;inset:0;
-  background:linear-gradient(90deg, var(--bg) 0 30%, rgba(14,13,18,.72) 52%, rgba(14,13,18,.18) 100%)}
+  background:linear-gradient(90deg, var(--bg) 0 30%,
+    color-mix(in srgb, var(--bg) 72%, transparent) 52%,
+    color-mix(in srgb, var(--bg) 18%, transparent) 100%)}
 /* ขีดทองบนสุด + กรอบเส้นผมรอบใบ */
 .top{position:absolute;left:0;right:0;top:0;height:6px;
   background:linear-gradient(90deg,var(--gold-3),var(--gold-2) 38%,var(--gold-1) 62%,var(--gold-2))}
@@ -131,10 +135,10 @@ h1{font-family:var(--display);font-weight:600;color:var(--fg);letter-spacing:-.5
   overflow:hidden;box-shadow:var(--e3), 0 0 0 1px var(--accent-line);
   background:linear-gradient(165deg,var(--c2) 0%,var(--c1) 58%,var(--bg) 100%)}
 .art img{width:100%;height:100%;object-fit:cover;display:block}
-.art .edge{position:absolute;inset:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);
+.art .edge{position:absolute;inset:0;box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--fg) 8%, transparent);
   border-radius:var(--r-lg)}
 .art .glow{position:absolute;inset:0;
-  background:linear-gradient(200deg, rgba(245,196,81,.16) 0%, transparent 42%)}
+  background:linear-gradient(200deg, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 42%)}
 
 /* ---- default.jpg: หน้าแม่ ---- */
 .hero{text-align:left}
