@@ -1,7 +1,7 @@
 /* วัดคอนทราสต์ของ placeholder "ทุกช่องกรอกในเว็บที่ส่งมอบ" ด้วยเบราว์เซอร์จริง — AIO-34 บั๊ก 4
    รัน:  node tools/test-contrast.mjs
          SKIP_BUILD=1 node tools/test-contrast.mjs     (ตรวจไฟล์ที่มีอยู่ตามสภาพ)
-   ตั้งพอร์ตทับได้ด้วย PH_PORT / PH_CDP เมื่อรันขนานกับ run อื่นใน workspace เดียวกัน
+   ค่าตั้งต้นขอพอร์ตว่างจาก OS เอง · ตั้งทับได้ด้วย PH_PORT / PH_CDP
 
    ทำไมต้องใช้เบราว์เซอร์: assets/site.css เขียนทับตัวเองตอนท้ายไฟล์ (บล็อก build/site-extra.css
    ต่อหลัง design/v2/v2.css) และ placeholder ที่ไม่โดน selector ไหนเลยจะได้ "สีเริ่มต้นของ UA"
@@ -13,13 +13,32 @@
    ที่เพิ่มวันหน้าจะถูกวัดเองโดยไม่ต้องแก้ไฟล์นี้ */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
+import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
-const PORT = +(process.env.PH_PORT || 4189), CDP = +(process.env.PH_CDP || 9445);
+/* พอร์ต — workspace นี้แชร์กับ run อื่น · พอร์ตตายตัวทำให้ด่านค้างเมื่อมีคนถืออยู่ (AIO-42)
+   ⇒ ขอพอร์ตว่างจาก OS เป็นค่าตั้งต้น · ตั้งทับด้วย PH_PORT / PH_CDP ได้เหมือนเดิม
+   ขอทีเดียวทุกตัวแล้วค่อยปล่อยคืนพร้อมกัน: ถ้าปล่อยทีละตัว OS คืนเลขเดิมซ้ำได้
+   แล้ว serve.mjs กับ chrome จะไปชนกันเอง */
+async function freePorts(envNames) {
+  const held = [], ports = [];
+  for (const name of envNames) {
+    if (process.env[name]) { ports.push(+process.env[name]); continue; }
+    const s = await new Promise((res, rej) => {
+      const srv = net.createServer();
+      srv.once('error', rej);
+      srv.listen(0, '127.0.0.1', () => res(srv));
+    });
+    held.push(s); ports.push(s.address().port);
+  }
+  await Promise.all(held.map(s => new Promise(r => s.close(r))));
+  return ports;
+}
+const [PORT, CDP] = await freePorts(['PH_PORT', 'PH_CDP']);
 const PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-ph-'));
 const BASE = `http://127.0.0.1:${PORT}`;
 const MIN = 4.5;                    /* WCAG 2.1 AA · 1.4.3 ข้อความขนาดปกติ */
@@ -59,6 +78,9 @@ const wantFields = found.reduce((a, p) => a + p.n, 0);
 
 /* ---------- 2. เบราว์เซอร์ ---------- */
 const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)], { stdio: 'ignore' });
+/* serve.mjs ตายเองได้ทางเดียวคือ listen ไม่ติด (พอร์ตถูกถือ) — เก็บโค้ดไว้บอกสาเหตุตอนแดง */
+let serverExit = null;
+server.on('exit', code => { serverExit = code === null ? -1 : code; });
 const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dbus',
   `--user-data-dir=${PROFILE}`, `--remote-debugging-port=${CDP}`, '--remote-allow-origins=*', 'about:blank'],
   { stdio: 'ignore' });
@@ -68,6 +90,20 @@ function cleanup(code) {
   try { chrome.kill('SIGTERM'); } catch {}
   try { fs.rmSync(PROFILE, { recursive: true, force: true }); } catch {}
   process.exit(code);
+}
+
+/* รอให้ serve.mjs ของเราขึ้นจริงก่อนเปิดหน้า — ถ้ามีคนถือพอร์ตนั้นอยู่ serve.mjs จะตายทันที
+   แล้ว Page.navigate จะค้างไม่มีกำหนด (เซิร์ฟเวอร์ของคนอื่นรับ connection แต่ไม่ตอบ) — AIO-42
+   ⇒ แดงเร็วพร้อมบอกสาเหตุ ดีกว่าค้างยาว · fetch ต้องมี timeout ด้วยเหตุเดียวกัน */
+let up = false;
+for (let i = 0; i < 80 && serverExit === null; i++) {
+  try { await fetch(BASE + '/', { signal: AbortSignal.timeout(1000) }); up = true; break; }
+  catch { await sleep(125); }
+}
+if (!up) {
+  console.error(`✗ เปิด tools/serve.mjs ที่พอร์ต ${PORT} ไม่ได้` +
+    (serverExit === null ? '' : ` (serve.mjs ออกด้วยโค้ด ${serverExit} — น่าจะมีคนถือพอร์ตอยู่ · ตั้ง PH_PORT เลือกเองได้)`));
+  cleanup(1);
 }
 
 async function wsUrl() {
@@ -82,8 +118,15 @@ async function wsUrl() {
   throw new Error('เชื่อมต่อ chrome ไม่ได้');
 }
 
-const ws = new WebSocket(await wsUrl());
-await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+/* ต่อ CDP ไม่ติดต้องเก็บกวาดด้วย — ปล่อย chrome/serve ค้างไว้คือไปถือพอร์ตให้รันถัดไปแดงต่อ */
+let ws;
+try {
+  ws = new WebSocket(await wsUrl());
+  await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+} catch (e) {
+  console.error('ทดสอบล้ม: ' + (e.message || e));
+  cleanup(1);
+}
 let id = 0; const pending = new Map();
 ws.onmessage = ev => {
   const m = JSON.parse(ev.data);

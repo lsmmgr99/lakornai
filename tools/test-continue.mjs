@@ -3,23 +3,43 @@
    ต้องมี tools/serve.mjs ทำงานอยู่ (สคริปต์นี้เปิดให้เอง) และ Chromium ของ playwright ในเครื่อง
 
    ไล่ทุกบูลเล็ตของ AC-2 ด้วยพฤติกรรมจริง ข้อไหนตกจะ exit 1 พร้อมบอกว่าข้อไหน
-   ตั้งพอร์ตทับได้ด้วย AC2_PORT / AC2_CDP เมื่อรันขนานกับ run อื่นใน workspace เดียวกัน */
+   ค่าตั้งต้นขอพอร์ตว่างจาก OS เอง · ตั้งทับได้ด้วย AC2_PORT / AC2_CDP */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
+import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
-/* พอร์ตและโปรไฟล์เบราว์เซอร์ตั้งทับได้ — workspace นี้แชร์กับ run อื่น
-   พอร์ตเดิมหรือโปรไฟล์ร่วมทำให้การรันค้าง (Reviewer-Codex เจอตอนรันขนานกัน) */
-const PORT = +(process.env.AC2_PORT || 4188), CDP = +(process.env.AC2_CDP || 9444);
+/* พอร์ต — workspace นี้แชร์กับ run อื่น · พอร์ตตายตัวทำให้ด่านค้างเมื่อมีคนถืออยู่ (AIO-42)
+   ⇒ ขอพอร์ตว่างจาก OS เป็นค่าตั้งต้น · ตั้งทับด้วย AC2_PORT / AC2_CDP ได้เหมือนเดิม
+   ขอทีเดียวทุกตัวแล้วค่อยปล่อยคืนพร้อมกัน: ถ้าปล่อยทีละตัว OS คืนเลขเดิมซ้ำได้
+   แล้ว serve.mjs กับ chrome จะไปชนกันเอง (โปรไฟล์เบราว์เซอร์แยกทุกรันอยู่แล้วด้านล่าง) */
+async function freePorts(envNames) {
+  const held = [], ports = [];
+  for (const name of envNames) {
+    if (process.env[name]) { ports.push(+process.env[name]); continue; }
+    const s = await new Promise((res, rej) => {
+      const srv = net.createServer();
+      srv.once('error', rej);
+      srv.listen(0, '127.0.0.1', () => res(srv));
+    });
+    held.push(s); ports.push(s.address().port);
+  }
+  await Promise.all(held.map(s => new Promise(r => s.close(r))));
+  return ports;
+}
+const [PORT, CDP] = await freePorts(['AC2_PORT', 'AC2_CDP']);
 const PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-ac2-'));
 const BASE = `http://127.0.0.1:${PORT}`;
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)], { stdio: 'ignore' });
+/* serve.mjs ตายเองได้ทางเดียวคือ listen ไม่ติด (พอร์ตถูกถือ) — เก็บโค้ดไว้บอกสาเหตุตอนแดง */
+let serverExit = null;
+server.on('exit', code => { serverExit = code === null ? -1 : code; });
 const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dbus',
   `--user-data-dir=${PROFILE}`, `--remote-debugging-port=${CDP}`, '--remote-allow-origins=*', 'about:blank'],
   { stdio: 'ignore' });
@@ -29,6 +49,21 @@ function cleanup(code) {
   try { chrome.kill('SIGTERM'); } catch {}
   try { fs.rmSync(PROFILE, { recursive: true, force: true }); } catch {}
   process.exit(code);
+}
+
+/* รอให้ serve.mjs ของเราขึ้นจริงก่อนเปิดหน้า — ถ้ามีคนถือพอร์ตนั้นอยู่ serve.mjs จะตายทันที
+   แล้ว Page.navigate จะค้างไม่มีกำหนด (เซิร์ฟเวอร์ของคนอื่นรับ connection แต่ไม่ตอบ)
+   นี่คืออาการที่ทำให้ check-ac.mjs นับ AC-2 เป็น "ตก" ตอนหมดเวลา 480 วิ (AIO-42)
+   ⇒ แดงเร็วพร้อมบอกสาเหตุ ดีกว่าค้างยาวแล้วแดงแบบไม่มีเหตุผล · fetch ต้องมี timeout ด้วยเหตุเดียวกัน */
+let up = false;
+for (let i = 0; i < 80 && serverExit === null; i++) {
+  try { await fetch(BASE + '/', { signal: AbortSignal.timeout(1000) }); up = true; break; }
+  catch { await sleep(125); }
+}
+if (!up) {
+  console.error(`✗ เปิด tools/serve.mjs ที่พอร์ต ${PORT} ไม่ได้` +
+    (serverExit === null ? '' : ` (serve.mjs ออกด้วยโค้ด ${serverExit} — น่าจะมีคนถือพอร์ตอยู่ · ตั้ง AC2_PORT เลือกเองได้)`));
+  cleanup(1);
 }
 
 async function wsUrl() {
@@ -43,8 +78,15 @@ async function wsUrl() {
   throw new Error('เชื่อมต่อ chrome ไม่ได้');
 }
 
-const ws = new WebSocket(await wsUrl());
-await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+/* ต่อ CDP ไม่ติดต้องเก็บกวาดด้วย — ปล่อย chrome/serve ค้างไว้คือไปถือพอร์ตให้รันถัดไปแดงต่อ */
+let ws;
+try {
+  ws = new WebSocket(await wsUrl());
+  await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+} catch (e) {
+  console.error('ทดสอบล้ม: ' + (e.message || e));
+  cleanup(1);
+}
 let id = 0; const pending = new Map();
 ws.onmessage = ev => {
   const m = JSON.parse(ev.data);

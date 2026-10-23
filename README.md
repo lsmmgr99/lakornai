@@ -13,8 +13,10 @@
 node build/build.mjs          # สร้างเว็บทั้งเว็บใหม่ (464 หน้า) — ล้มทันทีถ้าตกเกณฑ์ on-page
 node tools/serve.mjs          # เปิดดูที่ http://127.0.0.1:4173
 node tools/check-ac.mjs       # ตรวจเกณฑ์ตรวจรับ AIO-22 จากไฟล์ที่ส่งมอบจริง
-node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 66 ข้อ (AC2_PORT/AC2_CDP ตั้งทับได้)
-node tools/test-contrast.mjs  # วัดคอนทราสต์ placeholder ทุกช่องกรอกจากหน้าที่ render จริง (PH_PORT/PH_CDP)
+node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 66 ข้อ (ขอพอร์ตว่างจาก OS เอง ·
+                              # AC2_PORT/AC2_CDP ตั้งทับได้ · ~22 วินาที)
+node tools/test-contrast.mjs  # วัดคอนทราสต์ placeholder ทุกช่องกรอกจากหน้าที่ render จริง
+                              # (ขอพอร์ตว่างจาก OS เอง · PH_PORT/PH_CDP ตั้งทับได้)
 node tools/test-tags.mjs      # ตรวจแถว chip แท็กผสม (AIO-33 · SKIP_BUILD=1 ไม่ต้อง build ก่อน)
 node tools/test-layout.mjs    # ฮีโร่หน้าแรก 5 ขนาดจอ เทียบม็อกอัพที่อนุมัติ + self-test ตัวกวาด
                               # + กวาดทุกหน้าหา element ที่ display:inline แต่ตั้ง height/width/
