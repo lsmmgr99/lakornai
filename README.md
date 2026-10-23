@@ -16,6 +16,9 @@ node tools/check-ac.mjs       # ตรวจเกณฑ์ตรวจรับ
 node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วยเบราว์เซอร์จริง 66 ข้อ (AC2_PORT/AC2_CDP ตั้งทับได้)
 node tools/test-contrast.mjs  # วัดคอนทราสต์ placeholder ทุกช่องกรอกจากหน้าที่ render จริง (PH_PORT/PH_CDP)
 node tools/test-tags.mjs      # ตรวจแถว chip แท็กผสม (AIO-33 · SKIP_BUILD=1 ไม่ต้อง build ก่อน)
+node tools/test-layout.mjs    # ฮีโร่หน้าแรก 5 ขนาดจอ เทียบม็อกอัพที่อนุมัติ + กวาดทุกหน้าหา
+                              # element ที่ display:inline แต่ตั้ง height/aspect-ratio (AIO-37
+                              # ONLY=hero|sweep · STRICT=1 · LAY_PORT/LAY_CDP ตั้งทับได้ · ~5 นาที)
 node tools/test-serve.mjs     # ยิงจริงเช็ก MIME ของ .mjs ที่ tools/serve.mjs ส่งออก (SV_PORT ตั้งทับได้)
 node tools/check-mockup.mjs   # ม็อกอัพที่อนุมัติต้องสร้างซ้ำได้เหมือนเดิม (0 ไฟล์เปลี่ยน)
 node tools/smoke.mjs          # เปิดทุกชนิดหน้าในเบราว์เซอร์ เช็ก error + เก็บภาพ

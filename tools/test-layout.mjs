@@ -312,6 +312,10 @@ try {
       }
       const h0 = got.heroes[0], r0 = ref.heroes[0];
       const limit = Math.round(vp.h * MAX_BOTTOM_RATIO);
+      /* เงื่อนไขเข้าข่าย "รอมติ" ได้: ฮีโร่ของเว็บจริงต้องสูงเท่าแบบทุกสไลด์แล้วจริง ๆ
+         ไม่อย่างนั้นหน้าที่พังหนักกว่าแบบ (ฮีโร่ 1872px) จะหลุดไปอยู่กองรอมติ
+         ทั้งที่เป็น regression เต็มตัว — ข้อที่ไม่เข้าข่ายต้องเป็น ✗ เสมอ */
+      const heightParity = got.heroes.every(h => Math.abs(h.height - r0.height) <= 1);
       console.log(`    แบบที่อนุมัติ : ${r0.bg.tag}/${r0.bg.display} · ฮีโร่ ${r0.height}px`
         + ` · ขอบล่าง y=${r0.bottom} (${(r0.bottom / vp.h * 100).toFixed(1)}%)`
         + ` · แถวถัดไป y=${ref.next ? ref.next.top : '-'} เห็น ${ref.next ? ref.next.visible : '-'}px`);
@@ -355,7 +359,7 @@ try {
         const refOkBottom = r0.bottom <= limit;
         if (okBottom) {
           check(`${vp.w}×${vp.h} · ขอบล่างฮีโร่ y=${h0.bottom} ≤ ${limit} (${MAX_BOTTOM_RATIO * 100}% ของจอ)`, true);
-        } else if (!refOkBottom && h0.bottom <= r0.bottom + DOTS_SLACK) {
+        } else if (!refOkBottom && heightParity && h0.bottom <= r0.bottom + DOTS_SLACK) {
           /* แบบที่อนุมัติเองก็เกินเพดานนี้ที่ขนาดจอนี้ → ไม่ใช่ regression ของรอบนี้ */
           pendingCheck(`${vp.w}×${vp.h} · ขอบล่างฮีโร่ y=${h0.bottom} > ${limit} (เกณฑ์ข้อ 1)`,
             `ม็อกอัพที่อนุมัติได้ y=${r0.bottom} (${(r0.bottom / vp.h * 100).toFixed(1)}%) เท่ากัน`
@@ -377,10 +381,11 @@ try {
         check(`${vp.w}×${vp.h} · แถวถัดไปโผล่ไม่น้อยกว่าม็อกอัพ (${got.next.visible}px vs ${ref.next.visible}px)`,
           got.next.visible >= ref.next.visible - DOTS_SLACK,
           `เว็บจริง ${got.next.visible}px · แบบ ${ref.next.visible}px`);
+        const faithful = heightParity && got.next.visible >= ref.next.visible - DOTS_SLACK;
         if (!isMobile) {
           if (got.next.visible >= MIN_NEXT_VISIBLE) {
             check(`${vp.w}×${vp.h} · แถวถัดไปเห็นในจอแรก ${got.next.visible}px ≥ ${MIN_NEXT_VISIBLE}px`, true);
-          } else if (ref.next.visible < MIN_NEXT_VISIBLE) {
+          } else if (faithful && ref.next.visible < MIN_NEXT_VISIBLE) {
             pendingCheck(`${vp.w}×${vp.h} · แถวถัดไปเห็นในจอแรก ${got.next.visible}px < ${MIN_NEXT_VISIBLE}px (เกณฑ์ข้อ 2)`,
               `ม็อกอัพที่อนุมัติได้ ${ref.next.visible}px ที่ขนาดจอเดียวกัน`
               + ` · เพิ่มได้ต่อเมื่อลดความสูงฮีโร่หรือระยะเหนือฮีโร่ในแบบ`);
