@@ -5,6 +5,7 @@
    รัน:  node design/v2/share-cards.mjs              → HTML + JPEG ครบ 13 ใบ
          node design/v2/share-cards.mjs --html       → สร้าง HTML อย่างเดียว (ไม่เปิด chrome)
          node design/v2/share-cards.mjs durian       → เรนเดอร์เฉพาะไฟล์ที่ชื่อมีคำนั้น
+         node design/v2/share-cards.mjs --sheet      → เพิ่มแผ่นรวมทั้งชุด design/v2/share-sheet.jpg (ไว้ส่งตรวจ)
          SHARE_PORT=9401 node design/v2/share-cards.mjs   → เปลี่ยนพอร์ต CDP ถ้าชนกับ run อื่น
 
    ของที่เขียนออก  (2 ที่เท่านั้น)
@@ -247,6 +248,38 @@ function defaultCard() {
   });
 }
 
+/* ---- แผ่นรวม (--sheet) · ไว้ส่งให้ตรวจทั้งชุดในภาพเดียว
+   ออกที่ design/v2/share-sheet.jpg ไม่ใช่ assets/share/ เพราะไม่ใช่ไฟล์ที่เว็บใช้ ---- */
+const SHEET_W = 1616, SHEET_H = 1104;
+function sheetCard(names) {
+  const tile = n => `
+    <figure><img src="../../../assets/share/${n}.jpg" alt=""><figcaption>${n}.jpg</figcaption></figure>`;
+  return `<!doctype html>
+<html lang="th"><head>
+<meta charset="utf-8">
+<title>ภาพแชร์ 1200×630 ทั้งชุด · LakornAI</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:${SHEET_W}px;height:${SHEET_H}px;overflow:hidden;background:var(--bg);
+  font-family:var(--body);color:var(--fg)}
+.pad{padding:22px 24px}
+h1{font-family:var(--display);font-weight:600;font-size:24px;margin-bottom:4px}
+.note{font-size:15px;color:var(--muted);margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(4,380px);gap:14px 16px}
+figure{width:380px}
+figure img{width:380px;height:199.5px;display:block;border-radius:8px;
+  border:1px solid var(--line-2)}
+figcaption{font-size:13px;color:var(--dim);margin-top:5px;font-variant-numeric:tabular-nums}
+</style>
+</head><body><div class="pad">
+<h1>ภาพแชร์ 1200×630 (og:image) — ${names.length} ใบ</h1>
+<p class="note">assets/share/ · สร้างด้วย node design/v2/share-cards.mjs · ย่อจากไฟล์จริงเพื่อดูทั้งชุดในภาพเดียว</p>
+<div class="grid">${names.map(tile).join('')}</div>
+</div></body></html>
+`;
+}
+
 /* ============================ 1. เขียน HTML ============================ */
 fs.mkdirSync(SRC, { recursive: true });
 fs.mkdirSync(OUT, { recursive: true });
@@ -276,11 +309,20 @@ for (const c of CARDS) {
     if (hit) throw new Error(`${c.name}.html มี${what} ("${hit[0]}") — AIO-32 AC-6 ห้าม`);
   }
   if (!c.html.includes(FREE_LINE)) throw new Error(`${c.name}.html ไม่มีถ้อยคำทางการ`);
+  c.w = W; c.h = H; c.cap = MAX_BYTES; c.out = path.join(OUT, `${c.name}.jpg`);
   fs.writeFileSync(path.join(SRC, `${c.name}.html`), c.html);
 }
 console.log(`HTML ${CARDS.length} ไฟล์ → design/v2/share-src/`);
 
 const shots = CARDS.filter(c => !filter || c.name.includes(filter));
+if (args.includes('--sheet')) {
+  /* แผ่นรวมเป็นของสำหรับตรวจงาน ไม่ใช่ภาพแชร์ — ไม่ต้องมีถ้อยคำทางการและไม่เข้าลิมิต 300 KB */
+  fs.writeFileSync(path.join(SRC, 'sheet.html'), sheetCard(CARDS.map(c => c.name)));
+  shots.push({
+    name: 'sheet', w: SHEET_W, h: SHEET_H, cap: 4 * 1024 * 1024,
+    out: path.join(DIR, 'share-sheet.jpg'),
+  });
+}
 if (htmlOnly) {
   console.log('--html: ข้ามการเรนเดอร์');
   process.exit(0);
@@ -327,14 +369,15 @@ const send = (method, params = {}) => new Promise((res, rej) => {
 
 await send('Page.enable');
 await send('Runtime.enable');
-await send('Emulation.setDeviceMetricsOverride', {
-  width: W, height: H, deviceScaleFactor: 1, mobile: false, screenWidth: W, screenHeight: H,
-});
-
 let n = 0, fail = 0;
 const report = [];
 for (const c of shots) {
   try {
+    /* viewport ของใบนั้นเป๊ะ ๆ · ภาพแชร์ 1200×630 @1x (แผ่นรวมใช้ขนาดของตัวเอง) */
+    await send('Emulation.setDeviceMetricsOverride', {
+      width: c.w, height: c.h, deviceScaleFactor: 1, mobile: false,
+      screenWidth: c.w, screenHeight: c.h,
+    });
     await send('Page.navigate', { url: `file://${path.join(SRC, `${c.name}.html`)}` });
     /* รอ: โหลดเสร็จ + ฟอนต์ไทยพร้อม + ปกถอดรหัสเสร็จ + สคริปต์ย่อหัวเรื่องทำงานจบ */
     let ready = false;
@@ -342,7 +385,7 @@ for (const c of shots) {
       const r = await send('Runtime.evaluate', {
         expression: `(document.readyState==='complete') && (document.fonts.status==='loaded')
           && [...document.images].every(im=>im.complete && im.naturalWidth>0)
-          && document.documentElement.dataset.fit==='done'`,
+          && (document.documentElement.dataset.fit==='done' || !document.querySelector('h1[data-size]'))`,
         returnByValue: true,
       });
       if (r.result && r.result.value === true) { ready = true; break; }
@@ -355,15 +398,15 @@ for (const c of shots) {
     for (const q of QUALITY) {
       const { data } = await send('Page.captureScreenshot', {
         format: 'jpeg', quality: q,
-        clip: { x: 0, y: 0, width: W, height: H, scale: 1 }, captureBeyondViewport: false,
+        clip: { x: 0, y: 0, width: c.w, height: c.h, scale: 1 }, captureBeyondViewport: false,
       });
       buf = Buffer.from(data, 'base64'); used = q;
-      if (buf.length <= MAX_BYTES) break;
+      if (buf.length <= c.cap) break;
     }
-    if (buf.length > MAX_BYTES) throw new Error(`ย่อแล้วยังเกิน 300 KB (${buf.length} B)`);
-    fs.writeFileSync(path.join(OUT, `${c.name}.jpg`), buf);
+    if (buf.length > c.cap) throw new Error(`ย่อแล้วยังเกินลิมิต ${(c.cap / 1024).toFixed(0)} KB (${buf.length} B)`);
+    fs.writeFileSync(c.out, buf);
     n++;
-    report.push(`${c.name}.jpg  q${used}  ${(buf.length / 1024).toFixed(0)} KB`);
+    report.push(`${path.basename(c.out).padEnd(30)} ${c.w}×${c.h}  q${used}  ${(buf.length / 1024).toFixed(0)} KB`);
   } catch (e) {
     fail++;
     console.log(`เรนเดอร์ไม่สำเร็จ: ${c.name} — ${e.message}`);
