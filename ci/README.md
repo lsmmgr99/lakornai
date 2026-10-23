@@ -34,7 +34,9 @@ commit ที่แตะ content.json หรือ assets/covers/**
 | `.github/workflows/content-ci.yml` | ตัวปลุกและลำดับขั้นที่รันจริง | DevOps |
 | `ci/pipeline.mjs` | ลำดับขั้นเขียนที่เดียว · YAML/README/ตัวซ้อมอ้างอันนี้ | DevOps |
 | `ci/views-gate.mjs` | ด่าน **V12–V13** (§6.4 + §12.3) — กฎของ *ผลผลิต build* ไม่ใช่ของไฟล์ข้อมูล | DevOps |
-| `ci/stage-artifact.mjs` | คัดไฟล์ที่ผู้ชมต้องได้ แล้วพิสูจน์ว่า `admin/` `build/` `ci/` `design/` `docs/` `tools/` ไม่ติดไปด้วย | DevOps |
+| `ci/site-files.mjs` | ขอบเขตของ "ไฟล์ที่เป็นของเว็บ" — คัดทุกชั้นของพาธ ไม่ใช่แค่ชั้นราก | DevOps |
+| `ci/stage-artifact.mjs` | คัดไฟล์ที่ผู้ชมต้องได้ แล้วเรียกด่านพิสูจน์ชุดไฟล์ทับอีกชั้น | DevOps |
+| `ci/publish-gate.mjs` | **ด่านพิสูจน์ชุดไฟล์ที่ส่งขึ้น** (AIO-36) — เดินไฟล์ดิบในชุดจริง ใช้เดี่ยว ๆ ได้ | DevOps |
 | `ci/rehearse.mjs` | ซ้อมทุกขั้นในเครื่อง ในสำเนาชั่วคราว | DevOps |
 | `ci/publish-branches.json` | แหล่งความจริงเดียวของ "branch ที่เส้นทางเผยแพร่ใช้" (ข้อ B9) | DevOps |
 | `admin/check.mjs` + `admin/validate.mjs` | ด่าน **V1–V11** — เป็น *ตัวตรวจร่วม* กับแผง admin ตาม §9.2 | Dev-Codex |
@@ -128,13 +130,45 @@ CI นี้ **ไม่ได้แทน** เส้นทางส่งอ�
 
 ## สิ่งที่ artifact มีและไม่มี
 
-มี: ไฟล์ `.html` ทุกหน้า (รวม redirect stub) · `assets/` · `robots.txt` · `sitemap.xml` · `redirects.map` (ตาราง 301 ให้คนตั้งเซิร์ฟเวอร์)
+มี: ไฟล์ `.html` ทุกหน้า (รวม redirect stub) · `assets/` · `robots.txt` · `sitemap.xml` · `redirects.map` (ตาราง 301 ให้คนตั้งเซิร์ฟเวอร์) · `.nojekyll`
 
-ไม่มี: `admin/` (รวม broker) · `build/` · `ci/` · `design/` · `docs/` · `tools/` · `content.json` · ไฟล์ `.mjs` ใด ๆ
+ไม่มี: `admin/` (รวม broker) · `build/` · `ci/` · `design/` · `docs/` · `tools/` · `.github/` ·
+โฟลเดอร์/ไฟล์ที่ขึ้นต้นด้วยจุด (`.claude/` `.DS_Store` …) ยกเว้น `.nojekyll` และ `.well-known/` ·
+`content.json` · ไฟล์ `.mjs` ใด ๆ · ไฟล์ `.md` (บันทึกภายใน เช่น `assets/share/README.md`) · symlink
 
-`ci/stage-artifact.mjs` ไม่เชื่อ allowlist ของตัวเอง — หลังคัดลอกแล้วมันเดินไฟล์ที่ได้จริงอีกรอบ
-และล้มถ้าพบโฟลเดอร์ต้องห้าม ไฟล์ `.mjs` ชื่อไฟล์ที่เข้าข่าย credential หรือจำนวนหน้า HTML น้อยกว่าที่ควร
+`ci/stage-artifact.mjs` ไม่เชื่อ allowlist ของตัวเอง — หลังคัดลอกแล้วมันเดินไฟล์ที่ได้จริงอีกรอบด้วย
+`allFiles()` ของ `ci/publish-gate.mjs` และล้มถ้าพบของต้องห้าม ขาดไฟล์ที่ต้องมี หรือจำนวนหน้า HTML น้อยกว่าที่ควร
 (เหตุผล: แผง admin กับ broker อยู่ในรีโปเดียวกับเว็บ ถ้ามันหลุดเข้า artifact มันจะกลายเป็นหน้าเว็บสาธารณะพร้อมปลายทาง API)
+
+**ยามต้องเดินไฟล์ดิบ ไม่ใช่รายชื่อที่ถูกกรองแล้ว** — ยามรุ่นก่อนอ่านรายชื่อจาก `siteFiles(dest)` ซึ่งตัด
+โฟลเดอร์ต้องห้ามออกไปก่อนแล้ว ของที่หลุดเข้า artifact จึงไม่เคยปรากฏในรายชื่อที่ยามเห็น = ยามนั้นจับอะไรไม่ได้เลย
+มิวเทชันเทสต์ที่ `ci/publish-gate.test.mjs` ตรึงข้อนี้ไว้ (แอบใส่ `admin/index.html` เข้าชุด → ด่านต้องแดง)
+
+## ด่านพิสูจน์ชุดไฟล์ที่ส่งขึ้น (AIO-36)
+
+```sh
+node ci/publish-gate.mjs --plan .                    # ชุดที่ "จะ" ขึ้นมีอะไร โดยไม่ต้อง build
+node ci/publish-gate.mjs _artifact                   # ตรวจชุดที่จัดไว้แล้วจริง (เดินไฟล์ดิบ)
+node ci/publish-gate.mjs _artifact --expect-noindex  # บังคับ robots.txt ให้ยัง Disallow ทั้งเว็บ (รอบทดสอบ)
+node --test ci/publish-gate.test.mjs                 # เทสต์ของด่าน รวมมิวเทชันเทสต์
+```
+
+พิมพ์ทั้ง "มีอะไร" (จำนวนไฟล์ · ขนาด · แยกตามนามสกุล · รายการที่ราก · ไฟล์ที่ต้องมีครบ)
+และ "ไม่มีอะไร" (ไล่ยืนยันทีละโฟลเดอร์/กฎ) แล้วคืน exit code ที่ใช้ในสคริปต์ได้
+
+ด่านนี้ **ไม่ publish ไม่ deploy** · ขั้นตอนของวันขึ้นทดสอบจริงอยู่ที่ `docs/publish-test.md`
+
+## URL ของรอบทดสอบ: `SITE_ORIGIN`
+
+`build/seo.mjs` อ่าน `SITE_ORIGIN` จาก env ได้ ค่าตั้งต้นยังเป็น `https://lakornai.tv` เหมือนเดิมเมื่อไม่ส่ง env
+
+```sh
+SITE_ORIGIN=https://lsmmgr99.github.io/lakornai node build/build.mjs
+```
+
+canonical · `og:url` · `og:image` · `twitter:image` · `sitemap.xml` · JSON-LD `@id` · canonical ใน redirect stub
+ตามค่านี้ทั้งชุด · รองรับ origin ที่มี path ต่อท้ายโดยไม่เกิด `//` ซ้อน และค่าที่ใช้ไม่ได้ทำให้ build ล้มทันที
+เทสต์: `node --test ci/site-origin.test.mjs` (build ทั้งเว็บในสำเนาชั่วคราว แล้ววัดจากไฟล์ที่เขียนออกมาจริง)
 
 ## ของที่ CI นี้ยังไม่ได้ทำ และตั้งใจไม่ทำในงานนี้
 
