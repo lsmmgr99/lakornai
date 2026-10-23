@@ -35,7 +35,9 @@ const ok = (c, msg) => { console.log(`  ${c ? '✓' : '✗'} ${msg}`); if (!c) f
 const head = t => console.log('\n' + t);
 /* ด่านลูกที่แดงก่อนพิมพ์บรรทัด "ผล: ..." เคยถูกรายงานว่า "ต้องมี Chromium" ทุกกรณี
    ทั้งที่เหตุจริงอาจเป็นพอร์ตถูกคนอื่นถือ · chrome ตายกลางทาง · หรือ serve.mjs ตาย
-   ⇒ ข้อความดี ๆ ที่ด่านลูกพิมพ์ไว้ต้องไปถึงคนอ่านผล check-ac (รีวิว AIO-45 C6) */
+   ⇒ ข้อความดี ๆ ที่ด่านลูกพิมพ์ไว้ต้องไปถึงคนอ่านผล check-ac (รีวิว AIO-45 C6)
+   หัวข้อความต้องเป็นกลางด้วย ไม่ใช่เดาสาเหตุหนึ่งไว้ล่วงหน้าแล้วต่อเหตุจริงไว้ข้างหลัง
+   (รีวิว AIO-48 · ข้อสังเกตเพิ่มเติม) */
 const why = (r, out) => {
   const last = out.trim().split('\n').filter(l => l.trim()).slice(-3).map(l => l.trim());
   return ` · ตัวด่านออกด้วย ${r.status === null ? 'สัญญาณ ' + r.signal : 'โค้ด ' + r.status}`
@@ -74,7 +76,7 @@ if (process.env.SKIP_BROWSER) {
   const m = out.match(/ผล: ผ่าน (\d+) · ตก (\d+)/);
   ok(!!m && r.status === 0,
     m ? `tools/test-continue.mjs · ผ่าน ${m[1]} ตก ${m[2]}`
-      : 'รัน tools/test-continue.mjs ไม่สำเร็จ (ต้องมี Chromium ของ playwright ในเครื่อง)' + why(r, out));
+      : 'รัน tools/test-continue.mjs ไม่สำเร็จ' + why(r, out));
   if (!m || +m[2] > 0) out.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
 }
 const hand = PAGES.filter(f => /(ดูไปแล้ว \d+%|ดูต่อ EP\.\d+|EP\.\d+\/\d+ ·)/.test(read(f)));
@@ -153,7 +155,7 @@ if (process.env.SKIP_BROWSER) {
   ok(!!m && c.status === 0,
     m ? `tools/test-contrast.mjs · ผ่าน ${m[1]} ตก ${m[2]}`
       + (low ? ` · คอนทราสต์ placeholder ต่ำสุด ${low[1]}:1 ที่ ${low[2]}` : '')
-      : 'รัน tools/test-contrast.mjs ไม่สำเร็จ (ต้องมี Chromium ของ playwright ในเครื่อง)' + why(c, out));
+      : 'รัน tools/test-contrast.mjs ไม่สำเร็จ' + why(c, out));
   out.split('\n').filter(l => /^\s+[✓✗] \//.test(l)).forEach(l => console.log('     ' + l.trim()));
   if (!m || +m[2] > 0) out.split('\n').filter(l => l.includes('✗')).forEach(l => console.log('     ' + l.trim()));
 }

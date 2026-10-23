@@ -20,10 +20,14 @@ import { startGate } from './cdp-gate.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MIN = 4.5;                    /* WCAG 2.1 AA · 1.4.3 ข้อความขนาดปกติ */
 
+/* process.execPath ไม่ใช่ 'node' จาก PATH (ต้องเป็น node ตัวเดียวกับที่รันด่านนี้) และต้องมีเพดาน
+   — กฎข้อ 1 ของ tools/cdp-gate.mjs คือ "ทุกการรอมีเพดาน" แต่บรรทัดนี้อยู่ก่อนตัวร่วมถูกเรียก
+   และทุกเคสของ tools/test-ports.mjs ตั้ง SKIP_BUILD=1 ⇒ ไม่มีด่านไหนเดินผ่าน (รีวิว AIO-47 C6) */
 if (!process.env.SKIP_BUILD) {
-  const r = spawnSync('node', ['build/build.mjs'], { cwd: ROOT, encoding: 'utf8' });
+  const r = spawnSync(process.execPath, ['build/build.mjs'], { cwd: ROOT, encoding: 'utf8', timeout: 120000 });
   if (r.status !== 0) {
-    console.error('✗ build/build.mjs ล้ม — วัดไฟล์ที่ส่งมอบต่อไม่ได้\n' + (r.stderr || r.stdout));
+    console.error('✗ build/build.mjs ล้ม — วัดไฟล์ที่ส่งมอบต่อไม่ได้' +
+      (r.error ? ` (${r.error.message})` : '') + '\n' + (r.stderr || r.stdout || ''));
     process.exit(1);
   }
 }
