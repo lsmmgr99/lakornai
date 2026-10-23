@@ -29,10 +29,15 @@ export function buildHome() {
   const heroes = TOP10.slice(0, 3);
 
   const body = L => {
+    /* `.bg` ต้องเป็น <div> ตามแบบที่อนุมัติ (design/v2/pages-discovery.mjs:30) ห้ามเปลี่ยนเป็น <span>
+       span เป็น inline non-replaced → CSS height / aspect-ratio ของ `.hero .bg`
+       (assets/site.css จาก design/v2/v2.css:245,263,269) ไม่มีผลเลยทั้งคู่ · computed style
+       ยังรายงาน 480px ตามที่เขียนไว้ แต่กล่องจริงถอยไปใช้สัดส่วนไฟล์ปก 1024×1536
+       → ฮีโร่สูง 1872px บนเดสก์ท็อป ดันทุกแถวตกจอ (AIO-37) · ด่าน: tools/test-layout.mjs */
     const hero = `<section class="sec hero-sec" aria-label="เรื่องเด่นประจำสัปดาห์">
       <div class="hero-track" id="heroTrack">${heroes.map((s, i) => `
         <article class="hero" id="hero-${i + 1}">
-          <span class="bg">${coverImg(L, s, { lazy: i > 0 })}</span>
+          <div class="bg">${coverImg(L, s, { lazy: i > 0 })}</div>
           <div class="body">
             <span class="kick">${ic('sparkle', 'sm')} เรื่องเด่นประจำสัปดาห์</span>
             <h2><a href="${L(U.series(s.slug))}">${esc(s.title)}</a></h2>
