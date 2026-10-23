@@ -233,6 +233,7 @@ export async function startGate({ envPorts, profilePrefix }) {
   await send('Runtime.enable');
 
   async function evaluate(expr) {
+    alive();                      /* ลูกตายแล้วต้องรู้ทันที ไม่ใช่รอ timeout ของคำสั่ง 30 วินาที */
     const r = await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true });
     if (r.exceptionDetails) throw new Error(r.exceptionDetails.exception?.description || 'js error');
     return r.result.value;

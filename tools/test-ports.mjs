@@ -250,16 +250,19 @@ await caseOf('พอร์ต CDP มี chrome ของ run อื่นตอ
 /* ---------- 5. chrome ตายกลางทาง (รีวิว AIO-43 R2) ---------- */
 /* ฆ่าเฉพาะ chrome ที่เป็นลูกของด่านที่เราเพิ่ง spawn เอง — ไม่แตะ chrome ของ run อื่นในกล่องนี้
    ก่อนแก้: ws ปิดแล้ว promise ใน pending ไม่ถูก settle ⇒ ค้างเงียบจนคนมาฆ่า */
+/* เพดาน 20 วินาทีไม่ใช่เลขสวย ๆ: ด่านที่ยังมีการแก้ครบจะแดงใน ~3 วินาที (วัดแล้ว 2.7–3.1)
+   เพราะรู้ว่า chrome ตายจาก 'exit' ของลูกตัวเอง · ถ้าถอด onclose/onerror → wsDie ออก
+   จะเหลือทางเดียวคือรอ timeout ของคำสั่ง (30 วินาที) ⇒ เกินเพดานนี้แล้วด่านนี้แดง */
 await caseOf('chrome ถูกฆ่ากลางทาง (จำลอง OOM-kill ในกล่องที่รันหลาย run พร้อมกัน)', async () => {
   for (const g of MID) {
     let killed = 0;
-    const r = await runGate(g, {}, 60000, ctx => {
+    const r = await runGate(g, {}, 20000, ctx => {
       if (killed || !ctx.out.includes('✓')) return;          /* รอให้ CDP ทำงานแล้วจริงก่อน */
       const p = ctx.kid(/chrome/);
       if (p) { killTree(p, 'SIGKILL'); killed = p; }
     });
     check(`${r.file} · ฆ่า chrome ของด่านได้จริง (ไม่ใช่เคสที่ด่านจบไปก่อน)`, killed > 0, `pid=${killed}`);
-    expectRed('chrome ตายกลางทาง', r, 60000, /CDP/);
+    expectRed('chrome ตายกลางทาง', r, 20000, /CDP|chrome ตายกลางทาง/);
     notMisleading(r);
   }
 });
@@ -295,6 +298,27 @@ await caseOf('chrome ถูก SIGSTOP กลางทาง (socket เปิ�
     });
     check(`${r.file} · หยุด chrome ของด่านได้จริง`, stopped > 0, `pid=${stopped}`);
     expectRed('CDP ไม่ตอบคำสั่งแต่ socket ยังเปิด', r, 75000, 'CDP ไม่ตอบคำสั่ง');
+    notMisleading(r);
+  }
+});
+
+/* ---------- 7ข. CDP เงียบ "ขณะอยู่ในลูปรอหน้า" โดยเฉพาะ ---------- */
+/* เคส 7 หยุด chrome ตอนข้อแรกผ่านแล้ว ซึ่งคำสั่งถัดไปมักเป็น evaluate เดี่ยว ๆ (ไม่มีใครกลืน error)
+   ⇒ วัดไม่ได้ว่าลูปรอหน้า "ไม่กลืน timeout แล้วส่งซ้ำ" จริงไหม (วัดแล้ว: ถอดป้าย fatal ออก
+   เคส 7 ยังเขียว) · จังหวะที่การันตีว่าอยู่ในลูปคือทันทีหลังด่านพิมพ์หัวเรื่อง เพราะคำสั่งแรก
+   หลังจากนั้นคือ go('/') = Page.navigate แล้วเข้าลูป evaluate
+   สมบัติที่ยืนยันเป็นจริงทั้งสองจังหวะเมื่อการแก้ยังอยู่ (ทั้งตอนค้างที่ navigate และตอนค้างในลูป)
+   ⇒ เคสนี้ไม่แดงมั่ว แต่จะจับการถอยได้เมื่อค้างตกในลูป (รีวิว AIO-46 R3) */
+await caseOf('chrome ถูก SIGSTOP ขณะด่านกำลังรอหน้าแรก (ลูปรอหน้าห้ามกลืน timeout แล้วส่งซ้ำ)', async () => {
+  for (const g of MID) {
+    let stopped = 0;
+    const r = await runGate(g, {}, 75000, ctx => {
+      if (stopped || !/เบราว์เซอร์จริงที่/.test(ctx.out) || ctx.out.includes('✓')) return;
+      const p = ctx.kid(/chrome/);
+      if (p) { try { process.kill(p, 'SIGSTOP'); stopped = p; } catch { /* ตายแล้ว */ } }
+    });
+    check(`${r.file} · หยุด chrome ได้ก่อนข้อแรกผ่าน (คือขณะรอหน้าแรก)`, stopped > 0, `pid=${stopped}`);
+    expectRed('CDP เงียบขณะรอหน้าแรก', r, 75000, 'CDP ไม่ตอบคำสั่ง');
     notMisleading(r);
   }
 });
