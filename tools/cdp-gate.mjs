@@ -70,6 +70,14 @@ export const T = {
   CENSUS: 200,         /* จดลูกหลานทุกกี่มิลลิวินาที (ต้องจดก่อนแม่ตาย ไม่ใช่ตอนเก็บกวาด) */
 };
 
+/* บรรทัด DevTools จาก stderr ของ chrome — ยอมรับเฉพาะ "บรรทัดที่ครบแล้ว" (มี \n ปิดท้าย)
+   `\S+` เปล่า ๆ รับ guid ที่ขาดกลาง buffer ได้ทันที ถ้า chunk แบ่งตรงกลาง guid พอดี
+   ด่านจะไปต่อ ws ด้วย URL ที่ยังไม่ครบแล้วแดงเทียมทั้งที่เบราว์เซอร์ปกติดี (รีวิว AIO-48 C1)
+   และไม่ตรึง host ไว้ในแพตเทิร์น — ตัดสินทีหลังเพื่อให้บอกได้ว่า "bind 127.0.0.1 ไม่ได้"
+   แทนที่จะรอครบเพดานแล้วบอกว่า "ไม่ได้บรรทัด DevTools" ซึ่งเป็นเท็จ (รีวิว AIO-47 C2)
+   แยกออกมาเป็นฟังก์ชันเพื่อให้ tools/test-ports.mjs ตรวจสมบัตินี้ได้ตรง ๆ ไม่ต้องแข่งกับ chunk จริง */
+export const wsLineFrom = buf => buf.match(/DevTools listening on (ws:\/\/\S+)\r?\n/);
+
 /* ท้ายสุดของบันทึกไว้ใส่ข้อความแดง — เหตุจริงอยู่ท้ายล็อกเสมอ และล็อกเต็มยาวเกินจะพิมพ์ */
 const tail = (buf, n = 3) => {
   const lines = buf.split('\n').map(l => l.trim()).filter(Boolean).slice(-n);
@@ -248,12 +256,10 @@ export async function startGate({ envPorts, profilePrefix }) {
      และต้องไม่ตรึง host ไว้ในแพตเทิร์น: ถ้าตรึง เคสพอร์ตถูกคนอื่นถือจะกลายเป็น "ไม่ได้บรรทัด
      DevTools" (เท็จ — ได้ แต่ chrome ไป bind [::1] แทน) แล้วรอครบ 20 วินาทีก่อนบอกเหตุที่ผิด
      ⇒ รับทุก host แล้วตัดสินทีหลัง · ห้ามยอมใช้ host อื่น (รีวิว AIO-47 C2) */
-  const WS_LINE = /DevTools listening on (ws:\/\/\S+)\r?\n/;
-  const MINE = `ws://127.0.0.1:${CDP}/devtools/browser/`;
   const cdpBy = Date.now() + T.CHROME_UP;
   let found = null;
-  while (!(found = chromeErr.match(WS_LINE)) && chr.alive() && Date.now() < cdpBy) await sleep(25);
-  if (found && !found[1].startsWith(MINE)) {
+  while (!(found = wsLineFrom(chromeErr)) && chr.alive() && Date.now() < cdpBy) await sleep(25);
+  if (found && !found[1].startsWith(`ws://127.0.0.1:${CDP}/devtools/browser/`)) {
     /* chrome พิมพ์ทุกอย่างที่ต้องรู้ใน ~60 ms: "bind() failed: Address already in use (98)"
        แล้วไปขึ้นที่ [::1] ⇒ แดงทันทีพร้อมเหตุจริง ไม่ใช่รอครบเพดานแล้วเดา */
     console.error(`✗ chrome bind 127.0.0.1:${CDP} ไม่ได้ (พอร์ตถูกถืออยู่) · ไปขึ้นที่ ${found[1].split('/devtools')[0]} แทน` +

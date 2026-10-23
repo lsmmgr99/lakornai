@@ -30,7 +30,7 @@ import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { tree } from './cdp-gate.mjs';
+import { tree, wsLineFrom } from './cdp-gate.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
@@ -59,7 +59,13 @@ function check(name, ok, detail = '') {
 }
 /* เคสที่พังเอง (ยกตัวจำลองไม่ขึ้น · พอร์ตถูกแย่งกลางทาง) ต้องนับเป็น "ตก" พร้อมเหตุ
    ไม่ใช่ปล่อย throw หลุดออก top level แล้วไฟล์ตายทั้งไฟล์โดยไม่พิมพ์บรรทัดผล (รีวิว AIO-45 C9) */
+/* ONLY=<regex> รันเฉพาะเคสที่ชื่อตรง — ใช้ตอนฉีดมิวเทชันทีละชิ้น (ชุดเต็มใช้เวลาหลายนาที)
+   ต้องประกาศตัวเองให้ดังว่ากำลังรันไม่ครบ ไม่งั้น "ผ่านทุกข้อ" จากการรันบางส่วนจะถูกอ้างเป็นชุดเต็ม */
+const ONLY = process.env.ONLY ? new RegExp(process.env.ONLY) : null;
+if (ONLY) console.log(`⚠ ONLY=${process.env.ONLY} — รันเฉพาะเคสที่ชื่อตรงแพตเทิร์นนี้ ไม่ใช่ชุดเต็ม`);
+let skipped = 0;
 async function caseOf(title, fn) {
+  if (ONLY && !ONLY.test(title)) { skipped++; return; }
   console.log('\n' + title);
   try { await fn(); }
   catch (e) { check(`${title} — เคสนี้รันไม่จบ`, false, e.message); }
@@ -528,7 +534,34 @@ await g.cleanup(1);
     !/รับค่า /.test(r.out), JSON.stringify(r.out.slice(-200)));
 });
 
-/* ---------- 15. ห้ามแตกสำเนาตัวร่วมกลับไปไว้ในด่าน ----------
+/* ---------- 15. ตัวจับบรรทัด DevTools: ห้ามเชื่อบรรทัดที่ยังไม่ครบ (รีวิว AIO-48 C1) ----------
+   ช่องนี้ฉีดจากข้างนอกต้องไปแบ่ง chunk ของ chrome จริงให้ขาดตรงกลาง guid พอดี = แข่งกับเวลา
+   ⇒ ตรวจที่สมบัติของตัวจับตรง ๆ แทน ไม่มีช่องเวลา ไม่มีอะไรให้ flaky */
+await caseOf('ตัวจับบรรทัด DevTools จาก stderr ของ chrome', async () => {
+  const URL_ = 'ws://127.0.0.1:45787/devtools/browser/3385fa61-bac6-4240-bbb0-8a245522a313';
+  const line = `DevTools listening on ${URL_}\n`;
+  check('บรรทัดครบ → ได้ ws URL ทั้งเส้น', wsLineFrom(`noise\n${line}noise\n`)?.[1] === URL_);
+  check('บรรทัดที่ยังไม่ครบ (chunk ขาดกลาง guid) → ยังไม่เอา',
+    wsLineFrom(line.slice(0, line.indexOf('browser/') + 20)) === null,
+    JSON.stringify(wsLineFrom(line.slice(0, line.indexOf('browser/') + 20))?.[1]));
+  /* host อื่นต้อง "จับได้" เพื่อเอาไปบอกเหตุ — ตัวตัดสินว่าใช่ของเราไหมอยู่ที่ startGate ไม่ใช่ที่นี่ */
+  check('บรรทัดที่ไปขึ้นที่ host อื่น → จับได้ (เอาไปบอกเหตุว่า bind 127.0.0.1 ไม่ได้)',
+    wsLineFrom('DevTools listening on ws://[::1]:45787/devtools/browser/x\n')?.[1]
+      === 'ws://[::1]:45787/devtools/browser/x');
+});
+
+/* ---------- 16. ค่า env ของพอร์ตที่ผิดต้องบอกว่าเป็นค่าที่ตั้งเอง (รีวิว AIO-47 C7) ----------
+   ก่อนแก้: AC2_PORT=abc ได้ "เปิด serve.mjs ที่พอร์ต NaN ไม่ได้ (น่าจะมีคนถือพอร์ตอยู่)"
+   และ AC2_CDP=0 รอครบ 20 วินาทีแล้วโทษ run อื่น — ทั้งสองอันโทษคนอื่นทั้งที่เหตุคือค่าที่ตั้ง */
+await caseOf('ค่า env ของพอร์ตที่ไม่ใช่เลขพอร์ต', async () => {
+  for (const [name, val] of [['AC2_PORT', 'abc'], ['AC2_CDP', '0']]) {
+    const r = await runGate(MID[0], { [name]: val }, 30000);
+    expectRed(`${name}=${val} → บอกว่าเป็นค่าที่ตั้งเอง`, r, 30000,
+      new RegExp(`ค่า ${name}=.*ไม่ใช่เลขพอร์ตที่ใช้ได้`), 5000);
+  }
+});
+
+/* ---------- 17. ห้ามแตกสำเนาตัวร่วมกลับไปไว้ในด่าน ----------
    ที่ทำให้เคส 5–7 (ยิงด่านตัวเดียว) ยังคุ้มครองทั้งสองด่านคือ "โค้ดก้อนนั้นมีสำเนาเดียว"
    ถ้าใครก๊อปกลับเข้าไปในด่านใดด่านหนึ่ง ความคุ้มครองนั้นหายไปเงียบ ๆ ⇒ บังคับไว้ที่นี่ */
 /* ต้องตัดคอมเมนต์ออกก่อนตรวจ: คำอธิบายที่เอ่ยถึง tools/serve.mjs ไม่ใช่โค้ดที่ยกเซิร์ฟเวอร์
@@ -572,5 +605,5 @@ for (const e of fs.readdirSync(os.tmpdir())) {
   try { fs.rmSync(f, { recursive: true, force: true }); swept++; } catch { /* ของคนอื่น ไม่มีสิทธิ์ */ }
 }
 console.log(`\nเก็บโปรไฟล์ chrome ที่ไม่มีใครใช้แล้ว ${swept} ตัว`);
-console.log(`ผล: ผ่าน ${pass} · ตก ${fail}`);
+console.log(`ผล: ผ่าน ${pass} · ตก ${fail}` + (skipped ? ` · ข้ามเคสไป ${skipped} เคสเพราะตั้ง ONLY` : ''));
 process.exit(fail ? 1 : 0);
