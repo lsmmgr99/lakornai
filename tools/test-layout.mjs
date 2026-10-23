@@ -375,7 +375,10 @@ const PROBE_FIXTURE = `(async function () {
     + '<span id="f-clean">x</span>'
     + '<span id="f-block" style="display:block;height:200px">x</span>'
     + '<object id="f-obj-fallback" style="display:inline;height:200px"><span>fallback</span></object>'
-    + '<div hidden><span id="f-hidden" style="height:200px">x</span></div>';
+    /* ตัวที่ซ่อนอยู่เองต้องถูกเปิดก่อนจึงจะตรวจได้: computed display ของมันคือ none ตรง ๆ
+       (ต่างจากลูกของ ancestor ที่ซ่อน ซึ่ง getComputedStyle ยังคืน inline อยู่แล้ว
+       → fixture แบบ <div hidden><span ...> ผ่านได้แม้ถอดขั้นตอนเปิดแผงออก วัดแล้ว) */
+    + '<span id="f-hidden" hidden style="height:200px">x</span>';
   document.body.insertAdjacentHTML('beforeend', html);
   var img = document.createElement('img');
   img.id = 'f-img'; img.style.cssText = 'display:inline;height:200px'; img.src = SVG;
