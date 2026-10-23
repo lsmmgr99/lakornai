@@ -24,9 +24,14 @@ node tools/test-layout.mjs    # ฮีโร่หน้าแรก 5 ขนา
                               # ไม่ต้อง build ก่อน · LAY_PORT/LAY_CDP ตั้งทับได้ · ~2.5 นาที
                               # ONLY=hero SKIP_BUILD=1 เฉพาะส่วนฮีโร่ ~40 วินาที)
 node tools/test-serve.mjs     # ยิงจริงเช็ก MIME ของ .mjs ที่ tools/serve.mjs ส่งออก (SV_PORT ตั้งทับได้)
-node tools/test-ports.mjs     # พอร์ตชน/chrome ตายกลางทาง → ด่านต้องแดงเร็วพร้อมบอกสาเหตุ ไม่ค้าง
-                              # และห้ามเขียวจากเซิร์ฟเวอร์ของ run อื่น (AIO-42 · 9 ข้อ · ~1 นาที)
+node tools/test-ports.mjs     # พอร์ตชน/ลูกตายกลางทาง → ด่านต้องแดงเร็วพร้อมบอกสาเหตุ ไม่ค้าง
+                              # ห้ามเขียวจากเซิร์ฟเวอร์/เบราว์เซอร์ของ run อื่น และต้องไม่เหลือลูก
+                              # ค้างถือพอร์ต (AIO-42 · 47 ข้อ · ~6 นาที · ฉีดด้วย SIGSTOP/SIGKILL
+                              # ที่ลูกของตัวเองเท่านั้น)
 node tools/check-mockup.mjs   # ม็อกอัพที่อนุมัติต้องสร้างซ้ำได้เหมือนเดิม (0 ไฟล์เปลี่ยน)
+#                               tools/cdp-gate.mjs ไม่ใช่ด่าน — เป็นตัวร่วมที่ test-continue/
+#                               test-contrast เรียกใช้ (ยก serve.mjs + chrome + CDP · เพดานเวลา
+#                               ทุกชั้น · เก็บกวาดลูกทุกทางออก) · อย่าก๊อปโครงนี้กลับเข้าไฟล์ด่าน
 node tools/smoke.mjs          # เปิดทุกชนิดหน้าในเบราว์เซอร์ เช็ก error + เก็บภาพ
 node ci/rehearse.mjs --head   # ซ้อม CI ทุกขั้นในสำเนาชั่วคราว (ตรวจ V1–V13 → artifact)
 ```
