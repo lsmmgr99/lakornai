@@ -86,6 +86,28 @@ for (const s of shots) {
     }
     await sleep(140); // เผื่อ layout/paint รอบสุดท้าย
 
+    /* s.at = เลื่อนไปให้ section นั้นอยู่กลางจอก่อนถ่าย — ยังเป็นกรอบจอเดียวขนาดเดิม
+       (captureBeyondViewport ไม่ถูกตั้ง ⇒ false) ต่างจาก s.full ที่ยืด viewport ทั้งหน้า
+       scrollIntoView ไม่พอ: หัวเว็บเป็น sticky ทับยอด section ⇒ หักระยะหัวเว็บออกเอง
+       behavior:'instant' ไม่ใช่ค่าตั้งต้น 'auto' เพราะถ้าเบราว์เซอร์ตีความเป็น smooth
+       ภาพจะถูกถ่ายระหว่างยังเลื่อนไม่ถึง */
+    if (s.at) {
+      await send('Runtime.evaluate', {
+        expression: `(() => {
+          const el = document.querySelector(${JSON.stringify(s.at)});
+          if (!el) throw new Error('ไม่พบ ' + ${JSON.stringify(s.at)});
+          const hdr = document.querySelector('header, .hdr');
+          const pad = (hdr ? hdr.getBoundingClientRect().height : 0) + 16;
+          const r = el.getBoundingClientRect();
+          /* จัดให้ section อยู่กลางจอ แต่ไม่ให้ยอดของมันมุดใต้หัวเว็บ */
+          const mid = r.top + window.scrollY - Math.max(pad, (window.innerHeight - r.height) / 2);
+          window.scrollTo({ top: Math.max(0, mid), behavior: 'instant' });
+          return true;
+        })()`, returnByValue: true,
+      });
+      await sleep(220);
+    }
+
     if (s.full) {
       const r = await send('Runtime.evaluate', {
         expression: 'Math.min(document.documentElement.scrollHeight, 20000)', returnByValue: true,

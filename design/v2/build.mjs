@@ -13,7 +13,7 @@ import * as C from './pages-system.mjs';
    full = เรนเดอร์ full-page เพิ่มด้วย (หน้าที่ยาวและต้องโชว์ทั้งหน้าในเด็ค) */
 const M = [
   // A — การค้นพบ (10 หน้าจอ)
-  ['A1', 'หน้าแรก', '', 'R1', 'home.html', 'both', { full: 'mobile,desktop', h: [3400, 3000] }],
+  ['A1', 'หน้าแรก', '', 'R1', 'home.html', 'both', { full: 'mobile,desktop', h: [3400, 3000], at: '.genre-bento' }],
   ['A1', 'หน้าแรก', 'ไม่มีเรื่องที่ดูค้าง (empty)', 'R1', 'home-empty.html', 'm'],
   ['A1', 'หน้าแรก', 'กำลังโหลด (skeleton)', 'R1', 'home-loading.html', 'both'],
   ['A2', 'ฟีดแนวตั้ง', '', 'R1', 'feed.html', 'both'],
@@ -26,7 +26,9 @@ const M = [
   ['A4', 'หน้าแนว', '', 'R1', 'genre.html', 'both'],
   ['A4', 'หน้าแนว', 'แนวนี้ยังไม่มีเรื่อง (empty)', 'R1', 'genre-empty.html', 'm'],
   ['A5', 'หน้าแท็ก trope', '', 'R3', 'tag.html', 'm'],
-  ['A6', 'ฮับเลือกดู', '', 'R2', 'browse.html', 'm', { full: 'mobile', h: [1900] }],
+  /* A6 เพิ่มกรอบเดสก์ท็อปใน AIO-53: ไทล์แนวเป็นปก 2:3 แถวเดียว 6 ใบ ซึ่งเป็นเลย์เอาต์ที่
+     มีแต่ที่ ≥960px ⇒ เด็คที่มีแต่ภาพมือถือตัดสินข้อนี้ไม่ได้ (ลูกค้าเรียกหน้านี้ว่า "หน้าหมวด") */
+  ['A6', 'ฮับเลือกดู', '', 'R2', 'browse.html', 'both', { full: 'mobile', h: [1900] }],
   ['A7', 'ยอดนิยม TOP 10', '', 'R1', 'popular.html', 'both', { full: 'mobile', h: [2000] }],
   ['A8', 'ตอนใหม่', '', 'R2', 'new.html', 'm'],
   ['A8', 'ตอนใหม่', 'ไม่มีตอนใหม่ (empty)', 'R2', 'new-empty.html', 'm'],
@@ -110,10 +112,10 @@ const shotList = [];
 for (const [id, name, state, tier, file, vp, opt = {}] of [...M, ...EXTRA]) {
   const base = file.replace(/\.html$/, '');
   const shots = [];
-  const add = (prefix, w, h, dpr, mobile, full = false) => {
+  const add = (prefix, w, h, dpr, mobile, full = false, at = null) => {
     const out = `${prefix}-${base}.png`;
     shots.push(out);
-    shotList.push({ file, out, w, h, dpr, mobile, full });
+    shotList.push({ file, out, w, h, dpr, mobile, full, ...(at ? { at } : {}) });
   };
   if (vp === 'both' || vp === 'm') add('mobile', 390, 844, 2, true);       // 780×1688 px
   if (vp === 'both' || vp === 'd') add('desktop', 1440, 900, 1.5, false);  // 2160×1350 px
@@ -122,6 +124,14 @@ for (const [id, name, state, tier, file, vp, opt = {}] of [...M, ...EXTRA]) {
       if (k === 'mobile') add('mobilefull', 390, 844, 1, true, true);
       else add('desktopfull', 1440, 900, 1, false, true);
     }
+  }
+  /* opt.at = เลื่อนไปที่ section หนึ่งแล้วถ่าย "กรอบจอเดียว" ตรงนั้น (AIO-53)
+     ต่างจาก full: full ยืด viewport ตามความสูงทั้งหน้าแล้วถ่ายทีเดียว ซึ่งตัดสินเรื่อง
+     "อะไรอยู่ในจอแรก / กินที่เท่าไรของจอ" ไม่ได้เลย · ส่วนนี้ยังเป็นกรอบจอจริงขนาดเดิม
+     ใช้กับของที่อยู่ใต้พับแต่ต้องให้ลูกค้าตัดสิน เช่น ไทล์ "เลือกตามแนว" ในหน้าแรก */
+  if (opt.at) {
+    if (vp === 'both' || vp === 'm') add('mobileat', 390, 844, 2, true, false, opt.at);
+    if (vp === 'both' || vp === 'd') add('desktopat', 1440, 900, 1.5, false, false, opt.at);
   }
   screens.push({ id, name, state, tier, file, shots });
 }

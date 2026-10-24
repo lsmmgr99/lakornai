@@ -9,7 +9,9 @@
       "mobile-home.png",
       "desktop-home.png",
       "mobilefull-home.png",
-      "desktopfull-home.png"
+      "desktopfull-home.png",
+      "mobileat-home.png",
+      "desktopat-home.png"
     ]
   },
   {
@@ -144,6 +146,7 @@
     "file": "browse.html",
     "shots": [
       "mobile-browse.png",
+      "desktop-browse.png",
       "mobilefull-browse.png"
     ]
   },

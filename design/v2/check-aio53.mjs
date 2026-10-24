@@ -38,11 +38,14 @@ const { send, evaluate, until, cleanup } = await startGate({
   envPorts: ['A53_PORT', 'A53_CDP'], profilePrefix: 'lakorn-a53-',
 });
 
-/* กรอบจอเดียว: mobile=false ทุกจอเพราะม็อกอัพเดสก์ท็อปวัดด้วย 1.5x ก็ได้เลย์เอาต์เดียวกัน
-   สิ่งที่ต้องตรงเป๊ะคือ width/height ของ viewport ไม่ใช่ dpr */
+/* กรอบจอเดียว · dpr=1 ทุกจอเพราะเลย์เอาต์ไม่ขึ้นกับ dpr — สิ่งที่ต้องตรงเป๊ะคือ width/height
+   mobile:true เมื่อจอแคบกว่า 720px เพราะมือถือจริงใช้สกรอลล์บาร์แบบลอยทับ ไม่กินความกว้าง
+   (ถ้าปล่อยเป็น false จอ 390 จะเหลือพื้นที่ 375px ⇒ ไทล์ 106px ซึ่งไม่ใช่เลขที่เครื่องลูกค้าเห็น
+   ส่วนเดสก์ท็อปปล่อยไว้ false ตามจริง: สกรอลล์บาร์แบบกินที่คือของที่มีอยู่จริงบนเดสก์ท็อป
+   ⇒ ที่ 1280 จะได้ 195.5px ไม่ใช่ 198px และนั่นคือเลขที่ต้องผ่านเกณฑ์) */
 async function viewport({ w, h }) {
   await send('Emulation.setDeviceMetricsOverride',
-    { width: w, height: h, deviceScaleFactor: 1, mobile: false, screenWidth: w, screenHeight: h });
+    { width: w, height: h, deviceScaleFactor: 1, mobile: w < 720, screenWidth: w, screenHeight: h });
 }
 /* รอฟอนต์ให้พร้อมจริงด้วย document.fonts.ready ไม่ใช่ fonts.status === 'loaded'
    (วัดแล้ว: ตอน readyState เป็น complete สถานะยังเป็น 'loading' ⇒ เงื่อนไขที่อ่าน status เฉย ๆ
