@@ -91,7 +91,8 @@ svg.ico.lg{width:26px;height:26px}
 .page-head h1{font-size:var(--t-h1);line-height:var(--lh-h1);font-weight:600}
 .page-head p{margin-top:var(--s2);color:var(--muted);font-size:var(--t-sub);line-height:var(--lh-sub);max-width:62ch}
 /* F6 (AIO-38) · breadcrumb สูง 20px (หน้ารับชม) / 36px (หน้าอื่น) ⇒ ต่ำกว่า 44px ที่ระบบออกแบบ
-   ตั้งเองไว้ที่ลิงก์ฟุตเตอร์ (v2.css:596) · แก้ที่ "ลิงก์" ไม่ใช่ที่กล่อง เพราะของที่นิ้วต้องแตะคือลิงก์
+   ตั้งเองไว้ที่ลิงก์ฟุตเตอร์ (`.foot nav a{min-height:44px}` ในไฟล์นี้) · แก้ที่ "ลิงก์" ไม่ใช่ที่กล่อง
+   เพราะของที่นิ้วต้องแตะคือลิงก์ ไม่ใช่แถบ
    แล้วลดระยะบนของกล่องจาก s4 เป็น s2 เพื่อไม่ให้แถบรวมบวมเป็น 60px (ได้ 52px / 44px ที่หน้ารับชม) */
 .crumbs{font-size:var(--t-meta);line-height:var(--lh-meta);color:var(--dim);display:flex;gap:7px;flex-wrap:wrap;
   align-items:center;min-height:44px;padding-top:var(--s2)}
