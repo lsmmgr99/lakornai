@@ -18,11 +18,21 @@ node tools/test-continue.mjs  # ทดสอบ "ดูต่อ" ด้วย�
 node tools/test-contrast.mjs  # วัดคอนทราสต์ placeholder ทุกช่องกรอกจากหน้าที่ render จริง
                               # (ขอพอร์ตว่างจาก OS เอง · PH_PORT/PH_CDP ตั้งทับได้)
 node tools/test-tags.mjs      # ตรวจแถว chip แท็กผสม (AIO-33 · SKIP_BUILD=1 ไม่ต้อง build ก่อน)
-node tools/test-layout.mjs    # ฮีโร่หน้าแรก 5 ขนาดจอ เทียบม็อกอัพที่อนุมัติ + self-test ตัวกวาด
-                              # + กวาดทุกหน้าหา element ที่ display:inline แต่ตั้ง height/width/
-                              # aspect-ratio (AIO-37 · ONLY=hero|sweep · STRICT=1 · SKIP_BUILD=1
-                              # ไม่ต้อง build ก่อน · LAY_PORT/LAY_CDP ตั้งทับได้ · ~2.5 นาที
-                              # ONLY=hero SKIP_BUILD=1 เฉพาะส่วนฮีโร่ ~40 วินาที)
+node tools/test-layout.mjs    # 5 ส่วนในด่านเดียว (AIO-37 · AIO-54 · 141 ข้อ · ~10 นาที):
+                              # 0 self-test ตัวกวาด · 1 ฮีโร่ 5 ขนาดจอเทียบม็อกอัพที่อนุมัติ
+                              # 2 กวาด 504 หน้า × 2 จอ หา display:inline ที่ตั้ง height/width/
+                              #   aspect-ratio — "สองรอบ": ผู้ใช้ใหม่ + ผู้ใช้ที่กลับมา (ซีด
+                              #   lakorn.cont ก่อนสคริปต์ของหน้าทำงาน) รอบเดียวมองไม่เห็นของที่
+                              #   JS สร้างจากคลังเลย ซึ่งเป็นช่องที่บั๊ก .cont .thumb หลุดไป
+                              # 3 เกณฑ์ฟอลด์ A/B/C ของ UX (AIO-38) 503 หน้าผู้ชม × 7 จอ =
+                              #   3,521 เคส · ขอบเขต "หน้าผู้ชม" ถามจาก ci/site-files.mjs
+                              # 4 แถว "ดูต่อ": ว่างต้องซ่อนทั้ง section · มีของต้องได้ 16:9
+                              # 5 ไทล์ "เลือกตามแนว" 2:3 แถวเดียว ปกไม่ซ้ำ ที่ / และ /browse/
+                              # ONLY=hero|sweep|fold|bento (bento ~20 วินาที) · SKIP_BUILD=1
+                              # ไม่ต้อง build ก่อน · LAY_PORT/LAY_CDP ตั้งทับได้
+                              # FOLD_SEEDED=1 บังคับเกณฑ์ฟอลด์กับสภาพผู้ใช้ที่กลับมาด้วย —
+                              # ยังไม่เปิดเป็นค่าตั้งต้นเพราะ UX นิยามเกณฑ์ไว้กับสภาพที่ส่งมอบ
+                              # และสภาพนั้นฟ้องของจริง 3 เคส (เหตุผลครบในหัวไฟล์ที่ FOLD_SEEDED)
 node tools/test-serve.mjs     # ยิงจริงเช็ก MIME ของ .mjs ที่ tools/serve.mjs ส่งออก (SV_PORT ตั้งทับได้)
 node tools/test-ports.mjs     # พอร์ตชน/ลูกตายกลางทาง → ด่านต้องแดงเร็วพร้อมบอกสาเหตุ ไม่ค้าง
                               # ห้ามเขียวจากเซิร์ฟเวอร์/เบราว์เซอร์ของ run อื่น · ต้องไม่เหลือลูก

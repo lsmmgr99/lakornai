@@ -2,7 +2,7 @@
 import {
   D, U, SERIES, BY, TOP10, OPEN_TAGS, CAST, genreLabel, genreOf,
   seriesOfGenre, similar, isDaily, isAiring, tropesOf, isOpenTag, CAST_PAGES,
-  HAS_VIEWS, RANK_BASIS_TEXT,
+  HAS_VIEWS, RANK_BASIS_TEXT, GENRE_COVER,
 } from './content.mjs';
 import {
   definePage, shell, pageHead, crumbs, rail, section, poster, card, rankCard, epRow,
@@ -17,6 +17,19 @@ import { collectionLd, websiteLd, breadcrumb, shareImage, coverUrl } from './seo
    ส่วน "สัปดาห์นี้" ถูกถอดถาวร — เราไม่เคยคำนวณหน้าต่างรายสัปดาห์เลย แม้วันที่มี views
    หมายเหตุใต้อันดับผูกกับ viewsSource ไม่เขียนตายไว้ (C4) */
 const TOP10_LABEL = 'TOP 10 ในคลัง';
+
+/* ---------- ไทล์ "เลือกตามแนว" ----------
+   ใช้ที่หน้าแรกและที่ /browse/ ("หมวด" ในเมนู) · เคยเป็นสองก้อนที่เหมือนกันคนละที่
+   แล้วหลุดจากกันได้เงียบ ๆ ⇒ รวมเป็นที่เดียว (AIO-54 เฟส 2)
+   ปกของแต่ละไทล์มาจาก GENRE_COVER ซึ่งจับคู่แนว ↔ เรื่องให้ไม่ซ้ำกันเลยทั้ง 6 ใบ
+   (build/content.mjs:174-211) ไม่ใช่ `items[0]` ที่ทำให้ fruit กับ revenge ได้ปกใบเดียวกัน
+   รูปทรง 2:3 แถวเดียวมาจาก design/v2/v2.css:304-321 ของ Visual (AIO-53) ตามแบบ ไม่ตีความใหม่
+   ด่าน: tools/test-layout.mjs ส่วน 5 */
+const genreBento = L => `<div class="genre-bento">${D.genres.map(g => {
+  const items = seriesOfGenre(g.slug);
+  return `<a class="gtile" href="${L(U.genre(g.slug))}">${coverImg(L, GENRE_COVER.get(g.slug))}
+          <span>${g.label}</span><span class="cnt num">${items.length} เรื่อง</span></a>`;
+}).join('')}</div>`;
 const rankNote = () => sampleNote(HAS_VIEWS
   ? 'ยอดวิวและอันดับเป็นตัวเลขตัวอย่าง ยังไม่ได้ต่อระบบวัดผลจริง'
   : `ยังไม่ได้ต่อระบบวัดจำนวนผู้ชม — ลำดับในหน้านี้${RANK_BASIS_TEXT}`);
@@ -99,11 +112,7 @@ export function buildHome() {
       { more: ['ทั้งหมด', U.newEp], L });
 
     const byGenre = section('เลือกตามแนว',
-      `<div class="genre-bento">${D.genres.map(g => {
-        const items = seriesOfGenre(g.slug);
-        return `<a class="gtile" href="${L(U.genre(g.slug))}">${coverImg(L, items[0])}
-          <span>${g.label}</span><span class="cnt num">${items.length} เรื่อง</span></a>`;
-      }).join('')}</div>
+      `${genreBento(L)}
       ${OPEN_TAGS.length ? `<div class="chips" style="margin-top:var(--s4)">
         <span class="chips-lb">แท็ก</span>
         ${OPEN_TAGS.map(t => `<a class="chip" href="${L(U.tag(t.slug))}">${t.chip}<span class="n num">${t.items.length}</span></a>`).join('')}
@@ -242,11 +251,7 @@ export function buildBrowse() {
   const body = L => shell(L, {
     active: 'browse',
     main: wrapF(L, `${pageHead('เลือกดู', 'ทางเข้ารวมของทุกหมวด แท็ก และดัชนีในคลัง')}
-      ${section('6 แนวหลัก', `<div class="genre-bento">${D.genres.map(g => {
-        const items = seriesOfGenre(g.slug);
-        return `<a class="gtile" href="${L(U.genre(g.slug))}">${coverImg(L, items[0])}
-          <span>${g.label}</span><span class="cnt num">${items.length} เรื่อง</span></a>`;
-      }).join('')}</div>`)}
+      ${section('6 แนวหลัก', genreBento(L))}
       ${OPEN_TAGS.length
         ? section('แท็กที่เปิดแล้ว',
             `<div class="chip-row">${OPEN_TAGS.map(t =>

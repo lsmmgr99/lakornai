@@ -90,8 +90,13 @@ svg.ico.lg{width:26px;height:26px}
 .page-head{padding:var(--s5) 0 var(--s3)}
 .page-head h1{font-size:var(--t-h1);line-height:var(--lh-h1);font-weight:600}
 .page-head p{margin-top:var(--s2);color:var(--muted);font-size:var(--t-sub);line-height:var(--lh-sub);max-width:62ch}
-.crumbs{font-size:var(--t-meta);line-height:var(--lh-meta);color:var(--dim);display:flex;gap:7px;flex-wrap:wrap;padding-top:var(--s4)}
-.crumbs a{color:var(--muted)}
+/* F6 (AIO-38) · breadcrumb สูง 20px (หน้ารับชม) / 36px (หน้าอื่น) ⇒ ต่ำกว่า 44px ที่ระบบออกแบบ
+   ตั้งเองไว้ที่ลิงก์ฟุตเตอร์ (`.foot nav a{min-height:44px}` ในไฟล์นี้) · แก้ที่ "ลิงก์" ไม่ใช่ที่กล่อง
+   เพราะของที่นิ้วต้องแตะคือลิงก์ ไม่ใช่แถบ
+   แล้วลดระยะบนของกล่องจาก s4 เป็น s2 เพื่อไม่ให้แถบรวมบวมเป็น 60px (ได้ 52px / 44px ที่หน้ารับชม) */
+.crumbs{font-size:var(--t-meta);line-height:var(--lh-meta);color:var(--dim);display:flex;gap:7px;flex-wrap:wrap;
+  align-items:center;min-height:44px;padding-top:var(--s2)}
+.crumbs a{color:var(--muted);min-height:44px;display:inline-flex;align-items:center}
 .crumbs span{color:var(--faint)}
 
 .sec{margin-top:var(--s7)}
@@ -242,7 +247,10 @@ svg.ico.lg{width:26px;height:26px}
 
 /* ===================== 9. HERO ===================== */
 .hero{position:relative;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--e2);background:var(--surface)}
-.hero .bg{position:relative;aspect-ratio:var(--ar-poster)}
+/* F4 (AIO-38) · ฮีโร่กินจอ 86–89% ที่ 1366×768 และ 390×844 ⇒ เพดาน 56vh ตามค่าที่ UX ทดสอบมา
+   เขียนเป็น min()/max-height ไม่ใช่ 56vh เปล่า ๆ เพื่อให้จอสูงยังได้ความสูงที่อนุมัติไว้เท่าเดิม
+   (ที่ 1440×900 → min(480px,504px)=480px · ที่ 1920×1080 → min(480px,605px)=480px ⇒ ไม่ขยับ) */
+.hero .bg{position:relative;aspect-ratio:var(--ar-poster);max-height:56vh}
 .hero .bg img{width:100%;height:100%;object-fit:cover}
 .hero .bg::after{content:"";position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(9,8,12,.1) 0%,rgba(9,8,12,.05) 34%,rgba(9,8,12,.82) 72%,rgba(9,8,12,.97) 100%)}
@@ -260,13 +268,13 @@ svg.ico.lg{width:26px;height:26px}
 .dots i{width:7px;height:7px;border-radius:50%;background:var(--border-i)}
 .dots i.on{width:22px;border-radius:4px;background:var(--accent)}
 @media (min-width:720px){
-  .hero .bg{aspect-ratio:auto;height:440px}
+  .hero .bg{aspect-ratio:auto;height:min(440px,56vh)}
   .hero .bg img{object-position:center 22%}
   .hero .bg::after{background:linear-gradient(95deg,rgba(9,8,12,.96) 0%,rgba(9,8,12,.9) 34%,rgba(9,8,12,.35) 70%,rgba(9,8,12,.2) 100%)}
   .hero .body{right:48%;display:flex;flex-direction:column;justify-content:center;top:0;padding:var(--s7)}
   .hero .btn-row .btn{flex:0 0 auto}
 }
-@media (min-width:960px){ .hero .bg{height:480px} .hero .body{right:52%;padding:var(--s8)} }
+@media (min-width:960px){ .hero .bg{height:min(480px,56vh)} .hero .body{right:52%;padding:var(--s8)} }
 
 /* ===================== 10. BENTO ===================== */
 .bento{display:grid;gap:var(--s3);grid-template-columns:minmax(0,1fr)}
@@ -285,16 +293,33 @@ svg.ico.lg{width:26px;height:26px}
 .btile::before{content:"";position:absolute;inset:0;z-index:1;
   background:linear-gradient(180deg,rgba(14,13,18,.25),rgba(14,13,18,.94) 72%)}
 .btile>*{position:relative;z-index:2}
-.genre-bento{display:grid;gap:var(--s3);grid-template-columns:repeat(2,minmax(0,1fr))}
-@media (min-width:720px){.genre-bento{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (min-width:960px){.genre-bento{grid-template-columns:repeat(6,minmax(0,1fr))}}
+/* .gtile ตัวฐาน = ไทล์เลือกแนวแบบแถบ ใช้ที่ onboarding "เลือกแนวที่ชอบ" (pages-my.mjs:108,130)
+   ซึ่งเป็นตัวเลือกในฟอร์ม ไม่ใช่ปกในคลัง ⇒ รูปทรงแนวตั้งข้างล่างผูกไว้กับ .genre-bento เท่านั้น */
 .gtile{position:relative;border-radius:var(--r-md);overflow:hidden;min-height:104px;display:flex;align-items:flex-end;
   padding:var(--s3);color:#fff;box-shadow:var(--e1);font-family:var(--display);font-weight:500;font-size:var(--t-sub)}
 .gtile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.55}
 .gtile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,13,18,.25),rgba(14,13,18,.9))}
 .gtile span{position:relative;z-index:2}
 .gtile .cnt{position:relative;z-index:2;margin-left:auto;font-family:var(--body);font-size:var(--t-meta);color:var(--fg-3)}
-@media (min-width:960px){.genre-bento .gtile:first-child{grid-column:span 2;min-height:132px}}
+
+/* ไทล์ "เลือกตามแนว" (หน้าแรก + ฮับเลือกดู) — ปกแนวตั้ง 2:3 เท่ากับปกทุกที่ในเว็บ · AIO-53
+   ลูกค้าแจ้งเอง 24 ต.ค.: "ในหน้าแรก เลือกตามแนว กับ หน้าหมวด ไม่ใช่แนวตั้ง"
+   ของเดิมเป็นแถบนอน (วัดได้ ar 1.5–3.1) ซึ่งขัดกับ --ar-poster:2/3 และขัดกับตัวสินค้าที่เป็นละครแนวตั้ง
+   และไทล์แรกถูกสั่งกว้าง 2 ช่องในกริด 6 ช่อง = 7 ช่องในกริด 6 ⇒ ไทล์ที่ 6 ตกไปแถวสองตัวเดียว
+   แล้วเตี้ยกว่าเพื่อน (198×132 เทียบ 198×104) ⇒ ตัดกฎ span 2 ออก ทุกใบขนาดเท่ากัน แถวเดียว */
+.genre-bento{display:grid;gap:var(--s3);grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (min-width:720px){.genre-bento{grid-template-columns:repeat(6,minmax(0,1fr))}}
+/* min-height:0 ลบพื้น 104px ของตัวฐานทิ้ง — ถ้าปล่อยไว้ กล่องที่แคบกว่า 156px จะถูกยืดสูงเกิน 2:3 */
+.genre-bento .gtile{aspect-ratio:var(--ar-poster);min-height:0;flex-direction:column;
+  align-items:flex-start;justify-content:flex-end;gap:1px;line-height:1.3}
+/* ปกเต็มใบต้องอ่านว่าเป็น "ปก" ไม่ใช่พื้นหลังจาง ⇒ หรี่รูปน้อยลง แล้วชดเชยด้วยม่านทึบที่ไล่
+   จากใสครึ่งบนลงไปหาทึบที่ก้นกล่อง ซึ่งเป็นที่ที่ตัวหนังสืออยู่ (ของเดิมม่านทึบทั้งใบตั้งแต่ขอบบน) */
+.genre-bento .gtile img{opacity:.8}
+.genre-bento .gtile::after{background:linear-gradient(180deg,rgba(14,13,18,0) 38%,rgba(14,13,18,.86) 100%)}
+.genre-bento .gtile span{text-shadow:0 1px 6px rgba(9,8,12,.8)}
+/* ป้ายชื่อแนวกับจำนวนเรื่องเรียงบน-ล่าง ไม่ใช่ซ้าย-ขวา: ที่ 390px กล่องกว้าง 111px
+   ไม่พอให้สองก้อนอยู่บรรทัดเดียว (margin-left:auto ของตัวฐานจะดันจำนวนเรื่องตกขอบ) */
+.genre-bento .gtile .cnt{margin-left:0}
 
 /* ===================== 11. แถวตอนใหม่ ===================== */
 .list{display:grid;gap:var(--s2)}
@@ -637,9 +662,17 @@ svg.ico.lg{width:26px;height:26px}
 .two-col{display:grid;gap:var(--s6);grid-template-columns:minmax(0,1fr)}
 @media (min-width:720px){.two-col{grid-template-columns:280px minmax(0,1fr);align-items:start}}
 @media (min-width:960px){.two-col{grid-template-columns:320px minmax(0,1fr);gap:var(--s8)}}
-.watch-col{display:grid;gap:var(--s5);grid-template-columns:minmax(0,1fr)}
-@media (min-width:720px){.watch-col{grid-template-columns:420px minmax(0,1fr);align-items:start;gap:var(--s7)}}
-@media (min-width:960px){.watch-col{grid-template-columns:460px minmax(0,1fr)}}
+/* F2 (AIO-38) · เพลเยอร์หน้ารับชมสูง 818px บนจอสูง 768px (วัดได้ y 75→893) ⇒ ใช้ทั้งชิ้นไม่ได้
+   ต้นเหตุไม่ได้อยู่ที่ .player แต่อยู่ที่ "คอลัมน์ซ้ายกว้างคงที่ 460px" × 9:16 = 818px
+   ⇒ ผูกความกว้างคอลัมน์กับความสูงจอ: สัดส่วน 9:16 ของเพลเยอร์ไม่ขยับ (เป็นสัดส่วนของตัวสินค้า)
+   แต่กล่องย่อลงมาพอดีจอแรก · จอสูงพอยังได้ความกว้างที่อนุมัติไว้เท่าเดิม
+   (1920×1080 → min(460px,529px)=460px ⇒ 818px เหมือนเดิม · 1366×768 → 353px ⇒ 628px)
+   --watch-chrome = ที่ที่หัวเว็บกับระยะบนของ .wrap กินไปเหนือเพลเยอร์ (วัดได้ y=75) + ระยะหายใจก้นจอ */
+.watch-col{--watch-chrome:140px;display:grid;gap:var(--s5);grid-template-columns:minmax(0,1fr)}
+@media (min-width:720px){.watch-col{align-items:start;gap:var(--s7);
+  grid-template-columns:min(420px,calc((100vh - var(--watch-chrome)) * 9 / 16)) minmax(0,1fr)}}
+@media (min-width:960px){.watch-col{
+  grid-template-columns:min(460px,calc((100vh - var(--watch-chrome)) * 9 / 16)) minmax(0,1fr)}}
 .side-filter{display:none}
 @media (min-width:720px){
   .side-filter{display:block;width:240px;flex:none}
@@ -702,11 +735,22 @@ svg.ico.lg{width:26px;height:26px}
 input::placeholder,textarea::placeholder{color:var(--dim)}
 .field input::placeholder,.field textarea::placeholder{color:var(--dim)}
 
-/* --- ปกเป็น <img> ใน <span> จึงต้องบังคับ display --- */
+/* --- ปกเป็น <img> ใน <span> จึงต้องบังคับ display ---
+   เหตุผลเดียวกับ span.bg ของฮีโร่ (AIO-37): <span> เป็น inline non-replaced
+   → aspect-ratio / height / margin ในแนวตั้ง ถูกเมินทั้งหมด ขณะที่ computed style
+   ยังรายงานค่าที่เขียนไว้ตามปกติ · ทุกบรรทัดในบล็อกนี้คือ "ของจริงที่ต้องมี"
+   ไม่ใช่ของเผื่อ — ถอดบรรทัดไหนออก ด่าน tools/test-layout.mjs ต้องแดงที่ส่วนกวาดรอบซีด */
 .poster{display:block}
 .card{display:block}
 .card .t,.card .m{display:block}
 .card .t{display:-webkit-box}
+/* AIO-38 F3 · การ์ด "ดูต่อ" ที่ assets/app.js สร้างจาก localStorage
+   .cont .thumb ตั้ง aspect-ratio:var(--ar-cont) ไว้ที่ design/v2/v2.css:226 แต่เป็น <span>
+   → ถูกเมิน กล่องถอยไปใช้สัดส่วนไฟล์ปก 1024×1536 แล้วสูง 300×507px แทน 300×169px
+   (UX วัดที่ 1440 · 232×405 แทน 232×131 ที่ 390) · .cont .m มี margin-top:2px ที่ v2.css:241
+   ซึ่งถูกเมินด้วยเหตุเดียวกัน · .cont .t ไม่ต้องเติม เพราะ v2.css:240 ตั้ง display เองแล้ว */
+.cont .thumb{display:block}
+.cont .m{display:block}
 .ep-row .et{font-size:var(--t-sub);color:var(--fg-2)}
 .ep-row .tt{font-size:var(--t-body);font-weight:600;color:var(--fg)}
 .ep-row .rkn{font-family:var(--display);font-weight:600;font-size:22px;color:var(--accent);

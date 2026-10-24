@@ -1,8 +1,9 @@
-/* ด่านเลย์เอาต์ฮีโร่หน้าแรก + ด่านกันบั๊กตระกูล "inline แต่ตั้ง height" — AIO-37
+/* ด่านเลย์เอาต์ฮีโร่ + ด่านกันบั๊กตระกูล "inline แต่ตั้ง height" + ด่านฟอลด์ A/B/C — AIO-37 · AIO-54
    รัน:  node tools/test-layout.mjs
          SKIP_BUILD=1 node tools/test-layout.mjs       (ตรวจไฟล์ที่มีอยู่ตามสภาพ ไม่ build ใหม่)
-         ONLY=hero node tools/test-layout.mjs          (เฉพาะส่วน 1 · ONLY=sweep = เฉพาะส่วน 2)
-         STRICT=1 node tools/test-layout.mjs           (นับข้อ "รอมติ" เป็นตก — ดูหมายเหตุท้ายไฟล์)
+         ONLY=hero node tools/test-layout.mjs          (hero=ส่วน 1 · sweep=ส่วน 0+2 · fold=ส่วน 3+4 · bento=ส่วน 5)
+         FOLD_SEEDED=1 node tools/test-layout.mjs      (บังคับเกณฑ์ฟอลด์กับสภาพ "ผู้ใช้ที่กลับมา" ด้วย
+                                                        — ดูเหตุที่ยังไม่เปิดเป็นค่าตั้งต้นที่ FOLD_SEEDED)
          LAY_PORT=4299 LAY_CDP=9499 node tools/test-layout.mjs   (ตั้งพอร์ตทับเมื่อรันขนานกับ run อื่น)
 
    ทำไมต้องใช้เบราว์เซอร์จริง: บั๊กที่ด่านนี้กันคือ "ค่าถูกตั้งแต่ไม่ถูกใช้" — `<span>` เป็น inline
@@ -11,60 +12,85 @@
    → grep CSS ไม่เห็น · อ่าน computed style ไม่เห็น · เห็นได้ทางเดียวคือเทียบกับ
    getBoundingClientRect() ของหน้าที่ render จริง
 
-   สามส่วน:
+   สี่ส่วน:
    0) self-test ของตัวกวาดเอง — วาง fixture ที่ต้องจับ (span ตั้ง height/width/aspect-ratio ·
       object ที่แสดง fallback · ตัวที่ซ่อนด้วย [hidden]) และที่ต้องไม่จับ (span เปล่า ·
       display:block · img · object ที่โหลดทรัพยากรได้) แล้วบังคับว่าผลต้องตรงเป๊ะ
-   1) เรขาคณิตฮีโร่หน้าแรกที่ 5 ขนาดจอ (AIO-37 เกณฑ์ข้อ 1–4)
+   1) เรขาคณิตฮีโร่หน้าแรกที่ 5 ขนาดจอ (AIO-37 เกณฑ์ข้อ 1 · 3 · 4)
       อ้างอิงกับ "ม็อกอัพที่ลูกค้าอนุมัติ" (design/v2/home.html) โดยวัดม็อกอัพสด ๆ ที่ขนาดจอเดียวกัน
       ไม่ฝังเลข 440/480 ไว้ในด่าน — เลขที่อนุมัติอยู่ในม็อกอัพ ด่านแค่บังคับว่าเว็บจริงต้องตรงกับมัน
       (มีกรอบ MOCKUP_HERO กันฐานอ้างอิงเลื่อนเงียบ ๆ)
+      เพดาน "ขอบล่างฮีโร่ ≤85% ของจอ" และ "แถวถัดไปโผล่ ≥80px" ย้ายไปอยู่ส่วน 3 แล้ว —
+      เกณฑ์ชั่วคราวสองข้อนั้นผ่านได้ทั้งที่ผู้ใช้เห็นการ์ดเรื่อง 0 ใบ (UX พิสูจน์ไว้ใน AIO-38
+      ที่ 1920×1080: ฮีโร่จบ 63% · แถวถัดไปโผล่ 366px · การ์ดเรื่องที่เห็น 0 ใบ) · ส่วน 3
+      ครอบทั้งเว็บ 7 ขนาดจอ ไม่ใช่หน้าแรก 5 ขนาดจอ จึงกว้างและแน่นกว่าของที่ถอดออก
    2) กวาด "ทุกหน้าที่ส่งมอบ" หา element ที่ computed display:inline แต่มี height / width /
       aspect-ratio ≠ auto — กันตระกูลบั๊กนี้ทั้งตระกูล ไม่ใช่เฉพาะ .hero .bg (เกณฑ์ข้อ 5)
       ไม่รับรายชื่อหน้ามาจากใคร: สแกนไฟล์ .html ที่ส่งมอบเองทั้งหมด หน้าใหม่วันหน้าจะถูกกวาดเอง
-      ขอบเขตที่ตรวจได้จริง: สภาพหน้าตอนโหลด + แผงที่ซ่อนด้วย [hidden] (ด่านเปิดให้ก่อนกวาด)
-      · UI ที่ขึ้นจากสถานะใน localStorage (เช่น .cont/.nextup/.endcard ที่ต้องมีประวัติดูก่อน)
-      ยังไม่ถูกกวาด — รายงานจึงพิมพ์จำนวน "element ที่เป็น inline และกฎนี้ตรวจได้จริง" กำกับไว้
-      ไม่ใช่จำนวน element ทั้งหน้า
+      กวาด "สองรอบ" ต่อขนาดจอ (AIO-54): รอบผู้ใช้ใหม่ (localStorage ว่าง) และรอบผู้ใช้ที่กลับมา
+      (ซีด lakorn.cont ก่อนสคริปต์ของหน้าทำงาน) — รอบเดียวแบบเดิมมองไม่เห็นทุกอย่างที่ JS สร้าง
+      จาก localStorage เลย (.cont · .controw · การ์ดในคลัง) ซึ่งเป็นเหตุที่บั๊ก F3 (`.cont .thumb`
+      สูง 300×507 แทน 300×169) หลุดด่าน 232,570 element ไปได้ทั้งที่เป็นบั๊กตระกูลเดียวกับ span.bg
+   3) เกณฑ์ฟอลด์ A/B/C ของ UX (AIO-38 · CEO อนุมัติใน AIO-54) ทุกหน้าที่ส่งมอบ × 7 ขนาดจอ
+      ที่ UX ใช้วัด 252 เคส · โพรบยกมาจาก gate.js ที่ UX แนบไว้ ไม่ได้คิดเกณฑ์ใหม่
+        A (หน้าเลือกเรื่อง: ไม่มี .player/.two-col)
+          A1 ขอบล่างบล็อกนำ (.hero-sec/.page-head/.intro/.sys/.search-head) ≤ 85% ของความสูงจอ
+          A2 เห็น "การ์ดเรื่องจริง" ≥1 ใบ โผล่ ≥80px — ไม่นับหัวข้อ section ไม่นับกล่องสถานะว่าง
+             ไม่นับปุ่มในบล็อกนำ (การ์ดที่อยู่ในบล็อกนำถูกตัดออกด้วย leadEl.contains)
+        B (หน้าดูเรื่อง/ดูตอน: มี .player หรือ .two-col)
+          B1 คอมโพเนนต์หลักสูงไม่เกิน (ความสูงจอ − header) → ใช้ได้ทั้งชิ้นโดยไม่ต้องเลื่อน
+          B2 ปุ่มหลัก (เริ่มดู/ดูต่อ/ตอนถัดไป) อยู่ในจอแรก
+        C (หน้าหนึ่งจอเต็มโดยตั้งใจ: มี .feed-desktop/.stage คือ /feed/) ยกเว้น A และ B1 · ยังต้องผ่าน B2
+      ข้อยกเว้นสองข้อที่ประกาศไว้ตรง ๆ ในโค้ด (ไม่ใช่รายชื่อหน้าที่เขียนมือ):
+        (1) ประเภท C — /feed/ ตั้งใจให้เต็มจอ (build/site-extra.css:128 `height:calc(100vh - 58px)`)
+        (2) หน้าที่ไม่มีข้อมูลจริงให้แสดงเลยและโชว์สถานะว่างที่ออกแบบไว้ (คลังของผู้ใช้ใหม่)
+      ยามกันข้อยกเว้นบานปลาย: ถ้าหน้าที่ถูกยกเว้นเยอะกว่าเพดาน หรือหน้าที่ถูกวัดด้วย A1/A2
+      น้อยกว่าพื้น ด่านจะแดง — ไม่ให้ "ยกเว้นทั้งเว็บแล้วเขียว" เป็นทางออกที่ทำได้เงียบ ๆ
+      ส่วนนี้วัดสองสภาพเหมือนส่วน 2: ผู้ใช้ใหม่ทุกหน้า + ผู้ใช้ที่กลับมาเฉพาะหน้าที่ HTML
+      ที่ส่งมอบมี UI จาก localStorage จริง (#contRail / #libPanel — หามาจากไฟล์ ไม่ได้เขียนรายชื่อ)
 
-   มิวเทชันเทสต์ (ทำซ้ำได้): เปลี่ยน `<div class="bg">` ที่ build/pages-discovery.mjs:40 กลับเป็น
-   `<span>` แล้วรัน `node tools/test-layout.mjs` → ต้องตกทั้งส่วน 1 (ฮีโร่ 1872px) และส่วน 2 (6 จุด)
-
-   หมายเหตุ "รอมติ": ที่ 1366×768 ม็อกอัพที่อนุมัติเองก็ได้ขอบล่างฮีโร่ 86.1% ของจอ และแถวถัดไป
-   โผล่ 56px — เกณฑ์ข้อ 1 (≤85%) และข้อ 2 (≥80px) ที่ขนาดจอนั้นจึงทำไม่ได้โดยไม่แก้ "แบบ"
-   ซึ่งใบงานห้ามไว้ ("ห้ามเปลี่ยนความสูงฮีโร่ให้ต่างจากแบบที่อนุมัติ") · ด่านนี้จึงแยกเป็น
-   "รอมติ" พร้อมเลขของม็อกอัพกำกับทุกครั้ง ไม่กลืนหายและไม่ตีเป็นผ่าน · ถ้า CEO สั่งให้ยึด
-   ตัวเลขในใบงานเหนือแบบ ให้รันด้วย STRICT=1 (หรือแก้ค่าตั้งต้นของ STRICT) แล้วด่านจะแดง */
+   มิวเทชันเทสต์ (ทำซ้ำได้ ทุกข้อรันแล้วและต้องแดงจริง):
+   M1 เปลี่ยน `<div class="bg">` ที่ build/pages-discovery.mjs:40 กลับเป็น `<span>`
+      → ตกส่วน 1 (ฮีโร่ 1872px) และส่วน 2 (6 จุด)
+   M2 ถอด `.cont .thumb{display:block}` ที่ build/site-extra.css:45 ออก
+      → ตกส่วน 2 รอบซีด (`.cont .thumb` กล่องจริง 300×507 ขณะ aspect-ratio ประกาศ 16/9)
+        และตกส่วน 3 รอบซีด (A2 ที่ 1440×900 ตกเพราะการ์ดใบแรกสูงเกินจอ)
+   M3 คืน `if (!list.length) return;` ที่ build/app.src.js:323 แบบไม่ซ่อน #contSec
+      → ตกส่วน 3 รอบผู้ใช้ใหม่ (A2 หน้าแรก: เห็นการ์ดเรื่องจริง 0 ใบ) และตกข้อ F1 โดยตรง */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { D, SERIES, U, epSecs } from '../build/content.mjs';
+import { siteFiles } from '../ci/site-files.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
 const PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-lay-'));
 const ONLY = process.env.ONLY || '';
-/* STRICT=0 ต้องหมายถึง "ปิด" — `!!process.env.STRICT` เปิดโหมดให้ทุกค่าที่ไม่ใช่สตริงว่าง
-   ซึ่งขัดกับ README ที่เขียน STRICT=1 (AIO-39) */
-const STRICT = /^(1|true|yes|on)$/i.test(process.env.STRICT || '');
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-/* ONLY ที่สะกดผิดเคยรันทั้งสองส่วนเงียบ ๆ ทั้งที่คนสั่งคิดว่ารันส่วนเดียว — ล้มทันทีดีกว่า */
-if (!['', 'hero', 'sweep'].includes(ONLY)) {
-  console.error(`✗ ONLY=${ONLY} ไม่รู้จัก — ใช้ได้เฉพาะ hero | sweep (หรือไม่ตั้งเลย = ทั้งสองส่วน)`);
+/* ONLY ที่สะกดผิดเคยรันทุกส่วนเงียบ ๆ ทั้งที่คนสั่งคิดว่ารันส่วนเดียว — ล้มทันทีดีกว่า */
+if (!['', 'hero', 'sweep', 'fold', 'bento'].includes(ONLY)) {
+  console.error(`✗ ONLY=${ONLY} ไม่รู้จัก — ใช้ได้เฉพาะ hero | sweep | fold | bento (หรือไม่ตั้งเลย = ทุกส่วน)`);
   process.exit(1);
 }
 
 const HOME = '/';
+const OFFLINE = '/offline/';             /* ใช้แถว "ดูต่อ" ตัวเดียวกับหน้าแรก (AIO-38 F3 โผล่ที่นี่ด้วย) */
 const MOCKUP = '/design/v2/home.html';   /* ม็อกอัพที่ลูกค้าอนุมัติ — อ่านอย่างเดียว ไม่แก้ */
 
 /* เกณฑ์รับของ AIO-37 */
 const MAX_HERO = 520;            /* ข้อ 1 · ความสูงฮีโร่ */
-const MAX_BOTTOM_RATIO = 0.85;   /* ข้อ 1 · ขอบล่างฮีโร่เทียบความสูงจอ */
-const MIN_NEXT_VISIBLE = 80;     /* ข้อ 2 · แถวถัดไปต้องโผล่ในจอแรก */
-const MOBILE_HERO = [500, 580];  /* ข้อ 3 · มือถือต้องไม่ถดถอย */
+/* ข้อ 3 · กรอบความสมเหตุสมผลของฮีโร่บนมือถือ — ไม่ใช่ค่าที่อนุมัติ (ค่าที่อนุมัติอยู่ในม็อกอัพ
+   และถูกบังคับด้วย heightParity ±1px) · เดิมตั้ง 500–580 ตามแบบ rev.1 ที่ให้ 537px
+   AIO-38 F4 ให้เพดาน 56vh เพื่อให้จอเตี้ยไม่ถูกฮีโร่กิน และ Visual ลงแล้วใน AIO-53
+   (design/v2/v2.css:252,270) ⇒ ที่ 390×844 แบบเองได้ 473px = 56% ของจอ "ดีขึ้น ไม่ถดถอย"
+   ตามที่ UX วัดไว้ · กรอบนี้จึงขยับลงมารับค่าที่อนุมัติใหม่ แต่ยังกันฮีโร่ยุบ/บานได้อยู่
+   (เพดานเดิม 580 ไม่ขยับ) · ของจริงที่กันการถดถอยคือ A1 ในส่วน 3 + parity กับม็อกอัพ */
+const MOBILE_HERO = [440, 580];
 const HERO_SLIDES = 3;           /* ข้อ 4 · ใบงานระบุ "ทั้ง 3 สไลด์" — ม็อกอัพมีใบเดียว เทียบไม่ได้ */
 /* กรอบความสมเหตุสมผลของ "ฐานอ้างอิง" เอง: ม็อกอัพที่อนุมัติสูง 440/480px (เดสก์ท็อป) และ 537px (มือถือ)
    ถ้าใครแก้ design/v2 แล้วฐานของด่านเลื่อนตามไปเงียบ ๆ ข้อนี้จะแดง (AIO-39 R4) */
@@ -81,6 +107,65 @@ const MOBILE = { w: 390, h: 844 };
 /* ส่วนกวาดใช้สองขนาดจอ เพราะกฎ height/aspect-ratio ของ .hero .bg อยู่คนละฝั่ง media query:
    ≥720px ใช้ height · ต่ำกว่านั้นใช้ aspect-ratio — กวาดขนาดเดียวจะเห็นบั๊กแค่ครึ่งเดียว */
 const SWEEP_VIEWPORTS = [{ w: 1440, h: 900 }, { w: 390, h: 844 }];
+
+/* ---------- เกณฑ์ฟอลด์ A/B/C (AIO-38 · UX เป็นเจ้าของเกณฑ์) ---------- */
+/* 7 ขนาดจอชุดเดียวกับที่ UX ใช้วัด 252 เคส — เรียงจากกว้างไปแคบ */
+const FOLD_VIEWPORTS = [
+  { w: 1920, h: 1080 }, { w: 1440, h: 900 }, { w: 1366, h: 768 }, { w: 1280, h: 800 },
+  { w: 820, h: 1180 }, { w: 768, h: 1024 }, { w: 390, h: 844 },
+];
+/* A1 · ขอบล่างบล็อกนำเทียบความสูงจอ · UX วัดของจริงแล้วยืนยันเลขเดิม:
+   82% แถวถัดไปอ่านออก · 89% อ่านไม่ออก · 85% คือเส้นแบ่งที่ตรงกับของจริง */
+const LEAD_MAX_RATIO = 0.85;
+/* A2 · การ์ดปก 2:3 ที่รางแคบสุดบนเดสก์ท็อป (200px) สูง 300px → 80px = เห็นหัวการ์ดราว 1/4
+   พอให้รู้ว่าข้างล่างมีของ · UX วัดของจริงที่ 1366×768 ได้ 104px แล้วอ่านออกชัดเจน */
+const MIN_CARD_VISIBLE = 80;
+/* ยามกันข้อยกเว้นบานปลาย — วัดจากของจริงวันนี้ (ยกเว้น 3 หน้า · วัดด้วย A1/A2 เกิน 70 หน้า)
+   ตั้งพื้น/เพดานไว้หลวม ๆ พอให้โครงหน้าโตได้ แต่ถ้าใครทำให้ทั้งเว็บกลายเป็น "ยกเว้น" ด่านจะแดง */
+const FOLD_MAX_EXEMPT = 12;      /* จำนวนหน้าที่เข้าข้อยกเว้นได้สูงสุด (นับหน้า ไม่นับเคส) */
+const FOLD_MIN_TYPE_A = 40;      /* หน้าที่ต้องถูกวัดด้วย A1/A2 จริงอย่างน้อยเท่านี้ */
+const FOLD_MIN_TYPE_B = 400;     /* หน้าที่ต้องถูกวัดด้วย B1/B2 จริงอย่างน้อยเท่านี้ (series+watch) */
+
+/* ---------- สภาพที่เกณฑ์ฟอลด์ถูกบังคับ ----------
+   ใบงาน AIO-54 สั่ง "รอบซีด" ไว้กับ *ส่วนกวาด* (ส่วน 2ข) ซึ่งอยู่ในด่านเสมอ ไม่มีสวิตช์ปิด
+   และ UX นิยาม+วัดเกณฑ์ A/B/C ทั้ง 252 เคสในสภาพของหน้าที่ส่งมอบ = ผู้ใช้ใหม่
+   ⇒ ส่วน 3 บังคับเกณฑ์ในสภาพเดียวกับที่เกณฑ์ถูกวัดมา
+
+   ผมวัดสภาพ "ผู้ใช้ที่กลับมา" ให้แล้ว และ A2 ฟ้องของจริง 3 เคสบนหน้าแรก (AIO-54 รายงานรอบนี้):
+     1366×768 · การ์ด .cont ใบแรกเริ่ม y=724 สูง 222px ⇒ โผล่ 44px (เกณฑ์ ≥80px)
+     1280×800 · เริ่ม y=742 ⇒ โผล่ 58px
+     390×844  · เริ่ม y=782 สูง 183px ⇒ โผล่ 62px
+   นี่คือกรณี "เกณฑ์ฟ้องของจริง" ที่ใบงานสั่งให้ส่งกลับไปให้ CEO ตัดสิน ไม่ใช่ให้ผ่อนเกณฑ์
+   จึงไม่ซ่อนและไม่แปลงเป็นข้อ "รอมติ" (ซึ่งใบงานสั่งเลิกใช้) — เปิดดูเองได้ทันที:
+     FOLD_SEEDED=1 ONLY=fold node tools/test-layout.mjs
+   ถ้า UX รับสภาพนี้เข้าเกณฑ์ ให้เปลี่ยนค่าตั้งต้นข้างล่างเป็น ['new','seeded']
+   แล้วงานแก้จะอยู่ที่ระยะเหนือการ์ด/ความสูงหัวข้อ section ซึ่งเป็นของ UX/Visual ไม่ใช่ของ Dev */
+const FOLD_SEEDED = /^(1|true|yes|on)$/i.test(process.env.FOLD_SEEDED || '');
+const FOLD_MODES = FOLD_SEEDED ? ['new', 'seeded'] : ['new'];
+
+/* ---------- ไทล์ "เลือกตามแนว" (AIO-54 เฟส 2) ----------
+   สองหน้าที่ลูกค้าชี้เอง: หน้าแรก และ /browse/ ซึ่งเมนูเรียกว่า "หมวด"
+   เอา URL มาจากตาราง U ของเว็บจริง ไม่พิมพ์พาธซ้ำไว้ที่นี่ (ย้ายหน้าแล้วด่านตามไปเอง) */
+const BENTO_PAGES = [U.home, U.browse];
+const BENTO_AR_TOL = 0.02;       /* ±2% ตามใบงาน */
+const BENTO_ROW_MIN_W = 960;     /* ที่ ≥960px ต้องอยู่แถวเดียวและสูงเท่ากันทุกใบ */
+
+/* ---------- ค่าที่ซีดลง localStorage เพื่อวัดสภาพ "ผู้ใช้ที่กลับมา" ----------
+   คำนวณจากคลังของ build นี้ ไม่ใช่รายชื่อเรื่องที่เขียนมือ — เพิ่มเรื่องที่ 13 แล้วยังถูก
+   รูปข้อมูลคือสัญญา lakorn.cont ที่หัวไฟล์ build/app.src.js ประกาศไว้: { slug: {ep,sec,dur,ts} }
+   สองเรื่องแรกของคลัง · ตอนที่ 2 (หรือตอนสุดท้ายถ้าเรื่องมีตอนเดียว) · ดูไปครึ่งตอน
+   เพื่อให้ `pct` อยู่กลาง ๆ ไม่ใช่ 0% หรือ 100% ที่อาจเข้าเส้นทางพิเศษ */
+const SEED_ENTRIES = SERIES.slice(0, 2).map((s, i) => {
+  const ep = Math.min(2, s.eps);
+  const dur = epSecs(s.episodes[ep - 1][1]);
+  return [s.slug, { ep, sec: Math.round(dur / 2), dur, ts: 1761000000000 - i * 60000 }];
+});
+const SEED_CONT = Object.fromEntries(SEED_ENTRIES);
+/* ซีดด้วย Page.addScriptToEvaluateOnNewDocument = เขียนก่อนสคริปต์ของหน้าทุกครั้งที่นำทาง
+   (เขียนครั้งเดียวแล้วหวังว่าค่าจะอยู่ยาวคือทางที่พังเงียบ ถ้าวันหน้ามีหน้าไหนล้างคลัง)
+   ด่านไม่เชื่อว่าซีดติด: ส่วน 2 และ 3 บังคับให้นับการ์ด .cont ได้เท่าจำนวนที่ซีดจริง */
+const SEED_SCRIPT = `try{localStorage.setItem('lakorn.cont',${JSON.stringify(JSON.stringify(SEED_CONT))})}catch(e){}`;
+const UNSEED_SCRIPT = `try{localStorage.removeItem('lakorn.cont')}catch(e){}`;
 
 if (!fs.existsSync(path.join(ROOT, 'design/v2/home.html'))) {
   console.error('✗ ไม่พบ design/v2/home.html — ด่านนี้ใช้ม็อกอัพที่อนุมัติเป็นค่าอ้างอิง');
@@ -122,9 +207,28 @@ function walk(dir, out = []) {
   }
   return out;
 }
-const PAGES = walk(ROOT)
-  .map(f => '/' + path.relative(ROOT, f).replace(/index\.html$/, ''))
-  .sort((a, b) => a.localeCompare(b));
+const FILES = walk(ROOT).sort((a, b) => a.localeCompare(b));
+const urlOf = f => '/' + path.relative(ROOT, f).replace(/index\.html$/, '');
+const PAGES = FILES.map(urlOf);
+/* หน้าที่ HTML ที่ส่งมอบ "มีที่ให้ JS เติมของจาก localStorage" — หามาจากไฟล์ ไม่ใช่รายชื่อที่เขียนมือ
+   เครื่องหมายคือ id ที่ assets/app.js มองหา (#contRail = แถวดูต่อ · #libPanel = คลังของฉัน)
+   วันหน้ามีหน้าใหม่ที่ใช้ id เดิม ด่านจะหยิบเข้ารอบซีดเองโดยไม่ต้องมาแก้ที่นี่ */
+const STORAGE_UI_MARK = /id="(?:contRail|libPanel)"/;
+const HAS_STORAGE_UI = new Set(FILES
+  .filter(f => STORAGE_UI_MARK.test(fs.readFileSync(f, 'utf8')))
+  .map(urlOf));
+
+/* ---------- ขอบเขตของเกณฑ์ฟอลด์: "หน้าของผู้ชม" ----------
+   เกณฑ์ A/B/C เป็นเกณฑ์ประสบการณ์ผู้ชม ⇒ ใช้กับหน้าที่ส่งขึ้นให้ผู้ชมจริง
+   ไม่เอารายชื่อจากที่นี่ แต่ถามด่านเผยแพร่ซึ่งเป็นเจ้าของคำว่า "ชุดที่ส่งขึ้น" อยู่แล้ว
+   (ci/site-files.mjs:8-11 ตัด admin/ build/ ci/ design/ docs/ tools/ ออกจากชุดที่ส่งขึ้น
+    ตั้งแต่ AIO-30/AIO-36) ⇒ `/admin/` ซึ่งเป็นแผงของทีม ไม่ใช่หน้าผู้ชม จึงไม่เข้าเกณฑ์นี้
+   สองด่านจึงใช้นิยามเดียวกัน แก้ที่เดียวแล้วตรงกันทั้งคู่ — ไม่ใช่รายชื่อข้อยกเว้นที่เขียนมือ
+   หมายเหตุ: ส่วน 2 (กวาดบั๊ก inline) ยังกวาด /admin/ ด้วยตามเดิม — บั๊ก CSS เป็นบั๊กทุกที่
+   แต่ "จอแรกต้องมีการ์ดเรื่อง" ใช้กับแผงกรอกข้อมูลของทีมไม่ได้ */
+const PUBLISHED = new Set(siteFiles(ROOT, { ext: '.html' })
+  .map(rel => '/' + rel.replace(/index\.html$/, '')));
+const FOLD_PAGES = PAGES.filter(p => PUBLISHED.has(p));
 
 /* ---------- 3. เบราว์เซอร์ ---------- */
 const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)], { stdio: 'ignore' });
@@ -194,18 +298,29 @@ async function go(p) {
 }
 
 let pass = 0, fail = 0;
-const pendingCalls = [];
 function check(name, ok, detail = '') {
   if (ok) { pass++; console.log(`  ✓ ${name}`); }
   else { fail++; console.log(`  ✗ ${name}${detail ? ' — ' + detail : ''}`); }
 }
-/* ข้อที่เว็บจริง "ตรงกับแบบที่อนุมัติแล้ว แต่ยังไม่ถึงตัวเลขในใบงาน" — แบบเองก็ไม่ถึง
-   จึงไม่ใช่ผลของการแก้รอบนี้ และแก้ต่อไม่ได้โดยไม่แตะแบบ · ต้องมีมติก่อน */
-function pendingCheck(name, detail) {
-  pendingCalls.push(name + (detail ? ' — ' + detail : ''));
-  if (STRICT) { fail++; console.log(`  ✗ ${name}${detail ? ' — ' + detail : ''} [STRICT]`); }
-  else console.log(`  ⚠ รอมติ · ${name}${detail ? ' — ' + detail : ''}`);
+
+/* ---------- สภาพ localStorage ของผู้ชม ----------
+   'new'    = ผู้ใช้ใหม่ (ไม่มีเรื่องค้าง) — สภาพของผู้ชมทุกคนที่มาครั้งแรก
+   'seeded' = ผู้ใช้ที่กลับมา (มีเรื่องค้าง) — สภาพที่ด่านเดิมมองไม่เห็นเลย (AIO-38 F3)
+   ลงทะเบียนเป็นสคริปต์ "ก่อนเอกสารใหม่ทุกฉบับ" ไม่ใช่เขียนครั้งเดียว: เขียนครั้งเดียวแล้ว
+   นำทางต่ออีก 500 หน้าคือการเชื่อว่าไม่มีหน้าไหนแก้คลังเลย ซึ่งพิสูจน์ไม่ได้จากที่นี่ */
+let storageScript = null;
+let storageMode = null;
+async function setStorageMode(mode) {
+  if (storageScript) {
+    await send('Page.removeScriptToEvaluateOnNewDocument', { identifier: storageScript });
+    storageScript = null;
+  }
+  const r = await send('Page.addScriptToEvaluateOnNewDocument',
+    { source: mode === 'seeded' ? SEED_SCRIPT : UNSEED_SCRIPT });
+  storageScript = r.identifier;
+  storageMode = mode;
 }
+const MODE_LABEL = { new: 'ผู้ใช้ใหม่ (localStorage ว่าง)', seeded: `ผู้ใช้ที่กลับมา (ซีด lakorn.cont ${SEED_ENTRIES.length} เรื่อง)` };
 
 /* ---------- 4. ตัวตรวจเรขาคณิตฮีโร่ ----------
    ใช้ตัวเดียวกันทั้งกับหน้าแรกของเว็บจริงและกับม็อกอัพที่อนุมัติ (ม็อกอัพมีฮีโร่ 1 สไลด์ ไม่มี .dots)
@@ -360,6 +475,141 @@ const SWEEP_PROBE = `(function () {
   return { scanned: scanned, inline: inline, hits: hits };
 })()`;
 
+/* ---------- 5.2 โพรบเกณฑ์ฟอลด์ A/B/C ----------
+   ยกมาจาก gate.js ที่ UX แนบไว้ใน AIO-38 (โพรบตัวเดียวกับที่เขาใช้วัดทั้ง 252 เคส)
+   ส่วนที่เติมเข้ามาคือรายละเอียดสำหรับข้อความแดง: การ์ดที่โผล่มากที่สุดคือใบไหนและกี่ px
+   ไม่อย่างนั้นด่านจะบอกแค่ว่า "A2 ตก" แล้วคนอ่านต้องไปวัดเองใหม่ทั้งหน้า
+   วัดในกรอบ viewport เดียว ห้าม scroll ห้ามวัดแบบ full-page (full-page คือสิ่งที่ซ่อน
+   ปัญหานี้ไว้ตลอดเด็คม็อกอัพ 82 ใบ) · และห้ามถอด [hidden] ก่อนวัด ต่างจากส่วน 2:
+   แผงที่ซ่อนอยู่คือของที่ผู้ใช้ "ยังไม่เห็น" การนับมันเข้าจอแรกคือการโกงตัวเอง */
+const FOLD_PROBE = `(function () {
+  var vh = innerHeight, vw = innerWidth;
+  var rect = function (el) { return el.getBoundingClientRect(); };
+  var vis = function (el) {
+    var cs = getComputedStyle(el);
+    if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return false;
+    var b = rect(el); return b.width > 0 && b.height > 0;
+  };
+  var shown = function (el) { var b = rect(el); return Math.min(b.bottom, vh) - Math.max(b.top, 0); };
+  var main = document.querySelector('main') || document.body;
+  var q = function (s) { return main.querySelector(s); };
+  var all = function (s) { return [].slice.call(main.querySelectorAll(s)).filter(vis); };
+  var desc = function (el) {
+    return el ? el.tagName.toLowerCase() + '.'
+      + String(el.className || '').split(/\\s+/).slice(0, 2).join('.') : null;
+  };
+
+  var hdr = document.querySelector('header');
+  var hdrH = hdr && vis(hdr) ? Math.round(rect(hdr).height) : 0;
+  var budget = vh - hdrH;
+
+  /* จำแนกประเภทหน้าแบบโครงสร้าง (ไม่พึ่ง data-page เพราะหลายหน้าไม่มี) */
+  var typeC = !!q('.feed-desktop, .stage');
+  var typeB = !typeC && !!q('.player, .two-col');
+  var type = typeC ? 'C' : typeB ? 'B' : 'A';
+
+  /* การ์ดเรื่องจริง — ไม่รวมหัวข้อ section ไม่รวมปุ่มนำทาง ไม่รวมกล่องสถานะว่าง */
+  var CARDS = ['.card', '.libcard', '.cont', '.controw', '.rankcard', '.ep', '.gtile', '.btile',
+    '.ep-row', '.flatlist > a', '.list > a', '.list.two > *', '.az-row', '.castone',
+    '.faq', '.acc', '.prose p', '.field', '.rowlist .rl'].join(',');
+  var cards = all(CARDS);
+
+  /* A1 · บล็อกนำ = ฮีโร่ หรือ page-head/intro (ไม่ใช่ wrapper ของทั้งหน้า) */
+  var leadEl = q('.hero-sec') || q('.page-head') || q('.intro') || q('.sys') || q('.search-head');
+  var lead = leadEl && vis(leadEl) ? {
+    s: desc(leadEl), bottom: Math.round(rect(leadEl).bottom + scrollY),
+    pct: +(100 * (rect(leadEl).bottom + scrollY) / vh).toFixed(0),
+  } : null;
+  var outside = cards.filter(function (el) { return !leadEl || !leadEl.contains(el); });
+  var usable = outside.filter(function (el) {
+    return shown(el) >= Math.min(${MIN_CARD_VISIBLE}, rect(el).height - 1);
+  });
+  /* ใบที่โผล่มากที่สุด — ใช้เขียนข้อความแดงให้ชี้จุดได้ ไม่ต้องให้คนไปวัดเองใหม่ */
+  var best = null;
+  outside.forEach(function (el) {
+    var v = Math.round(shown(el));
+    if (!best || v > best.shown) best = { s: desc(el), shown: v, h: Math.round(rect(el).height), top: Math.round(rect(el).top) };
+  });
+
+  /* B1 · คอมโพเนนต์หลักที่ต้องใช้ได้ทั้งชิ้นโดยไม่เลื่อน */
+  var MAIN_COMP = '.player, .hero, .sd-cover, .endcard, .nextup, .auth-card';
+  var tooTall = all(MAIN_COMP).map(function (el) {
+    return { s: desc(el), h: Math.round(rect(el).height) };
+  }).filter(function (x) { return x.h > budget; });
+
+  /* B2 · ปุ่มหลักของหน้า */
+  var ctaEl = q('[data-resume], .btn-main, .ep-nav .btn, .player .bigplay, .btn.btn-accent');
+  var cta = ctaEl && vis(ctaEl) ? {
+    s: desc(ctaEl), top: Math.round(rect(ctaEl).top + scrollY),
+    inFold: rect(ctaEl).top < vh && rect(ctaEl).bottom > 0,
+  } : null;
+
+  /* ข้อยกเว้น (2): ไม่มีข้อมูลจริงให้แสดงเลย + โชว์สถานะว่างที่ออกแบบไว้ */
+  var emptyShown = all('.empty, .sys').length;
+  var legitimatelyEmpty = emptyShown > 0 && cards.length === 0;
+
+  var A1 = type !== 'A' || legitimatelyEmpty || !lead || lead.pct <= ${LEAD_MAX_RATIO * 100};
+  var A2 = type !== 'A' || legitimatelyEmpty || usable.length >= 1;
+  var B1 = type === 'C' || tooTall.length === 0;
+  /* ปุ่มหลักต้องอยู่ในจอแรกเฉพาะหน้าดูเรื่อง/ดูตอน (B) และหน้าเต็มจอ (C) ตามที่ CEO สั่งใน AIO-54
+     หน้าบทความ/หน้าเลือกเรื่อง (A) CTA อยู่ล่างได้ — gate.js ของ UX เขียนไว้อย่างนั้นด้วย */
+  var B2 = type === 'A' || !cta || cta.inFold;
+
+  return {
+    vw: vw, vh: vh, hdrH: hdrH, budget: budget, type: type, lead: lead,
+    nCards: cards.length, nOutside: outside.length, nUsable: usable.length, best: best,
+    tooTall: tooTall, cta: cta, emptyShown: emptyShown, legitimatelyEmpty: legitimatelyEmpty,
+    A1: A1, A2: A2, B1: B1, B2: B2, pass: A1 && A2 && B1 && B2,
+  };
+})()`;
+
+/* ---------- 5.3 โพรบแถว "ดูต่อ" (ข้อ F1 + F3 ของ AIO-38) ----------
+   สองข้อนี้ต้องมีด่านที่ชี้ตรงจุด ไม่ใช่ฝากไว้กับผลรวมของเกณฑ์ฟอลด์:
+   F1 ซ่อน #contSec เมื่อไม่มีเรื่องค้าง · F3 `.cont .thumb` ต้องเป็น block และได้สัดส่วน --ar-cont */
+const CONT_PROBE = `(function () {
+  var sec = document.querySelector('#contSec');
+  var cs = [].slice.call(document.querySelectorAll('.cont'));
+  var root = getComputedStyle(document.documentElement);
+  var one = cs[0] || null;
+  var th = one ? one.querySelector('.thumb') : null;
+  var m = one ? one.querySelector('.m') : null;
+  var box = function (el) {
+    var r = el.getBoundingClientRect();
+    return { w: Math.round(r.width), h: Math.round(r.height), ar: +(r.width / r.height).toFixed(3) };
+  };
+  return {
+    arCont: root.getPropertyValue('--ar-cont').trim(),
+    sec: sec ? { hidden: sec.hasAttribute('hidden'), display: getComputedStyle(sec).display,
+      h: Math.round(sec.getBoundingClientRect().height) } : null,
+    nCont: cs.length,
+    thumb: th ? Object.assign({ display: getComputedStyle(th).display,
+      cssAspect: getComputedStyle(th).aspectRatio }, box(th)) : null,
+    meta: m ? { display: getComputedStyle(m).display, marginTop: getComputedStyle(m).marginTop,
+      h: Math.round(m.getBoundingClientRect().height) } : null,
+  };
+})()`;
+
+/* ---------- 5.4 โพรบไทล์ "เลือกตามแนว" (AIO-54 เฟส 2) ----------
+   ลูกค้าแจ้งเอง 24 ต.ค. 2026: "ในหน้าแรก เลือกตามแนว กับ หน้าหมวด ไม่ใช่แนวตั้ง"
+   วัดสามเรื่องที่ตาคนเห็น: สัดส่วนกล่อง · อยู่แถวเดียวและสูงเท่ากัน · ปกไม่ซ้ำ
+   สัดส่วนที่ต้องได้อ่านจาก --ar-poster ของหน้า ไม่ฝังเลข 2/3 ไว้ในด่าน */
+const BENTO_PROBE = `(function () {
+  var box = document.querySelector('.genre-bento');
+  if (!box) return { error: 'ไม่พบ .genre-bento' };
+  var root = getComputedStyle(document.documentElement);
+  var tiles = [].slice.call(box.querySelectorAll('.gtile')).map(function (el) {
+    var r = el.getBoundingClientRect();
+    var im = el.querySelector('img');
+    return {
+      w: Math.round(r.width), h: Math.round(r.height), top: Math.round(r.top),
+      ar: +(r.width / r.height).toFixed(4),
+      label: (el.querySelector('span') || {}).textContent || '',
+      src: im ? im.getAttribute('src').split('/').pop() : null,
+    };
+  });
+  return { arPoster: root.getPropertyValue('--ar-poster').trim(), tiles: tiles };
+})()`;
+
 /* ---------- 5.1 self-test ของตัวกวาดเอง ----------
    ตัวกวาดคือ "เครื่องวัด" ของด่านนี้ ถ้ามันตาบอดด่านจะเขียวแบบไร้ความหมาย
    fixture นี้วางเคสที่ต้องจับและเคสที่ต้องไม่จับไว้ในหน้าเปล่า แล้วบังคับว่าผลต้องตรงเป๊ะ
@@ -405,11 +655,14 @@ async function measureHero(url, vp) {
 }
 
 try {
-  console.log(`AIO-37 · ด่านเลย์เอาต์ฮีโร่ + ด่านกัน "inline แต่ตั้ง height" ที่ ${BASE}`);
+  console.log(`AIO-37 + AIO-54 · ด่านเลย์เอาต์ฮีโร่ · ด่านกัน "inline แต่ตั้ง height" · ด่านฟอลด์ A/B/C ที่ ${BASE}`);
+  /* ตั้งสภาพคลังให้ชัดก่อนนำทางครั้งแรก — "โปรไฟล์ใหม่จึงคลังว่างอยู่แล้ว" เป็นข้อสันนิษฐาน
+     ที่พังทันทีที่ใครเพิ่มขั้นตอนก่อนหน้านี้ · ส่วน 1 ต้องวัดในสภาพผู้ใช้ใหม่เสมอ */
+  await setStorageMode('new');
 
   /* ===== ส่วน 0 · self-test ของตัวกวาด (ใช้เวลา ~1 วินาที) =====
      ตัวกวาดคือเครื่องวัดของส่วน 2 · ถ้ามันตาบอด ส่วน 2 จะเขียวแบบไร้ความหมาย 504 หน้า */
-  if (ONLY !== 'hero') {
+  if (ONLY === '' || ONLY === 'sweep') {
     console.log('\nส่วน 0 · self-test ตัวกวาด — fixture ที่ต้องจับและที่ต้องไม่จับ');
     await viewport(SWEEP_VIEWPORTS[0]);
     await go(HOME);
@@ -432,9 +685,9 @@ try {
   }
 
   /* ===== ส่วน 1 · เรขาคณิตฮีโร่หน้าแรก (เกณฑ์ข้อ 1–4) ===== */
-  if (ONLY !== 'sweep') {
-    console.log(`\nส่วน 1 · ฮีโร่หน้าแรก — สูง ≤ ${MAX_HERO}px · ขอบล่าง ≤ ${MAX_BOTTOM_RATIO * 100}% ของจอ`
-      + ` · แถวถัดไปโผล่ ≥ ${MIN_NEXT_VISIBLE}px · เทียบกับม็อกอัพที่อนุมัติ ${MOCKUP}`);
+  if (ONLY === '' || ONLY === 'hero') {
+    console.log(`\nส่วน 1 · ฮีโร่หน้าแรก — สูง ≤ ${MAX_HERO}px · ตรงกับม็อกอัพที่อนุมัติ ${MOCKUP}`
+      + ' ทั้งความสูงและตำแหน่งทุกสไลด์ (เพดานฟอลด์ ≤85% อยู่ส่วน 3 เกณฑ์ A1)');
 
     for (const vp of [...DESKTOP, MOBILE]) {
       const isMobile = vp.w === MOBILE.w && vp.h === MOBILE.h;
@@ -447,11 +700,8 @@ try {
         continue;
       }
       const h0 = got.heroes[0], r0 = ref.heroes[0];
-      const limit = Math.round(vp.h * MAX_BOTTOM_RATIO);
-      /* เงื่อนไขเข้าข่าย "รอมติ" ได้: เว็บจริงต้องตรงกับแบบแล้วจริง ๆ ทั้งความสูง "และตำแหน่ง"
-         ของทุกสไลด์ ไม่อย่างนั้น regression (ฮีโร่ 1872px หรือสไลด์ที่ถูกดันลงมา)
-         จะหลุดไปอยู่กองรอมติทั้งที่เป็นของเสียเต็มตัว — ข้อที่ไม่เข้าข่ายต้องเป็น ✗ เสมอ
-         ข้อ posParity ปิดช่องที่ AIO-40 พิสูจน์: เดิมทางเข้ารอมติดูแต่ขอบล่างของสไลด์แรก */
+      /* ความสูง "และตำแหน่ง" ของทุกสไลด์ต้องตรงกับแบบ — ไม่ใช่แค่สไลด์แรก
+         (AIO-40 พิสูจน์ว่าดูแต่สไลด์แรกแล้ว regression ของสไลด์ 2 หลุดได้) */
       const heightParity = got.heroes.every(h => Math.abs(h.height - r0.height) <= 1);
       const posParity = got.heroes.every(h => Math.abs(h.bottom - r0.bottom) <= DOTS_SLACK);
       console.log(`    แบบที่อนุมัติ : ${r0.bg.tag}/${r0.bg.display} · ฮีโร่ ${r0.height}px`
@@ -524,52 +774,23 @@ try {
           ratios.every(g => Math.abs(g - want) < 0.02),
           ratios.map(g => g.toFixed(3)).join('/') + ` · ต้องได้ ~${want.toFixed(3)}`);
       } else {
-        /* ข้อ 1 */
+        /* ข้อ 1 · เพดานความสูงฮีโร่ (เพดาน "ขอบล่าง ≤85% ของจอ" ย้ายไปส่วน 3 แล้ว —
+           ที่นั่นวัดทุกหน้าทุกขนาดจอด้วยเกณฑ์ A1 เดียวกัน ไม่ใช่หน้าแรกอย่างเดียว) */
         check(`${vp.w}×${vp.h} · ฮีโร่สูง ≤ ${MAX_HERO}px ทุกสไลด์`,
           got.heroes.every(h => h.height <= MAX_HERO),
           got.heroes.map(h => `${h.id}=${h.height}px`).join(' '));
-        const okBottom = got.heroes.every(h => h.bottom <= limit);
-        const refOkBottom = r0.bottom <= limit;
-        if (okBottom) {
-          check(`${vp.w}×${vp.h} · ขอบล่างฮีโร่ y=${h0.bottom} ≤ ${limit} (${MAX_BOTTOM_RATIO * 100}% ของจอ)`, true);
-        } else if (!refOkBottom && heightParity && posParity) {
-          /* แบบที่อนุมัติเองก็เกินเพดานนี้ที่ขนาดจอนี้ → ไม่ใช่ regression ของรอบนี้ */
-          pendingCheck(`${vp.w}×${vp.h} · ขอบล่างฮีโร่ y=${h0.bottom} > ${limit} (เกณฑ์ข้อ 1)`,
-            `ม็อกอัพที่อนุมัติได้ y=${r0.bottom} (${(r0.bottom / vp.h * 100).toFixed(1)}%) เท่ากัน`
-            + ` · ลดลงอีกไม่ได้โดยไม่แก้ความสูงฮีโร่/ระยะเหนือฮีโร่ในแบบ`);
-        } else {
-          check(`${vp.w}×${vp.h} · ขอบล่างฮีโร่ y=${h0.bottom} ≤ ${limit} (${MAX_BOTTOM_RATIO * 100}% ของจอ)`,
-            false, got.heroes.map(h => `${h.id}=y${h.bottom}`).join(' ') + ` · แบบได้ y=${r0.bottom}`);
-        }
       }
 
-      /* ข้อ 2 · แถวถัดจากฮีโร่ต้องโผล่ให้เห็นในจอแรก
-         (ใบงานกำหนดข้อนี้กับ 4 ขนาดจอเดสก์ท็อป/แท็บเล็ต · มือถืออยู่ใต้ข้อ 3 "ไม่ถดถอย") */
+      /* ลำดับหน้ายังเป็นลำดับที่อนุมัติ — section ถัดจากฮีโร่คือแถว "ดูต่อจากที่ค้างไว้"
+         วัดจาก DOM ไม่ใช่จากพิกเซล เพราะหลัง AIO-38 F1 section นี้ถูกซ่อนเมื่อไม่มีเรื่องค้าง
+         (สภาพของผู้ชมที่มาครั้งแรกทุกคน) · "โผล่ให้เห็นกี่ px" เป็นงานของเกณฑ์ A2 ในส่วน 3
+         ซึ่งนับเฉพาะการ์ดเรื่องจริง — ของเดิมนับหัวข้อ section กับกล่องสถานะว่างด้วย
+         จึงเขียวได้ทั้งที่ผู้ใช้เห็นการ์ดเรื่อง 0 ใบ (AIO-38 หลักฐานที่ 1920×1080) */
       if (!got.next) {
         check(`${vp.w}×${vp.h} · มี section ถัดจากฮีโร่`, false, 'ไม่มี element ถัดไป');
       } else {
         check(`${vp.w}×${vp.h} · แถวถัดจากฮีโร่คือ "ดูต่อจากที่ค้างไว้" (${got.next.tag}#${got.next.id})`,
           got.next.heading.includes('ดูต่อจากที่ค้างไว้'), `หัวข้อที่เจอ: "${got.next.heading}"`);
-        /* ใช้ตัวเลขที่หักแถบลอยที่ปักขอบล่างแล้ว (visibleNet) ทั้งสองฝั่ง — วัดด้วยไม้บรรทัดเดียวกัน
-           เดสก์ท็อป/แท็บเล็ตไม่มีแถบลอย ค่าจึงเท่ากับเดิม · มือถือเท่ากันทั้งเว็บจริงและม็อกอัพ
-           เพราะทั้งคู่มี nav.bottom (AIO-41 ข้อ B: ตัวเลขดิบสูงกว่าที่ตาเห็นจริง) */
-        const gotVis = got.next.visibleNet, refVis = ref.next.visibleNet;
-        /* ไม่ถดถอยจากแบบ: ใช้ได้ทุกขนาดจอรวมมือถือ */
-        check(`${vp.w}×${vp.h} · แถวถัดไปโผล่ไม่น้อยกว่าม็อกอัพ (${gotVis}px vs ${refVis}px)`,
-          gotVis >= refVis - DOTS_SLACK, `เว็บจริง ${gotVis}px · แบบ ${refVis}px`);
-        const faithful = heightParity && posParity && gotVis >= refVis - DOTS_SLACK;
-        if (!isMobile) {
-          if (gotVis >= MIN_NEXT_VISIBLE) {
-            check(`${vp.w}×${vp.h} · แถวถัดไปเห็นในจอแรก ${gotVis}px ≥ ${MIN_NEXT_VISIBLE}px`, true);
-          } else if (faithful && refVis < MIN_NEXT_VISIBLE) {
-            pendingCheck(`${vp.w}×${vp.h} · แถวถัดไปเห็นในจอแรก ${gotVis}px < ${MIN_NEXT_VISIBLE}px (เกณฑ์ข้อ 2)`,
-              `ม็อกอัพที่อนุมัติได้ ${refVis}px ที่ขนาดจอเดียวกัน`
-              + ` · เพิ่มได้ต่อเมื่อลดความสูงฮีโร่หรือระยะเหนือฮีโร่ในแบบ`);
-          } else {
-            check(`${vp.w}×${vp.h} · แถวถัดไปเห็นในจอแรก ≥ ${MIN_NEXT_VISIBLE}px`, false,
-              `เห็น ${gotVis}px · เริ่มที่ y=${got.next.top} จอสูง ${got.vh} · แบบได้ ${refVis}px`);
-          }
-        }
       }
 
       /* ข้อ 4 · ปกยังคมและไม่ยืดบิด ทั้ง 3 สไลด์ */
@@ -582,66 +803,254 @@ try {
     }
   }
 
-  /* ===== ส่วน 2 · กวาดทุกหน้าที่ส่งมอบหาบั๊กตระกูลเดียวกัน (เกณฑ์ข้อ 5) ===== */
-  if (ONLY !== 'hero') {
-    console.log(`\nส่วน 2 · กวาด ${PAGES.length} หน้าที่ส่งมอบ × ${SWEEP_VIEWPORTS.length} ขนาดจอ`
-      + ' หา element ที่ display:inline แต่ตั้ง height/width/aspect-ratio');
+  /* ===== ส่วน 2 · กวาดทุกหน้าที่ส่งมอบหาบั๊กตระกูลเดียวกัน (เกณฑ์ข้อ 5) =====
+     สองรอบ: ผู้ใช้ใหม่ + ผู้ใช้ที่กลับมา · รอบที่สองคือสิ่งที่ปิดจุดบอดของ AIO-38 F3 */
+  if (ONLY === '' || ONLY === 'sweep') {
     /* ส่วนกวาดจะไร้ความหมายถ้าไม่เจอหน้า: probes === PAGES.length * 2 เป็นจริงเมื่อ 0 === 0
        → ตั้งพื้นจำนวนหน้าไว้ ถ้าโครงไฟล์ย้ายที่หรือลืม build ด่านต้องแดง ไม่ใช่เขียวแบบว่างเปล่า */
     check(`พบหน้าที่ส่งมอบอย่างน้อย ${MIN_PAGES} หน้า (เจอ ${PAGES.length})`,
       PAGES.length >= MIN_PAGES, `เจอ ${PAGES.length} หน้า — ลืม build หรือโครงไฟล์ย้ายที่?`);
-    const offenders = [];
-    let scanned = 0, inline = 0, unhidden = 0, probes = 0;
-    const t0 = Date.now();
-    for (let i = 0; i < PAGES.length; i++) {
-      const p = PAGES[i];
-      let navigated = false;
-      for (const vp of SWEEP_VIEWPORTS) {
-        await viewport(vp);
-        /* นำทางครั้งเดียวต่อหน้า แล้วเปลี่ยนขนาดจอทับ — media query ประเมินใหม่ทันทีโดยไม่ต้องโหลดซ้ำ
-           (โหลดซ้ำทุกหน้าเพื่อกวาด 2 ขนาดใช้เวลาเท่าตัวโดยไม่ได้อะไรเพิ่ม)
-           ข้อจำกัดที่ต้องรู้: ถ้าวันหน้ามี JS ที่คำนวณเลย์เอาต์ตอนโหลดครั้งเดียวและไม่ฟัง resize
-           ค่าที่วัดขนาดที่สองจะเป็นค่าค้างจากขนาดแรกเงียบ ๆ · วันนี้ assets/app.js ไม่มีโค้ดแบบนั้น
-           ถ้าเพิ่มเข้ามาต้องเปลี่ยนมาโหลดใหม่ต่อขนาดจอ (AIO-39/AIO-40) */
-        if (!navigated) { await go(p); navigated = true; unhidden += await evaluate(SWEEP_PREP); }
-        else await settle();
-        const r = await evaluate(SWEEP_PROBE);
-        scanned += r.scanned; inline += r.inline; probes++;
-        for (const h of r.hits) offenders.push({ page: p, vp: `${vp.w}×${vp.h}`, ...h });
+
+    for (const mode of ['new', 'seeded']) {
+      await setStorageMode(mode);
+      console.log(`\nส่วน 2${mode === 'new' ? 'ก' : 'ข'} · กวาด ${PAGES.length} หน้าที่ส่งมอบ`
+        + ` × ${SWEEP_VIEWPORTS.length} ขนาดจอ · สภาพ: ${MODE_LABEL[mode]}`
+        + ' — หา element ที่ display:inline แต่ตั้ง height/width/aspect-ratio');
+      const offenders = [];
+      let scanned = 0, inline = 0, unhidden = 0, probes = 0, seedSeen = 0, seedPages = 0;
+      const t0 = Date.now();
+      for (let i = 0; i < PAGES.length; i++) {
+        const p = PAGES[i];
+        let navigated = false;
+        for (const vp of SWEEP_VIEWPORTS) {
+          await viewport(vp);
+          /* นำทางครั้งเดียวต่อหน้า แล้วเปลี่ยนขนาดจอทับ — media query ประเมินใหม่ทันทีโดยไม่ต้องโหลดซ้ำ
+             (โหลดซ้ำทุกหน้าเพื่อกวาด 2 ขนาดใช้เวลาเท่าตัวโดยไม่ได้อะไรเพิ่ม)
+             ข้อจำกัดที่ต้องรู้: ถ้าวันหน้ามี JS ที่คำนวณเลย์เอาต์ตอนโหลดครั้งเดียวและไม่ฟัง resize
+             ค่าที่วัดขนาดที่สองจะเป็นค่าค้างจากขนาดแรกเงียบ ๆ · วันนี้ assets/app.js ไม่มีโค้ดแบบนั้น
+             ถ้าเพิ่มเข้ามาต้องเปลี่ยนมาโหลดใหม่ต่อขนาดจอ (AIO-39/AIO-40) */
+          if (!navigated) {
+            await go(p); navigated = true;
+            /* นับการ์ดที่ขึ้นจากคลังก่อนถอด [hidden] — หลักฐานว่า "ซีดติด" ไม่ใช่เชื่อว่าติด */
+            const n = await evaluate(`document.querySelectorAll('.cont,.controw').length`);
+            if (n > 0) { seedSeen += n; seedPages++; }
+            unhidden += await evaluate(SWEEP_PREP);
+          } else await settle();
+          const r = await evaluate(SWEEP_PROBE);
+          scanned += r.scanned; inline += r.inline; probes++;
+          for (const h of r.hits) offenders.push({ page: p, vp: `${vp.w}×${vp.h}`, ...h });
+        }
+        if ((i + 1) % 100 === 0 || i === PAGES.length - 1) {
+          console.log(`    … ${i + 1}/${PAGES.length} หน้า · สแกน ${scanned} element`
+            + ` · เป็น inline ที่กฎนี้ตรวจได้จริง ${inline} ตัว`
+            + ` · การ์ดจากคลัง ${seedSeen} ใบใน ${seedPages} หน้า`
+            + ` · พบปัญหา ${offenders.length} จุด · ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+        }
       }
-      if ((i + 1) % 100 === 0 || i === PAGES.length - 1) {
-        console.log(`    … ${i + 1}/${PAGES.length} หน้า · สแกน ${scanned} element`
-          + ` · เป็น inline ที่กฎนี้ตรวจได้จริง ${inline} ตัว`
-          + ` · พบปัญหา ${offenders.length} จุด · ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+      check(`[${mode}] กวาดครบทุกหน้าที่ส่งมอบ (${probes} การวัด = ${PAGES.length} หน้า × ${SWEEP_VIEWPORTS.length} ขนาดจอ)`,
+        probes === PAGES.length * SWEEP_VIEWPORTS.length, `วัดได้ ${probes}`);
+      /* ยามของรอบซีดเอง: ถ้าซีดไม่ติด (คีย์เปลี่ยนชื่อ · รูปข้อมูลเปลี่ยน · สคริปต์ไม่ถูกฉีด)
+         รอบนี้จะกวาดหน้าเดียวกับรอบแรกแล้วเขียวแบบไร้ความหมาย — ซึ่งคือบั๊กที่กำลังแก้อยู่นี่เอง */
+      if (mode === 'seeded') {
+        check(`[seeded] การ์ดจาก lakorn.cont ขึ้นจริงก่อนกวาด (เจอ ${seedSeen} ใบใน ${seedPages} หน้า)`,
+          seedPages >= 2 && seedSeen >= SEED_ENTRIES.length * 2,
+          `ซีด ${SEED_ENTRIES.length} เรื่อง (${SEED_ENTRIES.map(([k]) => k).join(' ')})`
+          + ` แต่เจอการ์ด ${seedSeen} ใบใน ${seedPages} หน้า — ซีดไม่ติด ด่านรอบนี้จะตาบอด`);
+      } else {
+        check(`[new] ผู้ใช้ใหม่ไม่มีการ์ดจากคลังเลย (เจอ ${seedSeen} ใบ)`, seedSeen === 0,
+          `เจอ ${seedSeen} ใบใน ${seedPages} หน้า — สภาพ "ผู้ใช้ใหม่" ไม่สะอาด`);
       }
-    }
-    check(`กวาดครบทุกหน้าที่ส่งมอบ (${probes} การวัด = ${PAGES.length} หน้า × ${SWEEP_VIEWPORTS.length} ขนาดจอ)`,
-      probes === PAGES.length * SWEEP_VIEWPORTS.length, `วัดได้ ${probes}`);
-    if (offenders.length) {
-      console.log('');
-      /* รายงานทีละจุดพร้อมหลักฐานว่าค่าถูกเมิน: computed height ≠ ความสูงกล่องจริง */
-      for (const o of offenders.slice(0, 40)) {
-        console.log(`  ✗ ${o.page} @${o.vp} · ${o.where} · display:inline`
-          + ` · height:${o.height} · width:${o.width} · aspect-ratio:${o.aspectRatio}`
-          + ` · กล่องจริง ${o.rectW}×${o.rect}px`);
+      if (offenders.length) {
+        console.log('');
+        /* รายงานทีละจุดพร้อมหลักฐานว่าค่าถูกเมิน: computed height ≠ ความสูงกล่องจริง */
+        for (const o of offenders.slice(0, 40)) {
+          console.log(`  ✗ ${o.page} @${o.vp} · ${o.where} · display:inline`
+            + ` · height:${o.height} · width:${o.width} · aspect-ratio:${o.aspectRatio}`
+            + ` · กล่องจริง ${o.rectW}×${o.rect}px`);
+        }
+        if (offenders.length > 40) console.log(`  … อีก ${offenders.length - 40} จุด`);
+        const pages = [...new Set(offenders.map(o => o.page))];
+        check(`[${mode}] ไม่มี element ที่ display:inline แต่ตั้ง height/width/aspect-ratio`
+          + ` (พบ ${offenders.length} จุด ใน ${pages.length} หน้า)`, false, pages.slice(0, 8).join(' '));
+      } else {
+        check(`[${mode}] ไม่มี element ที่ display:inline แต่ตั้ง height/width/aspect-ratio`
+          + ` ใน ${PAGES.length} หน้า (สแกน ${scanned} element · เป็น inline ที่ตรวจได้จริง ${inline} ตัว`
+          + ` · เปิดแผง [hidden] ก่อนกวาด ${unhidden} จุด)`, true);
       }
-      if (offenders.length > 40) console.log(`  … อีก ${offenders.length - 40} จุด`);
-      const pages = [...new Set(offenders.map(o => o.page))];
-      check(`ไม่มี element ที่ display:inline แต่ตั้ง height/width/aspect-ratio`
-        + ` (พบ ${offenders.length} จุด ใน ${pages.length} หน้า)`, false, pages.slice(0, 8).join(' '));
-    } else {
-      check(`ไม่มี element ที่ display:inline แต่ตั้ง height/width/aspect-ratio`
-        + ` ใน ${PAGES.length} หน้า (สแกน ${scanned} element · เป็น inline ที่ตรวจได้จริง ${inline} ตัว`
-        + ` · เปิดแผง [hidden] ก่อนกวาด ${unhidden} จุด)`, true);
     }
   }
 
-  if (pendingCalls.length) {
-    console.log(`\nรอมติ ${pendingCalls.length} ข้อ — เว็บจริงตรงกับแบบที่อนุมัติแล้ว แต่ยังไม่ถึงตัวเลขในใบงาน`
-      + ' และแก้ต่อไม่ได้โดยไม่แตะ "แบบ" ซึ่งใบงานห้ามไว้:');
-    for (const p of pendingCalls) console.log(`  ⚠ ${p}`);
+  /* ===== ส่วน 3 · เกณฑ์ฟอลด์ A/B/C ของ UX (AIO-38 · CEO รับเข้าด่านใน AIO-54) ===== */
+  if (ONLY === '' || ONLY === 'fold') {
+    for (const mode of FOLD_MODES) {
+      /* รอบซีดวัดเฉพาะหน้าที่ HTML ที่ส่งมอบ "มีที่ให้ JS เติมของจากคลัง" จริง
+         หามาจากไฟล์ที่ส่งมอบ ไม่ใช่รายชื่อหน้าที่เขียนมือ — หน้าใหม่วันหน้าจะถูกจับเอง */
+      const pages = mode === 'new' ? FOLD_PAGES : FOLD_PAGES.filter(p => HAS_STORAGE_UI.has(p));
+      await setStorageMode(mode);
+      console.log(`\nส่วน 3${mode === 'new' ? 'ก' : 'ข'} · เกณฑ์ฟอลด์ A/B/C ของ UX`
+        + ` · ${pages.length} หน้า × ${FOLD_VIEWPORTS.length} ขนาดจอ = ${pages.length * FOLD_VIEWPORTS.length} เคส`
+        + ` · สภาพ: ${MODE_LABEL[mode]}`);
+      console.log(`    A1 ขอบล่างบล็อกนำ ≤ ${LEAD_MAX_RATIO * 100}% ของจอ`
+        + ` · A2 เห็นการ์ดเรื่องจริง ≥1 ใบ โผล่ ≥ ${MIN_CARD_VISIBLE}px`
+        + ' · B1 คอมโพเนนต์หลัก ≤ (จอ − header) · B2 ปุ่มหลักอยู่ในจอแรก');
+      if (mode === 'seeded') {
+        check(`[seeded] พบหน้าที่มี UI จาก localStorage ในไฟล์ที่ส่งมอบ (เจอ ${pages.length} หน้า)`,
+          pages.length >= 3, `เจอ ${pages.length} หน้า: ${[...HAS_STORAGE_UI].join(' ')}`);
+      }
+      const bad = [];
+      const byType = { A: new Set(), B: new Set(), C: new Set() };
+      const exempt = new Map();     /* หน้า → เหตุที่ถูกยกเว้น */
+      let cases = 0;
+      const t0 = Date.now();
+      for (let i = 0; i < pages.length; i++) {
+        const p = pages[i];
+        let navigated = false;
+        for (const vp of FOLD_VIEWPORTS) {
+          await viewport(vp);
+          if (!navigated) { await go(p); navigated = true; } else await settle();
+          const r = await evaluate(FOLD_PROBE);
+          cases++;
+          byType[r.type].add(p);
+          if (r.type === 'C') exempt.set(p, 'ประเภท C — หน้าเต็มจอโดยตั้งใจ (/feed/) ยกเว้น A1/A2/B1');
+          else if (r.legitimatelyEmpty) exempt.set(p, `ไม่มีข้อมูลจริงให้แสดงและโชว์สถานะว่างที่ออกแบบไว้ (${r.emptyShown} กล่อง) ยกเว้น A1/A2`);
+          if (!r.pass) {
+            bad.push({ page: p, vp: `${vp.w}×${vp.h}`, r });
+          }
+        }
+        if ((i + 1) % 100 === 0 || i === pages.length - 1) {
+          console.log(`    … ${i + 1}/${pages.length} หน้า · ${cases} เคส`
+            + ` · A ${byType.A.size} หน้า · B ${byType.B.size} · C ${byType.C.size}`
+            + ` · ยกเว้น ${exempt.size} หน้า · ตก ${bad.length} เคส · ${((Date.now() - t0) / 1000).toFixed(0)}s`);
+        }
+      }
+      check(`[${mode}] วัดครบทุกเคส (${cases} = ${pages.length} หน้า × ${FOLD_VIEWPORTS.length} ขนาดจอ)`,
+        cases === pages.length * FOLD_VIEWPORTS.length, `วัดได้ ${cases}`);
+
+      if (bad.length) {
+        console.log('');
+        /* พิมพ์เคสที่ตกพร้อมตัวเลขที่ทำให้ตก — คนอ่านต้องไม่ต้องไปวัดเองใหม่ */
+        for (const b of bad.slice(0, 30)) {
+          const r = b.r, why = [];
+          if (!r.A1) why.push(`A1 บล็อกนำ ${r.lead.s} จบที่ y=${r.lead.bottom} = ${r.lead.pct}% ของจอ ${r.vh}px (เพดาน ${LEAD_MAX_RATIO * 100}%)`);
+          if (!r.A2) why.push(`A2 การ์ดเรื่องจริงที่เห็น 0 ใบ (มีการ์ดนอกบล็อกนำ ${r.nOutside} ใบ`
+            + `${r.best ? ` · ใบที่โผล่มากสุด ${r.best.s} โผล่ ${r.best.shown}px จากสูง ${r.best.h}px เริ่ม y=${r.best.top}` : ''}`
+            + ` · เกณฑ์ ≥ ${MIN_CARD_VISIBLE}px)`);
+          if (!r.B1) why.push(`B1 ${r.tooTall.map(x => `${x.s} สูง ${x.h}px`).join(' · ')} > งบ ${r.budget}px (จอ ${r.vh} − header ${r.hdrH})`);
+          if (!r.B2) why.push(`B2 ปุ่มหลัก ${r.cta.s} อยู่ที่ y=${r.cta.top} หลุดจอแรก (จอ ${r.vh}px)`);
+          console.log(`  ✗ ${b.page} @${b.vp} · ประเภท ${r.type} · ${why.join(' | ')}`);
+        }
+        if (bad.length > 30) console.log(`  … อีก ${bad.length - 30} เคส`);
+        const byPage = [...new Set(bad.map(b => b.page))];
+        check(`[${mode}] ทุกหน้าผ่านเกณฑ์ฟอลด์ A/B/C (ตก ${bad.length} เคส ใน ${byPage.length} หน้า)`,
+          false, byPage.slice(0, 6).join(' ') + (byPage.length > 6 ? ' …' : ''));
+      } else {
+        check(`[${mode}] ทุกหน้าผ่านเกณฑ์ฟอลด์ A/B/C ครบ ${cases} เคส`
+          + ` (A ${byType.A.size} หน้า · B ${byType.B.size} หน้า · C ${byType.C.size} หน้า`
+          + ` · ยกเว้นตามที่ประกาศไว้ ${exempt.size} หน้า)`, true);
+      }
+      for (const [p, why] of exempt) console.log(`    ยกเว้น: ${p} — ${why}`);
+
+      /* ยามกันทางออกง่าย: "ยกเว้นทั้งเว็บแล้วเขียว" ต้องทำไม่ได้เงียบ ๆ
+         และต้องมีหน้าที่ถูกวัดด้วย A1/A2 และ B1/B2 จริงอย่างละเป็นกอง ไม่ใช่หน้าสองหน้า */
+      if (mode === 'new') {
+        check(`ข้อยกเว้นไม่เกิน ${FOLD_MAX_EXEMPT} หน้า (ใช้ ${exempt.size} หน้า)`,
+          exempt.size <= FOLD_MAX_EXEMPT, [...exempt.keys()].join(' '));
+        check(`หน้าที่ถูกวัดด้วยเกณฑ์ A (หน้าเลือกเรื่อง) ≥ ${FOLD_MIN_TYPE_A} หน้า (ได้ ${byType.A.size})`,
+          byType.A.size >= FOLD_MIN_TYPE_A, `ได้ ${byType.A.size} หน้า`);
+        check(`หน้าที่ถูกวัดด้วยเกณฑ์ B (หน้าดูเรื่อง/ดูตอน) ≥ ${FOLD_MIN_TYPE_B} หน้า (ได้ ${byType.B.size})`,
+          byType.B.size >= FOLD_MIN_TYPE_B, `ได้ ${byType.B.size} หน้า`);
+      }
+    }
+
+    /* ===== ส่วน 4 · F1 + F3 ของ AIO-38 แบบชี้ตรงจุด =====
+       สองข้อนี้มีด่านเฉพาะ เพราะผลรวมของเกณฑ์ฟอลด์บอกแค่ "ตก/ผ่าน" ไม่ได้บอกว่าแถว "ดูต่อ"
+       ยังทำงานถูกอยู่ไหม · F1 วัดสองสภาพที่ขัดกันเอง: ว่างต้องซ่อน · มีของต้องโชว์ */
+    console.log('\nส่วน 4 · แถว "ดูต่อจากที่ค้างไว้" — F1 (ซ่อนเมื่อว่าง) และ F3 (สัดส่วนการ์ด)');
+    for (const vp of [{ w: 1440, h: 900 }, { w: 390, h: 844 }]) {
+      await viewport(vp);
+
+      await setStorageMode('new');
+      await go(HOME);
+      const dry = await evaluate(CONT_PROBE);
+      check(`${vp.w}×${vp.h} · ผู้ใช้ใหม่: #contSec ถูกซ่อนทั้ง section (F1)`,
+        !!dry.sec && dry.sec.hidden && dry.sec.display === 'none' && dry.sec.h === 0,
+        dry.sec ? `hidden=${dry.sec.hidden} display=${dry.sec.display} สูง ${dry.sec.h}px`
+          + ' — กล่องสถานะว่างกินพื้นที่ใต้ฮีโร่จนจอแรกเหลือการ์ดเรื่อง 0 ใบ' : 'ไม่พบ #contSec');
+      check(`${vp.w}×${vp.h} · ผู้ใช้ใหม่: ไม่มีการ์ด .cont บนหน้าแรก (${dry.nCont} ใบ)`,
+        dry.nCont === 0, `เจอ ${dry.nCont} ใบ`);
+
+      await setStorageMode('seeded');
+      for (const p of [HOME, OFFLINE]) {
+        await go(p);
+        const wet = await evaluate(CONT_PROBE);
+        check(`${vp.w}×${vp.h} ${p} · ผู้ใช้ที่กลับมา: การ์ด .cont ครบ ${SEED_ENTRIES.length} ใบ`,
+          wet.nCont === SEED_ENTRIES.length, `เจอ ${wet.nCont} ใบ`);
+        if (p === HOME) {
+          check(`${vp.w}×${vp.h} · ผู้ใช้ที่กลับมา: #contSec กลับมาแสดง (ไม่ค้างซ่อน)`,
+            !!wet.sec && !wet.sec.hidden && wet.sec.h > 0,
+            wet.sec ? `hidden=${wet.sec.hidden} สูง ${wet.sec.h}px` : 'ไม่พบ #contSec');
+        }
+        if (!wet.thumb) { check(`${vp.w}×${vp.h} ${p} · มี .cont .thumb ให้วัด`, false, 'ไม่พบ'); continue; }
+        /* F3 · กล่องจริงต้องได้สัดส่วนที่โทเคนประกาศ ไม่ใช่สัดส่วนไฟล์ปก 1024×1536 (0.667)
+           วัดจาก --ar-cont ของหน้า ไม่ฝังเลข 16/9 ไว้ในด่าน */
+        const [aw, ah] = (wet.arCont || '16/9').split('/').map(Number);
+        const want = aw / ah;
+        check(`${vp.w}×${vp.h} ${p} · .cont .thumb เป็น block และได้สัดส่วน --ar-cont (${wet.arCont})`,
+          wet.thumb.display === 'block' && Math.abs(wet.thumb.ar - want) < 0.02 * want,
+          `display:${wet.thumb.display} · aspect-ratio ที่ประกาศ ${wet.thumb.cssAspect}`
+          + ` · กล่องจริง ${wet.thumb.w}×${wet.thumb.h}px (ar ${wet.thumb.ar}) · ต้องได้ ~${want.toFixed(3)}`);
+        check(`${vp.w}×${vp.h} ${p} · .cont .m เป็น block (margin-top ${wet.meta.marginTop} มีผลจริง)`,
+          wet.meta.display === 'block',
+          `display:${wet.meta.display} — inline ทำให้ margin ในแนวตั้งถูกเมินทั้งค่า`);
+      }
+    }
+    await setStorageMode('new');
   }
-  console.log(`\nผล: ผ่าน ${pass} · ตก ${fail}${pendingCalls.length ? ` · รอมติ ${pendingCalls.length}` : ''}`);
+
+  /* ===== ส่วน 5 · ไทล์ "เลือกตามแนว" แนวตั้ง 2:3 (AIO-54 เฟส 2) ===== */
+  if (ONLY === '' || ONLY === 'bento') {
+    await setStorageMode('new');
+    console.log(`\nส่วน 5 · ไทล์ "เลือกตามแนว" ที่ ${BENTO_PAGES.join(' และ ')}`
+      + ` × ${FOLD_VIEWPORTS.length} ขนาดจอ — สัดส่วน 2:3 ±${BENTO_AR_TOL * 100}%`
+      + ` · ที่ ≥${BENTO_ROW_MIN_W}px อยู่แถวเดียวสูงเท่ากัน · ปกไม่ซ้ำกันเลยทั้ง ${D.genres.length} ใบ`);
+    for (const p of BENTO_PAGES) {
+      let navigated = false;
+      for (const vp of FOLD_VIEWPORTS) {
+        await viewport(vp);
+        if (!navigated) { await go(p); navigated = true; } else await settle();
+        const r = await evaluate(BENTO_PROBE);
+        if (r.error) { check(`${p} @${vp.w}×${vp.h} · มีไทล์ให้วัด`, false, r.error); continue; }
+        const t = r.tiles;
+        const at = `${p} @${vp.w}×${vp.h}`;
+        /* จำนวนไทล์ต้องเท่าจำนวนแนวในข้อมูล — ถ้าหายไปใบหนึ่ง every() ข้างล่างจะจริงเงียบ ๆ */
+        check(`${at} · มีไทล์ครบ ${D.genres.length} ใบเท่าจำนวนแนวในคลัง`,
+          t.length === D.genres.length, `เจอ ${t.length} ใบ`);
+        if (!t.length) continue;
+        const [aw, ah] = (r.arPoster || '2/3').split('/').map(Number);
+        const want = aw / ah;
+        check(`${at} · ทุกใบสัดส่วน --ar-poster (${r.arPoster} = ${want.toFixed(3)}) ±${BENTO_AR_TOL * 100}%`,
+          t.every(x => Math.abs(x.ar - want) <= BENTO_AR_TOL * want),
+          t.map(x => `${x.w}×${x.h}=${x.ar}`).join(' · '));
+        /* ปกซ้ำ: เทียบชื่อไฟล์ปก ไม่ใช่เทียบชื่อเรื่อง — ที่ตาเห็นคือไฟล์ */
+        const srcs = t.map(x => x.src);
+        const dup = srcs.filter((s, i) => srcs.indexOf(s) !== i);
+        check(`${at} · ปกของไทล์ไม่ซ้ำกันเลย (${new Set(srcs).size}/${t.length} ใบไม่ซ้ำ)`,
+          new Set(srcs).size === t.length && srcs.every(Boolean),
+          `ซ้ำ: ${[...new Set(dup)].join(' ') || '-'} · ทั้งชุด: ${srcs.join(' ')}`);
+        if (vp.w >= BENTO_ROW_MIN_W) {
+          const tops = [...new Set(t.map(x => x.top))];
+          check(`${at} · อยู่แถวเดียวทั้ง ${t.length} ใบ`, tops.length === 1,
+            `ขอบบนที่เจอ: ${tops.join(' / ')} — ใบที่ตกแถวสอง: `
+            + t.filter(x => x.top !== t[0].top).map(x => `${x.label.trim()}@y${x.top}`).join(' '));
+          const hs = [...new Set(t.map(x => x.h))];
+          check(`${at} · สูงเท่ากันทุกใบ (${hs.join('/')}px)`, hs.length === 1,
+            t.map(x => `${x.label.trim()}=${x.w}×${x.h}`).join(' · '));
+        }
+      }
+    }
+  }
+
+  console.log(`\nผล: ผ่าน ${pass} · ตก ${fail}`);
   cleanup(fail ? 1 : 0);
 } catch (e) {
   console.error('ทดสอบล้ม: ' + e.message);

@@ -30,11 +30,22 @@
 input::placeholder,textarea::placeholder{color:var(--dim)}
 .field input::placeholder,.field textarea::placeholder{color:var(--dim)}
 
-/* --- ปกเป็น <img> ใน <span> จึงต้องบังคับ display --- */
+/* --- ปกเป็น <img> ใน <span> จึงต้องบังคับ display ---
+   เหตุผลเดียวกับ span.bg ของฮีโร่ (AIO-37): <span> เป็น inline non-replaced
+   → aspect-ratio / height / margin ในแนวตั้ง ถูกเมินทั้งหมด ขณะที่ computed style
+   ยังรายงานค่าที่เขียนไว้ตามปกติ · ทุกบรรทัดในบล็อกนี้คือ "ของจริงที่ต้องมี"
+   ไม่ใช่ของเผื่อ — ถอดบรรทัดไหนออก ด่าน tools/test-layout.mjs ต้องแดงที่ส่วนกวาดรอบซีด */
 .poster{display:block}
 .card{display:block}
 .card .t,.card .m{display:block}
 .card .t{display:-webkit-box}
+/* AIO-38 F3 · การ์ด "ดูต่อ" ที่ assets/app.js สร้างจาก localStorage
+   .cont .thumb ตั้ง aspect-ratio:var(--ar-cont) ไว้ที่ design/v2/v2.css:226 แต่เป็น <span>
+   → ถูกเมิน กล่องถอยไปใช้สัดส่วนไฟล์ปก 1024×1536 แล้วสูง 300×507px แทน 300×169px
+   (UX วัดที่ 1440 · 232×405 แทน 232×131 ที่ 390) · .cont .m มี margin-top:2px ที่ v2.css:241
+   ซึ่งถูกเมินด้วยเหตุเดียวกัน · .cont .t ไม่ต้องเติม เพราะ v2.css:240 ตั้ง display เองแล้ว */
+.cont .thumb{display:block}
+.cont .m{display:block}
 .ep-row .et{font-size:var(--t-sub);color:var(--fg-2)}
 .ep-row .tt{font-size:var(--t-body);font-weight:600;color:var(--fg)}
 .ep-row .rkn{font-family:var(--display);font-weight:600;font-size:22px;color:var(--accent);
