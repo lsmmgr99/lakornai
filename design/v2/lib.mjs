@@ -43,6 +43,44 @@ export const releaseDay = s => DAY[s.status] || null;
 
 export const cover = s => `../../assets/covers/${s.slug}.webp`;
 
+/* ---------- ปกของไทล์ "เลือกตามแนว" ----------
+   AIO-53 · ของเดิมหยิบ `items[0]` ของแต่ละแนวตรง ๆ ⇒ durian-revenge เป็นเรื่องแรกของทั้ง
+   `fruit` และ `revenge` (content.json) ⇒ ไทล์ "ละครผลไม้ AI" กับ "แก้แค้น" ได้ปกใบเดียวกัน
+   ตอนไทล์เป็นแถบเล็กหรี่ 55% แทบไม่เห็น แต่พอเป็นปกเต็มใบที่ความสว่าง 80% มันเด่นมาก
+
+   เกณฑ์การเลือกคำนวณจากข้อมูล ไม่มีรายชื่อเรื่องฝังตาย: นี่คือการจับคู่สองฝั่ง
+   (แนว ↔ เรื่อง) ที่ต้องการคู่มากที่สุด ⇒ ใช้ Kuhn (เส้นทางสลับ) ไม่ใช่ greedy
+   greedy ล้มได้จริงกับชุดนี้: ถ้า `fruit` หยิบ durian-revenge ไปก่อน แล้ว `revenge`
+   มาเจอว่าถูกจองแล้ว greedy ก็ต้องยอมซ้ำ — Kuhn จะย้อนไปบอก `fruit` ว่าเปลี่ยนไปใช้
+   seedless-longan แล้วปล่อย durian-revenge ให้ `revenge`
+   ลำดับการเลือก = แนวที่มีตัวเลือกน้อยสุดก่อน แล้วตัดเสมอด้วยลำดับในข้อมูล
+   ⇒ ไม่สุ่ม ไม่ขึ้นกับเวลา ⇒ ม็อกอัพสร้างซ้ำได้ไบต์ต่อไบต์ (tools/check-mockup.mjs)
+   เพิ่มเรื่องที่ 13 หรือเพิ่มแนวที่ 7 แล้วยังถูกโดยไม่ต้องแก้ไฟล์นี้ */
+export function genreCovers() {
+  const cand = new Map(D.genres.map(g => [g.slug, D.series.filter(s => s.genres.includes(g.slug))]));
+  const order = D.genres.map((g, i) => [g.slug, i])
+    .sort((a, b) => cand.get(a[0]).length - cand.get(b[0]).length || a[1] - b[1])
+    .map(x => x[0]);
+  const owner = new Map();                 /* slug ของเรื่อง → slug ของแนวที่ถือปกใบนั้น */
+  /* seen = เรื่องที่ "สายการค้นนี้" แตะแล้ว — กันวนไม่จบเมื่อสองแนวสลับกันไปมา */
+  const claim = (gs, seen) => {
+    for (const s of cand.get(gs)) {
+      if (seen.has(s.slug)) continue;
+      seen.add(s.slug);
+      /* อ่านเจ้าของเดิมก่อนทับ: ให้เจ้าของเดิมไปหาปกใบอื่นให้ได้ก่อน แล้วจึงยึดใบนี้ */
+      if (!owner.has(s.slug) || claim(owner.get(s.slug), seen)) { owner.set(s.slug, gs); return true; }
+    }
+    return false;
+  };
+  for (const gs of order) claim(gs, new Set());
+  const pick = new Map();
+  for (const [sSlug, gSlug] of owner) pick.set(gSlug, by(sSlug));
+  /* เหลือแนวที่จับคู่ไม่ได้เลยได้ในกรณีเดียว: คลังมีเรื่องน้อยกว่าจำนวนแนว
+     กรณีนั้นไทล์ว่างแย่กว่าปกซ้ำ ⇒ ถอยไปใช้เรื่องแรกของแนว (วันนี้ไม่มีแนวไหนเข้าเคสนี้) */
+  for (const g of D.genres) if (!pick.has(g.slug)) pick.set(g.slug, cand.get(g.slug)[0] || null);
+  return pick;
+}
+
 /* ---------- ไอคอน (inline SVG · stroke 1.8) ---------- */
 const P = {
   home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/>',

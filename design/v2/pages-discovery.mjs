@@ -1,6 +1,6 @@
 /* หน้ากลุ่ม A (การค้นพบ) + B (เรื่องและการรับชม) + C (ไลบรารี) */
 import {
-  D, by, genreLabel, views, cover, ic, esc, TROPES, tropesOf,
+  D, by, genreLabel, views, cover, genreCovers, ic, esc, TROPES, tropesOf,
   header, bottomNav, footer, page, write, poster, card, rankCard, contCard, epRow, epGrid, epTabs,
   legend, aiBadge, newBadge, hotBadge, doneBadge, freeBadge, sampleNote, empty, errorBox,
   localNote, freeAllBar, skelCard, skelCont, skelRow, releaseDay,
@@ -10,6 +10,14 @@ const S = Object.fromEntries(D.series.map(s => [s.slug, s]));
 const TOP10 = ['ceo-cold', 'durian-revenge', 'billion-widow', 'villainess-reborn', 'ayutthaya-love',
   'undercover-tycoon', 'heir-returns', 'mirror-bride', 'one-night-bangkok', 'mangosteen-heart'].map(k => S[k]);
 const CONT = [['villainess-reborn', 12, 27], ['durian-revenge', 5, 62], ['ayutthaya-love', 21, 53], ['mirror-bride', 3, 18]];
+/* ไทล์ "เลือกตามแนว" ใช้ชุดปกเดียวกันทั้งหน้าแรกและฮับเลือกดู ⇒ คิดครั้งเดียว
+   (ถ้าเรียกคนละที ก็ได้ผลเดียวกันเพราะฟังก์ชันไม่สุ่ม แต่สองที่ต้องไม่หลุดจากกันในอนาคต) */
+const GCOVER = genreCovers();
+const genreBento = () => `<div class="genre-bento">${D.genres.map(g => {
+  const items = D.series.filter(s => s.genres.includes(g.slug));
+  return `<a class="gtile" href="#"><img src="${cover(GCOVER.get(g.slug))}" alt="">
+        <span>${g.label}</span><span class="cnt num">${items.length} เรื่อง</span></a>`;
+}).join('')}</div>`;
 
 /* ===================== A1 หน้าแรก ===================== */
 function homeSections({ emptyCont = false } = {}) {
@@ -92,11 +100,7 @@ function homeSections({ emptyCont = false } = {}) {
   </section>
 
   <section class="sec"><div class="sec-h"><h2>เลือกตามแนว</h2></div>
-    <div class="genre-bento">${D.genres.map(g => {
-      const items = D.series.filter(s => s.genres.includes(g.slug));
-      return `<a class="gtile" href="#"><img src="${cover(items[0])}" alt="">
-        <span>${g.label}</span><span class="cnt num">${items.length} เรื่อง</span></a>`;
-    }).join('')}</div>
+    ${genreBento()}
     <div class="chips" style="margin-top:var(--s4)">
       <span style="align-self:center;font-size:var(--t-meta);color:var(--dim);flex:none;padding-right:4px">แท็กยอดนิยม</span>
       ${TROPES.map(t => `<a class="chip" href="#">${t.label}<span class="n num">${t.items.length}</span></a>`).join('')}
@@ -394,11 +398,7 @@ export function buildBrowse() {
     body: `${header({ active: 'browse' })}<main id="main" class="page"><div class="wrap">
       <div class="page-head"><h1>เลือกดู</h1><p>ทางเข้ารวมของทุกหมวด แท็ก และดัชนีในคลัง</p></div>
       <section class="sec" style="margin-top:0"><div class="sec-h"><h2>6 แนวหลัก</h2></div>
-        <div class="genre-bento">${D.genres.map(g => {
-          const items = D.series.filter(s => s.genres.includes(g.slug));
-          return `<a class="gtile" href="#"><img src="${cover(items[0])}" alt="">
-            <span>${g.label}</span><span class="cnt num">${items.length} เรื่อง</span></a>`;
-        }).join('')}</div></section>
+        ${genreBento()}</section>
       <section class="sec"><div class="sec-h"><h2>แท็กที่เปิดแล้ว</h2></div>
         <p class="sec-sub">เปิดเฉพาะแท็กที่มีเรื่อง 3 เรื่องขึ้นไป — แท็กจะเพิ่มขึ้นตามคลัง ไม่ใช่ตามความอยาก</p>
         <div style="display:flex;gap:9px;flex-wrap:wrap">${TROPES.map(t =>
