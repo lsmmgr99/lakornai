@@ -180,7 +180,7 @@ export const tropesOf = s => (s.tropes || []).map(tropeOf).filter(Boolean);
    ไม่ใช่ greedy · greedy ล้มกับชุดข้อมูลนี้จริง: ถ้า `fruit` ยึด durian-revenge ไปก่อน
    `revenge` จะเจอว่าถูกจองแล้วและต้องยอมซ้ำ — Kuhn ย้อนไปบอก `fruit` ให้เปลี่ยนไปใช้
    ปกใบอื่นแล้วปล่อย durian-revenge ให้ `revenge`
-   อัลกอริทึม ลำดับการเลือก และผลลัพธ์ ตรงกับ design/v2/lib.mjs:46-80 ของ Visual (AIO-53)
+   อัลกอริทึม ลำดับการเลือก และผลลัพธ์ ตรงกับ genreCovers() ใน design/v2/lib.mjs ของ Visual (AIO-53)
    ⇒ ม็อกอัพกับเว็บจริงได้ปกชุดเดียวกัน ไม่ใช่สองชุดที่เผอิญดูคล้ายกัน
    ไม่มีรายชื่อเรื่องฝังตาย ไม่สุ่ม ไม่ขึ้นกับเวลา ⇒ เพิ่มเรื่องที่ 13 หรือแนวที่ 7 แล้วยังถูก */
 export function genreCovers() {

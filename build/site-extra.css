@@ -22,10 +22,10 @@
    จึงไม่โดนกฎไหนเลย → ได้สีเริ่มต้นของเบราว์เซอร์ #757575 = 3.73:1 บน --surface-2 (ตก AA)
    บรรทัดล่างสุดเป็น "พื้น" ของทุกช่องกรอกในเว็บ ทั้งที่มีวันนี้และที่เพิ่มวันหน้า
    — author style ชนะ UA style เสมอ จึงไม่ต้องไล่เขียน selector ทีละหน้า
-   แต่มันชนะกฎ .field input::placeholder ของ v2.css:367 (ซึ่งตั้งสีเป็น --faint) ไม่ได้
+   แต่มันชนะกฎ `.field input::placeholder` ของ v2.css (ซึ่งตั้งสีเป็น --faint) ไม่ได้
    เพราะ specificity ต่ำกว่า (0,0,2 vs 0,1,2) กฎ .field จึงยังต้องอยู่คู่กันไว้
    ห้ามลบทิ้งข้อใดข้อหนึ่ง · หมายเหตุ: อย่าเขียนรูปกฎ CSS เต็ม ๆ ลงในคอมเมนต์นี้
-   ด่าน --faint ที่ tools/check-ac.mjs:124 อ่านไฟล์ด้วย regex จะนับคอมเมนต์เป็นกฎจริง
+   ด่าน --faint ที่ tools/check-ac.mjs:135 อ่านไฟล์ด้วย regex จะนับคอมเมนต์เป็นกฎจริง
    วัดจากหน้าที่ render จริงด้วย tools/test-contrast.mjs — ทั้ง 4 ช่องได้ 5.00:1 */
 input::placeholder,textarea::placeholder{color:var(--dim)}
 .field input::placeholder,.field textarea::placeholder{color:var(--dim)}
@@ -40,10 +40,11 @@ input::placeholder,textarea::placeholder{color:var(--dim)}
 .card .t,.card .m{display:block}
 .card .t{display:-webkit-box}
 /* AIO-38 F3 · การ์ด "ดูต่อ" ที่ assets/app.js สร้างจาก localStorage
-   .cont .thumb ตั้ง aspect-ratio:var(--ar-cont) ไว้ที่ design/v2/v2.css:226 แต่เป็น <span>
+   `.cont .thumb` ตั้ง aspect-ratio:var(--ar-cont) ไว้ใน design/v2/v2.css แต่เป็น <span>
    → ถูกเมิน กล่องถอยไปใช้สัดส่วนไฟล์ปก 1024×1536 แล้วสูง 300×507px แทน 300×169px
-   (UX วัดที่ 1440 · 232×405 แทน 232×131 ที่ 390) · .cont .m มี margin-top:2px ที่ v2.css:241
-   ซึ่งถูกเมินด้วยเหตุเดียวกัน · .cont .t ไม่ต้องเติม เพราะ v2.css:240 ตั้ง display เองแล้ว */
+   (UX วัดที่ 1440 · 232×405 แทน 232×131 ที่ 390) · `.cont .m` มี margin-top:2px ซึ่งถูกเมิน
+   ด้วยเหตุเดียวกัน · `.cont .t` ไม่ต้องเติม เพราะกฎของมันใน v2.css ตั้ง display:-webkit-box เอง
+   (อ้างกฎด้วยชื่อ selector ไม่ใช่เลขบรรทัด — v2.css เป็นไฟล์ของ Visual เลขบรรทัดเลื่อนทุกรอบ) */
 .cont .thumb{display:block}
 .cont .m{display:block}
 .ep-row .et{font-size:var(--t-sub);color:var(--fg-2)}

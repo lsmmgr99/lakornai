@@ -22,8 +22,9 @@ const TOP10_LABEL = 'TOP 10 ในคลัง';
    ใช้ที่หน้าแรกและที่ /browse/ ("หมวด" ในเมนู) · เคยเป็นสองก้อนที่เหมือนกันคนละที่
    แล้วหลุดจากกันได้เงียบ ๆ ⇒ รวมเป็นที่เดียว (AIO-54 เฟส 2)
    ปกของแต่ละไทล์มาจาก GENRE_COVER ซึ่งจับคู่แนว ↔ เรื่องให้ไม่ซ้ำกันเลยทั้ง 6 ใบ
-   (build/content.mjs:174-211) ไม่ใช่ `items[0]` ที่ทำให้ fruit กับ revenge ได้ปกใบเดียวกัน
-   รูปทรง 2:3 แถวเดียวมาจาก design/v2/v2.css:304-321 ของ Visual (AIO-53) ตามแบบ ไม่ตีความใหม่
+   (build/content.mjs:174-213) ไม่ใช่ `items[0]` ที่ทำให้ fruit กับ revenge ได้ปกใบเดียวกัน
+   รูปทรง 2:3 แถวเดียวมาจากบล็อก `.genre-bento` ใน design/v2/v2.css ของ Visual (AIO-53)
+   ตามแบบ ไม่ตีความใหม่ (อ้างด้วยชื่อ selector เพราะเลขบรรทัดของไฟล์ Visual เลื่อนทุกรอบ)
    ด่าน: tools/test-layout.mjs ส่วน 5 */
 const genreBento = L => `<div class="genre-bento">${D.genres.map(g => {
   const items = seriesOfGenre(g.slug);
@@ -42,9 +43,10 @@ export function buildHome() {
   const heroes = TOP10.slice(0, 3);
 
   const body = L => {
-    /* `.bg` ต้องเป็น <div> ตามแบบที่อนุมัติ (design/v2/pages-discovery.mjs:30) ห้ามเปลี่ยนเป็น <span>
+    /* `.bg` ต้องเป็น <div> ตามแบบที่อนุมัติ (`<div class="hero"><div class="bg">` ใน
+       design/v2/pages-discovery.mjs) ห้ามเปลี่ยนเป็น <span>
        span เป็น inline non-replaced → CSS height / aspect-ratio ของ `.hero .bg`
-       (assets/site.css จาก design/v2/v2.css:245,263,269) ไม่มีผลเลยทั้งคู่ · computed style
+       (assets/site.css จากกฎ `.hero .bg` ทั้งสามชั้นของ design/v2/v2.css) ไม่มีผลเลยทั้งคู่ · computed style
        ยังรายงาน 480px ตามที่เขียนไว้ แต่กล่องจริงถอยไปใช้สัดส่วนไฟล์ปก 1024×1536
        → ฮีโร่สูง 1872px บนเดสก์ท็อป ดันทุกแถวตกจอ (AIO-37) · ด่าน: tools/test-layout.mjs */
     const hero = `<section class="sec hero-sec" aria-label="เรื่องเด่นประจำสัปดาห์">
