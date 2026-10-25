@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="th"><head>
+<meta charset="utf-8">
+<title>mirror-bride.webp — 2640x1200</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1320px;height:600px;overflow:hidden;background:var(--bg)}
+body{-webkit-font-smoothing:antialiased}
+
+.plate{position:relative;width:1320px;height:600px;overflow:hidden;
+  background:var(--bg);isolation:isolate}
+.plate img{display:block}
+
+/* ---- แถวพาโนรามาสะท้อน · ชั้นเดียวกันถูกใช้ซ้ำสองครั้ง (.wings / .sharp) ---- */
+.pan{position:absolute;top:0;height:100%;width:2000px;
+  left:calc(73.0000% - 1000px);display:flex}
+.pan span{width:400px;height:100%;flex:none;overflow:hidden}
+.pan span img{width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+.pan span:nth-child(even) img{transform:scaleX(-1)}
+
+.pan.wings{filter:blur(24px) saturate(1.18) brightness(.70)}
+/* ชุดกลางของแถวคือชุดที่ 3 ⇒ กินช่วง 40.0%–60.0% ของความกว้างแถว
+   ไล่จางออกไปด้านละ ~6.5% ของแถว (≈ 130 px) ⇒ รอยต่อนุ่มจนตาไม่จับ */
+.pan.sharp{
+  mask-image:linear-gradient(90deg,transparent 0 35.5%,#000 42% 58%,transparent 64.5% 100%);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0 35.5%,#000 42% 58%,transparent 64.5% 100%)}
+
+/* ---- แสงคู่สีของเรื่องเอง (assets/data.js) ---- */
+.wash{position:absolute;inset:0;
+  background:
+    radial-gradient(900px 640px at 72% 18%, var(--c2) 0%, transparent 64%),
+    radial-gradient(760px 600px at 14% 88%, var(--c1) 0%, transparent 68%);
+  opacity:.38}
+
+/* ---- ริ้วม่านทอง — ลายเดียวกับ design/v2/share-cards.mjs ---- */
+.curtain{position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 7%, transparent) 0 2px, transparent 2px 28px);
+  mask-image:linear-gradient(90deg, transparent 0 30%, #000 100%);
+  -webkit-mask-image:linear-gradient(90deg, transparent 0 30%, #000 100%)}
+
+/* ---- แสงขอบทองจากขวา: ผูกแผ่นเข้ากับลุคม่านทองโดยไม่เติมสีใหม่ ---- */
+.rim{position:absolute;inset:0;
+  background:radial-gradient(58% 120% at 104% 34%,
+    color-mix(in srgb, var(--accent) 17%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 5%, transparent) 38%,
+    transparent 72%)}
+
+/* ---- วิกเนตต์ซ้ายบาง ๆ (ดูหมายเหตุหัวบล็อก CSS) + ขอบล่างจมลงพื้นเวที ---- */
+.vig{position:absolute;inset:0;
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--bg) 22%, transparent) 0 12%,
+      color-mix(in srgb, var(--bg) 8%, transparent) 44%, transparent 70%),
+    linear-gradient(0deg, color-mix(in srgb, var(--bg) 38%, transparent) 0 3%, transparent 22%)}
+
+/* ---- default: พัดปก 4 ใบ (ไม่มีตัวอักษร) ---- */
+.fan{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:flex;align-items:center;justify-content:center}
+.fan .p{width:246px;height:369px;border-radius:var(--r-lg);overflow:hidden;flex:none;
+  box-shadow:var(--e3), 0 0 0 1px var(--accent-line);margin-left:-54px}
+.fan .p:first-child{margin-left:0}
+.fan .p img{width:100%;height:100%;object-fit:cover}
+.fan .p:nth-child(1){transform:rotate(-7deg) translateY(-30px) scale(.9)}
+.fan .p:nth-child(2){transform:rotate(-2.5deg) translateY(-10px) scale(.97)}
+.fan .p:nth-child(3){transform:rotate(2.5deg) translateY(10px) scale(.97)}
+.fan .p:nth-child(4){transform:rotate(7deg) translateY(30px) scale(.9)}
+</style>
+</head><body>
+<div class="plate " style="--c1:#3A2626;--c2:#5c2f35">
+  <div class="pan wings"><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span></div>
+  <div class="wash"></div>
+  <div class="curtain"></div>
+  <div class="pan sharp"><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span><span><img src="../../../assets/covers/mirror-bride.webp" alt=""></span></div>
+  <div class="rim"></div>
+  <div class="vig"></div>
+</div>
+</body></html>
