@@ -44,31 +44,40 @@ test('importer accepts a well-formed coverWide whose file exists (V15/V16 positi
   d.series[0].coverWide=wide;
   assert.ok(run(d).length);
 });
-for (const [name,change] of Object.entries({
-  version:d=>d.version=3,
-  orientationMissing:d=>delete d.series[0].orientation,
-  orientationCase:d=>d.series[0].orientation='Vertical',
-  orientationUnknown:d=>d.series[0].orientation='portrait',
-  orientationNull:d=>d.series[0].orientation=null,
-  orientationOnV1:d=>d.version=1,
-  horizontalWithoutWide:d=>d.series[0].orientation='horizontal',
-  wideMissingFile:d=>d.series[0].coverWide='assets/covers-wide/missing.webp',
-  wideTraversal:d=>d.series[0].coverWide='assets/covers-wide/../../content.json',
-  duplicate:d=>d.series[1].slug=d.series[0].slug,
-  registry:d=>d.series[0].genres=['missing'],
-  numbering:d=>d.series[0].episodes[0].n=2,
-  count:d=>d.series[0].eps++,
-  schedule:d=>{d.series[0].status='ended';d.series[0].releaseDay='wed';},
-  image:d=>d.series[0].cover='assets/covers/missing.webp',
-  traversal:d=>d.series[0].cover='../content.json',
-  synopsis:d=>d.series[0].synopsis=d.series[0].hook.repeat(3),
-  extra:d=>d.series[0].episodes[0].locked=true,
-  personal:d=>d.following=[],
-  synthetic:d=>d.series[0].views=42,
-  missingMeasurement:d=>d.meta.viewsSource='analytics',
-  duration:d=>d.series[0].episodes[0].durationSec=0,
-  nullRecord:d=>d.series[0]=null,
-})) test(`reject ${name}`, () => { const d=structuredClone(source);change(d);assert.ok(run(d).length); });
+// Each negative case asserts **which rule fired**, not just that something failed: a
+// `.length` assertion passes when an unrelated rule rejects the draft, so a mutation that
+// deletes the rule under test can stay green as long as any other rule is still alive
+// (AIO-64 R3 · CTO decision "เคสลบต้อง assert รหัสกฎ ไม่ใช่ .length").
+// The expected string is `${path}: ${rule}` exactly as validate() emits it.
+for (const [name,[change,expected]] of Object.entries({
+  version:[d=>d.version=3,'version: V1'],
+  orientationMissing:[d=>delete d.series[0].orientation,'series[0].orientation: V14'],
+  orientationCase:[d=>d.series[0].orientation='Vertical','series[0].orientation: V14'],
+  orientationUnknown:[d=>d.series[0].orientation='portrait','series[0].orientation: V14'],
+  orientationNull:[d=>d.series[0].orientation=null,'series[0].orientation: V14'],
+  orientationOnV1:[d=>d.version=1,'series[0].orientation: V1'],
+  horizontalWithoutWide:[d=>d.series[0].orientation='horizontal','series[0].coverWide: V16'],
+  wideMissingFile:[d=>d.series[0].coverWide='assets/covers-wide/missing.webp','series[0].coverWide: V15'],
+  wideTraversal:[d=>d.series[0].coverWide='assets/covers-wide/../../content.json','series[0].coverWide: V15'],
+  duplicate:[d=>d.series[1].slug=d.series[0].slug,'series[1]: V2'],
+  registry:[d=>d.series[0].genres=['missing'],'series[0].genres: V3'],
+  numbering:[d=>d.series[0].episodes[0].n=2,'series[0].episodes: V4'],
+  count:[d=>d.series[0].eps++,'series[0].eps: V4'],
+  schedule:[d=>{d.series[0].status='ended';d.series[0].releaseDay='wed';},'series[0].status: V5'],
+  image:[d=>d.series[0].cover='assets/covers/missing.webp','series[0].cover: V6'],
+  traversal:[d=>d.series[0].cover='../content.json','series[0].cover: V6'],
+  synopsis:[d=>d.series[0].synopsis=d.series[0].hook.repeat(3),'series[0].synopsis: V7'],
+  extra:[d=>d.series[0].episodes[0].locked=true,'series[0].episodes.locked: unknown field'],
+  personal:[d=>d.following=[],'$.following: unknown field'],
+  synthetic:[d=>d.series[0].views=42,'series[0].views: V10'],
+  missingMeasurement:[d=>d.meta.viewsSource='analytics','series[0].views: V10'],
+  duration:[d=>d.series[0].episodes[0].durationSec=0,'series[0].episodes: duration 30–600'],
+  nullRecord:[d=>d.series[0]=null,'series[0]: object required'],
+})) test(`reject ${name} (${expected})`, () => {
+  const d=structuredClone(source);change(d);
+  const errs=run(d);
+  assert.ok(errs.includes(expected),`expected ${JSON.stringify(expected)} · got ${JSON.stringify(errs.slice(0,4))}`);
+});
 test('accept all ongoing schedule days',()=>{
   for (const day of ['daily','mon','tue','wed','thu','fri','sat','sun']) {
     const d=structuredClone(source);d.series[0].status='ongoing';d.series[0].releaseDay=day;assert.deepEqual(run(d),[]);

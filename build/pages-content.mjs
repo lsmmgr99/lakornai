@@ -4,7 +4,7 @@ import {
   definePage, shell, pageHead, crumbs, rail, section, card, poster, coverImg,
   ic, esc, footer, empty, localNote, sampleNote, freeAllBar, FREE_LINE,
 } from './ui.mjs';
-import { breadcrumb, faqLd, SITE_NAME, abs } from './seo.mjs';
+import { breadcrumb, faqLd, SITE_NAME, abs, coverSlot } from './seo.mjs';
 
 const wrapF = (L, inner, cls = '') => `<main id="main" class="page"><div class="wrap${cls ? ' ' + cls : ''}">${inner}</div>${footer(L)}</main>`;
 
@@ -295,11 +295,21 @@ export function buildContent() {
     jsonLd: [{
       '@context': 'https://schema.org', '@type': 'CollectionPage', url: abs(U.behind),
       name: 'เบื้องหลังการสร้างด้วย AI', inLanguage: 'th',
-      hasPart: SERIES.map(s => ({
-        '@type': 'ImageObject',
-        contentUrl: abs(`/assets/covers/${s.slug}.webp`),
-        name: `ปก ${s.title}`, width: 1024, height: 1536,
-      })),
+      /* ที่วางนี้เคยประกอบพาธปกเอง (`/assets/covers/${slug}.webp`) + ฝังขนาด 1024×1536 ไว้ตรง ๆ
+         ซึ่งขัดหลักของ ADR-001 §13.5 ("ที่วางประกาศทรงที่ต้องการ ไม่ใช่ประกาศไฟล์") และสัญญา
+         §13.4 อนุญาตให้ `cover` ชี้ไฟล์ชื่ออะไรก็ได้ใน assets/covers/ ⇒ เรื่องที่ชื่อไฟล์ปก
+         ไม่เท่ากับ slug จะส่ง contentUrl ที่ไม่มีไฟล์จริงเข้า structured data แบบเงียบ ๆ
+         (ไม่มีด่านใดจับ — ด่านวัดกล่องที่ render ไม่ได้อ่าน JSON-LD · ปิดช่องนี้ด้วยข้อ
+          "พาธภาพใน JSON-LD ต้องมีไฟล์จริง" ในส่วน 6 ของ tools/test-layout.mjs)
+         ค่าที่ส่งออกวันนี้ไม่ขยับแม้ไบต์เดียว: 12/12 เรื่องมีปกตามแบบแผนและเป็น 1024×1536 */
+      hasPart: SERIES.map(s => {
+        const cs = coverSlot(s, 'poster');
+        return {
+          '@type': 'ImageObject',
+          contentUrl: abs(cs.url),
+          name: `ปก ${s.title}`, width: cs.w, height: cs.h,
+        };
+      }),
     }],
     body: L => shell(L, {
       main: wrapF(L, `${pageHead('เบื้องหลังการสร้างด้วย AI',

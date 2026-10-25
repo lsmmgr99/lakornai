@@ -98,7 +98,22 @@
          + ด่านนับจุดเรียกเทียบกับจำนวนที่สัญญาประกาศ
    M14 **รันทุกรอบโดยตัวด่านเอง** (ไม่ใช่มิวเทชันที่ต้องทำมือ): ฉีด `s = SERIES[0]` สำหรับทรง
       `poster` ลงต้นไม้ชั่วคราวที่กำลังจะถูกลบ แล้ว build ใหม่ → ออราเคิล identity ต้องจับได้
-      ⚠️ นี่คือรอย AIO-64 R1 ที่เคยทำให้ปกทั้งเว็บเป็นเรื่องเดียวกันแล้วด่านยัง 261/0 */
+      ⚠️ นี่คือรอย AIO-64 R1 ที่เคยทำให้ปกทั้งเว็บเป็นเรื่องเดียวกันแล้วด่านยัง 261/0
+   ---- รอบปิดคำตัดสินของ CTO (25 ต.ค. 2026) · ท่อนที่ R1 ยังไม่ครบ ----
+   M15 เปลี่ยนที่มาของ 3 ใบในแถบรีลที่บล็อก `feedBlock` จาก `REEL_SLUGS` เป็น `TOP10.slice(0,3)`
+      (หรือกลับลำดับ `REEL_SLUGS` เฉพาะตอน render) → ตก "แถบรีล · รายชื่อบรรณาธิการชุดเดิม
+      ลำดับเดิม" ทั้งสองสถานะ
+      ⚠️ เกณฑ์เดิมของข้อนี้คือ "slug ที่ชื่อไฟล์บอกมีอยู่จริงในคลัง" ⇒ มิวเทชันนี้ **เขียว**
+         ทั้งที่แถบโฆษณาเรื่องผิดชุด (คำตัดสิน CTO · ข้อ R1 ท่อนแถบรีล)
+   M16 กลับออราเคิล S2 ไปใช้ชื่อไฟล์เป็น slug (`want = wantPath(fileSlug, …)` แทน `who.slug`)
+      → ตก S2 ที่เรื่องของ fixture "ชื่อไฟล์ปก ≠ slug" ในสถานะ ข (`a7f3-not-a-slug.webp`
+      แมปกลับเป็นเรื่องในคลังไม่ได้) ⇒ fixture นั้นคือหลักฐานว่าเลิกใช้ basename จริง ไม่ใช่คำพูด
+   M17 คืนพาธที่ประกอบเองใน JSON-LD ของหน้า "เบื้องหลังการสร้างด้วย AI"
+      (`contentUrl: abs('/assets/covers/' + s.slug + '.webp')` ที่ build/pages-content.mjs)
+      → ตก "พาธภาพใน JSON-LD มีไฟล์จริงบนดิสก์ทุกเส้น" ในสถานะ ข
+      ⚠️ ของจริงที่ fixture ของ M16 เปิดให้เห็น: ที่วางนั้นประกอบพาธปกเองและฝังขนาด 1024×1536
+         ไว้ตรง ๆ ⇒ เรื่องที่ชื่อไฟล์ปกไม่เท่ากับ slug ส่งพาธที่ไม่มีไฟล์เข้า structured data
+         โดยไม่มีด่านใดเห็น (ด่านวัดกล่องอ่านแต่ DOM ไม่อ่าน JSON-LD) */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -109,12 +124,38 @@ import { fileURLToPath } from 'node:url';
    จึงใช้เป็นค่าอ้างอิงของ "เรื่องแรกที่ฟีดเปิด" ได้ทั้งรีโปจริงและต้นไม้ชั่วคราว */
 import { D, SERIES, TOP10, U, epSecs, COVER_WIDE_W, COVER_WIDE_H } from '../build/content.mjs';
 import { imageSize } from '../build/imgsize.mjs';
-import { HERO_WIDE_BP } from '../build/pages-discovery.mjs';
+/* `REEL_SLUGS` = **รายชื่อบรรณาธิการ** ของแถบรีล (ADR-001 §13.7 ตารางรอย แถว "3 slug ในแถบรีล"
+   บอกว่าชื่อถูกฝังไว้ในบล็อก `feedBlock` ⇒ ตัวแปรนี้คือแหล่งเดียวของ "รายชื่อที่ตั้งใจเลือก"
+   สัญญาไม่ได้เขียนสาม slug ไว้เอง จึงไม่มีที่อื่นให้อ้าง) · ของที่ถูกตรวจคือ **ไฟล์ที่แต่ละใบ
+   โหลดจริง** เทียบกับพาธที่ `content.json` ของเรื่องในตำแหน่งนั้นควรได้ ไม่ใช่เทียบรายชื่อกับตัวเอง */
+import { HERO_WIDE_BP, REEL_SLUGS } from '../build/pages-discovery.mjs';
 import { siteFiles } from '../ci/site-files.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
-const PROFILE = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-lay-'));
+/* ---------- ที่เก็บของชั่วคราว: สั้นเข้าไว้ เพราะ chrome ผูกกับ unix socket ----------
+   chrome สร้าง socket ของ process singleton ที่ `<tmp>/org.chromium.Chromium.XXXXXX/SingletonSocket`
+   และพาธของ unix socket มีเพดาน ~104 ไบต์ (`sun_path`) ⇒ **ถ้า TMPDIR ลึก chrome ตายทันที**
+   ด้วย `FATAL: Socket path too long` แล้วด่านรายงานแค่ "ต่อ chrome ไม่ได้" ซึ่งชี้ผิดทางหมด
+   (เจอเองรอบนี้: TMPDIR ของ runtime คือ /tmp/paperclip-run-…-XXXXXX ยาว 45 ตัว ⇒ ซ้อน mkdtemp
+    อีกชั้นแล้วเกินเพดานพอดี · สามรันล้มพร้อมกันทั้งที่ chrome ขึ้นได้ปกติเมื่อรันเดี่ยว)
+   ⇒ ขอรากที่สั้นที่สุดที่เขียนได้ และตั้งชื่อสั้น · ของที่เคยอยู่ใน os.tmpdir() ก็ย้ายมาด้วย
+   เพื่อให้ด่านทนกับ scratch dir ลึก ๆ ของ runtime ในอนาคต */
+const TMP_ROOT = (() => {
+  for (const b of ['/tmp', os.tmpdir()]) {
+    try { fs.accessSync(b, fs.constants.W_OK); return b; } catch { /* ลองรากถัดไป */ }
+  }
+  return os.tmpdir();
+})();
+const PROFILE = fs.mkdtempSync(path.join(TMP_ROOT, 'lkn-lay-'));
+/* chrome สร้างไดเรกทอรีของตัวเองใน TMPDIR **ของมันเอง** ไม่ใช่ใน --user-data-dir ⇒ cleanup ที่ลบ
+   แต่ PROFILE ยังเหลือขยะทิ้งไว้ทุกรอบที่ถูกตัดด้วยสัญญาณ (วัดเองตอนปิด AIO-64 R5: SIGTERM
+   แล้วเหลือ 1 ไดเรกทอรี) · จะเดาชื่อแล้วลบตามแพตเทิร์นไม่ได้ — TMPDIR แชร์กับ run อื่น เดี๋ยวลบ
+   ของเขา ⇒ **ยก TMPDIR ของ chrome ให้เป็นโฟลเดอร์ของเราเอง** แล้วลบทั้งโฟลเดอร์
+   ยามกันรอยที่เพิ่งเจอ: ถ้าพาธยังยาวเกินงบของ socket ให้คืนไปใช้ TMPDIR ที่สืบทอดมา
+   (เหลือขยะ 1 โฟลเดอร์ดีกว่าด่านที่ล้มทุกรอบด้วยข้อความที่ชี้ผิดทาง) */
+const CHROME_TMP = fs.mkdtempSync(path.join(TMP_ROOT, 'lkn-ct-'));
+const CHROME_TMP_FITS = CHROME_TMP.length + '/org.chromium.Chromium.XXXXXX/SingletonSocket'.length < 104;
 const ONLY = process.env.ONLY || '';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
@@ -232,7 +273,9 @@ const BENTO_ROW_MIN_W = 960;     /* ที่ ≥960px ต้องอยู่�
    **สองสถานะ ไม่ใช่สถานะเดียว** — ทั้งหมดข้างบนรันสองรอบ:
      ก) สถานะถอยกลับ = รีโปตามสภาพ (ยังไม่มีไฟล์ภาพกว้าง · ทุกเรื่องแนวตั้ง)
      ข) สถานะมีของจริง = ต้นไม้ชั่วคราวใน /tmp ที่ด่านสร้างเอง: ภาพกว้าง 2640×1200 ครบทุกเรื่อง
-        + เรื่องสุดท้ายถูกตั้งเป็น `horizontal` แล้ว build ใหม่ที่นั่น
+        + เรื่องสุดท้ายถูกตั้งเป็น `horizontal` + **ปกของเรื่องที่ 2 ถูกย้ายไปใช้ชื่อไฟล์ที่ไม่ใช่
+        slug** (สัญญา §13.4 อนุญาต) แล้ว build ใหม่ที่นั่น ⇒ ด่านที่อ่าน basename เป็น slug
+        แดงทันทีในสถานะนี้ ไม่ใช่รอให้มีคนเปลี่ยนชื่อไฟล์จริงวันหนึ่ง (ดู M16)
         ⇒ เส้นทางที่วันนี้ไม่มีใครเดินผ่าน (ฮีโร่ `<picture>` · `.cont` ทรงกว้าง · เพลเยอร์ 16:9
           · ฟีดที่มีเรื่องแนวนอนอยู่ด้วย) ถูกวัดของจริงทุกรอบ ไม่ใช่รอให้มีไฟล์จริงก่อนจึงรู้ว่าพัง
         ⚠️ ต้นไม้ชั่วคราวเป็นสำเนา — ด่านนี้ **ไม่แก้ไฟล์ในรีโปแม้ไฟล์เดียว** (workspace แชร์กับ run อื่น)
@@ -335,9 +378,11 @@ const SHAPE_MAP = [
      declared:false เพราะกล่องไม่มี aspect-ratio เลย (flex:1 + ความสูงตรึง 200px) ⇒ ทรงเปลี่ยน
      ตามจอโดยไม่มีใครตั้งใจ · Visual วัดเองและบันทึกไว้ใน AIO-56 §5 — เป็นของ Visual */
   /* identity:false · สามใบในแถบนี้เป็นเรื่อง **บรรณาธิการ** (REEL_SLUGS) และกล่องทั้งไทล์เป็น
-     ลิงก์ไป /feed/ ⇒ ไม่มีอะไรใน DOM ที่บอกว่า "ช่องนี้ควรเป็นเรื่องอะไร" · ด่านของช่องนี้คือ
-     ข้อ "ทั้ง 3 ใบเป็นเรื่องที่มีจริงในคลัง" ที่ท้ายส่วน 6 ⇒ ประกาศไว้ตรง ๆ ว่า S2 ของช่องนี้
-     อ่อนกว่าช่องอื่น (เทียบทรงของไฟล์กับเรื่องที่ชื่อไฟล์บอก) และถูกคุมด้วย SHAPE_MAX_NO_IDENTITY */
+     ลิงก์ไป /feed/ ⇒ ไม่มีอะไรใน DOM ที่บอกว่า "ช่องนี้ควรเป็นเรื่องอะไร" ⇒ S2 ของช่องนี้
+     อ่อนกว่าช่องอื่น (เทียบทรงของไฟล์กับเรื่องที่ชื่อไฟล์บอก) และถูกคุมด้วย SHAPE_MAX_NO_IDENTITY
+     identity ของช่องนี้ถูกบังคับด้วย **ข้อแยก** ที่ท้ายส่วน 6: สมาชิกครบ + ลำดับตรงกับรายชื่อ
+     บรรณาธิการ แล้วเทียบไฟล์ของใบที่ i กับพาธที่ `content.json` ของ `REEL_SLUGS[i]` ควรได้
+     (รอบแรกข้อนั้นตรวจแค่ "มีอยู่จริงในคลัง" ⇒ สลับลำดับหรือยัดเรื่องเดียวสามใบยังเขียว · M15) */
   { key: 'แถบรีลในไทล์ฟีด', sel: '.btile .reelstrip span', at: U.home, shape: 'poster', declared: false, identity: false },
   { key: 'ดัชนีทุกเรื่อง', sel: '.flatlist .th2', at: U.az, shape: 'poster' },
   /* เพลเยอร์ต้องวัด **สองเรื่อง** ไม่ใช่เรื่องเดียว — นี่คือรูที่มิวเทชัน M5 เปิดให้เห็น:
@@ -476,7 +521,8 @@ const FOLD_PAGES = PAGES.filter(p => PUBLISHED.has(p));
 const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)], { stdio: 'ignore' });
 const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dbus',
   '--hide-scrollbars', `--user-data-dir=${PROFILE}`, `--remote-debugging-port=${CDP}`,
-  '--remote-allow-origins=*', 'about:blank'], { stdio: 'ignore' });
+  '--remote-allow-origins=*', 'about:blank'],
+  { stdio: 'ignore', env: CHROME_TMP_FITS ? { ...process.env, TMPDIR: CHROME_TMP } : process.env });
 
 /* ส่วน 6 เปิดเซิร์ฟเวอร์ตัวที่สองบนต้นไม้ชั่วคราว — ต้องถูกเก็บทุกทางออก รวมทางที่โยน exception
    (ถ้าหลุด จะเหลือ node ค้างถือพอร์ตแล้วการรันครั้งถัดไปแดงแบบสุ่ม — บทเรียน AIO-45) */
@@ -496,6 +542,7 @@ async function cleanup(code) {
   ]);
   for (const p of kids) { try { if (p.exitCode == null) p.kill('SIGKILL'); } catch {} }
   try { fs.rmSync(PROFILE, { recursive: true, force: true }); } catch {}
+  try { fs.rmSync(CHROME_TMP, { recursive: true, force: true }); } catch {}
   try { if (wideDir) fs.rmSync(wideDir, { recursive: true, force: true }); } catch {}
   process.exit(code);
 }
@@ -509,8 +556,12 @@ for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
 process.on('uncaughtException', e => { console.error('ทดสอบล้ม (uncaught): ' + e.message); cleanup(1); });
 process.on('unhandledRejection', e => { console.error('ทดสอบล้ม (rejection): ' + (e && e.message || e)); cleanup(1); });
 
+/* งบเวลารอ chrome ขึ้น: 240 × 250ms = 60 วินาที · ของเดิม 20 วินาที ซึ่ง **ไม่พอจริง** เมื่อ
+   เครื่องนี้มี run อื่นถือ chrome อยู่ด้วย (วัดเอง: สามรันพร้อมกันล้มทั้งสามที่ "ต่อ chrome ไม่ได้"
+   ทั้งที่ chrome ขึ้นได้ปกติเมื่อรันเดี่ยว) ⇒ ด่านที่แดงเพราะเครื่องช้าคือด่านที่เชื่อถือไม่ได้
+   เท่ากับด่านที่เขียวผิด — คนอ่านจะเลิกเชื่อผลทั้งชุด */
 async function wsUrl() {
-  for (let i = 0; i < 80; i++) {
+  for (let i = 0; i < 240; i++) {
     try {
       const r = await fetch(`http://127.0.0.1:${CDP}/json/new?about:blank`, { method: 'PUT' });
       const j = await r.json();
@@ -1554,6 +1605,26 @@ try {
       check(`จุดเรียก coverAttrs() ฝั่งเบราว์เซอร์ = ${SHAPE_CALLSITES_APP} จุดตามตารางของสัญญา (นับได้ ${nApp})`,
         nApp === SHAPE_CALLSITES_APP,
         'ท่อเบราว์เซอร์คือท่อที่ด่านซึ่งอ่าน HTML มองไม่เห็น (§13.1) ⇒ ที่วางใหม่ที่นี่ต้องมีรายการในแผนที่');
+      /* ---------- ห้ามที่วางประกอบพาธปกเอง (ADR-001 §13.5 หลักข้อแรก) ----------
+         รอยที่ปิดด้วยข้อนี้: `build/pages-content.mjs` ประกอบ `/assets/covers/${slug}.webp` เอง
+         ใส่ JSON-LD ของหน้า "เบื้องหลังการสร้างด้วย AI" ⇒ เรื่องที่ชื่อไฟล์ปกไม่เท่ากับ slug
+         (สัญญา §13.4 อนุญาต) ส่งพาธที่ไม่มีไฟล์เข้า structured data เงียบ ๆ
+         เจ้าของพาธตามแบบแผนมีสี่ไฟล์เท่านั้น: ตัวเลือกไฟล์ (seo.mjs) · ชั้นข้อมูลที่เติมค่าตั้งต้น
+         (content.mjs) · และท่อเบราว์เซอร์สองสำเนา (app.src.js ต้นทาง + assets/app.js ที่ build สร้าง)
+         นับจากซอร์สที่ **ถอดคอมเมนต์ออกแล้ว** — ด่าน regex ที่นับคอมเมนต์เป็นของจริงได้บั๊กผี */
+      {
+        const OWNERS = new Set(['build/seo.mjs', 'build/content.mjs', 'build/app.src.js', 'assets/app.js']);
+        const HANDMADE = /['"`]?\/?assets\/covers\/['"`]?\s*(?:\+|\$\{)/;
+        const culprits = [];
+        for (const f of fs.readdirSync(path.join(ROOT, 'build')).filter(n => n.endsWith('.mjs')).map(n => `build/${n}`)) {
+          if (OWNERS.has(f)) continue;
+          const src = fs.readFileSync(path.join(ROOT, f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+          if (HANDMADE.test(src)) culprits.push(f);
+        }
+        check(`ไม่มีที่วางใดประกอบพาธ assets/covers/ เอง (ตรวจ build/*.mjs ยกเว้นเจ้าของ ${OWNERS.size} ไฟล์)`,
+          culprits.length === 0,
+          `${culprits.join(' · ')} ⇒ ขอไฟล์จากตัวเลือกไฟล์ (coverSlot/coverImg) แทนการเดาชื่อไฟล์จาก slug`);
+      }
       /* ทุกที่วางในแผนที่ต้องมีคู่ (selector, หน้า) ที่ไม่ซ้ำกัน — รายการซ้ำคือการวัดของเดิมสองรอบ
          แล้วเข้าใจว่าครอบคลุมมากขึ้น ซึ่งเป็นความมั่นใจปลอม */
       const keys = SHAPE_MAP.map(p => `${p.sel} @ ${p.atFor ? 'atFor:' + p.key : p.at}`);
@@ -1569,11 +1640,12 @@ try {
       if (p.length === 1 && p[0] > 0) return p[0];
       return null;
     };
-    const COVER_RE = /^\/assets\/covers(-wide)?\/([a-z0-9][a-z0-9._-]*)\.(webp|png|jpg|jpeg)$/;
-    /* ⚠️ `slugOf` คือ "เรื่องที่ **ชื่อไฟล์** บอก" ⇒ ใช้ได้เฉพาะในข้อความรายงาน และในที่วาง
-       ที่ประกาศ identity:false ไว้ · **ห้ามใช้มันเป็นคำตอบที่ถูกของ S2** นั่นคือรอย AIO-64 R1
-       (ปกทั้งเว็บเป็นเรื่องเดียวกันแล้วด่านยังเขียว เพราะโจทย์กับเฉลยมาจากไฟล์ใบเดียวกัน) */
-    const slugOf = p => { const m = COVER_RE.exec(String(p || '')); return m ? m[2] : null; };
+    /* ⚠️ เคยมี helper `slugOf(path)` ("เรื่องที่ **ชื่อไฟล์** บอก") อยู่ที่นี่ และมันคือรอย
+       AIO-64 R1 ตรง ๆ: ปกทั้งเว็บเป็นเรื่องเดียวกันแล้วด่านยังเขียว เพราะโจทย์กับเฉลยมาจาก
+       ไฟล์ใบเดียวกัน · **ถอนออกทั้งตัว** ไม่ใช่แค่เลิกเรียก — helper ชื่อนี้ข้างกฎที่ห้ามใช้มัน
+       คือคำเชิญให้รื้อคืน (บทเรียนเดิมของรีโปนี้) · การแมป "พาธ → เรื่อง" ทำที่ `fileOwner`
+       ซึ่งอ่านทะเบียน `cover`/`coverWide` ของข้อมูลสถานะนั้น และ fixture "ชื่อไฟล์ ≠ slug"
+       ในสถานะ ข เป็นด่านที่กันการกลับไปใช้ basename */
     /* --- ออราเคิลฝั่ง node: พาธของลิงก์ → เรื่อง/แนว · สร้างจากตาราง U + คลัง ไม่ใช่จากชื่อไฟล์ ---
        slug/จำนวนตอน/รายชื่อแนว เหมือนกันทั้งสองสถานะ (สถานะ ข แก้เฉพาะ orientation/coverWide)
        ⇒ สร้างครั้งเดียวจากคลังจริงได้ · เพิ่มเรื่องที่ 13 แล้วยังถูกเอง */
@@ -1635,6 +1707,18 @@ try {
       /* เรื่องสุดท้ายเป็นแนวนอน — ต้องไม่ใช่เรื่องที่ฮีโร่หรือฟีดหยิบเป็นใบแรก ไม่งั้นจะวัด
          "ฟีดตัดเรื่องออก" กับ "ฮีโร่เลือกไฟล์" ปนกัน · เลือกตัวท้ายของคลังด้วยเหตุนี้ */
       cj.series[cj.series.length - 1].orientation = 'horizontal';
+      /* ---------- fixture "ชื่อไฟล์ปก ≠ slug" (คำตัดสิน CTO · ข้อ R1 ท่อนสุดท้าย) ----------
+         สัญญา §13.4 อนุญาตให้ `cover` ชี้ไฟล์ชื่ออะไรก็ได้ใน assets/covers/ (ชื่อไฟล์ไม่ใช่
+         ทะเบียน) ⇒ ด่านที่ใช้ basename เป็น slug จะ **แดงทันที** ในสถานะนี้ ไม่ใช่รอให้มีคน
+         มาเปลี่ยนชื่อไฟล์จริงวันหนึ่งแล้วค่อยรู้ · ไฟล์ถูก **ย้าย** ไม่ใช่คัดลอก ⇒ พาธตามแบบแผน
+         (`assets/covers/<slug>.webp`) ไม่มีไฟล์แล้วในต้นไม้นี้ ที่ใดอ่านชื่อไฟล์เอาเองจะภาพแตก
+         เลือกเรื่องที่ 2 ของคลัง: ไม่ใช่เรื่องแรก (ฮีโร่/ฟีดใบแรก) และไม่ใช่เรื่องท้ายที่ถูกตั้ง
+         เป็นแนวนอน ⇒ สองเส้นทางนั้นยังวัดเรื่องของมันเองได้ไม่ปนกัน */
+      const idFix = cj.series[1];
+      const idFixRel = 'assets/covers/a7f3-not-a-slug.webp';
+      fs.renameSync(path.join(wideDir, idFix.cover || `assets/covers/${idFix.slug}.webp`),
+        path.join(wideDir, idFixRel));
+      idFix.cover = idFixRel;
       fs.writeFileSync(path.join(wideDir, 'content.json'), JSON.stringify(cj, null, 2) + '\n');
       const rb = spawnSync('node', ['build/build.mjs'], { cwd: wideDir, encoding: 'utf8' });
       check('build ต้นไม้ชั่วคราว "มีภาพกว้าง + เรื่องแนวนอน 1 เรื่อง" ผ่าน (กฎ V14–V16 ไม่ล้ม)',
@@ -1666,7 +1750,9 @@ try {
             + `/${(wideReady.series || []).length} เรื่อง — ถ้าไม่ครบ นี่ไม่ใช่ต้นไม้ของด่านนี้`
             : 'ไม่มีใครตอบที่พอร์ตนั้นเลย');
         states.push({
-          label: `ข · มีภาพกว้างครบ ${cj.series.length} เรื่อง + แนวนอน 1 เรื่อง (${cj.series[cj.series.length - 1].slug})`,
+          label: `ข · มีภาพกว้างครบ ${cj.series.length} เรื่อง + แนวนอน 1 เรื่อง (${cj.series[cj.series.length - 1].slug})`
+            + ` + ปกของ ${idFix.slug} ชื่อไฟล์ไม่เท่ากับ slug (${idFixRel.split('/').pop()})`,
+          idFixture: { slug: idFix.slug, path: '/' + idFixRel },
           base: wideBase, root: wideDir, synthetic: true,
           by: byOf(cj.series.map(s => ({ slug: s.slug, cover: s.cover, coverWide: s.coverWide, orientation: s.orientation }))),
         });
@@ -1680,7 +1766,18 @@ try {
         + ` · สถานะ: ${st.label}`);
       console.log(`    คลังของสถานะนี้: แนวตั้ง ${verticals.length} · แนวนอน ${horizontals.length}`
         + ` · ประกาศ coverWide ${Object.values(st.by).filter(s => s.coverWide).length}`);
-      let undeclared = 0, noIdentity = 0;
+      let undeclared = 0, noIdentity = 0, idFixHits = 0;
+      /* "ไฟล์ใบนี้เป็นของเรื่องไหน" — **ถามข้อมูล ไม่ใช่ถามชื่อไฟล์** (ทะเบียนคือ `cover`/`coverWide`
+         ใน content.json ไม่ใช่ basename · สัญญา §13.4) ⇒ ใช้ที่ไหนก็ได้ที่ต้องแมปพาธกลับเป็นเรื่อง
+         เช่นไทล์ที่ผูกกับ "แนว" (ต้องรู้ว่าปกที่ขึ้นเป็นสมาชิกของแนวนั้นจริงไหม) และช่องที่
+         ประกาศ identity:false · fixture "ชื่อไฟล์ ≠ slug" ในสถานะ ข จับรอยนี้ได้ตรง ๆ: ของเดิม
+         อ่าน basename ได้ 'a7f3-not-a-slug' ซึ่งไม่ใช่เรื่องใดในคลัง แล้วแดงทั้งแถว (วัดแล้ว 4 ข้อ) */
+      const fileOwner = new Map();
+      for (const [slug, s] of Object.entries(st.by)) {
+        for (const f of [s.cover, s.coverWide]) {
+          if (f) fileOwner.set('/' + String(f).replace(/^\//, ''), slug);
+        }
+      }
 
       for (const pl of SHAPE_MAP) {
         /* ที่วางที่ผูกกับ "ต้องมีเรื่องแนวนอนอยู่ในคลัง" ข้ามได้เฉพาะเมื่อคลังนั้นไม่มีจริง
@@ -1744,7 +1841,9 @@ try {
             if (!it.img) { bad.empty.push(`${vpAt} ไม่มี <img> ในกล่อง`); continue; }
             /* S2 · ไฟล์ที่เบราว์เซอร์โหลดจริง = ไฟล์ที่ทรงนี้ควรได้ **ของเรื่องที่การ์ดใบนี้เป็น**
                identity มาจากลิงก์/data-slug/URL ของหน้า (ออราเคิลอิสระ) ไม่ใช่จากชื่อไฟล์ */
-            const fileSlug = slugOf(it.img.path);
+            /* เรื่องที่ "ไฟล์ที่โหลด" เป็นของ — จากทะเบียนในข้อมูล (fileOwner) ไม่ใช่จาก basename
+               ไฟล์ที่ไม่มีเจ้าของในทะเบียน = null ⇒ ข้อที่พึ่งค่านี้แดง ไม่ใช่เดาจากชื่อไฟล์ */
+            const fileSlug = fileOwner.get(it.img.path) || null;
             const who = pl.identity === false ? null : resolveId(it.id, at);
             if (pl.identity !== false && !who) {
               bad.id.push(`${vpAt} ระบุไม่ได้ว่าการ์ดนี้คือเรื่องอะไร (สัญญาณ: ${JSON.stringify(it.id)})`);
@@ -1779,6 +1878,9 @@ try {
               bad.file.push(`${vpAt} ทรง '${shape}'${who && who.slug ? ` ของ ${who.slug}` : ''} ควรได้ /${want} แต่โหลด ${it.img.path}`);
             }
             if (who && who.slug) { idSeen.add(who.slug); idResolved++; }
+            /* fixture "ชื่อไฟล์ ≠ slug" ถูกวัดของจริงกี่กล่อง — ถ้าศูนย์ fixture ไม่ได้พิสูจน์อะไรเลย
+               (ของที่วางไว้แล้วไม่มีใครเดินผ่าน = ด่านที่หลอกตัวเอง) ⇒ บังคับด้วย check ข้างล่าง */
+            if (st.idFixture && who && who.slug === st.idFixture.slug && it.img.path === st.idFixture.path) idFixHits++;
             /* S3/S4 · ขนาดที่ประกาศต้องตรงกับขนาดไฟล์ "ที่โหลดจริง" บนดิสก์ — ไม่มีเลขในด่าน
                เทียบกับไฟล์ที่โหลด ไม่ใช่ไฟล์ที่ควรโหลด เพื่อให้ S3 ไม่พลอยแดงตาม S2
                และผู้ประกาศขนาดคือ <source> ที่ถูกเลือก ถ้ามี ไม่ใช่ <img> เสมอ */
@@ -1866,6 +1968,37 @@ try {
         noIdentity <= SHAPE_MAX_NO_IDENTITY,
         'ยามแบบเดียวกับ declared:false — identity:false คือช่องที่ S2 อ่อนลงเป็นการเทียบชื่อไฟล์ '
         + 'กับตัวเอง ⇒ ห้ามเป็นทางออกของที่วางใหม่');
+      /* ข้อนี้คือสิ่งที่ทำให้ fixture "ชื่อไฟล์ ≠ slug" เป็นหลักฐาน ไม่ใช่ของประดับ: ต้องมีกล่อง
+         ที่ **ระบุตัวเรื่องจากลิงก์/data-slug แล้วโหลดไฟล์ชื่อแปลกใบนั้น** จริงอย่างน้อยหนึ่งกล่อง
+         ถ้าออราเคิลกลับไปอ่าน basename เป็น slug ข้อ S2 จะแดงที่เรื่องนี้ก่อนใคร (รอย AIO-64 R1) */
+      if (st.idFixture) {
+        check(`fixture "ชื่อไฟล์ปก ≠ slug" ถูกวัดของจริง · ${st.idFixture.slug} โหลด ${st.idFixture.path} ที่ ${idFixHits} กล่อง`,
+          idFixHits > 0,
+          `ไม่มีกล่องใดในสถานะนี้ที่ identity = ${st.idFixture.slug} แล้วโหลด ${st.idFixture.path} ⇒ `
+          + 'fixture ไม่ได้พิสูจน์ว่าเลิกใช้ชื่อไฟล์เป็น slug แล้ว — เลือกเรื่องที่มีการ์ดในที่วางที่วัดได้');
+      }
+      /* --- พาธภาพใน structured data ต้องมีไฟล์จริงบนดิสก์ ---
+         ช่องว่างที่ fixture ข้างบนเปิดให้เห็น: `hasPart[].contentUrl` ของหน้า "เบื้องหลังการสร้าง
+         ด้วย AI" เคยประกอบพาธเองเป็น `/assets/covers/<slug>.webp` ⇒ เรื่องที่ชื่อไฟล์ปกไม่เท่ากับ
+         slug จะส่งพาธที่ไม่มีไฟล์เข้า JSON-LD โดยไม่มีด่านใดเห็น (ด่านวัดกล่องอ่านแต่ DOM)
+         ข้อนี้อ่านจากไฟล์ที่ส่งมอบของสถานะนั้น ⇒ ทั้งสองสถานะถูกตรวจด้วยเกณฑ์เดียวกัน */
+      {
+        const miss = [];
+        let blocks = 0, refs = 0;
+        for (const rel of siteFiles(st.root, { ext: '.html' })) {
+          const html = fs.readFileSync(path.join(st.root, rel), 'utf8');
+          for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+            blocks++;
+            for (const p of m[1].matchAll(/\/assets\/[A-Za-z0-9._\/-]+\.(?:webp|png|jpg|jpeg|svg)/g)) {
+              refs++;
+              if (!fs.existsSync(path.join(st.root, p[0].replace(/^\//, '')))) miss.push(`${rel} → ${p[0]}`);
+            }
+          }
+        }
+        check(`พาธภาพใน JSON-LD มีไฟล์จริงบนดิสก์ทุกเส้น (${refs} เส้น ใน ${blocks} บล็อก)`,
+          miss.length === 0 && refs > 0,
+          miss.slice(0, 4).join(' · ') || 'ไม่พบพาธภาพใน JSON-LD เลย — ด่านนี้วัดของที่ไม่มีอยู่');
+      }
 
       /* --- S5 · ฮีโร่: เบราว์เซอร์ต้องเลือกไฟล์ตามเบรกพอยต์ของจริง ไม่ใช่ตามสตริงที่เขียนไว้ ---
          ⚠️ รอบแรกข้อนี้ยืม `HERO_WIDE_BP` ตัวเดียวกับที่ผลิต `<source media>` มาเป็นทั้งโจทย์
@@ -1919,8 +2052,13 @@ try {
           `โหลด ${it.img.path} · <source> = ${(it.sources || []).map(x => `${x.media}→${x.path}`).join(' ') || 'ไม่มี'}`);
         /* ไม่มีภาพกว้าง ⇒ ต้องไม่มี <picture>/<source> เลย ไม่ใช่ <picture> ที่ว่าง:
            สัญญา §13.6 บอกว่าผลลัพธ์ต้องเป็น "HTML เดิมเป๊ะ" ไม่ใช่ HTML ที่คล้ายเดิม */
-        const hasWideFile = Object.values(st.by).some(x => x.coverWide);
-        check(`ฮีโร่ @${w}px · ${hasWideFile ? 'มี <source media> พร้อม <picture> ที่เป็น block' : 'ไม่มี <picture> เลย (ถอยกลับเป็น HTML เดิม)'}`,
+        /* เงื่อนไขคือ "**เรื่องของสไลด์นี้** มีภาพกว้างไหม" ไม่ใช่ "คลังนี้มีเรื่องใดมีภาพกว้างไหม"
+           รอบแรกข้อนี้อ่านธงระดับคลัง (`…some(x => x.coverWide)`) ⇒ สถานะผสม (บางเรื่องมีไฟล์กว้าง
+           บางเรื่องยังไม่มี — ซึ่งคือสภาพของ AIO-60 ระหว่างทาง) จะ **แดงผิดตัว**: ฮีโร่ของเรื่องที่
+           ยังไม่มีไฟล์กว้างถอยกลับถูกต้องแล้ว แต่ด่านไปเรียกร้อง <source> · เจอตอนรันมิวเทชัน M12
+           (ข้อมูลจริงมีเรื่องแนวนอน 1 เรื่องที่มี coverWide ขณะที่ 11 เรื่องยังไม่มี) */
+        const hasWideFile = !!s.coverWide;
+        check(`ฮีโร่ @${w}px · ${who.slug} ${hasWideFile ? 'มี <source media> พร้อม <picture> ที่เป็น block' : 'ไม่มี <picture> เลย (ถอยกลับเป็น HTML เดิม)'}`,
           hasWideFile
             /* เทียบ media กับ **เบรกพอยต์ที่วัดได้จาก CSS** ไม่ใช่กับค่าที่สร้างมันเอง */
             ? (it.sources || []).length === 1 && it.sources[0].media === `(min-width:${measuredBp}px)` && it.img.wrapDisplay === 'block'
@@ -2025,10 +2163,24 @@ try {
       await goAt(st.base, U.home);
       await evaluate(SHAPE_PREP('.btile .reelstrip span'));
       const reel = await evaluate(SHAPE_PROBE('.btile .reelstrip span'));
-      const reelSlugs = (reel.items || []).map(x => slugOf(x.img && x.img.path));
-      check(`แถบรีลในไทล์ฟีด · ทั้ง ${reelSlugs.length} ใบเป็นเรื่องที่มีจริงในคลัง (${reelSlugs.join(',')})`,
-        reelSlugs.length === 3 && reelSlugs.every(k => k && st.by[k]),
-        reelSlugs.filter(k => !k || !st.by[k]).join(' ') || 'จำนวนไม่ครบ 3 ใบ');
+      /* รอบแรกข้อนี้ตรวจแค่ "slug ที่ชื่อไฟล์บอก มีอยู่จริงในคลัง" ⇒ มิวเทชันที่สลับลำดับ
+         หรือเปลี่ยนทั้งสามใบเป็นเรื่องเดียว **ยังเขียว** (คำตัดสิน CTO · ข้อ R1 ท่อนแถบรีล)
+         เกณฑ์ที่ใช้แทน: **สมาชิกครบและลำดับตรง** กับรายชื่อบรรณาธิการ แล้วเทียบ "ไฟล์ที่
+         ใบที่ i โหลดจริง" กับพาธที่ทรงของช่องนี้ควรได้ของ `REEL_SLUGS[i]` ตาม content.json
+         ⇒ โจทย์มาจาก DOM · เฉลยมาจากรายชื่อ + ข้อมูล ไม่ใช่จากชื่อไฟล์ใบที่กำลังตรวจ
+         ทรงอ่านจากแผนที่ ไม่พิมพ์ซ้ำ — วันที่ §13.5 เปลี่ยนค่าของช่องนี้ แก้ที่เดียวแล้วตรงกัน */
+      const reelShape = (SHAPE_MAP.find(p => p.sel === '.btile .reelstrip span') || {}).shape || 'poster';
+      const reelPaths = (reel.items || []).map(x => (x.img && x.img.path) || null);
+      const reelWant = REEL_SLUGS.map(k => { const w = wantPath(k, reelShape, st.by); return w ? '/' + w.replace(/^\//, '') : null; });
+      check(`แถบรีลในไทล์ฟีด · ${REEL_SLUGS.length} ใบเป็นรายชื่อบรรณาธิการชุดเดิม ลำดับเดิม `
+        + `และได้ไฟล์ของทรง '${reelShape}' ของเรื่องในตำแหน่งนั้น (${REEL_SLUGS.join(',')})`,
+        reelPaths.length === REEL_SLUGS.length && reelWant.every(w => w)
+          && reelWant.every((w, i) => reelPaths[i] === w),
+        reelPaths.length !== REEL_SLUGS.length
+          ? `แถบนี้มี ${reelPaths.length} ใบ แต่รายชื่อบรรณาธิการมี ${REEL_SLUGS.length} ชื่อ`
+          : reelWant.map((w, i) => w === reelPaths[i] ? null
+            : `ใบที่ ${i + 1} ควรเป็น ${REEL_SLUGS[i]} → ${w || 'ไม่อยู่ในคลังของสถานะนี้'} แต่โหลด ${reelPaths[i] || 'ไม่มี <img>'}`)
+            .filter(Boolean).join(' · '));
     }
 
     /* ---------- M14 · มิวเทชัน "ปกผิดเรื่อง" เป็น self-test ถาวรของด่าน ----------
