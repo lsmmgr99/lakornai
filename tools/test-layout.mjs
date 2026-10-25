@@ -1,10 +1,15 @@
-/* ด่านเลย์เอาต์ฮีโร่ + ด่านกันบั๊กตระกูล "inline แต่ตั้ง height" + ด่านฟอลด์ A/B/C — AIO-37 · AIO-54
+/* ด่านเลย์เอาต์ฮีโร่ + ด่านกันบั๊กตระกูล "inline แต่ตั้ง height" + ด่านฟอลด์ A/B/C
+   + ด่านวัดทรงทุกที่วาง — AIO-37 · AIO-54 · AIO-57
    รัน:  node tools/test-layout.mjs
          SKIP_BUILD=1 node tools/test-layout.mjs       (ตรวจไฟล์ที่มีอยู่ตามสภาพ ไม่ build ใหม่)
-         ONLY=hero node tools/test-layout.mjs          (hero=ส่วน 1 · sweep=ส่วน 0+2 · fold=ส่วน 3+4 · bento=ส่วน 5)
+         ONLY=hero node tools/test-layout.mjs          (hero=ส่วน 1 · sweep=ส่วน 0+2 · fold=ส่วน 3+4
+                                                        · bento=ส่วน 5 · shape=ส่วน 6)
          FOLD_SEEDED=1 node tools/test-layout.mjs      (บังคับเกณฑ์ฟอลด์กับสภาพ "ผู้ใช้ที่กลับมา" ด้วย
                                                         — ดูเหตุที่ยังไม่เปิดเป็นค่าตั้งต้นที่ FOLD_SEEDED)
-         LAY_PORT=4299 LAY_CDP=9499 node tools/test-layout.mjs   (ตั้งพอร์ตทับเมื่อรันขนานกับ run อื่น)
+         LAY_PORT=4299 LAY_CDP=9499 LAY_PORT_WIDE=4300 node tools/test-layout.mjs
+                                                       (ตั้งพอร์ตทับเมื่อรันขนานกับ run อื่น ·
+                                                        ส่วน 6 ใช้พอร์ตที่สองสำหรับต้นไม้ชั่วคราว)
+         LAY_STACK=1 node tools/test-layout.mjs        (พิมพ์ stack ตอนด่านล้มเอง ไม่ใช่ตอนเคสตก)
 
    ทำไมต้องใช้เบราว์เซอร์จริง: บั๊กที่ด่านนี้กันคือ "ค่าถูกตั้งแต่ไม่ถูกใช้" — `<span>` เป็น inline
    non-replaced ซึ่ง CSS height / aspect-ratio ไม่มีผล · getComputedStyle ยังรายงาน
@@ -12,7 +17,7 @@
    → grep CSS ไม่เห็น · อ่าน computed style ไม่เห็น · เห็นได้ทางเดียวคือเทียบกับ
    getBoundingClientRect() ของหน้าที่ render จริง
 
-   สี่ส่วน:
+   เจ็ดส่วน:
    0) self-test ของตัวกวาดเอง — วาง fixture ที่ต้องจับ (span ตั้ง height/width/aspect-ratio ·
       object ที่แสดง fallback · ตัวที่ซ่อนด้วย [hidden]) และที่ต้องไม่จับ (span เปล่า ·
       display:block · img · object ที่โหลดทรัพยากรได้) แล้วบังคับว่าผลต้องตรงเป๊ะ
@@ -49,21 +54,41 @@
       ส่วนนี้วัดสองสภาพเหมือนส่วน 2: ผู้ใช้ใหม่ทุกหน้า + ผู้ใช้ที่กลับมาเฉพาะหน้าที่ HTML
       ที่ส่งมอบมี UI จาก localStorage จริง (#contRail / #libPanel — หามาจากไฟล์ ไม่ได้เขียนรายชื่อ)
 
+   5) ไทล์ "เลือกตามแนว" แนวตั้ง 2:3 แถวเดียว ปกไม่ซ้ำ (AIO-54 เฟส 2)
+   6) ทรงของ **ทุกที่วาง** ในแผนที่ของ ADR-001 §13.5 + AIO-56 × 7 ขนาดจอ × **สองสถานะ**
+      (ไม่มีไฟล์ภาพกว้าง = เส้นถอยกลับ · มีไฟล์ภาพกว้างครบ + เรื่องแนวนอน 1 เรื่อง)
+      รายละเอียดเกณฑ์ S1–S7 อยู่ที่บล็อก SHAPE_TOL/SHAPE_MAP ข้างล่าง
+
    มิวเทชันเทสต์ (ทำซ้ำได้ ทุกข้อรันแล้วและต้องแดงจริง):
-   M1 เปลี่ยน `<div class="bg">` ที่ build/pages-discovery.mjs:53 กลับเป็น `<span>`
+   M1 เปลี่ยน `<div class="bg">` ของฮีโร่ใน build/pages-discovery.mjs กลับเป็น `<span>`
       → ตกส่วน 1 (ฮีโร่ 1872px) และส่วน 2 (6 จุด)
-   M2 ถอด `.cont .thumb{display:block}` ที่ build/site-extra.css:47 ออก
+   M2 ถอด `.cont .thumb{display:block}` ใน build/site-extra.css ออก
       → ตกส่วน 2 รอบซีด (`.cont .thumb` กล่องจริง 300×507 ขณะ aspect-ratio ประกาศ 16/9)
         และตกส่วน 3 รอบซีด (A2 ที่ 1440×900 ตกเพราะการ์ดใบแรกสูงเกินจอ)
-   M3 คืนพฤติกรรมเดิมที่ build/app.src.js:335-337 (ถอดสองบรรทัดที่ซ่อน #contSec ออก)
-      → ตกส่วน 3 รอบผู้ใช้ใหม่ (A2 หน้าแรก: เห็นการ์ดเรื่องจริง 0 ใบ) และตกข้อ F1 โดยตรง */
+   M3 คืนพฤติกรรมเดิมที่ซ่อน #contSec ใน build/app.src.js (ถอดสองบรรทัดออก)
+      → ตกส่วน 3 รอบผู้ใช้ใหม่ (A2 หน้าแรก: เห็นการ์ดเรื่องจริง 0 ใบ) และตกข้อ F1 โดยตรง
+   ---- ส่วน 6 (AIO-57) · วัดแล้วทั้งหมด แต่ละข้อรันในสำเนาแยกของรีโป ----
+   M4 ถอด `wideMedia: HERO_WIDE_MEDIA` ออกจากฮีโร่ = บังคับให้ฮีโร่ใช้ปก 2:3 ทั้งที่มีภาพกว้าง
+      → ตก 4 ข้อ (ส่วน 6ข): ไฟล์ของทรง 'wide' · ฮีโร่ @720px · <picture> ทั้งสองความกว้าง
+   M5 คอมเมนต์กฎ `.player[data-orientation=horizontal]` ทิ้ง = เพลเยอร์ 9:16 ตายตัวให้เรื่องแนวนอน
+      → ตก 1 ข้อ: "เพลเยอร์หน้าตอน (เรื่องแนวนอน)" ประกาศ 9/16 แต่ต้องได้ --ar-stage-h
+      ⚠️ ข้อนี้ **เคยเขียว** ตอนด่านไปแต่หน้าตอนของเรื่องแนวตั้ง — เหตุที่แผนที่ต้องมีสองรายการ
+         สำหรับ `.player` และต้องหยิบเรื่องจากคลังของสถานะนั้นด้วย `atFor`
+   M6 เปลี่ยน `.cont .thumb` กลับไปขอทรง 'poster' → ตก "ไฟล์ที่โหลดคือไฟล์ของทรง 'wide'"
+   M7 ฝัง `width="1024" height="1536"` กลับที่การ์ด "ดูต่อ" (กฎ V18)
+      → ตก "<img width/height> = ขนาดไฟล์จริงบนดิสก์" (ประกาศ 1024×1536 แต่ไฟล์ 2640×1200)
+   M8 เอาตัวกรองทิศออกจากฟีดฝั่งเบราว์เซอร์ (`list = D.series`) = D8 รั่วฝั่งที่ HTML มองไม่เห็น
+      → ตก 2 ข้อ: เดินครบวงแล้วเจอเรื่องแนวนอน · ตัวนับได้ 12 ขณะฝั่ง build ได้ 11
+   M9 ถอด `.hero .bg picture{display:block}` → ตก 2 ข้อ (picture display=inline ทั้งสองความกว้าง) */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { D, SERIES, U, epSecs } from '../build/content.mjs';
+import { D, SERIES, U, epSecs, COVER_WIDE_W, COVER_WIDE_H } from '../build/content.mjs';
+import { imageSize } from '../build/imgsize.mjs';
+import { HERO_WIDE_BP } from '../build/pages-discovery.mjs';
 import { siteFiles } from '../ci/site-files.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -73,8 +98,8 @@ const ONLY = process.env.ONLY || '';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 /* ONLY ที่สะกดผิดเคยรันทุกส่วนเงียบ ๆ ทั้งที่คนสั่งคิดว่ารันส่วนเดียว — ล้มทันทีดีกว่า */
-if (!['', 'hero', 'sweep', 'fold', 'bento'].includes(ONLY)) {
-  console.error(`✗ ONLY=${ONLY} ไม่รู้จัก — ใช้ได้เฉพาะ hero | sweep | fold | bento (หรือไม่ตั้งเลย = ทุกส่วน)`);
+if (!['', 'hero', 'sweep', 'fold', 'bento', 'shape'].includes(ONLY)) {
+  console.error(`✗ ONLY=${ONLY} ไม่รู้จัก — ใช้ได้เฉพาะ hero | sweep | fold | bento | shape (หรือไม่ตั้งเลย = ทุกส่วน)`);
   process.exit(1);
 }
 
@@ -151,6 +176,92 @@ const BENTO_PAGES = [U.home, U.browse];
 const BENTO_AR_TOL = 0.02;       /* ±2% ตามใบงาน */
 const BENTO_ROW_MIN_W = 960;     /* ที่ ≥960px ต้องอยู่แถวเดียวและสูงเท่ากันทุกใบ */
 
+/* ---------- ส่วน 6 · ด่านวัด "ทรงของทุกที่วาง" (AIO-57 · ADR-001 §13) ----------
+   ประวัติที่ทำให้ด่านนี้ต้องมี: AIO-37 (ฮีโร่ `span` ทำให้ height ถูกเมิน) และ AIO-53/54
+   (ไทล์แบน) — **ทั้งสองรอบลูกค้าเป็นคนจับได้ก่อนทีม** และด่าน 252 เคสของ UX ก็ไม่เห็น
+   เพราะมันวัด "จอแรกเห็นอะไร" ไม่ได้วัดความถูกต้องของ "ทรง"
+
+   ส่วนนี้วัดสี่อย่างต่อหนึ่งที่วาง ต่อหนึ่งขนาดจอ:
+     S1 กล่องที่ render จริงตรงกับทรงที่ "ที่วางนั้นประกาศไว้" (±2%) — คือบั๊ก AIO-37/53/54
+        ทรงที่ประกาศอ่านจาก computed aspect-ratio ของกล่อง (หรือจาก height/width ที่เป็น px)
+        ไม่ฝังเลขไว้ในด่าน · กล่องที่ "ไม่ประกาศทรงเลย" ถูกบันทึกเป็น ℹ ไม่ใช่ ✓ (ดู SHAPE_MAX_UNDECLARED)
+     S2 ไฟล์ที่เบราว์เซอร์โหลดจริง = ไฟล์ที่ทรงนั้นควรได้ (ADR-001 §13.5 poster/wide/auto)
+        รู้ว่า "ควรได้" จากข้อมูลของ build นั้น ไม่ใช่รายชื่อเรื่องที่เขียนมือ
+     S3 แอตทริบิวต์ width/height ของ <img> = ขนาดจริงของไฟล์นั้นบนดิสก์ (อ่านด้วย build/imgsize.mjs)
+        ข้อนี้คือข้อที่จับ "ค่าคงที่ 1024×1536 ที่ฝังไว้ 8 จุด" (กฎ V18) และจับ V15 ถ้าไฟล์ขนาดเพี้ยน
+        — ไม่มีเลขขนาดภาพอยู่ในด่านนี้แม้ตัวเดียว
+     S4 naturalWidth/Height ของรูปที่โหลดแล้ว = ขนาดเดียวกัน (แอตทริบิวต์ไม่ได้โกหกไบต์จริง)
+   บวกสามข้อที่ผูกกับทรงโดยเฉพาะ:
+     S5 ฮีโร่: ที่ 719px เบราว์เซอร์ต้องเลือกไฟล์ปก 2:3 · ที่ 720px ต้องเลือกไฟล์กว้าง
+        (วัดของจริง ไม่ใช่เทียบสตริง media กับ CSS — เบราว์เซอร์เป็นคนเลือก ADR §13.6)
+     S6 กล่องเพลเยอร์มาจาก `orientation` ของเรื่องที่ขึ้นจริง ไม่ใช่โทเคนตายตัว (§13.7 D7)
+     S7 ฟีดไม่มีเรื่องแนวนอนเลย ทั้งใน HTML ที่ส่งออกและตอนกดลูกศรถัดไปจนครบวง (กฎ V17)
+
+   **สองสถานะ ไม่ใช่สถานะเดียว** — ทั้งหมดข้างบนรันสองรอบ:
+     ก) สถานะถอยกลับ = รีโปตามสภาพ (ยังไม่มีไฟล์ภาพกว้าง · ทุกเรื่องแนวตั้ง)
+     ข) สถานะมีของจริง = ต้นไม้ชั่วคราวใน /tmp ที่ด่านสร้างเอง: ภาพกว้าง 2640×1200 ครบทุกเรื่อง
+        + เรื่องสุดท้ายถูกตั้งเป็น `horizontal` แล้ว build ใหม่ที่นั่น
+        ⇒ เส้นทางที่วันนี้ไม่มีใครเดินผ่าน (ฮีโร่ `<picture>` · `.cont` ทรงกว้าง · เพลเยอร์ 16:9
+          · ฟีดตัดเรื่องออก) ถูกวัดของจริงทุกรอบ ไม่ใช่รอให้มีไฟล์จริงก่อนจึงรู้ว่าพัง
+        ⚠️ ต้นไม้ชั่วคราวเป็นสำเนา — ด่านนี้ **ไม่แก้ไฟล์ในรีโปแม้ไฟล์เดียว** (workspace แชร์กับ run อื่น) */
+const SHAPE_TOL = 0.02;          /* ±2% ตามใบงาน — เกณฑ์เดียวกับ BENTO_AR_TOL */
+/* กล่องที่ไม่ประกาศ aspect-ratio ที่ขนาดจอใดเลย จับด้วย S1 ไม่ได้โดยหลักการ (ไม่มีอะไรให้เทียบ)
+   ยามกันการปิดปากด่าน: ถ้ามีมากกว่านี้ แปลว่ามีคนย้ายที่วางเข้าช่องนี้แทนที่จะแก้ของ
+   วันนี้มีสามช่อง และทั้งสามมีเหตุผลที่เขียนไว้ที่ตัวมันเองใน SHAPE_MAP:
+     `.pickgrid .gtile`        — Visual ตัดสินว่าเป็นแถบนอน เขียนกำกับไว้ในกฎเอง
+     `.btile .reelstrip span`  — flex:1 ความสูงตรึง 200px ⇒ ทรงเปลี่ยนตามจอ (1.103 ที่ 1440
+                                 · 0.520 ที่ 390) Visual เจอเองและบันทึกไว้ใน AIO-56 §5
+     `.player.full`            — ตั้งใจเต็มจอ (aspect-ratio:auto + height) ตามเกณฑ์ประเภท C
+   หมายเหตุ: ฮีโร่ **ไม่** อยู่ในรายการนี้ เพราะมันประกาศ --ar-poster ที่ <720px
+   (ที่ ≥720px ความสูงเป็นของ UX ตามเพดาน 56vh ของ AIO-38 · ADR §13.10 ข้อ 3) */
+const SHAPE_MAX_UNDECLARED = 3;
+const SHAPE_WIDE_DIR = 'assets/covers-wide';
+
+/* ---------- แผนที่ที่วาง ----------
+   ยกมาจากตารางที่วางของ ADR-001 §13.5 (ฝั่ง build 12 จุด + ฝั่งเบราว์เซอร์) และจากแผนที่
+   ของ AIO-56 §1 ซึ่งวัดกล่องทุกช่องไว้แล้ว · `shape` คือ "ทรงที่ที่วางนี้ขอ" ตามสัญญา
+   `at` = หน้าที่ต้องไปวัด (เอา URL มาจากตาราง U ของเว็บจริง ไม่พิมพ์พาธซ้ำ)
+   `mode` = สภาพ localStorage ที่ทำให้ที่วางนั้น "มีตัวตน" — ที่วางที่ render เฉพาะเมื่อมี
+   ข้อมูลในเครื่อง (`.cont` `.lib-list` `.notif`) ถ้าไม่ซีดก่อนวัด ด่านมองไม่เห็นโดยโครงสร้าง
+   ซึ่งเป็นรูที่เปิดจริงใน AIO-38 F3 · `drive` = ขั้นตอนขับแอปให้ที่วางนั้นโผล่ (การ์ดจบตอน/จบเรื่อง)
+   `declared:false` = กล่องไม่ประกาศทรง (ดู SHAPE_MAX_UNDECLARED) */
+const LAST_SERIES = SERIES[SERIES.length - 1];
+const SHORT_SERIES = SERIES.reduce((a, b) => (b.eps < a.eps ? b : a));
+const SHAPE_MAP = [
+  { key: 'ฮีโร่หน้าแรก', sel: '.hero .bg', at: U.home, shape: 'poster', wideAtBp: true },
+  { key: 'ปกในการ์ด', sel: '.card .poster', at: U.home, shape: 'poster' },
+  { key: 'ไทล์เลือกตามแนว (หน้าแรก)', sel: '.genre-bento .gtile', at: U.home, shape: 'poster' },
+  { key: 'ไทล์เลือกตามแนว (/browse/)', sel: '.genre-bento .gtile', at: U.browse, shape: 'poster' },
+  /* declared:false ไม่ใช่การผ่อนด่าน แต่เป็นคำตัดสินของ Visual ที่เขียนกำกับไว้ในกฎเอง:
+     คอมเมนต์เหนือกฎ `.gtile` ตัวฐานใน design/v2/v2.css บอกตรง ๆ ว่าช่อง onboarding
+     "เป็นตัวเลือกในฟอร์ม ไม่ใช่ปกในคลัง ⇒ รูปทรงแนวตั้งผูกไว้กับ .genre-bento เท่านั้น"
+     ⇒ ช่องนี้เป็นแถบนอนโดยเจตนา · ด่านยังบังคับ S2/S3/S4 กับมันเต็มรูปแบบ */
+  { key: 'ไทล์เลือกแนวหน้าต้อนรับ', sel: '.pickgrid .gtile', at: U.welcome, shape: 'poster', declared: false },
+  { key: 'แถวตอน', sel: '.ep-row .th', at: U.newEp, shape: 'poster' },
+  /* declared:false เพราะกล่องนี้ไม่มี aspect-ratio เลย (flex:1 + ความสูงตรึง 200px) ⇒ ทรง
+     เปลี่ยนตามจอโดยไม่มีใครตั้งใจ · Visual วัดเองและบันทึกเป็นข้อค้างไว้ใน AIO-56 §5
+     เป็นของ Visual ไม่ใช่ของ AIO-57 — ที่นี่แค่ไม่กล่าวอ้างว่าตรวจแล้วผ่าน */
+  { key: 'แถบรีลในไทล์ฟีด', sel: '.btile .reelstrip span', at: U.home, shape: 'poster', declared: false },
+  { key: 'ดัชนีทุกเรื่อง', sel: '.flatlist .th2', at: U.az, shape: 'poster' },
+  /* เพลเยอร์ต้องวัด **สองเรื่อง** ไม่ใช่เรื่องเดียว — นี่คือรูที่มิวเทชัน M5 เปิดให้เห็น:
+     ถ้าด่านไปแต่หน้าตอนของเรื่องแนวตั้ง การคืนกฎ "เพลเยอร์ 9:16 ตายตัว" จะเขียวทั้งแผง
+     เพราะ 9:16 ถูกต้องสำหรับเรื่องแนวตั้งอยู่แล้ว · `atFor` หยิบเรื่องจากคลังของสถานะนั้น
+     ไม่ใช่ชื่อเรื่องที่เขียนไว้ในด่าน (เพิ่มเรื่องที่ 13 แล้วยังถูกเอง) */
+  { key: 'เพลเยอร์หน้าตอน (เรื่องแนวตั้ง)', sel: '.player', shape: 'auto', player: true,
+    atFor: st => { const s = Object.values(st.by).find(x => x.orientation === 'vertical'); return s ? U.watch(s.slug, 1) : null; } },
+  { key: 'เพลเยอร์หน้าตอน (เรื่องแนวนอน)', sel: '.player', shape: 'auto', player: true, needs: 'horizontal',
+    atFor: st => { const s = Object.values(st.by).find(x => x.orientation === 'horizontal'); return s ? U.watch(s.slug, 1) : null; } },
+  { key: 'เพลเยอร์ฟีด', sel: '.player.full', at: U.feed, shape: 'poster', player: true, declared: false },
+  { key: 'การ์ดดูต่อ (หน้าแรก)', sel: '.cont .thumb', at: U.home, shape: 'wide', mode: 'shape' },
+  /* คลังมีสองผิวที่สลับกันด้วย media query: `.lib-list` (มือถือ) และ `.lib-grid` (≥720px)
+     ทั้งคู่ถูก assets/app.js สร้างจาก localStorage ⇒ ถ้าวัดแค่ผิวเดียว อีกผิวไม่มีด่านเลย */
+  { key: 'รายการในคลัง (มือถือ)', sel: '.lib-list .controw .th', at: U.library, shape: 'poster', mode: 'shape' },
+  { key: 'การ์ดในคลัง (เดสก์ท็อป)', sel: '.lib-grid .libcard .poster', at: U.library, shape: 'poster', mode: 'shape' },
+  { key: 'รายการแจ้งเตือน', sel: '.notif .th', at: U.notifications, shape: 'poster', mode: 'shape' },
+  { key: 'การ์ดตอนถัดไป', sel: '.nextup .thumb', at: U.watch(SHORT_SERIES.slug, 1), shape: 'poster', mode: 'shape', drive: 'finish' },
+  { key: 'การ์ดจบเรื่อง', sel: '.endcard .ec-next .thumb', at: U.watch(SHORT_SERIES.slug, SHORT_SERIES.eps), shape: 'poster', mode: 'shape', drive: 'finish' },
+];
+
 /* ---------- ค่าที่ซีดลง localStorage เพื่อวัดสภาพ "ผู้ใช้ที่กลับมา" ----------
    คำนวณจากคลังของ build นี้ ไม่ใช่รายชื่อเรื่องที่เขียนมือ — เพิ่มเรื่องที่ 13 แล้วยังถูก
    รูปข้อมูลคือสัญญา lakorn.cont ที่หัวไฟล์ build/app.src.js ประกาศไว้: { slug: {ep,sec,dur,ts} }
@@ -167,6 +278,16 @@ const SEED_CONT = Object.fromEntries(SEED_ENTRIES);
    ด่านไม่เชื่อว่าซีดติด: ส่วน 2 และ 3 บังคับให้นับการ์ด .cont ได้เท่าจำนวนที่ซีดจริง */
 const SEED_SCRIPT = `try{localStorage.setItem('lakorn.cont',${JSON.stringify(JSON.stringify(SEED_CONT))})}catch(e){}`;
 const UNSEED_SCRIPT = `try{localStorage.removeItem('lakorn.cont')}catch(e){}`;
+/* สภาพที่ 3 สำหรับส่วน 6: ที่วางบางช่องต้องมีของอย่างอื่นในเครื่องด้วย ไม่ใช่แค่ `lakorn.cont`
+     follows → `.notif .th` (หน้าแจ้งเตือนวาดจากรายการติดตาม)
+     set.autoplay:false → การ์ด "ตอนถัดไป" ต้องไม่นับถอยหลังแล้วพาหน้าเปลี่ยนไปกลางการวัด
+   สองเรื่องแรกของคลังเหมือนรอบซีด — คำนวณจาก build นี้ ไม่ใช่รายชื่อที่เขียนมือ */
+const SHAPE_SET = { autoplay: false, sound: false, subs: true, notify: true };
+const SHAPE_SCRIPT = `try{
+  localStorage.setItem('lakorn.cont',${JSON.stringify(JSON.stringify(SEED_CONT))});
+  localStorage.setItem('lakorn.follows',${JSON.stringify(JSON.stringify(SEED_ENTRIES.map(e => e[0])))});
+  localStorage.setItem('lakorn.set',${JSON.stringify(JSON.stringify(SHAPE_SET))});
+}catch(e){}`;
 
 if (!fs.existsSync(path.join(ROOT, 'design/v2/home.html'))) {
   console.error('✗ ไม่พบ design/v2/home.html — ด่านนี้ใช้ม็อกอัพที่อนุมัติเป็นค่าอ้างอิง');
@@ -237,10 +358,15 @@ const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu',
   '--hide-scrollbars', `--user-data-dir=${PROFILE}`, `--remote-debugging-port=${CDP}`,
   '--remote-allow-origins=*', 'about:blank'], { stdio: 'ignore' });
 
+/* ส่วน 6 เปิดเซิร์ฟเวอร์ตัวที่สองบนต้นไม้ชั่วคราว — ต้องถูกเก็บทุกทางออก รวมทางที่โยน exception
+   (ถ้าหลุด จะเหลือ node ค้างถือพอร์ตแล้วการรันครั้งถัดไปแดงแบบสุ่ม — บทเรียน AIO-45) */
+let wideServer = null, wideDir = null;
 function cleanup(code) {
   try { server.kill('SIGTERM'); } catch {}
+  try { if (wideServer) wideServer.kill('SIGTERM'); } catch {}
   try { chrome.kill('SIGTERM'); } catch {}
   try { fs.rmSync(PROFILE, { recursive: true, force: true }); } catch {}
+  try { if (wideDir) fs.rmSync(wideDir, { recursive: true, force: true }); } catch {}
   process.exit(code);
 }
 
@@ -283,8 +409,8 @@ const settle = () => evaluate('new Promise(r => requestAnimationFrame(() => requ
 
 /* รอให้หน้านิ่งก่อนวัด: ฟอนต์โหลดเสร็จ (ไม่อย่างนั้นความสูงข้อความขยับ)
    รูป lazy ที่อยู่นอกจอไม่ต้องรอตรงนี้ — ส่วนฮีโร่บังคับโหลดเองใน HERO_PREP */
-async function go(p) {
-  await send('Page.navigate', { url: BASE + p });
+async function goAt(base, p) {
+  await send('Page.navigate', { url: base + p });
   for (let i = 0; i < 150; i++) {
     try {
       if (await evaluate(`document.readyState === 'complete' && document.fonts.status === 'loaded'
@@ -295,8 +421,9 @@ async function go(p) {
     } catch { /* ระหว่างสลับเอกสาร */ }
     await sleep(60);
   }
-  throw new Error('โหลดหน้าไม่เสร็จ: ' + p);
+  throw new Error('โหลดหน้าไม่เสร็จ: ' + base + p);
 }
+const go = p => goAt(BASE, p);
 
 let pass = 0, fail = 0;
 function check(name, ok, detail = '') {
@@ -316,12 +443,16 @@ async function setStorageMode(mode) {
     await send('Page.removeScriptToEvaluateOnNewDocument', { identifier: storageScript });
     storageScript = null;
   }
-  const r = await send('Page.addScriptToEvaluateOnNewDocument',
-    { source: mode === 'seeded' ? SEED_SCRIPT : UNSEED_SCRIPT });
+  const src = mode === 'seeded' ? SEED_SCRIPT : mode === 'shape' ? SHAPE_SCRIPT : UNSEED_SCRIPT;
+  const r = await send('Page.addScriptToEvaluateOnNewDocument', { source: src });
   storageScript = r.identifier;
   storageMode = mode;
 }
-const MODE_LABEL = { new: 'ผู้ใช้ใหม่ (localStorage ว่าง)', seeded: `ผู้ใช้ที่กลับมา (ซีด lakorn.cont ${SEED_ENTRIES.length} เรื่อง)` };
+const MODE_LABEL = {
+  new: 'ผู้ใช้ใหม่ (localStorage ว่าง)',
+  seeded: `ผู้ใช้ที่กลับมา (ซีด lakorn.cont ${SEED_ENTRIES.length} เรื่อง)`,
+  shape: `ผู้ใช้ที่กลับมา + ติดตาม ${SEED_ENTRIES.length} เรื่อง + ปิดเล่นอัตโนมัติ`,
+};
 
 /* ---------- 4. ตัวตรวจเรขาคณิตฮีโร่ ----------
    ใช้ตัวเดียวกันทั้งกับหน้าแรกของเว็บจริงและกับม็อกอัพที่อนุมัติ (ม็อกอัพมีฮีโร่ 1 สไลด์ ไม่มี .dots)
@@ -610,6 +741,131 @@ const BENTO_PROBE = `(function () {
   });
   return { arPoster: root.getPropertyValue('--ar-poster').trim(), tiles: tiles };
 })()`;
+
+/* ---------- 5.1.5 โพรบของส่วน 6 (ทรงของที่วาง) ----------
+   วัด "กล่องที่ render จริง" เทียบกับ "ทรงที่กล่องนั้นประกาศ" และ "ไฟล์ที่เบราว์เซอร์โหลดจริง"
+   `currentSrc` ไม่ใช่ `src`: กับ <picture> สองค่านี้ต่างกัน และค่าที่ตาเห็นคือ currentSrc */
+const SHAPE_PREP = sel => `(async function () {
+  var els = [].slice.call(document.querySelectorAll(${JSON.stringify(sel)}));
+  /* รูป lazy ที่อยู่นอกจอไม่มีวัน complete ในกรอบจอเดียว ⇒ naturalWidth = 0 แล้ว S3/S4
+     จะเทียบกับศูนย์และเขียวแบบไร้ความหมาย · บังคับโหลดเฉพาะรูปของที่วางที่กำลังวัด */
+  var imgs = [];
+  els.forEach(function (el) {
+    var im = el.tagName === 'IMG' ? el : el.querySelector('img');
+    if (im) { im.loading = 'eager'; imgs.push(im); }
+  });
+  await Promise.all(imgs.map(function (im) {
+    if (im.complete && im.naturalWidth) return null;
+    return new Promise(function (r) { im.addEventListener('load', r); im.addEventListener('error', r); setTimeout(r, 4000); });
+  }));
+  await Promise.all(imgs.map(function (im) { return im.decode ? im.decode().catch(function () { return null; }) : null; }));
+  await new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); });
+  return imgs.length;
+})()`;
+
+const SHAPE_PROBE = sel => `(function () {
+  var els = [].slice.call(document.querySelectorAll(${JSON.stringify(sel)}));
+  var cssVar = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+  return {
+    n: els.length,
+    tokens: { poster: cssVar('--ar-poster'), reel: cssVar('--ar-reel'), cont: cssVar('--ar-cont'), stageH: cssVar('--ar-stage-h') },
+    items: els.slice(0, 8).map(function (el) {
+      var r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+      var im = el.tagName === 'IMG' ? el : el.querySelector('img');
+      var pic = im && im.parentElement && im.parentElement.tagName === 'PICTURE' ? im.parentElement : null;
+      var abs = function (u) { try { return new URL(u, location.href).pathname; } catch (e) { return u || ''; } };
+      return {
+        w: +r.width.toFixed(2), h: +r.height.toFixed(2),
+        ar: r.height > 0 ? +(r.width / r.height).toFixed(4) : null,
+        /* ที่วางบางช่องถูกซ่อนด้วย media query โดยตั้งใจ (.lib-list ที่ >=720px สลับไป .lib-grid)
+           กล่องที่ไม่ถูก render ไม่มีทรงให้วัด แต่ computed aspect-ratio ยังรายงานค่าเดิมอยู่
+           ⇒ ถ้าไม่แยกออก ด่านจะฟ้อง 0x0 ว่าเป็นบั๊ก ซึ่งชี้ผิดทาง · ตัวนับอยู่ฝั่งผู้เรียก
+           (ห้ามใช้ backtick ในคอมเมนต์ของบล็อกนี้ — มันปิด template literal ของฝั่ง node) */
+        rendered: cs.display !== 'none' && el.getClientRects().length > 0,
+        display: cs.display, cssAr: cs.aspectRatio, cssH: cs.height, cssW: cs.width,
+        orientation: el.getAttribute('data-orientation')
+          || (el.closest('[data-orientation]') ? el.closest('[data-orientation]').getAttribute('data-orientation') : null),
+        img: im ? {
+          attrW: im.getAttribute('width'), attrH: im.getAttribute('height'),
+          natW: im.naturalWidth, natH: im.naturalHeight,
+          path: abs(im.currentSrc || im.src), fit: getComputedStyle(im).objectFit,
+          wrapDisplay: pic ? getComputedStyle(pic).display : null,
+        } : null,
+        /* <source> มีแอตทริบิวต์ width/height ของตัวเอง และเบราว์เซอร์ใช้ค่าของ "ตัวที่ถูกเลือก"
+           ไม่ใช่ของ <img> ⇒ ด่านต้องเทียบขนาดกับตัวที่ประกาศจริง ไม่ใช่กับ <img> เสมอ */
+        sources: pic ? [].slice.call(pic.querySelectorAll('source')).map(function (s) {
+          return {
+            media: s.getAttribute('media'), path: abs((s.getAttribute('srcset') || '').split(/\\s+/)[0]),
+            attrW: s.getAttribute('width'), attrH: s.getAttribute('height'),
+          };
+        }) : null,
+      };
+    }),
+  };
+})()`;
+
+/* ขับแอปให้การ์ด "ตอนถัดไป"/"จบเรื่อง" โผล่ — สูตรเดียวกับ tools/test-continue.mjs
+   (กดปลายแถบเวลาแล้วกดเล่น ปล่อยให้เดินจนจบ) ไม่ใช่การเรียกฟังก์ชันภายในของแอป
+   ซึ่งจะทำให้ด่านเขียวได้แม้เส้นทางที่ผู้ชมเดินจริงพัง */
+const FINISH_SCRIPT = `(function(){
+  var b = document.getElementById('barWrap'); if (!b) return 'ไม่พบ #barWrap';
+  var r = b.getBoundingClientRect();
+  b.dispatchEvent(new MouseEvent('click', { clientX: r.right - 1, clientY: r.top + 2, bubbles: true }));
+  var p = document.getElementById('playBtn'); if (!p) return 'ไม่พบ #playBtn';
+  p.click();
+  return 'ok';
+})()`;
+
+/* ฟีด: เดินครบวงด้วยปุ่มของจริง แล้วรายงานทุก slug ที่ผ่านตา + ตัวนับที่หน้าแสดง (กฎ V17) */
+const FEED_WALK = n => `(async function () {
+  var box = document.getElementById('feedPlayer');
+  if (!box) return { empty: true, text: (document.querySelector('#main') || {}).textContent || '' };
+  var next = document.getElementById('feedNext');
+  var seen = [box.dataset.slug], orients = [box.dataset.orientation];
+  for (var i = 0; i < ${n}; i++) {
+    next.click();
+    await new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); });
+    seen.push(box.dataset.slug); orients.push(box.dataset.orientation);
+  }
+  return {
+    empty: false, seen: seen, orients: orients,
+    pos: (document.getElementById('feedPos') || {}).textContent || '',
+  };
+})()`;
+
+/* ---------- 5.1.6 ต้นไม้ชั่วคราว "สถานะมีภาพกว้างจริง" ----------
+   ทำไมต้องเป็นสำเนาใน /tmp ไม่ใช่แก้รีโปแล้วคืน: workspace นี้แชร์กับ run อื่นที่ขยับ HEAD
+   ได้กลางงาน ⇒ ถ้าด่านแก้ `content.json` แล้วตายกลางทาง สถานะ fixture จะติดไปกับ commit
+   ของคนอื่น · สำเนาตัดโฟลเดอร์ design/ ออก (81 MB ส่วนใหญ่เป็นภาพ) แล้วใส่คืนเฉพาะสามอย่าง
+   ที่ build/build.mjs อ่าน: tokens.css · v2.css · fonts/ */
+function copyTree(src, dst, skip) {
+  fs.mkdirSync(dst, { recursive: true });
+  for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+    if (skip(e.name)) continue;
+    const a = path.join(src, e.name), b = path.join(dst, e.name);
+    if (e.isSymbolicLink()) continue;
+    if (e.isDirectory()) copyTree(a, b, skip);
+    else if (e.isFile()) fs.copyFileSync(a, b);
+  }
+}
+
+/* ไฟล์ fixture ขนาด 2640×1200 ให้ chrome เป็นคนเข้ารหัสผ่าน canvas.toDataURL('image/webp')
+   — เครื่องนี้ไม่มีเครื่องมือทำภาพ และด่านต้องเขียวได้บน checkout สะอาด จึงไม่ยืมไฟล์ของ
+   AIO-56 ที่อยู่ใน design/v2/wide-out/ (ของ Visual · ยังไม่ผ่านการอนุมัติ · และ untracked) */
+async function makeWideFixture(w, h) {
+  const b64 = await evaluate(`(function(){
+    var c = document.createElement('canvas'); c.width = ${w}; c.height = ${h};
+    var g = c.getContext('2d');
+    var gr = g.createLinearGradient(0, 0, ${w}, ${h});
+    gr.addColorStop(0, '#2a2733'); gr.addColorStop(1, '#f5c451');
+    g.fillStyle = gr; g.fillRect(0, 0, ${w}, ${h});
+    g.fillStyle = '#09080c'; g.fillRect(${Math.round(w * 0.4)}, ${Math.round(h * 0.3)}, ${Math.round(w * 0.2)}, ${Math.round(h * 0.4)});
+    var u = c.toDataURL('image/webp', 0.7);
+    return u.indexOf('data:image/webp') === 0 ? u.split(',')[1] : null;
+  })()`);
+  if (!b64) throw new Error('chrome เข้ารหัส image/webp ไม่ได้ — ด่านสถานะ "มีภาพกว้าง" สร้าง fixture ไม่ได้');
+  return Buffer.from(b64, 'base64');
+}
 
 /* ---------- 5.1 self-test ของตัวกวาดเอง ----------
    ตัวกวาดคือ "เครื่องวัด" ของด่านนี้ ถ้ามันตาบอดด่านจะเขียวแบบไร้ความหมาย
@@ -1051,9 +1307,267 @@ try {
     }
   }
 
+  /* ===== ส่วน 6 · ทรงของทุกที่วาง × ทุกขนาดจอ × สองสถานะ (AIO-57 · ADR-001 §13) ===== */
+  if (ONLY === '' || ONLY === 'shape') {
+    /* --- ตัวช่วยอ่าน "ทรงที่ประกาศ" และ "ไฟล์ที่ควรได้" --- */
+    const parseAr = v => {
+      if (!v || v === 'auto') return null;
+      const p = String(v).split('/').map(x => parseFloat(x));
+      if (p.length === 2 && p[0] > 0 && p[1] > 0) return p[0] / p[1];
+      if (p.length === 1 && p[0] > 0) return p[0];
+      return null;
+    };
+    const COVER_RE = /^\/assets\/covers(-wide)?\/([a-z0-9][a-z0-9._-]*)\.(webp|png|jpg|jpeg)$/;
+    const slugOf = p => { const m = COVER_RE.exec(String(p || '')); return m ? m[2] : null; };
+    /* ไฟล์ที่ทรงนั้น "ควรได้" — กฎเดียวกับ build/seo.mjs coverSlot() และ build/app.src.js
+       คิดจากข้อมูลของ build ที่กำลังวัด ไม่ใช่รายชื่อเรื่องที่เขียนไว้ในด่าน */
+    const wantPath = (slug, shape, by) => {
+      const s = by[slug];
+      if (!s) return null;
+      const wide = shape === 'wide' || (shape === 'auto' && s.orientation === 'horizontal');
+      return wide && s.coverWide ? s.coverWide : (s.cover || `assets/covers/${slug}.webp`);
+    };
+    const byOf = ser => Object.fromEntries(ser.map(s => [s.slug, s]));
+
+    /* --- สถานะ ก) รีโปตามสภาพ · สถานะ ข) ต้นไม้ชั่วคราวที่มีภาพกว้างครบ + เรื่องแนวนอน 1 เรื่อง --- */
+    const states = [{
+      label: 'ก · ถอยกลับ (ไม่มีไฟล์ภาพกว้างเลย)',
+      base: BASE, root: ROOT, by: byOf(SERIES),
+    }];
+
+    wideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-wide-'));
+    {
+      const keepDesign = ['tokens.css', 'v2.css', 'fonts'];
+      copyTree(ROOT, wideDir, n => n === '.git' || n === 'node_modules' || n === 'design');
+      for (const f of keepDesign) {
+        const a = path.join(ROOT, 'design/v2', f), b = path.join(wideDir, 'design/v2', f);
+        if (fs.statSync(a).isDirectory()) copyTree(a, b, () => false);
+        else { fs.mkdirSync(path.dirname(b), { recursive: true }); fs.copyFileSync(a, b); }
+      }
+      const fixture = await makeWideFixture(COVER_WIDE_W, COVER_WIDE_H);
+      check(`fixture ภาพกว้างที่ด่านสร้างเองผ่านกฎ V15 (${COVER_WIDE_W}×${COVER_WIDE_H} · ${Math.round(fixture.length / 1024)} KB)`,
+        fixture.length <= 300 * 1024, `${fixture.length} ไบต์ — เพดานสัญญา 300 KB`);
+      fs.mkdirSync(path.join(wideDir, SHAPE_WIDE_DIR), { recursive: true });
+      const cj = JSON.parse(fs.readFileSync(path.join(wideDir, 'content.json'), 'utf8'));
+      for (const s of cj.series) {
+        fs.writeFileSync(path.join(wideDir, SHAPE_WIDE_DIR, `${s.slug}.webp`), fixture);
+        s.coverWide = `${SHAPE_WIDE_DIR}/${s.slug}.webp`;
+      }
+      /* เรื่องสุดท้ายเป็นแนวนอน — ต้องไม่ใช่เรื่องที่ฮีโร่หรือฟีดหยิบเป็นใบแรก ไม่งั้นจะวัด
+         "ฟีดตัดเรื่องออก" กับ "ฮีโร่เลือกไฟล์" ปนกัน · เลือกตัวท้ายของคลังด้วยเหตุนี้ */
+      cj.series[cj.series.length - 1].orientation = 'horizontal';
+      fs.writeFileSync(path.join(wideDir, 'content.json'), JSON.stringify(cj, null, 2) + '\n');
+      const rb = spawnSync('node', ['build/build.mjs'], { cwd: wideDir, encoding: 'utf8' });
+      check('build ต้นไม้ชั่วคราว "มีภาพกว้าง + เรื่องแนวนอน 1 เรื่อง" ผ่าน (กฎ V14–V16 ไม่ล้ม)',
+        rb.status === 0, (rb.stderr || rb.stdout || '').slice(-600));
+      if (rb.status === 0) {
+        const widePort = await freePort('LAY_PORT_WIDE');
+        wideServer = spawn(process.execPath, [path.join(wideDir, 'tools/serve.mjs'), String(widePort)], { stdio: 'ignore' });
+        const wideBase = `http://127.0.0.1:${widePort}`;
+        for (let i = 0; i < 80; i++) {
+          try { const r = await fetch(wideBase + '/'); if (r.ok) break; } catch { /* ยังไม่ขึ้น */ }
+          await sleep(100);
+        }
+        states.push({
+          label: `ข · มีภาพกว้างครบ ${cj.series.length} เรื่อง + แนวนอน 1 เรื่อง (${cj.series[cj.series.length - 1].slug})`,
+          base: wideBase, root: wideDir,
+          by: byOf(cj.series.map(s => ({ slug: s.slug, cover: s.cover, coverWide: s.coverWide, orientation: s.orientation }))),
+        });
+      }
+    }
+
+    for (const st of states) {
+      const verticals = Object.values(st.by).filter(s => s.orientation === 'vertical');
+      const horizontals = Object.values(st.by).filter(s => s.orientation === 'horizontal');
+      console.log(`\nส่วน 6${st === states[0] ? 'ก' : 'ข'} · ทรงของ ${SHAPE_MAP.length} ที่วาง × ${FOLD_VIEWPORTS.length} ขนาดจอ`
+        + ` · สถานะ: ${st.label}`);
+      console.log(`    คลังของสถานะนี้: แนวตั้ง ${verticals.length} · แนวนอน ${horizontals.length}`
+        + ` · ประกาศ coverWide ${Object.values(st.by).filter(s => s.coverWide).length}`);
+      let undeclared = 0;
+
+      for (const pl of SHAPE_MAP) {
+        /* ที่วางที่ผูกกับ "ต้องมีเรื่องแนวนอนอยู่ในคลัง" ข้ามได้เฉพาะเมื่อคลังนั้นไม่มีจริง
+           และการข้ามต้องถูกยืนยันด้วย check ไม่ใช่ `continue` เงียบ ๆ — ไม่งั้นวันที่
+           `atFor` คืน null เพราะบั๊ก ด่านจะเขียวทั้งที่ไม่ได้วัดอะไรเลย */
+        const at = pl.atFor ? pl.atFor(st) : pl.at;
+        if (!at) {
+          check(`${pl.key} (${pl.sel}) · ข้ามได้เพราะคลังของสถานะนี้ไม่มีเรื่อง${pl.needs === 'horizontal' ? 'แนวนอน' : 'ที่ต้องการ'}เลย`,
+            pl.needs === 'horizontal' && horizontals.length === 0,
+            `needs=${pl.needs} · แนวนอนในคลัง ${horizontals.length} เรื่อง — atFor คืน null ทั้งที่ควรหาเจอ`);
+          continue;
+        }
+        await setStorageMode(pl.mode || 'new');
+        const bad = { box: [], inline: [], file: [], attr: [], nat: [], none: [], empty: [] };
+        let seen = 0, hiddenAt = [], declaredSome = false;
+        for (const vp of FOLD_VIEWPORTS) {
+          await viewport(vp);
+          await goAt(st.base, at);             /* นำทางใหม่ทุกขนาดจอ: ที่วางบางช่องมาจาก JS */
+          if (pl.drive === 'finish') {
+            const r = await evaluate(FINISH_SCRIPT);
+            if (r !== 'ok') { bad.empty.push(`${vp.w}: ${r}`); continue; }
+            await sleep(1600);
+          }
+          await evaluate(SHAPE_PREP(pl.sel));
+          const res = await evaluate(SHAPE_PROBE(pl.sel));
+          const vpAt = `${vp.w}×${vp.h}`;
+          if (!res.n) { bad.empty.push(vpAt); continue; }
+          if (res.items.every(it => !it.rendered)) { hiddenAt.push(vpAt); continue; }
+          seen += res.items.filter(it => it.rendered).length;
+          /* ทรงที่ "ที่วางนี้" ขอ · ฮีโร่เป็นที่วางเดียวที่ขอสองทรงในที่เดียว ⇒ ทรงที่คาดหวัง
+             เปลี่ยนตามขนาดจอตามเบรกพอยต์ของจริง (ADR-001 §13.6) ไม่ใช่ค่าเดียวทุกจอ */
+          const shape = pl.wideAtBp && vp.w >= HERO_WIDE_BP ? 'wide' : pl.shape;
+          for (const it of res.items) {
+            if (!it.rendered) continue;
+            /* S1a · ตระกูลบั๊ก AIO-37: ชั้นกลางที่เป็น inline ทำให้ height/aspect-ratio ถูกเมิน
+               ขณะที่ computed style ยังรายงานค่าเดิม ⇒ มองเห็นได้ทางเดียวคือเทียบกล่องจริง */
+            if (it.display === 'inline') bad.inline.push(`${vpAt} display:inline`);
+            /* S1b · กล่องจริงต้องตรงกับ "สัดส่วนที่ประกาศ" ±2%
+               ความซื่อสัตย์ของเกณฑ์: "ทรง" คือ aspect-ratio เท่านั้น · ความสูงเป็น px เพียว ๆ
+               ไม่ใช่การประกาศทรง และเทียบกับกล่องจริงแล้วจะจริงเสมอสำหรับกล่อง block
+               (computed height = used value) ⇒ ถ้านับเป็น ✓ จะได้ความมั่นใจปลอม
+               ช่องที่ไม่ประกาศสัดส่วนเลยจึงเข้าถัง `none` แล้วถูกคุมด้วย SHAPE_MAX_UNDECLARED
+               ส่วนบั๊กของช่องที่ตั้งความสูงไว้แต่ค่าไม่ถูกใช้ ถูกจับที่ S1a (display:inline)
+               ซึ่งเป็นสาเหตุเดียวที่เคยเกิดจริงในรีโปนี้ (AIO-37 · AIO-38 F3) */
+            const dAr = parseAr(it.cssAr);
+            if (dAr) {
+              declaredSome = true;
+              if (it.ar == null || Math.abs(it.ar - dAr) > SHAPE_TOL * dAr) {
+                bad.box.push(`${vpAt} ประกาศ ${it.cssAr}=${dAr.toFixed(3)} แต่กล่องจริง ${it.w}×${it.h}=${it.ar}`);
+              }
+            } else {
+              bad.none.push(`${vpAt} ${it.w}×${it.h}=${it.ar} (cssH=${it.cssH})`);
+            }
+            if (!it.img) { bad.empty.push(`${vpAt} ไม่มี <img> ในกล่อง`); continue; }
+            /* S2 · ไฟล์ที่เบราว์เซอร์โหลดจริง = ไฟล์ที่ทรงนี้ควรได้ */
+            const slug = slugOf(it.img.path);
+            const want = slug ? wantPath(slug, shape, st.by) : null;
+            if (!want) { bad.file.push(`${vpAt} path ที่โหลด "${it.img.path}" แมปกลับเป็นเรื่องในคลังไม่ได้`); continue; }
+            if (it.img.path !== '/' + want.replace(/^\//, '')) {
+              bad.file.push(`${vpAt} ทรง '${shape}' ควรได้ /${want} แต่โหลด ${it.img.path}`);
+            }
+            /* S3/S4 · ขนาดที่ประกาศต้องตรงกับขนาดไฟล์ "ที่โหลดจริง" บนดิสก์ — ไม่มีเลขในด่าน
+               เทียบกับไฟล์ที่โหลด ไม่ใช่ไฟล์ที่ควรโหลด เพื่อให้ S3 ไม่พลอยแดงตาม S2
+               และผู้ประกาศขนาดคือ <source> ที่ถูกเลือก ถ้ามี ไม่ใช่ <img> เสมอ */
+            const decl = (it.sources || []).find(x => x.path === it.img.path) || it.img;
+            const dim = imageSize(path.join(st.root, it.img.path.replace(/^\//, '')));
+            if (!dim) { bad.attr.push(`${vpAt} อ่านขนาด ${it.img.path} จากดิสก์ไม่ออก`); continue; }
+            if (+decl.attrW !== dim.w || +decl.attrH !== dim.h) {
+              bad.attr.push(`${vpAt} ประกาศ width="${decl.attrW}" height="${decl.attrH}" `
+                + `แต่ไฟล์จริง ${dim.w}×${dim.h} (${it.img.path})`);
+            }
+            if (it.img.natW !== dim.w || it.img.natH !== dim.h) {
+              bad.nat.push(`${vpAt} natural ${it.img.natW}×${it.img.natH} vs ไฟล์ ${dim.w}×${dim.h}`);
+            }
+            /* S6 · กล่องเพลเยอร์มาจาก orientation ของเรื่องที่ขึ้นจริง ไม่ใช่โทเคนตายตัว */
+            if (pl.player && dAr) {
+              const o = it.orientation;
+              const tok = o === 'horizontal' ? res.tokens.stageH : res.tokens.reel;
+              const wantAr = parseAr(tok);
+              if (!wantAr) {
+                bad.box.push(`${vpAt} ไม่มีโทเคนสัดส่วนสำหรับ orientation=${o}`);
+              } else if (Math.abs(dAr - wantAr) > SHAPE_TOL * wantAr) {
+                bad.box.push(`${vpAt} orientation=${o} ควรได้ ${tok}=${wantAr.toFixed(3)} แต่กล่องประกาศ ${it.cssAr}`);
+              }
+            }
+          }
+        }
+        const atp = `${pl.key} (${pl.sel} @ ${at})`;
+        /* ซ่อนทุกขนาดจอ = ด่านมองไม่เห็นที่วางนี้โดยโครงสร้าง ⇒ ต้องแดง ไม่ใช่ข้ามเงียบ ๆ
+           (รูนี้เปิดจริงใน AIO-38 F3: ด่าน 232,570 element ไม่เห็น `.cont .thumb` เลย) */
+        check(`${atp} · มีตัวตนให้วัด (${seen} กล่อง`
+          + `${hiddenAt.length ? ` · ซ่อนตามแบบที่ ${hiddenAt.join(',')}` : ''})`,
+          bad.empty.length === 0 && seen > 0,
+          bad.empty.slice(0, 4).join(' · ') || 'ไม่พบ element ที่ selector นี้ที่ขนาดจอใดเลย — '
+            + 'ที่วางย้ายที่ หรือสภาพ localStorage ไม่ถูก');
+        check(`${atp} · ไม่มีกล่องที่ display:inline (ตระกูลบั๊ก AIO-37)`,
+          bad.inline.length === 0, bad.inline.slice(0, 3).join(' · '));
+        check(`${atp} · กล่องจริงตรงกับทรงที่ประกาศ ±${SHAPE_TOL * 100}%`,
+          bad.box.length === 0, bad.box.slice(0, 4).join(' · '));
+        check(`${atp} · ไฟล์ที่โหลดคือไฟล์ของทรง '${pl.shape}'`,
+          bad.file.length === 0, bad.file.slice(0, 4).join(' · '));
+        check(`${atp} · <img width/height> = ขนาดไฟล์จริงบนดิสก์ (กฎ V15/V18)`,
+          bad.attr.length === 0, bad.attr.slice(0, 4).join(' · '));
+        check(`${atp} · ไบต์ที่โหลดมีขนาดตามที่ประกาศ (naturalWidth/Height)`,
+          bad.nat.length === 0, bad.nat.slice(0, 4).join(' · '));
+        if (bad.none.length) {
+          console.log(`  ℹ ${atp} · กล่องไม่ประกาศสัดส่วนที่ ${bad.none.length} เคส ⇒ S1 เทียบไม่ได้ `
+            + `(ของจริงที่วัดได้: ${bad.none.slice(0, 2).join(' · ')})`);
+        }
+        /* ข้อนี้คือบั๊ก AIO-53 ตรง ๆ: ไทล์ "เลือกตามแนว" ไม่ได้ประกาศ 2:3 ไว้เลย จึงแบนตามจอ
+           และเพราะมันไม่ประกาศ ด่านที่เทียบ "ประกาศ vs ของจริง" ก็ไม่มีอะไรให้เทียบ
+           ⇒ ที่วางทุกช่องต้องประกาศสัดส่วนที่อย่างน้อยหนึ่งขนาดจอ เว้นช่องที่ประกาศข้อยกเว้น
+           ไว้ในแผนที่พร้อมเหตุผล (วันนี้สองช่อง: แถบรีล และเพลเยอร์ฟีดที่ตั้งใจเต็มจอ) */
+        if (!declaredSome) undeclared++;
+        check(`${atp} · ประกาศสัดส่วนไว้อย่างน้อยหนึ่งขนาดจอ${pl.declared === false ? ' (หรือเป็นข้อยกเว้นที่ประกาศไว้)' : ''}`,
+          declaredSome || pl.declared === false,
+          'ไม่มี aspect-ratio ที่ขนาดจอใดเลย — นี่คืออาการของบั๊ก AIO-53 (ไทล์แบนตามจอ) · '
+          + 'แก้ CSS ให้ประกาศทรง หรือถ้าช่องนี้ไม่มีทรงจริง ใส่ declared:false ใน SHAPE_MAP พร้อมเหตุผล');
+      }
+      check(`ช่องที่ไม่ประกาศสัดส่วนเลย ไม่เกิน ${SHAPE_MAX_UNDECLARED} ช่อง (เจอ ${undeclared})`,
+        undeclared <= SHAPE_MAX_UNDECLARED,
+        'ยามกันการย้ายที่วางเข้าช่อง declared:false เพื่อให้ด่านเงียบ แทนที่จะแก้ของ');
+
+      /* --- S5 · ฮีโร่: เบราว์เซอร์ต้องเลือกไฟล์ตามเบรกพอยต์ของจริง ไม่ใช่ตามสตริงที่เขียนไว้ --- */
+      await setStorageMode('new');
+      for (const w of [HERO_WIDE_BP - 1, HERO_WIDE_BP]) {
+        await viewport({ w, h: 900 });
+        await goAt(st.base, U.home);
+        await evaluate(SHAPE_PREP('.hero .bg'));
+        const r = await evaluate(SHAPE_PROBE('.hero .bg'));
+        const it = (r.items || [])[0];
+        if (!it || !it.img) { check(`ฮีโร่ @${w}px · วัดได้`, false, 'ไม่พบ .hero .bg img'); continue; }
+        const slug = slugOf(it.img.path);
+        const s = slug ? st.by[slug] : null;
+        const wide = w >= HERO_WIDE_BP && s && s.coverWide;
+        const want = '/' + (wide ? s.coverWide : (s ? s.cover : '')).replace(/^\//, '');
+        check(`ฮีโร่ @${w}px · เบราว์เซอร์เลือก${wide ? 'ไฟล์กว้าง' : 'ปก 2:3'} (${want})`,
+          it.img.path === want,
+          `โหลด ${it.img.path} · <source> = ${(it.sources || []).map(x => `${x.media}→${x.path}`).join(' ') || 'ไม่มี'}`);
+        /* ไม่มีภาพกว้าง ⇒ ต้องไม่มี <picture>/<source> เลย ไม่ใช่ <picture> ที่ว่าง:
+           สัญญา §13.6 บอกว่าผลลัพธ์ต้องเป็น "HTML เดิมเป๊ะ" ไม่ใช่ HTML ที่คล้ายเดิม */
+        const hasWideFile = Object.values(st.by).some(x => x.coverWide);
+        check(`ฮีโร่ @${w}px · ${hasWideFile ? 'มี <source media> พร้อม <picture> ที่เป็น block' : 'ไม่มี <picture> เลย (ถอยกลับเป็น HTML เดิม)'}`,
+          hasWideFile
+            ? (it.sources || []).length === 1 && it.sources[0].media === `(min-width:${HERO_WIDE_BP}px)` && it.img.wrapDisplay === 'block'
+            : it.sources === null,
+          `sources=${JSON.stringify(it.sources)} · picture display=${it.img.wrapDisplay}`);
+      }
+
+      /* --- S7 · ฟีดไม่รวมเรื่องแนวนอน ทั้งใน HTML และตอนเดินด้วยปุ่มจริง (กฎ V17) --- */
+      const vSlugs = new Set(verticals.map(s => s.slug));
+      const feedHtml = await (await fetch(st.base + U.feed)).text();
+      const htmlSlugs = [...feedHtml.matchAll(/data-slug="([^"]+)"/g)].map(m => m[1]);
+      check(`/feed/ · HTML ที่ส่งออกไม่มีเรื่องแนวนอน (${htmlSlugs.join(',') || 'ไม่มี data-slug'})`,
+        htmlSlugs.every(k => vSlugs.has(k)), htmlSlugs.filter(k => !vSlugs.has(k)).join(' '));
+      check(`/feed/ · ตัวนับบอก N = จำนวนเรื่องแนวตั้ง (${verticals.length}) ไม่ใช่จำนวนเรื่องทั้งคลัง`,
+        new RegExp(`จาก\\s*${verticals.length}\\b`).test(feedHtml),
+        (/เรื่องที่ 1 จาก [0-9]+/.exec(feedHtml) || ['ไม่พบตัวนับ'])[0]);
+      await viewport(MOBILE);
+      await goAt(st.base, U.feed);
+      const walk = await evaluate(FEED_WALK(verticals.length));
+      check(`/feed/ · กดลูกศรถัดไปครบวง ${verticals.length} ครั้ง ไม่เจอเรื่องแนวนอนเลย`,
+        !walk.empty && walk.seen.every(k => vSlugs.has(k))
+          && walk.orients.every(o => o === 'vertical'),
+        walk.empty ? 'ฟีดเป็นสถานะว่าง' : walk.seen.filter(k => !vSlugs.has(k)).join(' ') || `orients=${[...new Set(walk.orients)].join(',')}`);
+      check(`/feed/ · ตัวนับฝั่งเบราว์เซอร์ได้ N เท่ากับฝั่ง build (${verticals.length})`,
+        !walk.empty && new RegExp(`จาก ${verticals.length}$`).test(walk.pos.trim()), walk.pos);
+      /* แถบรีลคือ "ตัวอย่างของฟีด" — ต้องไม่โฆษณาเรื่องที่คลิกเข้าไปแล้วไม่เจอ */
+      await viewport(FOLD_VIEWPORTS[1]);
+      await goAt(st.base, U.home);
+      await evaluate(SHAPE_PREP('.btile .reelstrip span'));
+      const reel = await evaluate(SHAPE_PROBE('.btile .reelstrip span'));
+      const reelSlugs = (reel.items || []).map(x => slugOf(x.img && x.img.path));
+      check(`แถบรีลในไทล์ฟีด · ทั้ง ${reelSlugs.length} ใบเป็นเรื่องแนวตั้ง (${reelSlugs.join(',')})`,
+        reelSlugs.length === 3 && reelSlugs.every(k => k && vSlugs.has(k)),
+        reelSlugs.filter(k => !vSlugs.has(k)).join(' '));
+    }
+    await setStorageMode('new');
+  }
+
   console.log(`\nผล: ผ่าน ${pass} · ตก ${fail}`);
   cleanup(fail ? 1 : 0);
 } catch (e) {
   console.error('ทดสอบล้ม: ' + e.message);
+  if (process.env.LAY_STACK) console.error(e.stack);
   cleanup(1);
 }

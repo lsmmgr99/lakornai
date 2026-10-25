@@ -1,0 +1,1101 @@
+{
+  "at": "2026-10-25",
+  "feedSha": "4e183df57468",
+  "demo": "durian-revenge",
+  "wideSrc": "/design/v2/wide-out/durian-revenge.webp",
+  "stories": 12,
+  "rows": [
+    {
+      "vp": {
+        "tag": "1920x1080",
+        "w": 1920,
+        "h": 1080,
+        "dpr": 1.5,
+        "mobile": false,
+        "label": "เดสก์ท็อป 1920×1080"
+      },
+      "stack": {
+        "max": 288.8,
+        "min": 288.8,
+        "n": 12,
+        "titles": 12
+      },
+      "tall": {
+        "frame": {
+          "x": 508,
+          "y": 160,
+          "w": 460,
+          "h": 820,
+          "top": 160,
+          "bottom": 980,
+          "left": 508,
+          "right": 968
+        },
+        "vis": {
+          "w": 460,
+          "h": 820,
+          "seen": 0.8415,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 1080
+        }
+      },
+      "crop": {
+        "vis": {
+          "w": 460,
+          "h": 820,
+          "seen": 0.255,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 1080
+        }
+      },
+      "contain": {
+        "vis": {
+          "w": 460,
+          "h": 209.1,
+          "seen": 1,
+          "fit": "contain",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "plate": {
+        "clip": {
+          "x": 508,
+          "y": 311.3,
+          "w": 460,
+          "h": 258.8,
+          "top": 311.3,
+          "bottom": 570,
+          "left": 508,
+          "right": 968
+        },
+        "vis": {
+          "w": 460,
+          "h": 258.8,
+          "seen": 0.8081,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "bisected": [],
+      "wide": {
+        "frame": {
+          "x": 508,
+          "y": 160,
+          "w": 460,
+          "h": 820,
+          "top": 160,
+          "bottom": 980,
+          "left": 508,
+          "right": 968
+        },
+        "clip": {
+          "x": 508,
+          "y": 311.3,
+          "w": 460,
+          "h": 258.8,
+          "top": 311.3,
+          "bottom": 570,
+          "left": 508,
+          "right": 968
+        },
+        "vis": {
+          "w": 460,
+          "h": 258.8,
+          "seen": 0.375,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 1080
+        },
+        "gapTop": 74.5,
+        "gapBot": 121.2,
+        "moved": [],
+        "btnMoved": [],
+        "lum": {
+          "clip": {
+            "mean": 0.1516,
+            "max": 1,
+            "px": 267720
+          },
+          "behindRail": {
+            "mean": 0.0065,
+            "max": 0.0122,
+            "px": 30530
+          },
+          "behindCaption": {
+            "mean": 0.0026,
+            "max": 0.0044,
+            "px": 80162
+          },
+          "bandAboveClip": {
+            "mean": 0.035,
+            "max": 0.0943,
+            "px": 69000
+          }
+        }
+      }
+    },
+    {
+      "vp": {
+        "tag": "1440x900",
+        "w": 1440,
+        "h": 900,
+        "dpr": 1.5,
+        "mobile": false,
+        "label": "เดสก์ท็อป 1440×900"
+      },
+      "stack": {
+        "max": 288.8,
+        "min": 288.8,
+        "n": 12,
+        "titles": 12
+      },
+      "tall": {
+        "frame": {
+          "x": 268,
+          "y": 85,
+          "w": 460,
+          "h": 790,
+          "top": 85,
+          "bottom": 875,
+          "left": 268,
+          "right": 728
+        },
+        "vis": {
+          "w": 460,
+          "h": 790,
+          "seen": 0.8734,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 900
+        }
+      },
+      "crop": {
+        "vis": {
+          "w": 460,
+          "h": 790,
+          "seen": 0.2647,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 900
+        }
+      },
+      "contain": {
+        "vis": {
+          "w": 460,
+          "h": 209.1,
+          "seen": 1,
+          "fit": "contain",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "plate": {
+        "clip": {
+          "x": 268,
+          "y": 221.3,
+          "w": 460,
+          "h": 258.8,
+          "top": 221.3,
+          "bottom": 480,
+          "left": 268,
+          "right": 728
+        },
+        "vis": {
+          "w": 460,
+          "h": 258.8,
+          "seen": 0.8081,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "bisected": [],
+      "wide": {
+        "frame": {
+          "x": 268,
+          "y": 85,
+          "w": 460,
+          "h": 790,
+          "top": 85,
+          "bottom": 875,
+          "left": 268,
+          "right": 728
+        },
+        "clip": {
+          "x": 268,
+          "y": 221.3,
+          "w": 460,
+          "h": 258.8,
+          "top": 221.3,
+          "bottom": 480,
+          "left": 268,
+          "right": 728
+        },
+        "vis": {
+          "w": 460,
+          "h": 258.8,
+          "seen": 0.375,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 900
+        },
+        "gapTop": 59.5,
+        "gapBot": 106.2,
+        "moved": [],
+        "btnMoved": [],
+        "lum": {
+          "clip": {
+            "mean": 0.1516,
+            "max": 1,
+            "px": 267720
+          },
+          "behindRail": {
+            "mean": 0.0069,
+            "max": 0.0127,
+            "px": 30530
+          },
+          "behindCaption": {
+            "mean": 0.0027,
+            "max": 0.0048,
+            "px": 80162
+          },
+          "bandAboveClip": {
+            "mean": 0.0324,
+            "max": 0.0858,
+            "px": 53130
+          }
+        }
+      }
+    },
+    {
+      "vp": {
+        "tag": "1366x768",
+        "w": 1366,
+        "h": 768,
+        "dpr": 1.5,
+        "mobile": false,
+        "label": "เดสก์ท็อป 1366×768"
+      },
+      "stack": {
+        "max": 288.8,
+        "min": 288.8,
+        "n": 12,
+        "titles": 12
+      },
+      "tall": {
+        "frame": {
+          "x": 231,
+          "y": 85,
+          "w": 460,
+          "h": 658,
+          "top": 85,
+          "bottom": 743,
+          "left": 231,
+          "right": 691
+        },
+        "vis": {
+          "w": 460,
+          "h": 658,
+          "seen": 0.9536,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 768
+        }
+      },
+      "crop": {
+        "vis": {
+          "w": 460,
+          "h": 658,
+          "seen": 0.3178,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 768
+        }
+      },
+      "contain": {
+        "vis": {
+          "w": 460,
+          "h": 209.1,
+          "seen": 1,
+          "fit": "contain",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "plate": {
+        "clip": {
+          "x": 253.9,
+          "y": 181,
+          "w": 414.2,
+          "h": 233,
+          "top": 181,
+          "bottom": 414,
+          "left": 253.9,
+          "right": 668.1
+        },
+        "vis": {
+          "w": 414.2,
+          "h": 233,
+          "seen": 0.8081,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "bisected": [],
+      "wide": {
+        "frame": {
+          "x": 231,
+          "y": 85,
+          "w": 460,
+          "h": 658,
+          "top": 85,
+          "bottom": 743,
+          "left": 231,
+          "right": 691
+        },
+        "clip": {
+          "x": 253.9,
+          "y": 181,
+          "w": 414.2,
+          "h": 233,
+          "top": 181,
+          "bottom": 414,
+          "left": 253.9,
+          "right": 668.1
+        },
+        "vis": {
+          "w": 414.2,
+          "h": 233,
+          "seen": 0.375,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 768
+        },
+        "gapTop": 19.2,
+        "gapBot": 40.2,
+        "moved": [],
+        "btnMoved": [],
+        "lum": {
+          "clip": {
+            "mean": 0.1521,
+            "max": 1,
+            "px": 217350
+          },
+          "behindRail": {
+            "mean": 0.0094,
+            "max": 0.0207,
+            "px": 30530
+          },
+          "behindCaption": {
+            "mean": 0.0032,
+            "max": 0.007,
+            "px": 80162
+          },
+          "bandAboveClip": {
+            "mean": 0.0265,
+            "max": 0.0603,
+            "px": 11730
+          }
+        }
+      }
+    },
+    {
+      "vp": {
+        "tag": "1280x800",
+        "w": 1280,
+        "h": 800,
+        "dpr": 1.5,
+        "mobile": false,
+        "label": "เดสก์ท็อป 1280×800"
+      },
+      "stack": {
+        "max": 288.8,
+        "min": 288.8,
+        "n": 12,
+        "titles": 12
+      },
+      "tall": {
+        "frame": {
+          "x": 188,
+          "y": 85,
+          "w": 460,
+          "h": 690,
+          "top": 85,
+          "bottom": 775,
+          "left": 188,
+          "right": 648
+        },
+        "vis": {
+          "w": 460,
+          "h": 690,
+          "seen": 1,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 800
+        }
+      },
+      "crop": {
+        "vis": {
+          "w": 460,
+          "h": 690,
+          "seen": 0.303,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 800
+        }
+      },
+      "contain": {
+        "vis": {
+          "w": 460,
+          "h": 209.1,
+          "seen": 1,
+          "fit": "contain",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "plate": {
+        "clip": {
+          "x": 196.7,
+          "y": 181,
+          "w": 442.7,
+          "h": 249,
+          "top": 181,
+          "bottom": 430,
+          "left": 196.7,
+          "right": 639.3
+        },
+        "vis": {
+          "w": 442.7,
+          "h": 249,
+          "seen": 0.8081,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "bisected": [],
+      "wide": {
+        "frame": {
+          "x": 188,
+          "y": 85,
+          "w": 460,
+          "h": 690,
+          "top": 85,
+          "bottom": 775,
+          "left": 188,
+          "right": 648
+        },
+        "clip": {
+          "x": 196.7,
+          "y": 181,
+          "w": 442.7,
+          "h": 249,
+          "top": 181,
+          "bottom": 430,
+          "left": 196.7,
+          "right": 639.3
+        },
+        "vis": {
+          "w": 442.7,
+          "h": 249,
+          "seen": 0.375,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 0,
+          "botEdge": 800
+        },
+        "gapTop": 19.2,
+        "gapBot": 56.2,
+        "moved": [],
+        "btnMoved": [],
+        "lum": {
+          "clip": {
+            "mean": 0.1511,
+            "max": 1,
+            "px": 248336
+          },
+          "behindRail": {
+            "mean": 0.0086,
+            "max": 0.0177,
+            "px": 30530
+          },
+          "behindCaption": {
+            "mean": 0.0029,
+            "max": 0.0062,
+            "px": 80162
+          },
+          "bandAboveClip": {
+            "mean": 0.0243,
+            "max": 0.0566,
+            "px": 11730
+          }
+        }
+      }
+    },
+    {
+      "vp": {
+        "tag": "820x1180",
+        "w": 820,
+        "h": 1180,
+        "dpr": 2,
+        "mobile": true,
+        "label": "แท็บเล็ต 820×1180"
+      },
+      "stack": {
+        "max": 288.8,
+        "min": 288.8,
+        "n": 12,
+        "titles": 12
+      },
+      "tall": {
+        "frame": {
+          "x": 0,
+          "y": 59,
+          "w": 820,
+          "h": 1056,
+          "top": 59,
+          "bottom": 1115,
+          "left": 0,
+          "right": 820
+        },
+        "vis": {
+          "w": 820,
+          "h": 1056,
+          "seen": 0.8585,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 1113
+        }
+      },
+      "crop": {
+        "vis": {
+          "w": 820,
+          "h": 1056,
+          "seen": 0.353,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 1113
+        }
+      },
+      "contain": {
+        "vis": {
+          "w": 820,
+          "h": 372.7,
+          "seen": 1,
+          "fit": "contain",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "plate": {
+        "clip": {
+          "x": 26,
+          "y": 155,
+          "w": 768,
+          "h": 432,
+          "top": 155,
+          "bottom": 587,
+          "left": 26,
+          "right": 794
+        },
+        "vis": {
+          "w": 768,
+          "h": 432,
+          "seen": 0.8081,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "bisected": [],
+      "wide": {
+        "frame": {
+          "x": 0,
+          "y": 59,
+          "w": 820,
+          "h": 1056,
+          "top": 59,
+          "bottom": 1115,
+          "left": 0,
+          "right": 820
+        },
+        "clip": {
+          "x": 26,
+          "y": 155,
+          "w": 768,
+          "h": 432,
+          "top": 155,
+          "bottom": 587,
+          "left": 26,
+          "right": 794
+        },
+        "vis": {
+          "w": 768,
+          "h": 432,
+          "seen": 0.375,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 1113
+        },
+        "gapTop": 19.2,
+        "gapBot": 239.2,
+        "moved": [],
+        "btnMoved": [],
+        "lum": {
+          "clip": {
+            "mean": 0.1544,
+            "max": 1,
+            "px": 1327104
+          },
+          "behindRail": {
+            "mean": 0.0074,
+            "max": 0.0156,
+            "px": 54510
+          },
+          "behindCaption": {
+            "mean": 0.0029,
+            "max": 0.0057,
+            "px": 284526
+          },
+          "bandAboveClip": {
+            "mean": 0.0205,
+            "max": 0.0516,
+            "px": 36080
+          }
+        }
+      }
+    },
+    {
+      "vp": {
+        "tag": "768x1024",
+        "w": 768,
+        "h": 1024,
+        "dpr": 2,
+        "mobile": true,
+        "label": "แท็บเล็ต 768×1024"
+      },
+      "stack": {
+        "max": 288.8,
+        "min": 288.8,
+        "n": 12,
+        "titles": 12
+      },
+      "tall": {
+        "frame": {
+          "x": 0,
+          "y": 59,
+          "w": 768,
+          "h": 900,
+          "top": 59,
+          "bottom": 959,
+          "left": 0,
+          "right": 768
+        },
+        "vis": {
+          "w": 768,
+          "h": 900,
+          "seen": 0.7812,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 957
+        }
+      },
+      "crop": {
+        "vis": {
+          "w": 768,
+          "h": 900,
+          "seen": 0.3879,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 957
+        }
+      },
+      "contain": {
+        "vis": {
+          "w": 768,
+          "h": 349.1,
+          "seen": 1,
+          "fit": "contain",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "plate": {
+        "clip": {
+          "x": 69.3,
+          "y": 155,
+          "w": 629.3,
+          "h": 354,
+          "top": 155,
+          "bottom": 509,
+          "left": 69.3,
+          "right": 698.7
+        },
+        "vis": {
+          "w": 629.3,
+          "h": 354,
+          "seen": 0.8081,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "bisected": [],
+      "wide": {
+        "frame": {
+          "x": 0,
+          "y": 59,
+          "w": 768,
+          "h": 900,
+          "top": 59,
+          "bottom": 959,
+          "left": 0,
+          "right": 768
+        },
+        "clip": {
+          "x": 69.3,
+          "y": 155,
+          "w": 629.3,
+          "h": 354,
+          "top": 155,
+          "bottom": 509,
+          "left": 69.3,
+          "right": 698.7
+        },
+        "vis": {
+          "w": 629.3,
+          "h": 354,
+          "seen": 0.375,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 957
+        },
+        "gapTop": 19.2,
+        "gapBot": 161.2,
+        "moved": [],
+        "btnMoved": [],
+        "lum": {
+          "clip": {
+            "mean": 0.1545,
+            "max": 0.9981,
+            "px": 891372
+          },
+          "behindRail": {
+            "mean": 0.0089,
+            "max": 0.0141,
+            "px": 54510
+          },
+          "behindCaption": {
+            "mean": 0.0035,
+            "max": 0.0083,
+            "px": 263934
+          },
+          "bandAboveClip": {
+            "mean": 0.0227,
+            "max": 0.0538,
+            "px": 33792
+          }
+        }
+      }
+    },
+    {
+      "vp": {
+        "tag": "390x844",
+        "w": 390,
+        "h": 844,
+        "dpr": 2,
+        "mobile": true,
+        "label": "มือถือ 390×844"
+      },
+      "stack": {
+        "max": 288.8,
+        "min": 288.8,
+        "n": 12,
+        "titles": 12
+      },
+      "tall": {
+        "frame": {
+          "x": 0,
+          "y": 59,
+          "w": 390,
+          "h": 720,
+          "top": 59,
+          "bottom": 779,
+          "left": 0,
+          "right": 390
+        },
+        "vis": {
+          "w": 390,
+          "h": 720,
+          "seen": 0.8125,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 777
+        }
+      },
+      "crop": {
+        "vis": {
+          "w": 390,
+          "h": 720,
+          "seen": 0.2462,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 777
+        }
+      },
+      "contain": {
+        "vis": {
+          "w": 390,
+          "h": 177.3,
+          "seen": 1,
+          "fit": "contain",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "plate": {
+        "clip": {
+          "x": 0,
+          "y": 199.6,
+          "w": 390,
+          "h": 219.4,
+          "top": 199.6,
+          "bottom": 419,
+          "left": 0,
+          "right": 390
+        },
+        "vis": {
+          "w": 390,
+          "h": 219.4,
+          "seen": 0.8081,
+          "fit": "cover",
+          "natW": 2640,
+          "natH": 1200,
+          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+        }
+      },
+      "bisected": [],
+      "wide": {
+        "frame": {
+          "x": 0,
+          "y": 59,
+          "w": 390,
+          "h": 720,
+          "top": 59,
+          "bottom": 779,
+          "left": 0,
+          "right": 390
+        },
+        "clip": {
+          "x": 0,
+          "y": 199.6,
+          "w": 390,
+          "h": 219.4,
+          "top": 199.6,
+          "bottom": 419,
+          "left": 0,
+          "right": 390
+        },
+        "vis": {
+          "w": 390,
+          "h": 219.4,
+          "seen": 0.375,
+          "fit": "cover",
+          "natW": 1024,
+          "natH": 1536,
+          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+        },
+        "fold": {
+          "total": 9,
+          "bad": [],
+          "topEdge": 59,
+          "botEdge": 777
+        },
+        "gapTop": 63.8,
+        "gapBot": 71.2,
+        "moved": [],
+        "btnMoved": [],
+        "lum": {
+          "clip": {
+            "mean": 0.1501,
+            "max": 1,
+            "px": 342420
+          },
+          "behindRail": {
+            "mean": 0.0067,
+            "max": 0.0143,
+            "px": 54510
+          },
+          "behindCaption": {
+            "mean": 0.003,
+            "max": 0.0062,
+            "px": 141942
+          },
+          "bandAboveClip": {
+            "mean": 0.0367,
+            "max": 0.0889,
+            "px": 87360
+          }
+        }
+      }
+    }
+  ]
+}
