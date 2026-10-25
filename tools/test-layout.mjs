@@ -85,7 +85,10 @@
    M10 ไม่เขียนทิศลงกล่องตอนสลับเรื่องในฟีด (`box.dataset.orientation`)
       → ตก V17 ค ครึ่งข้อมูล: กล่องบอก vertical แต่ข้อมูลบอก horizontal
    M11 เลือกไฟล์ครั้งเดียวแทนเลือกใหม่ทุกครั้งที่สลับเรื่อง (`coverSlot(s,'poster')` ใน `show()`)
-      → ตก "ภาพในเพลเยอร์ฟีดได้ไฟล์ของทรง 'auto' ทุกก้าว" */
+      → ตก "ภาพในเพลเยอร์ฟีดได้ไฟล์ของทรง 'auto' ทุกก้าว"
+   M12 ตั้ง `V17C_BOX_PENDING_AIO59 = false` ทั้งที่ `.mwin`/`.clip` ยังไม่มีในเว็บจริง
+      → ตก V17 ค ครึ่งทรง ("ไม่มี .clip ที่: <slug>") · ข้อนี้พิสูจน์ว่าสวิตช์ที่ปิดไว้
+        **ต่ออยู่กับด่านจริง** ไม่ใช่ค่าที่ตั้งแล้วไม่มีผล — ยามกันการใช้สวิตช์เป็นที่ซ่อนงาน */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -226,16 +229,29 @@ const SHAPE_MAX_UNDECLARED = 3;
 const SHAPE_WIDE_DIR = 'assets/covers-wide';
 
 /* ---------- V17 ข้อ ค ครึ่งหลัง: ทรงของกล่องสื่อในฟีดเมื่อเรื่องเป็นแนวนอน ----------
-   16/9 คือทรงของ **ไฟล์วิดีโอ** ไม่ใช่คำตัดสินการวาง (ADR-001 §13.10 ข้อ 7)
-   ถ้า AIO-59 กำหนดกรอบที่ไม่ใช่ 16/9 ให้ **แก้ตัวเลขนี้ตามกฎนั้น** ไม่ใช่เลิกข้อ ค */
+   สามค่าข้างล่าง **ไม่ใช่ของ Dev** — UX-Designer ตอบมาให้ตรง ๆ ใน AIO-59 §10.1–§10.3
+   (ADR-001 §13.10 ข้อ 7 ล็อกว่ากฎกรอบและอิลิเมนต์ของกล่องสื่อเป็นของ UX ไม่ใช่ของสัญญา)
+
+     §10.1 อิลิเมนต์ = `.player.full[data-orientation=horizontal] > .mwin > .clip`
+           `.mwin` คือ "หน้าต่าง" (พื้นที่ที่กล่องมีสิทธิ์อยู่) · `.clip` คือ **กล่องสื่อ**
+           ⇒ ต้องวัด `.clip` ไม่ใช่ `.mwin` · เคสแนวตั้งไม่มีสองชั้นนี้ (กล่องสื่อ = `.player.full` เอง)
+     §10.1 UX สั่งไว้ชัดว่า **"ถ้าแนวนอนแล้วไม่เจอ `.clip` = ตก" ไม่ใช่ "ไม่เจอ = ข้าม"**
+           ไม่งั้นวันที่ Dev ลืมสร้างสองชั้น ด่านจะเขียวทั้งที่หน้าพัง
+     §10.2 สัดส่วน = 16/9 จากโทเคน `--ar-stage-h` ของ Visual · **ไม่ต้องแก้เลขใน V17**
+           (ด่าน R2 ของ UX แคบกว่า ±0.5% และอยู่ในช่วง ±2% ของสัญญาทั้งช่วง)
+     §10.3 ค่ามาจาก `orientation` ในข้อมูลเท่านั้น · `--clip-ar` ไม่อยู่ใต้ `@media` ใดเลย */
 const FEED_BOX_AR = 16 / 9;
-/* ❗ ช่องโหว่ที่ประกาศไว้ตรง ๆ ไม่ใช่ที่ลืม
-   ข้อ ค ครึ่งทรงอ่าน "กล่องสื่อ" ซึ่ง **อิลิเมนต์และกฎกรอบของมันเป็นของ UX-Designer (AIO-59)**
-   ตามที่ ADR-001 §13.7/§13.10 ข้อ 7 ล็อกไว้ และ AIO-59 ยังไม่ส่งกฎมา
-   ⇒ Dev เขียนกฎกรอบเองคือการตัดสินการวางแทน UX ซึ่งสัญญาห้าม · ด่านจึง **วัดและพิมพ์ของจริง
-     ทุกรอบ** แต่ยังไม่ทำให้แดง · วันที่ AIO-59 ลง: ตั้งค่านี้เป็น `false` แล้วข้อนี้เป็นด่านจริง
-     ทันทีโดยไม่ต้องเขียนโค้ดเพิ่ม · ราคาวันนี้ = ศูนย์ (0 เรื่องแนวนอนในรีโป · เจอเฉพาะใน
-     สถานะ ข ที่ด่านสร้างขึ้นเอง) · **ห้ามใช้ค่านี้ปิดข้ออื่น** — ครึ่งข้อมูลของข้อ ค บังคับอยู่ */
+const FEED_CLIP_SEL = '.player.full[data-orientation=horizontal] > .mwin > .clip';
+/* ❗ ช่องโหว่ที่ประกาศไว้ตรง ๆ ไม่ใช่ที่ลืม — และตอนนี้เหลือเหตุเดียว
+   กฎกรอบของ AIO-59 **มาแล้ว** (ค่าทั้งสามข้างบนคือของเขา) แต่ DOM สองชั้น `.mwin`/`.clip`
+   ยังไม่ได้ถูกสร้างลงเว็บจริง เพราะ **แบบของ AIO-59 ยังรอลูกค้าอนุมัติ** (ใบงานนั้นชื่อ
+   "...+ ม็อกอัพกรอบจอเดียวให้ลูกค้าอนุมัติ" และยัง in_progress) · วินัยของโปรเจกต์นี้คือ
+   ลูกค้าอนุมัติภาพก่อน Dev จึงลงมือ ⇒ ผมยังไม่สร้างสองชั้นนั้น และยังบังคับข้อนี้ไม่ได้
+   ⇒ ด่าน **วัดและพิมพ์ของจริงทุกรอบ** แต่ยังไม่ทำให้แดง
+   ⇒ วันที่ลูกค้าอนุมัติแบบ: สร้าง `.mwin`/`.clip` ที่ `buildFeed()` + ย้าย CSS ของ UX เข้า
+     แล้วตั้งค่านี้เป็น `false` — ข้อนี้กลายเป็นด่านจริงทันทีโดยไม่ต้องเขียนโค้ดเพิ่ม
+   ราคาวันนี้ = ศูนย์ (0 เรื่องแนวนอนในรีโป · เจอเฉพาะในสถานะ ข ที่ด่านสร้างขึ้นเอง)
+   **ห้ามใช้ค่านี้ปิดข้ออื่น** — ครึ่งข้อมูลของข้อ ค (ทิศบนกล่องตรงกับข้อมูลทุกก้าว) บังคับอยู่ */
 const V17C_BOX_PENDING_AIO59 = true;
 
 /* ---------- แผนที่ที่วาง ----------
@@ -262,7 +278,10 @@ const SHAPE_MAP = [
   /* declared:false เพราะกล่องนี้ไม่มี aspect-ratio เลย (flex:1 + ความสูงตรึง 200px) ⇒ ทรง
      เปลี่ยนตามจอโดยไม่มีใครตั้งใจ · Visual วัดเองและบันทึกเป็นข้อค้างไว้ใน AIO-56 §5
      เป็นของ Visual ไม่ใช่ของ AIO-57 — ที่นี่แค่ไม่กล่าวอ้างว่าตรวจแล้วผ่าน */
-  { key: 'แถบรีลในไทล์ฟีด', sel: '.btile .reelstrip span', at: U.home, shape: 'auto', declared: false },
+  /* 'poster' ตามข้อตัดสินของ UX ใน AIO-59 §10.5 (กรอบนี้แทน "จอของฟีด" ซึ่งเป็นแนวตั้งเสมอ)
+     declared:false เพราะกล่องไม่มี aspect-ratio เลย (flex:1 + ความสูงตรึง 200px) ⇒ ทรงเปลี่ยน
+     ตามจอโดยไม่มีใครตั้งใจ · Visual วัดเองและบันทึกไว้ใน AIO-56 §5 — เป็นของ Visual */
+  { key: 'แถบรีลในไทล์ฟีด', sel: '.btile .reelstrip span', at: U.home, shape: 'poster', declared: false },
   { key: 'ดัชนีทุกเรื่อง', sel: '.flatlist .th2', at: U.az, shape: 'poster' },
   /* เพลเยอร์ต้องวัด **สองเรื่อง** ไม่ใช่เรื่องเดียว — นี่คือรูที่มิวเทชัน M5 เปิดให้เห็น:
      ถ้าด่านไปแต่หน้าตอนของเรื่องแนวตั้ง การคืนกฎ "เพลเยอร์ 9:16 ตายตัว" จะเขียวทั้งแผง
@@ -870,8 +889,21 @@ const FEED_WALK = n => `(async function () {
     return {
       slug: box.dataset.slug, orientation: box.dataset.orientation,
       pos: (document.getElementById('feedPos') || {}).textContent || '',
-      /* กล่องสื่อ = อิลิเมนต์ที่ถือภาพ · วันนี้คือรูปที่เต็มกล่อง .player.full
-         (อิลิเมนต์ที่ถูกต้องตามกฎการวางของ AIO-59 อาจเป็นตัวอื่น — ดู V17C_BOX_RULE_OWNER) */
+      /* "กล่องสื่อ" ตามคำตอบของ UX (AIO-59 §10.1) = .mwin > .clip ของกรอบแนวนอน
+         วัดตัวนั้นถ้ามี · ถ้าไม่มี (วันนี้ยังไม่มี เพราะแบบรอลูกค้าอนุมัติ) รายงาน null
+         แล้วให้ฝั่ง node ตัดสินตามกฎ "ไม่เจอ = ตก" ของ UX — ที่นี่ไม่ตัดสินแทน
+         box* ข้างล่างคือรูปที่เต็มกล่อง .player.full = สภาพของวันนี้ เก็บไว้รายงานของจริง
+         (ห้ามใช้ backtick ในคอมเมนต์ของบล็อกนี้ — มันปิด template literal ของฝั่ง node) */
+      clip: (function () {
+        var c = document.querySelector(${JSON.stringify(FEED_CLIP_SEL)});
+        if (!c) return null;
+        var cr = c.getBoundingClientRect();
+        return {
+          ar: cr.height > 0 ? +(cr.width / cr.height).toFixed(4) : null,
+          w: Math.round(cr.width), h: Math.round(cr.height),
+          declaredAr: getComputedStyle(c).aspectRatio,
+        };
+      })(),
       boxAr: r.height > 0 ? +(r.width / r.height).toFixed(4) : null,
       boxW: Math.round(r.width), boxH: Math.round(r.height),
       declaredAr: cs.aspectRatio,
@@ -1653,15 +1685,24 @@ try {
         const horiz = walk.steps.filter(x => x.orientation === 'horizontal');
         if (horiz.length) {
           const lo = FEED_BOX_AR * (1 - SHAPE_TOL), hi = FEED_BOX_AR * (1 + SHAPE_TOL);
-          const off = horiz.filter(x => x.boxAr == null || x.boxAr < lo || x.boxAr > hi);
-          console.log(`  ℹ V17 ค (ครึ่งทรง) · กล่องสื่อของเรื่องแนวนอน ${horiz.length} ก้าว: `
-            + horiz.slice(0, 2).map(x => `${x.slug} ${x.boxW}×${x.boxH}=${x.boxAr} (ประกาศ ${x.declaredAr}) ไฟล์ ${x.file}`).join(' · ')
+          /* กฎของ UX (AIO-59 §10.1): **ไม่เจอ `.clip` = ตก** ไม่ใช่ "ไม่เจอ = ข้าม"
+             ไม่งั้นวันที่ลืมสร้างสองชั้น ด่านจะเขียวทั้งที่หน้าพัง — เขียนตามที่เขาสั่ง */
+          const noClip = horiz.filter(x => !x.clip);
+          const off = horiz.filter(x => x.clip && (x.clip.ar == null || x.clip.ar < lo || x.clip.ar > hi));
+          console.log(`  ℹ V17 ค (ครึ่งทรง) · เรื่องแนวนอน ${horiz.length} ก้าว · `
+            + `กล่องสื่อตามกฎ AIO-59 "${FEED_CLIP_SEL}" ${noClip.length ? `ยังไม่มีในเว็บจริง ${noClip.length}/${horiz.length} ก้าว` : 'เจอครบ'}`
+            + ` · สภาพวันนี้: ` + horiz.slice(0, 2).map(x => `${x.slug} กรอบ ${x.boxW}×${x.boxH}=${x.boxAr}`
+              + (x.clip ? ` · .clip ${x.clip.w}×${x.clip.h}=${x.clip.ar}` : ' · ไม่มี .clip')
+              + ` · ไฟล์ ${x.file}`).join(' · ')
             + ` · ต้องได้ ${FEED_BOX_AR.toFixed(4)} ±${SHAPE_TOL * 100}%`);
-          check(`V17 ค (ครึ่งทรง) · กล่องสื่อของเรื่องแนวนอนได้ ${FEED_BOX_AR.toFixed(3)} ±${SHAPE_TOL * 100}%`
-            + `${V17C_BOX_PENDING_AIO59 ? ' — รอกฎกรอบจาก AIO-59 (ยังไม่บังคับ)' : ''}`,
-            off.length === 0 || V17C_BOX_PENDING_AIO59,
-            off.slice(0, 3).map(x => `${x.slug} = ${x.boxAr}`).join(' · ')
-            + ' — ถ้า AIO-59 ลงแล้ว ให้ตั้ง V17C_BOX_PENDING_AIO59 = false แล้วแก้ของ');
+          check(`V17 ค (ครึ่งทรง) · เรื่องแนวนอนมีกล่องสื่อ "${FEED_CLIP_SEL}" และได้ `
+            + `${FEED_BOX_AR.toFixed(3)} ±${SHAPE_TOL * 100}%`
+            + `${V17C_BOX_PENDING_AIO59 ? ' — ยังไม่บังคับ: แบบของ AIO-59 รอลูกค้าอนุมัติ' : ''}`,
+            (noClip.length === 0 && off.length === 0) || V17C_BOX_PENDING_AIO59,
+            (noClip.length ? `ไม่มี .clip ที่: ${noClip.map(x => x.slug).join(' ')} · ` : '')
+            + (off.length ? `สัดส่วนเพี้ยน: ${off.map(x => `${x.slug}=${x.clip.ar}`).join(' ')} · ` : '')
+            + 'เมื่อลูกค้าอนุมัติแบบ AIO-59: สร้าง .mwin/.clip ที่ buildFeed() + ย้าย CSS ของ UX เข้า '
+            + 'แล้วตั้ง V17C_BOX_PENDING_AIO59 = false');
         }
       }
       /* แถบรีล: 3 slug ต้องมีจริงในคลัง และ **ห้ามถูกเลือกด้วยทิศ** (D8 ฉบับกลับทาง)
