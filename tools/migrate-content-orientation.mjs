@@ -64,7 +64,9 @@ console.log(`✓ หลักฐาน 1 · ปกทั้ง ${data.series.len
    (แท็กในคอมเมนต์หรือในม็อกอัพของ Visual ไม่ได้แปลว่ามีของจริง — บทเรียน AIO-54
     เรื่องด่าน regex ที่นับคอมเมนต์เป็นของจริง) · design/ เป็นชั้นออกแบบ ไม่ใช่เว็บจริง */
 const VIDEO_EXT = /\.(mp4|m4v|webm|mov|m3u8|mpd)$/i;
-const SKIP = new Set(['.git', 'node_modules', 'design']);
+/* `.paperclip-repositories` = สำเนารีโปของ runtime ที่ run อื่นในเวิร์กสเปซเดียวกันทิ้งไว้ ·
+   ถ้าไม่ตัด เครื่องมือจะล้มเพราะไฟล์ของคนอื่นพร้อมข้อความที่ชี้ผิดทาง (AIO-63 ข้อ 7) */
+const SKIP = new Set(['.git', 'node_modules', 'design', '.paperclip-repositories']);
 const videos = [];
 (function walk(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -115,6 +117,12 @@ for (const [i, s] of after.series.entries()) {
   if (JSON.stringify({ ...s, orientation: undefined }) !== JSON.stringify({ ...data.series[i], orientation: undefined })) {
     die(`series[${i}] (${s.slug}) มีฟิลด์อื่นเปลี่ยนไปด้วย — ตัวนี้ต้องเพิ่มฟิลด์เดียวเท่านั้น`);
   }
+}
+/* คีย์บนสุดอื่น ๆ (`genres` `tropes` `meta` `generatedAt`) ไม่ถูกเทียบเลยในรอบแรก (AIO-63 ข้อ 7)
+   ⇒ เทียบทั้งไฟล์กับ "ไฟล์เดิมที่ฉีด orientation ตามตำแหน่งที่คาด" ครั้งเดียวจบ */
+const expected = { ...data, version: 2, series: data.series.map(s => ({ ...s, orientation: VALUE })) };
+if (JSON.stringify(after) !== JSON.stringify(expected)) {
+  die('ไฟล์ที่จะเขียนต่างจาก "ไฟล์เดิม + orientation" ในจุดอื่นด้วย — ยกเลิก ห้ามเขียนทับโดยเดา');
 }
 
 fs.writeFileSync(R('content.json'), out);

@@ -86,9 +86,19 @@
       → ตก V17 ค ครึ่งข้อมูล: กล่องบอก vertical แต่ข้อมูลบอก horizontal
    M11 เลือกไฟล์ครั้งเดียวแทนเลือกใหม่ทุกครั้งที่สลับเรื่อง (`coverSlot(s,'poster')` ใน `show()`)
       → ตก "ภาพในเพลเยอร์ฟีดได้ไฟล์ของทรง 'auto' ทุกก้าว"
-   M12 ตั้ง `V17C_BOX_PENDING_AIO59 = false` ทั้งที่ `.mwin`/`.clip` ยังไม่มีในเว็บจริง
-      → ตก V17 ค ครึ่งทรง ("ไม่มี .clip ที่: <slug>") · ข้อนี้พิสูจน์ว่าสวิตช์ที่ปิดไว้
-        **ต่ออยู่กับด่านจริง** ไม่ใช่ค่าที่ตั้งแล้วไม่มีผล — ยามกันการใช้สวิตช์เป็นที่ซ่อนงาน */
+   M12 ตั้ง `orientation: "horizontal"` + `coverWide` ให้เรื่องหนึ่งใน content.json **ของจริง**
+      (รันในสำเนาที่ตรึงคอมมิต ไม่ใช่ในรีโป) ขณะที่ `.mwin`/`.clip` ยังไม่มีในเว็บ
+      → ตก V17 ค ครึ่งทรง ในสถานะ **ก** ("ไม่มี .clip ที่: <slug>") ไม่ใช่เลื่อนไว้
+        ⇒ พิสูจน์ว่าการเลื่อนผูกกับ "เรื่องแนวนอนเป็นของที่ด่านสร้างเอง" ไม่ใช่กับบูลีนที่ใครก็ตั้งได้
+        (รอบก่อนข้อนี้เป็น `V17C_BOX_PENDING_AIO59 = false` ซึ่งเป็นสวิตช์ — ถอนออกแล้วตาม AIO-64 R2)
+   M13 เปลี่ยนจุดเรียกของ /schedule/ เป็น `coverImg(L, s, { shape: 'wide' })`
+      → ตก "ไฟล์ที่โหลดคือไฟล์ของทรง 'poster'" ที่ `.ep-row .th @ /schedule/`
+      ⚠️ ข้อนี้ **เขียวทั้งแผงมาก่อน** เพราะแผนที่ไม่มีรายการของ /popular/ และ /schedule/ เลย
+         ทั้งที่ ADR §13.5 ลงตารางไว้ (Reviewer-Claude · AIO-63 ข้อ 4ก) — ปิดด้วยสองรายการใหม่
+         + ด่านนับจุดเรียกเทียบกับจำนวนที่สัญญาประกาศ
+   M14 **รันทุกรอบโดยตัวด่านเอง** (ไม่ใช่มิวเทชันที่ต้องทำมือ): ฉีด `s = SERIES[0]` สำหรับทรง
+      `poster` ลงต้นไม้ชั่วคราวที่กำลังจะถูกลบ แล้ว build ใหม่ → ออราเคิล identity ต้องจับได้
+      ⚠️ นี่คือรอย AIO-64 R1 ที่เคยทำให้ปกทั้งเว็บเป็นเรื่องเดียวกันแล้วด่านยัง 261/0 */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -198,23 +208,37 @@ const BENTO_ROW_MIN_W = 960;     /* ที่ ≥960px ต้องอยู่�
         ไม่ฝังเลขไว้ในด่าน · กล่องที่ "ไม่ประกาศทรงเลย" ถูกบันทึกเป็น ℹ ไม่ใช่ ✓ (ดู SHAPE_MAX_UNDECLARED)
      S2 ไฟล์ที่เบราว์เซอร์โหลดจริง = ไฟล์ที่ทรงนั้นควรได้ (ADR-001 §13.5 poster/wide/auto)
         รู้ว่า "ควรได้" จากข้อมูลของ build นั้น ไม่ใช่รายชื่อเรื่องที่เขียนมือ
+        ⚠️ **คำว่า "ควรได้" ต้องรู้ก่อนว่า "การ์ดใบนี้คือเรื่องอะไร" และคำตอบนั้นห้ามมาจาก
+           ชื่อไฟล์ที่กำลังตรวจ** — รอบแรกด่านนี้หา slug จาก `slugOf(it.img.path)` แล้วคำนวณ
+           คำตอบที่ถูกจาก slug นั้นเอง ⇒ เป็น tautology ของ identity: มิวเทชันที่ทำให้ปก
+           **ทั้งเว็บเป็นเรื่องเดียวกัน** ยังเขียว 261/0 (Reviewer-Codex จับได้ · AIO-64 R1)
+           ⇒ identity มาจาก SHAPE_ID ข้างล่าง (ลิงก์ของการ์ด / data-slug / URL ของหน้า)
+           ซึ่งเป็นของที่ build เขียนจากข้อมูลคนละทางกับการเลือกไฟล์ · มิวเทชันถาวร M14 ค้ำข้อนี้
      S3 แอตทริบิวต์ width/height ของ <img> = ขนาดจริงของไฟล์นั้นบนดิสก์ (อ่านด้วย build/imgsize.mjs)
         ข้อนี้คือข้อที่จับ "ค่าคงที่ 1024×1536 ที่ฝังไว้ 8 จุด" (กฎ V18) และจับ V15 ถ้าไฟล์ขนาดเพี้ยน
         — ไม่มีเลขขนาดภาพอยู่ในด่านนี้แม้ตัวเดียว
      S4 naturalWidth/Height ของรูปที่โหลดแล้ว = ขนาดเดียวกัน (แอตทริบิวต์ไม่ได้โกหกไบต์จริง)
    บวกสามข้อที่ผูกกับทรงโดยเฉพาะ:
-     S5 ฮีโร่: ที่ 719px เบราว์เซอร์ต้องเลือกไฟล์ปก 2:3 · ที่ 720px ต้องเลือกไฟล์กว้าง
-        (วัดของจริง ไม่ใช่เทียบสตริง media กับ CSS — เบราว์เซอร์เป็นคนเลือก ADR §13.6)
+     S5 ฮีโร่: ใต้เบรกพอยต์เบราว์เซอร์ต้องเลือกไฟล์ปก 2:3 · ตั้งแต่เบรกพอยต์ขึ้นไปต้องเลือก
+        ไฟล์กว้าง (วัดของจริง ไม่ใช่เทียบสตริง media กับ CSS — เบราว์เซอร์เป็นคนเลือก §13.6)
+        และ **ตัวเบรกพอยต์เองมีออราเคิลอิสระ**: ด่านค้นหาจุดที่ CSS ของ `.hero .bg` สลับจาก
+        aspect-ratio เป็น height ด้วยการวัดในเบราว์เซอร์ แล้วบังคับว่าตรงกับค่าที่ผลิต
+        `<source media>` — ไม่ใช่ยืมค่าเดียวกันมาเป็นทั้งโจทย์และเฉลย (AIO-64 R6)
      S6 กล่องเพลเยอร์มาจาก `orientation` ของเรื่องที่ขึ้นจริง ไม่ใช่โทเคนตายตัว (§13.7 D7)
-     S7 ฟีดไม่มีเรื่องแนวนอนเลย ทั้งใน HTML ที่ส่งออกและตอนกดลูกศรถัดไปจนครบวง (กฎ V17)
+     S7 กฎ V17 **ฉบับกลับขั้ว** (มติลูกค้า 25 ต.ค. 2026 · AIO-58): ฟีดต้องมีครบทุกเรื่อง
+        ไม่ขาดไม่ซ้ำ · ตัวนับ N = ทั้งคลัง · ทิศบนกล่องตรงกับข้อมูลทุกก้าว
+        (ฉบับแรก "ฟีดไม่มีเรื่องแนวนอนเลย" ถูกยกเลิกแล้ว — ห้ามรื้อคืน)
 
    **สองสถานะ ไม่ใช่สถานะเดียว** — ทั้งหมดข้างบนรันสองรอบ:
      ก) สถานะถอยกลับ = รีโปตามสภาพ (ยังไม่มีไฟล์ภาพกว้าง · ทุกเรื่องแนวตั้ง)
      ข) สถานะมีของจริง = ต้นไม้ชั่วคราวใน /tmp ที่ด่านสร้างเอง: ภาพกว้าง 2640×1200 ครบทุกเรื่อง
         + เรื่องสุดท้ายถูกตั้งเป็น `horizontal` แล้ว build ใหม่ที่นั่น
         ⇒ เส้นทางที่วันนี้ไม่มีใครเดินผ่าน (ฮีโร่ `<picture>` · `.cont` ทรงกว้าง · เพลเยอร์ 16:9
-          · ฟีดตัดเรื่องออก) ถูกวัดของจริงทุกรอบ ไม่ใช่รอให้มีไฟล์จริงก่อนจึงรู้ว่าพัง
-        ⚠️ ต้นไม้ชั่วคราวเป็นสำเนา — ด่านนี้ **ไม่แก้ไฟล์ในรีโปแม้ไฟล์เดียว** (workspace แชร์กับ run อื่น) */
+          · ฟีดที่มีเรื่องแนวนอนอยู่ด้วย) ถูกวัดของจริงทุกรอบ ไม่ใช่รอให้มีไฟล์จริงก่อนจึงรู้ว่าพัง
+        ⚠️ ต้นไม้ชั่วคราวเป็นสำเนา — ด่านนี้ **ไม่แก้ไฟล์ในรีโปแม้ไฟล์เดียว** (workspace แชร์กับ run อื่น)
+     ค) มิวเทชันถาวร M14 ในต้นไม้ชั่วคราวใบเดิม (หลังวัดสถานะ ข เสร็จ ก่อนลบทิ้ง):
+        บังคับให้ทุกที่วางที่ขอ `poster` ได้ปกของเรื่องแรก แล้ว build ใหม่ ⇒ **ด่านต้องแดง**
+        ถ้าไม่แดงคือออราเคิล identity ตายแล้ว (ดู SHAPE_ID) — ยามกันรอย AIO-64 R1 กลับมา */
 const SHAPE_TOL = 0.02;          /* ±2% ตามใบงาน — เกณฑ์เดียวกับ BENTO_AR_TOL */
 /* กล่องที่ไม่ประกาศ aspect-ratio ที่ขนาดจอใดเลย จับด้วย S1 ไม่ได้โดยหลักการ (ไม่มีอะไรให้เทียบ)
    ยามกันการปิดปากด่าน: ถ้ามีมากกว่านี้ แปลว่ามีคนย้ายที่วางเข้าช่องนี้แทนที่จะแก้ของ
@@ -226,7 +250,23 @@ const SHAPE_TOL = 0.02;          /* ±2% ตามใบงาน — เกณ�
    หมายเหตุ: ฮีโร่ **ไม่** อยู่ในรายการนี้ เพราะมันประกาศ --ar-poster ที่ <720px
    (ที่ ≥720px ความสูงเป็นของ UX ตามเพดาน 56vh ของ AIO-38 · ADR §13.10 ข้อ 3) */
 const SHAPE_MAX_UNDECLARED = 3;
+/* ช่องที่ DOM ไม่มีอะไรบอกว่า "ควรเป็นเรื่องอะไร" ⇒ S2 อ่อนลงเป็นการเทียบทรงของไฟล์กับเรื่องที่
+   ชื่อไฟล์บอก · วันนี้มีช่องเดียว (แถบรีลในไทล์ฟีด ซึ่งเป็นเรื่องบรรณาธิการ ไม่ใช่เรื่องของช่อง)
+   ยามแบบเดียวกับ SHAPE_MAX_UNDECLARED: ห้าม identity:false เป็นทางออกของที่วางใหม่ */
+const SHAPE_MAX_NO_IDENTITY = 1;
 const SHAPE_WIDE_DIR = 'assets/covers-wide';
+/* ---------- ด่านความครบของแผนที่ (AIO-63 ข้อ 4ก) ----------
+   รอยที่ปิดด้วยข้อนี้: แผนที่ขาดสามจุดเรียกไปทั้งรอบ และ **ไม่มีอะไรบอกเลย** — หัวบล็อกอ้างว่า
+   วัด "ทุกที่วาง" ซึ่งไม่จริง · ตารางของ ADR §13.5 ประกาศจำนวนจุดเรียกไว้ตรง ๆ ⇒ ด่านนับจาก
+   ซอร์สจริงแล้วเทียบกับตัวเลขของสัญญา · เพิ่มที่วางใหม่แล้วไม่แตะแผนที่ = แดงทันที
+   (นับจากซอร์ส ไม่ใช่จากไฟล์ที่ build ออกมา และถอดคอมเมนต์บล็อกออกก่อนนับ — บทเรียนเดิม
+    ของรีโปนี้: ด่าน regex ที่นับคอมเมนต์เป็นของจริงได้บั๊กผี) */
+const SHAPE_CALLSITES_BUILD = 12;      /* ADR-001 §13.5 ตารางฝั่ง build */
+const SHAPE_CALLSITES_APP = 8;         /* ADR-001 §13.5 ตารางฝั่งเบราว์เซอร์ (ไม่นับตัวนิยาม) */
+function countCalls(rel, name) {
+  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  return (src.match(new RegExp(`(?<!function\\s)\\b${name}\\s*\\(`, 'g')) || []).length;
+}
 
 /* ---------- V17 ข้อ ค ครึ่งหลัง: ทรงของกล่องสื่อในฟีดเมื่อเรื่องเป็นแนวนอน ----------
    สามค่าข้างล่าง **ไม่ใช่ของ Dev** — UX-Designer ตอบมาให้ตรง ๆ ใน AIO-59 §10.1–§10.3
@@ -242,17 +282,25 @@ const SHAPE_WIDE_DIR = 'assets/covers-wide';
      §10.3 ค่ามาจาก `orientation` ในข้อมูลเท่านั้น · `--clip-ar` ไม่อยู่ใต้ `@media` ใดเลย */
 const FEED_BOX_AR = 16 / 9;
 const FEED_CLIP_SEL = '.player.full[data-orientation=horizontal] > .mwin > .clip';
-/* ❗ ช่องโหว่ที่ประกาศไว้ตรง ๆ ไม่ใช่ที่ลืม — และตอนนี้เหลือเหตุเดียว
+/* ❗ ช่องโหว่ที่ประกาศไว้ตรง ๆ ไม่ใช่ที่ลืม — และ **เงื่อนไขของการเลื่อนคือข้อมูล ไม่ใช่บูลีน**
    กฎกรอบของ AIO-59 **มาแล้ว** (ค่าทั้งสามข้างบนคือของเขา) แต่ DOM สองชั้น `.mwin`/`.clip`
-   ยังไม่ได้ถูกสร้างลงเว็บจริง เพราะ **แบบของ AIO-59 ยังรอลูกค้าอนุมัติ** (ใบงานนั้นชื่อ
-   "...+ ม็อกอัพกรอบจอเดียวให้ลูกค้าอนุมัติ" และยัง in_progress) · วินัยของโปรเจกต์นี้คือ
-   ลูกค้าอนุมัติภาพก่อน Dev จึงลงมือ ⇒ ผมยังไม่สร้างสองชั้นนั้น และยังบังคับข้อนี้ไม่ได้
-   ⇒ ด่าน **วัดและพิมพ์ของจริงทุกรอบ** แต่ยังไม่ทำให้แดง
-   ⇒ วันที่ลูกค้าอนุมัติแบบ: สร้าง `.mwin`/`.clip` ที่ `buildFeed()` + ย้าย CSS ของ UX เข้า
-     แล้วตั้งค่านี้เป็น `false` — ข้อนี้กลายเป็นด่านจริงทันทีโดยไม่ต้องเขียนโค้ดเพิ่ม
-   ราคาวันนี้ = ศูนย์ (0 เรื่องแนวนอนในรีโป · เจอเฉพาะในสถานะ ข ที่ด่านสร้างขึ้นเอง)
-   **ห้ามใช้ค่านี้ปิดข้ออื่น** — ครึ่งข้อมูลของข้อ ค (ทิศบนกล่องตรงกับข้อมูลทุกก้าว) บังคับอยู่ */
-const V17C_BOX_PENDING_AIO59 = true;
+   ยังไม่ได้ถูกสร้างลงเว็บจริง เพราะ **แบบของ AIO-59 ยังรอลูกค้าอนุมัติ** · วินัยของโปรเจกต์นี้
+   คือลูกค้าอนุมัติภาพก่อน Dev จึงลงมือ ⇒ ยังสร้างสองชั้นนั้นไม่ได้
+
+   รอบแรกข้อนี้เขียนเป็น `check(..., เงื่อนไขจริง || V17C_BOX_PENDING_AIO59, ...)` ซึ่ง
+   **ผ่อนด่านสองชั้นพร้อมกัน** (Reviewer-Codex · AIO-64 R2): (1) นับข้อที่ปิดอยู่รวมในช่อง
+   "ผ่าน" (2) บูลีนตัวเดียวข้ามทุกสถานะ ⇒ วันแรกที่ **ข้อมูลจริง** มีเรื่องแนวนอน มันจะกลืน
+   ความผิดพลาดของข้อมูลจริงไปด้วย โดยไม่มีใครต้องพลิกอะไรเลย
+
+   โครงที่ใช้แทน — เลื่อนได้เฉพาะเรื่องแนวนอนที่ **ด่านสร้างขึ้นเอง** ในสถานะ ข:
+     · สถานะ ก (รีโปจริง) มีเรื่องแนวนอน ⇒ **บังคับเต็ม ตกได้ทันที** ไม่มีทางผ่อน
+     · สถานะ ข (ต้นไม้ชั่วคราวของด่าน) ⇒ เข้าช่อง `defer()` พิมพ์ของจริงทุกรอบ ไม่นับเป็นผ่าน
+   ⇒ ไม่มีสวิตช์ให้ใครลืมพลิก: วันที่ `.mwin`/`.clip` ลงเว็บ สถานะ ข จะเขียวเองและเลิกเลื่อน
+     วันที่ข้อมูลจริงมีเรื่องแนวนอนก่อนแบบลง สถานะ ก จะแดงทันที ซึ่งเป็นของที่ ADR §13.7
+     สั่งไว้ตรง ๆ ("ห้ามส่งขั้นที่ปลดตัวกรองโดยที่กล่องสื่อยังไม่ได้ทรงจาก orientation")
+   หมายเหตุถึง CTO (เสนอไว้ในรายงาน AIO-57): ด่านฝั่ง build ที่ล้มเมื่อ "มีเรื่องแนวนอน ≥1
+   + /feed/ ไม่มีกล่องสื่อตามกฎ AIO-59" แข็งกว่านี้อีกชั้น เพราะล้มทุก build ไม่ต้องรอด่าน
+   25 นาที — แต่เป็นกฎ V ใหม่ในสัญญา จึงเป็นของ CTO ไม่ใช่ของ Dev (ทั้งสองฝั่งรีวิวเสนอตรงกัน) */
 
 /* ---------- แผนที่ที่วาง ----------
    ยกมาจากตารางที่วางของ ADR-001 §13.5 (ฝั่ง build 12 จุด + ฝั่งเบราว์เซอร์) และจากแผนที่
@@ -275,26 +323,40 @@ const SHAPE_MAP = [
      ⇒ ช่องนี้เป็นแถบนอนโดยเจตนา · ด่านยังบังคับ S2/S3/S4 กับมันเต็มรูปแบบ */
   { key: 'ไทล์เลือกแนวหน้าต้อนรับ', sel: '.pickgrid .gtile', at: U.welcome, shape: 'poster', declared: false },
   { key: 'แถวตอน', sel: '.ep-row .th', at: U.newEp, shape: 'poster' },
-  /* declared:false เพราะกล่องนี้ไม่มี aspect-ratio เลย (flex:1 + ความสูงตรึง 200px) ⇒ ทรง
-     เปลี่ยนตามจอโดยไม่มีใครตั้งใจ · Visual วัดเองและบันทึกเป็นข้อค้างไว้ใน AIO-56 §5
-     เป็นของ Visual ไม่ใช่ของ AIO-57 — ที่นี่แค่ไม่กล่าวอ้างว่าตรวจแล้วผ่าน */
+  /* สามรายการข้างล่างเป็นจุดเรียกที่ **แผนที่รอบแรกไม่มีเลย** ทั้งที่อยู่ในตารางของ ADR §13.5
+     (Reviewer-Claude · AIO-63 ข้อ 4ก) · selector เหมือนแถวตอน แต่ **คู่ (selector, หน้า)
+     ต่างกัน** ⇒ รายการที่ไปแต่ /new/ ไม่เคยเปิดสามจุดนี้เลย และมิวเทชัน M13 (ให้ /schedule/
+     ขอทรง 'wide' ⇒ ไฟล์ 2640×1200 ลงภาพจิ๋ว 64px) เขียวทั้งแผง · วัดแล้ว
+     /schedule/ มีสองบล็อกด้วย selector เดียวกัน (รายวัน + รายสัปดาห์ วันนี้ 5+3 แถว)
+     ⇒ ตั้ง max ให้ครอบทั้งหน้า ไม่งั้นบล็อกรายสัปดาห์ไม่ถูกวัด */
+  { key: 'อันดับ 4–10', sel: '.ep-row .th', at: U.popular, shape: 'poster', max: 24 },
+  { key: 'ตารางออกตอน (รายวัน+รายสัปดาห์)', sel: '.ep-row .th', at: U.schedule, shape: 'poster', max: 24 },
   /* 'poster' ตามข้อตัดสินของ UX ใน AIO-59 §10.5 (กรอบนี้แทน "จอของฟีด" ซึ่งเป็นแนวตั้งเสมอ)
      declared:false เพราะกล่องไม่มี aspect-ratio เลย (flex:1 + ความสูงตรึง 200px) ⇒ ทรงเปลี่ยน
      ตามจอโดยไม่มีใครตั้งใจ · Visual วัดเองและบันทึกไว้ใน AIO-56 §5 — เป็นของ Visual */
-  { key: 'แถบรีลในไทล์ฟีด', sel: '.btile .reelstrip span', at: U.home, shape: 'poster', declared: false },
+  /* identity:false · สามใบในแถบนี้เป็นเรื่อง **บรรณาธิการ** (REEL_SLUGS) และกล่องทั้งไทล์เป็น
+     ลิงก์ไป /feed/ ⇒ ไม่มีอะไรใน DOM ที่บอกว่า "ช่องนี้ควรเป็นเรื่องอะไร" · ด่านของช่องนี้คือ
+     ข้อ "ทั้ง 3 ใบเป็นเรื่องที่มีจริงในคลัง" ที่ท้ายส่วน 6 ⇒ ประกาศไว้ตรง ๆ ว่า S2 ของช่องนี้
+     อ่อนกว่าช่องอื่น (เทียบทรงของไฟล์กับเรื่องที่ชื่อไฟล์บอก) และถูกคุมด้วย SHAPE_MAX_NO_IDENTITY */
+  { key: 'แถบรีลในไทล์ฟีด', sel: '.btile .reelstrip span', at: U.home, shape: 'poster', declared: false, identity: false },
   { key: 'ดัชนีทุกเรื่อง', sel: '.flatlist .th2', at: U.az, shape: 'poster' },
   /* เพลเยอร์ต้องวัด **สองเรื่อง** ไม่ใช่เรื่องเดียว — นี่คือรูที่มิวเทชัน M5 เปิดให้เห็น:
      ถ้าด่านไปแต่หน้าตอนของเรื่องแนวตั้ง การคืนกฎ "เพลเยอร์ 9:16 ตายตัว" จะเขียวทั้งแผง
      เพราะ 9:16 ถูกต้องสำหรับเรื่องแนวตั้งอยู่แล้ว · `atFor` หยิบเรื่องจากคลังของสถานะนั้น
      ไม่ใช่ชื่อเรื่องที่เขียนไว้ในด่าน (เพิ่มเรื่องที่ 13 แล้วยังถูกเอง) */
   { key: 'เพลเยอร์หน้าตอน (เรื่องแนวตั้ง)', sel: '.player', shape: 'auto', player: true,
+    autoCoveredBy: 'รายการ "เพลเยอร์หน้าตอน (เรื่องแนวนอน)" ในแผนที่เดียวกัน',
     atFor: st => { const s = Object.values(st.by).find(x => x.orientation === 'vertical'); return s ? U.watch(s.slug, 1) : null; } },
   { key: 'เพลเยอร์หน้าตอน (เรื่องแนวนอน)', sel: '.player', shape: 'auto', player: true, needs: 'horizontal',
     atFor: st => { const s = Object.values(st.by).find(x => x.orientation === 'horizontal'); return s ? U.watch(s.slug, 1) : null; } },
   /* 'auto' ไม่ใช่ 'poster' ตาม D8 ฉบับกลับทาง: ช่องนี้มีกรณีกว้างจริงตั้งแต่เรื่องแนวนอนเรื่องแรก
      declared:false เพราะกล่องตั้งใจเต็มจอ (aspect-ratio:auto + height) ⇒ ทรงของกล่องสื่อ
      เมื่อเรื่องเป็นแนวนอนเป็นของ AIO-59 · ด่าน V17 ข้อ ค ข้างล่างเป็นที่ที่บังคับข้อนั้น */
-  { key: 'เพลเยอร์ฟีด', sel: '.player.full', at: U.feed, shape: 'auto', player: true, declared: false },
+  /* autoCoveredBy: ฟีดเปิดด้วย TOP10[0] ซึ่งเป็นแนวตั้งทั้งสองสถานะ ⇒ รายการนี้วัดเคส
+     auto=wide ไม่ได้โดยโครงสร้าง · เคสนั้นถูกวัดที่ FEED_WALK (เลื่อนครบทุกเรื่องแล้วเทียบ
+     ไฟล์ของทุกก้าว) ⇒ เขียนที่อยู่ของมันไว้ที่นี่ ไม่ใช่ปล่อยให้คนรอบหน้าเดา (AIO-63 ข้อ 4ข) */
+  { key: 'เพลเยอร์ฟีด', sel: '.player.full', at: U.feed, shape: 'auto', player: true, declared: false,
+    autoCoveredBy: 'FEED_WALK · ข้อ "ภาพในเพลเยอร์ฟีดได้ไฟล์ของทรง auto ทุกก้าว"' },
   /* ช่องนี้ **เคยเป็น 'wide'** และเปลี่ยนเป็น 'auto' โดยคำตัดสินของ CTO ตามข้อเสนอของ Visual
      (AIO-56 §4.2 → AIO-58 · ADR-001 §13.5) · กรอบของการ์ดยัง 16/9 เปลี่ยนเฉพาะไฟล์ที่ได้ */
   { key: 'การ์ดดูต่อ (หน้าแรก)', sel: '.cont .thumb', at: U.home, shape: 'auto', mode: 'shape' },
@@ -419,14 +481,33 @@ const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu',
 /* ส่วน 6 เปิดเซิร์ฟเวอร์ตัวที่สองบนต้นไม้ชั่วคราว — ต้องถูกเก็บทุกทางออก รวมทางที่โยน exception
    (ถ้าหลุด จะเหลือ node ค้างถือพอร์ตแล้วการรันครั้งถัดไปแดงแบบสุ่ม — บทเรียน AIO-45) */
 let wideServer = null, wideDir = null;
-function cleanup(code) {
-  try { server.kill('SIGTERM'); } catch {}
-  try { if (wideServer) wideServer.kill('SIGTERM'); } catch {}
-  try { chrome.kill('SIGTERM'); } catch {}
+let cleaning = false;
+async function cleanup(code) {
+  if (cleaning) return;                /* สัญญาณที่มาสองครั้ง (SIGTERM แล้ว SIGINT) ต้องไม่ลบซ้อนกัน */
+  cleaning = true;
+  const kids = [server, wideServer, chrome].filter(Boolean);
+  for (const p of kids) { try { p.kill('SIGTERM'); } catch {} }
+  /* **รอให้ลูกปิดจริงก่อนลบ** — chrome ที่ยังไม่ตายเขียนไฟล์กลับลงโปรไฟล์ได้หลัง rm
+     แล้วเหลือไดเรกทอรีค้างใน tmp ของเครื่องที่แชร์กัน (AIO-64 R5 · AIO-63 ข้อ 5) */
+  await Promise.race([
+    Promise.all(kids.map(p => (p.exitCode != null || p.killed === false
+      ? null : new Promise(r => p.once('exit', r))))),
+    sleep(3000),
+  ]);
+  for (const p of kids) { try { if (p.exitCode == null) p.kill('SIGKILL'); } catch {} }
   try { fs.rmSync(PROFILE, { recursive: true, force: true }); } catch {}
   try { if (wideDir) fs.rmSync(wideDir, { recursive: true, force: true }); } catch {}
   process.exit(code);
 }
+/* ถูก `timeout` หรือ Ctrl-C ตัด = ต้องไม่ทิ้งเซิร์ฟเวอร์สองตัว + chrome + สำเนารีโปใน tmp
+   (รูนี้เปิดอยู่จริงจนถึงรอบนี้ และเป็นอาการเดียวกับ AIO-45 ที่ทำให้การรันครั้งถัดไปแดงแบบสุ่ม) */
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+  process.on(sig, () => { console.log(`\n(ถูก ${sig} — เก็บเซิร์ฟเวอร์/chrome/ไฟล์ชั่วคราวก่อนออก)`); cleanup(130); });
+}
+/* ทางออกที่เหลืออีกสองทาง: ข้อผิดพลาดที่ไม่มีใครรับ และ promise ที่ reject ลอย ๆ
+   ทั้งคู่เคยออกได้โดยไม่เรียก cleanup เลย เพราะโค้ดก่อน `try` หลักอยู่นอก handler */
+process.on('uncaughtException', e => { console.error('ทดสอบล้ม (uncaught): ' + e.message); cleanup(1); });
+process.on('unhandledRejection', e => { console.error('ทดสอบล้ม (rejection): ' + (e && e.message || e)); cleanup(1); });
 
 async function wsUrl() {
   for (let i = 0; i < 80; i++) {
@@ -440,8 +521,16 @@ async function wsUrl() {
   throw new Error('เชื่อมต่อ chrome ไม่ได้');
 }
 
-const ws = new WebSocket(await wsUrl());
-await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+/* การเชื่อมต่อ chrome ล้มได้จริงเมื่อรันขนานกัน (พอร์ตชน ⇒ chrome ไปขึ้นที่ `[::1]` แต่ยังพิมพ์
+   บรรทัด DevTools ตามปกติ) · ถ้าไม่จับที่นี่ กระบวนการตายโดยไม่เรียก cleanup เลย */
+let ws;
+try {
+  ws = new WebSocket(await wsUrl());
+  await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+} catch (e) {
+  console.error('✗ ต่อ chrome ไม่ได้: ' + (e && e.message || e));
+  await cleanup(1);
+}
 let id = 0; const pending = new Map();
 ws.onmessage = ev => {
   const m = JSON.parse(ev.data);
@@ -483,10 +572,23 @@ async function goAt(base, p) {
 }
 const go = p => goAt(BASE, p);
 
-let pass = 0, fail = 0;
+let pass = 0, fail = 0, deferred = 0;
 function check(name, ok, detail = '') {
   if (ok) { pass++; console.log(`  ✓ ${name}`); }
   else { fail++; console.log(`  ✗ ${name}${detail ? ' — ' + detail : ''}`); }
+}
+/* ---------- ช่อง "เลื่อนไว้" แยกจากช่อง "ผ่าน" ----------
+   รอยที่ Reviewer-Codex จับได้ (AIO-64 R2): ข้อที่ยังไม่บังคับถูกเขียนเป็น
+   `check(..., เงื่อนไขจริง || FLAG, ...)` ⇒ ขณะ FLAG เป็น true ข้อนั้น **ผ่านเสมอ** และถูก
+   บวกรวมในเลขท้าย ⇒ ใครอ่านแค่ "ผ่าน 261 · ตก 0" จะเข้าใจว่าทุกข้อถูกบังคับ ซึ่งไม่จริง
+   `defer()` พิมพ์ของจริงที่วัดได้เหมือนเดิม แต่ **ไม่บวกเข้าช่องผ่าน** และโผล่ในบรรทัดสรุป
+   ⚠️ ห้ามแปลง `check` ที่แดงอยู่ให้เป็น `defer` เพื่อให้ด่านเขียว — `defer` ใช้ได้เฉพาะกับข้อ
+      ที่ของจริงยังไม่มีอยู่ในเว็บโดยคำตัดสินของเจ้าของเรื่อง และต้องระบุ "ปลดเมื่อไร" ทุกครั้ง */
+const deferrals = [];
+function defer(name, why, detail = '') {
+  deferred++;
+  deferrals.push(name);
+  console.log(`  ⊘ ${name} — เลื่อนไว้: ${why}${detail ? ' · ' + detail : ''}`);
 }
 
 /* ---------- สภาพ localStorage ของผู้ชม ----------
@@ -821,13 +923,57 @@ const SHAPE_PREP = sel => `(async function () {
   return imgs.length;
 })()`;
 
-const SHAPE_PROBE = sel => `(function () {
+/* ---------- ออราเคิลของ "การ์ดใบนี้คือเรื่องอะไร" (AIO-64 R1) ----------
+   กฎ: identity มาจาก **สิ่งที่พาผู้ชมไปที่เรื่องนั้น** ไม่ใช่จากชื่อไฟล์ภาพที่กำลังตรวจ
+   เดินขึ้นจากกล่องที่วัด แล้วหยุดที่บรรพบุรุษตัวแรกที่ "ระบุเรื่องเดียวได้ไม่กำกวม":
+     data-slug      · กล่องเพลเยอร์ฟีด (build เขียนเอง + ฝั่งเบราว์เซอร์เขียนทับทุกก้าว)
+     ลิงก์ <a href> · การ์ด/แถวตอน/การ์ดดูต่อ/คลัง/แจ้งเตือน/การ์ดจบเรื่อง (ฝั่ง node แมปพาธ
+                      กลับเป็น slug ด้วยตาราง U ของเว็บจริง ไม่ใช่ด้วยการแกะชื่อไฟล์)
+     data-pref      · ไทล์เลือกแนวหน้าต้อนรับ (เป็น <button> ไม่ใช่ลิงก์) ⇒ ระบุ **แนว**
+     data-resume/follow · ฮีโร่ (กล่อง .bg ไม่ได้อยู่ในลิงก์ แต่ article.hero มีปุ่มของเรื่องนั้น)
+   ถ้าระดับหนึ่งมีหลายค่าที่ไม่ตรงกัน = กำกวม ⇒ ไม่นับ เดินขึ้นต่อ (กันการหยิบการ์ดข้างเคียง)
+   ที่วางที่ไม่มีอะไรระบุตัวเรื่องเลยต้องประกาศ identity:false พร้อมเหตุผล และถูกคุมด้วยเพดาน */
+const ID_PROBE_FN = `function (el) {
+    var uniq = function (list) {
+      var out = [];
+      for (var i = 0; i < list.length; i++) if (list[i] && out.indexOf(list[i]) < 0) out.push(list[i]);
+      return out;
+    };
+    var pathOf = function (u) { try { return new URL(u, location.href).pathname; } catch (e) { return null; } };
+    for (var n = el; n && n !== document.documentElement; n = n.parentElement) {
+      if (n.getAttribute) {
+        var ds = n.getAttribute('data-slug');
+        if (ds) return { kind: 'data-slug', value: ds };
+        var pref = n.getAttribute('data-pref');
+        if (pref) return { kind: 'data-pref', value: pref };
+      }
+      if (n.querySelectorAll) {
+        var marks = uniq([].slice.call(n.querySelectorAll('[data-resume],[data-follow]')).map(function (m) {
+          return m.getAttribute('data-resume') || m.getAttribute('data-follow');
+        }));
+        if (marks.length === 1) return { kind: 'data-resume', value: marks[0] };
+      }
+      if (n.tagName === 'A' && n.getAttribute('href')) {
+        var p = pathOf(n.getAttribute('href'));
+        if (p) return { kind: 'href', value: p };
+      }
+    }
+    return null;
+  }`;
+
+/* เพดานจำนวนกล่องต่อหนึ่งที่วางต่อหนึ่งขนาดจอ — มีเพื่อให้ด่านไม่โหลดรูปทั้งหน้าแรก (การ์ดหลายสิบใบ)
+   เพดานนี้เคยเป็นเลข 8 ที่ฝังอยู่กลางโพรบโดยไม่มีใครรู้ (AIO-63 ข้อ 4ข) ⇒ ยกขึ้นมาตั้งชื่อ และ
+   ที่วางที่มีหลายบล็อกในหน้าเดียว (เช่น /schedule/ ที่มีทั้งรายวันและรายสัปดาห์ด้วย selector
+   เดียวกัน) ต้องตั้ง `max` ให้ครอบทั้งหน้า ไม่งั้นบล็อกท้ายหน้าไม่ถูกวัดโดยโครงสร้าง */
+const SHAPE_ITEM_CAP = 8;
+const SHAPE_PROBE = (sel, max = SHAPE_ITEM_CAP) => `(function () {
   var els = [].slice.call(document.querySelectorAll(${JSON.stringify(sel)}));
   var cssVar = function (n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); };
+  var idOf = ${ID_PROBE_FN};
   return {
     n: els.length,
     tokens: { poster: cssVar('--ar-poster'), reel: cssVar('--ar-reel'), cont: cssVar('--ar-cont'), stageH: cssVar('--ar-stage-h') },
-    items: els.slice(0, 8).map(function (el) {
+    items: els.slice(0, ${max}).map(function (el) {
       var r = el.getBoundingClientRect(), cs = getComputedStyle(el);
       var im = el.tagName === 'IMG' ? el : el.querySelector('img');
       var pic = im && im.parentElement && im.parentElement.tagName === 'PICTURE' ? im.parentElement : null;
@@ -841,6 +987,7 @@ const SHAPE_PROBE = sel => `(function () {
            (ห้ามใช้ backtick ในคอมเมนต์ของบล็อกนี้ — มันปิด template literal ของฝั่ง node) */
         rendered: cs.display !== 'none' && el.getClientRects().length > 0,
         display: cs.display, cssAr: cs.aspectRatio, cssH: cs.height, cssW: cs.width,
+        id: idOf(el),
         orientation: el.getAttribute('data-orientation')
           || (el.closest('[data-orientation]') ? el.closest('[data-orientation]').getAttribute('data-orientation') : null),
         img: im ? {
@@ -1395,6 +1542,25 @@ try {
 
   /* ===== ส่วน 6 · ทรงของทุกที่วาง × ทุกขนาดจอ × สองสถานะ (AIO-57 · ADR-001 §13) ===== */
   if (ONLY === '' || ONLY === 'shape') {
+    console.log('\nส่วน 6 · ความครบของแผนที่ที่วาง (เทียบจำนวนจุดเรียกในซอร์สกับตารางของ ADR §13.5)');
+    {
+      const nBuild = ['build/pages-discovery.mjs', 'build/pages-watch.mjs', 'build/pages-content.mjs', 'build/ui.mjs']
+        .reduce((n, f) => n + countCalls(f, 'coverImg'), 0);
+      check(`จุดเรียก coverImg() ฝั่ง build = ${SHAPE_CALLSITES_BUILD} จุดตามตารางของสัญญา (นับได้ ${nBuild})`,
+        nBuild === SHAPE_CALLSITES_BUILD,
+        'จำนวนที่วางเปลี่ยนไปจากที่สัญญาประกาศ ⇒ ถ้าเพิ่มที่วางใหม่ ต้องเพิ่มรายการใน SHAPE_MAP '
+        + 'พร้อมแก้ตารางใน ADR-001 §13.5 แล้วอัปเดตตัวเลขนี้ · ห้ามอัปเดตตัวเลขอย่างเดียว');
+      const nApp = countCalls('build/app.src.js', 'coverAttrs');
+      check(`จุดเรียก coverAttrs() ฝั่งเบราว์เซอร์ = ${SHAPE_CALLSITES_APP} จุดตามตารางของสัญญา (นับได้ ${nApp})`,
+        nApp === SHAPE_CALLSITES_APP,
+        'ท่อเบราว์เซอร์คือท่อที่ด่านซึ่งอ่าน HTML มองไม่เห็น (§13.1) ⇒ ที่วางใหม่ที่นี่ต้องมีรายการในแผนที่');
+      /* ทุกที่วางในแผนที่ต้องมีคู่ (selector, หน้า) ที่ไม่ซ้ำกัน — รายการซ้ำคือการวัดของเดิมสองรอบ
+         แล้วเข้าใจว่าครอบคลุมมากขึ้น ซึ่งเป็นความมั่นใจปลอม */
+      const keys = SHAPE_MAP.map(p => `${p.sel} @ ${p.atFor ? 'atFor:' + p.key : p.at}`);
+      check(`ทุกรายการในแผนที่เป็นคู่ (selector, หน้า) ที่ไม่ซ้ำกัน (${keys.length} รายการ)`,
+        new Set(keys).size === keys.length,
+        keys.filter((k, i) => keys.indexOf(k) !== i).join(' · '));
+    }
     /* --- ตัวช่วยอ่าน "ทรงที่ประกาศ" และ "ไฟล์ที่ควรได้" --- */
     const parseAr = v => {
       if (!v || v === 'auto') return null;
@@ -1404,7 +1570,31 @@ try {
       return null;
     };
     const COVER_RE = /^\/assets\/covers(-wide)?\/([a-z0-9][a-z0-9._-]*)\.(webp|png|jpg|jpeg)$/;
+    /* ⚠️ `slugOf` คือ "เรื่องที่ **ชื่อไฟล์** บอก" ⇒ ใช้ได้เฉพาะในข้อความรายงาน และในที่วาง
+       ที่ประกาศ identity:false ไว้ · **ห้ามใช้มันเป็นคำตอบที่ถูกของ S2** นั่นคือรอย AIO-64 R1
+       (ปกทั้งเว็บเป็นเรื่องเดียวกันแล้วด่านยังเขียว เพราะโจทย์กับเฉลยมาจากไฟล์ใบเดียวกัน) */
     const slugOf = p => { const m = COVER_RE.exec(String(p || '')); return m ? m[2] : null; };
+    /* --- ออราเคิลฝั่ง node: พาธของลิงก์ → เรื่อง/แนว · สร้างจากตาราง U + คลัง ไม่ใช่จากชื่อไฟล์ ---
+       slug/จำนวนตอน/รายชื่อแนว เหมือนกันทั้งสองสถานะ (สถานะ ข แก้เฉพาะ orientation/coverWide)
+       ⇒ สร้างครั้งเดียวจากคลังจริงได้ · เพิ่มเรื่องที่ 13 แล้วยังถูกเอง */
+    const SLUG_BY_PATH = new Map();
+    for (const s of SERIES) {
+      SLUG_BY_PATH.set(U.series(s.slug), s.slug);
+      for (let n = 1; n <= s.eps; n++) SLUG_BY_PATH.set(U.watch(s.slug, n), s.slug);
+    }
+    const GENRE_BY_PATH = new Map(D.genres.map(g => [U.genre(g.slug), g.slug]));
+    const SLUGS_OF_GENRE = new Map(D.genres.map(g => [g.slug, SERIES.filter(s => s.genres.includes(g.slug)).map(s => s.slug)]));
+    /* คืน {slug} หรือ {genre} หรือ null · `page` = ที่วางที่ไม่มีลิงก์ของตัวเอง (เพลเยอร์หน้าตอน
+       การ์ดตอนถัดไป) ⇒ เรื่องของหน้านั้นคือคำตอบ และ URL ของหน้าเป็นของที่ด่านสั่งเปิดเอง */
+    const resolveId = (sig, pagePath) => {
+      const s = sig || { kind: 'page', value: String(pagePath || '').split('?')[0] };
+      if (s.kind === 'data-slug' || s.kind === 'data-resume') return { slug: s.value, via: s.kind };
+      if (s.kind === 'data-pref') return { genre: s.value, via: s.kind };
+      const p = String(s.value || '').split('?')[0];
+      if (SLUG_BY_PATH.has(p)) return { slug: SLUG_BY_PATH.get(p), via: s.kind };
+      if (GENRE_BY_PATH.has(p)) return { genre: GENRE_BY_PATH.get(p), via: s.kind };
+      return null;
+    };
     /* ไฟล์ที่ทรงนั้น "ควรได้" — กฎเดียวกับ build/seo.mjs coverSlot() และ build/app.src.js
        คิดจากข้อมูลของ build ที่กำลังวัด ไม่ใช่รายชื่อเรื่องที่เขียนไว้ในด่าน */
     const wantPath = (slug, shape, by) => {
@@ -1418,13 +1608,16 @@ try {
     /* --- สถานะ ก) รีโปตามสภาพ · สถานะ ข) ต้นไม้ชั่วคราวที่มีภาพกว้างครบ + เรื่องแนวนอน 1 เรื่อง --- */
     const states = [{
       label: 'ก · ถอยกลับ (ไม่มีไฟล์ภาพกว้างเลย)',
-      base: BASE, root: ROOT, by: byOf(SERIES),
+      base: BASE, root: ROOT, by: byOf(SERIES), synthetic: false,
     }];
 
     wideDir = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-wide-'));
     {
       const keepDesign = ['tokens.css', 'v2.css', 'fonts'];
-      copyTree(ROOT, wideDir, n => n === '.git' || n === 'node_modules' || n === 'design');
+      /* ตัด `.paperclip-repositories` ด้วยเหตุผลเดียวกับที่มันอยู่ในรายการ SKIP ของตัวกวาด:
+         เป็นสำเนารีโปของ runtime ไม่ใช่ของที่ส่งมอบ — และมันพาสำเนาเข้ามาอีกชั้นในต้นไม้ชั่วคราว */
+      copyTree(ROOT, wideDir, n => n === '.git' || n === 'node_modules' || n === 'design'
+        || n === '.paperclip-repositories');
       for (const f of keepDesign) {
         const a = path.join(ROOT, 'design/v2', f), b = path.join(wideDir, 'design/v2', f);
         if (fs.statSync(a).isDirectory()) copyTree(a, b, () => false);
@@ -1448,15 +1641,33 @@ try {
         rb.status === 0, (rb.stderr || rb.stdout || '').slice(-600));
       if (rb.status === 0) {
         const widePort = await freePort('LAY_PORT_WIDE');
-        wideServer = spawn(process.execPath, [path.join(wideDir, 'tools/serve.mjs'), String(widePort)], { stdio: 'ignore' });
+        /* `cwd: wideDir` ไม่ใช่ของประดับ: วันนี้ความถูกต้องของสถานะ ข แขวนอยู่กับคุณสมบัติของ
+           ไฟล์อื่น (tools/serve.mjs คิด ROOT จาก import.meta.url ไม่ใช่ process.cwd()) ⇒ ถ้าวันหน้า
+           มีคนแก้ serve.mjs ไปใช้ cwd สถานะ ข จะกลายเป็นการวัด **รีโปจริง** เงียบ ๆ ทั้งที่ป้าย
+           บอกว่า "มีภาพกว้างครบ" (AIO-63 ข้อ 5) · ตั้งให้ตรงเสียเลย ไม่เสียอะไร */
+        wideServer = spawn(process.execPath, [path.join(wideDir, 'tools/serve.mjs'), String(widePort)],
+          { stdio: 'ignore', cwd: wideDir });
         const wideBase = `http://127.0.0.1:${widePort}`;
+        let wideReady = null;
         for (let i = 0; i < 80; i++) {
-          try { const r = await fetch(wideBase + '/'); if (r.ok) break; } catch { /* ยังไม่ขึ้น */ }
+          try {
+            const r = await fetch(wideBase + '/content.json');
+            if (r.ok) { wideReady = await r.json(); break; }
+          } catch { /* ยังไม่ขึ้น */ }
           await sleep(100);
         }
+        /* "มีใครตอบ HTTP ที่พอร์ตนี้" ไม่ใช่หลักฐานว่าเป็นเซิร์ฟเวอร์ของ run นี้ — ด่านเขียวจาก
+           ไฟล์ของ run อื่นได้ (บทเรียนของรีโปนี้) ⇒ พิสูจน์ความเป็นเจ้าของด้วยของที่มีแต่ที่นี่:
+           ต้นไม้ชั่วคราวเท่านั้นที่ทุกเรื่องประกาศ coverWide */
+        check('เซิร์ฟเวอร์ของสถานะ ข เสิร์ฟต้นไม้ชั่วคราวจริง (ไม่ใช่พอร์ตของ run อื่น)',
+          !!wideReady && Array.isArray(wideReady.series)
+            && wideReady.series.length > 0 && wideReady.series.every(s => s.coverWide),
+          wideReady ? `content.json ที่พอร์ตนั้นประกาศ coverWide ${(wideReady.series || []).filter(s => s.coverWide).length}`
+            + `/${(wideReady.series || []).length} เรื่อง — ถ้าไม่ครบ นี่ไม่ใช่ต้นไม้ของด่านนี้`
+            : 'ไม่มีใครตอบที่พอร์ตนั้นเลย');
         states.push({
           label: `ข · มีภาพกว้างครบ ${cj.series.length} เรื่อง + แนวนอน 1 เรื่อง (${cj.series[cj.series.length - 1].slug})`,
-          base: wideBase, root: wideDir,
+          base: wideBase, root: wideDir, synthetic: true,
           by: byOf(cj.series.map(s => ({ slug: s.slug, cover: s.cover, coverWide: s.coverWide, orientation: s.orientation }))),
         });
       }
@@ -1469,7 +1680,7 @@ try {
         + ` · สถานะ: ${st.label}`);
       console.log(`    คลังของสถานะนี้: แนวตั้ง ${verticals.length} · แนวนอน ${horizontals.length}`
         + ` · ประกาศ coverWide ${Object.values(st.by).filter(s => s.coverWide).length}`);
-      let undeclared = 0;
+      let undeclared = 0, noIdentity = 0;
 
       for (const pl of SHAPE_MAP) {
         /* ที่วางที่ผูกกับ "ต้องมีเรื่องแนวนอนอยู่ในคลัง" ข้ามได้เฉพาะเมื่อคลังนั้นไม่มีจริง
@@ -1483,8 +1694,10 @@ try {
           continue;
         }
         await setStorageMode(pl.mode || 'new');
-        const bad = { box: [], inline: [], file: [], attr: [], nat: [], none: [], empty: [] };
+        const bad = { box: [], inline: [], file: [], attr: [], nat: [], none: [], empty: [], id: [] };
         let seen = 0, hiddenAt = [], declaredSome = false;
+        const shapesUsed = new Set();
+        const idSeen = new Set();        /* เรื่องที่ "การ์ดในกล่องที่วัดได้" เป็น — ตาม identity ไม่ใช่ตามชื่อไฟล์ */
         for (const vp of FOLD_VIEWPORTS) {
           await viewport(vp);
           await goAt(st.base, at);             /* นำทางใหม่ทุกขนาดจอ: ที่วางบางช่องมาจาก JS */
@@ -1494,7 +1707,7 @@ try {
             await sleep(1600);
           }
           await evaluate(SHAPE_PREP(pl.sel));
-          const res = await evaluate(SHAPE_PROBE(pl.sel));
+          const res = await evaluate(SHAPE_PROBE(pl.sel, pl.max || SHAPE_ITEM_CAP));
           const vpAt = `${vp.w}×${vp.h}`;
           if (!res.n) { bad.empty.push(vpAt); continue; }
           if (res.items.every(it => !it.rendered)) { hiddenAt.push(vpAt); continue; }
@@ -1502,6 +1715,7 @@ try {
           /* ทรงที่ "ที่วางนี้" ขอ · ฮีโร่เป็นที่วางเดียวที่ขอสองทรงในที่เดียว ⇒ ทรงที่คาดหวัง
              เปลี่ยนตามขนาดจอตามเบรกพอยต์ของจริง (ADR-001 §13.6) ไม่ใช่ค่าเดียวทุกจอ */
           const shape = pl.wideAtBp && vp.w >= HERO_WIDE_BP ? 'wide' : pl.shape;
+          shapesUsed.add(shape);
           for (const it of res.items) {
             if (!it.rendered) continue;
             /* S1a · ตระกูลบั๊ก AIO-37: ชั้นกลางที่เป็น inline ทำให้ height/aspect-ratio ถูกเมิน
@@ -1524,13 +1738,42 @@ try {
               bad.none.push(`${vpAt} ${it.w}×${it.h}=${it.ar} (cssH=${it.cssH})`);
             }
             if (!it.img) { bad.empty.push(`${vpAt} ไม่มี <img> ในกล่อง`); continue; }
-            /* S2 · ไฟล์ที่เบราว์เซอร์โหลดจริง = ไฟล์ที่ทรงนี้ควรได้ */
-            const slug = slugOf(it.img.path);
-            const want = slug ? wantPath(slug, shape, st.by) : null;
+            /* S2 · ไฟล์ที่เบราว์เซอร์โหลดจริง = ไฟล์ที่ทรงนี้ควรได้ **ของเรื่องที่การ์ดใบนี้เป็น**
+               identity มาจากลิงก์/data-slug/URL ของหน้า (ออราเคิลอิสระ) ไม่ใช่จากชื่อไฟล์ */
+            const fileSlug = slugOf(it.img.path);
+            const who = pl.identity === false ? null : resolveId(it.id, at);
+            if (pl.identity !== false && !who) {
+              bad.id.push(`${vpAt} ระบุไม่ได้ว่าการ์ดนี้คือเรื่องอะไร (สัญญาณ: ${JSON.stringify(it.id)})`);
+              continue;
+            }
+            /* ที่วางที่ผูกกับ "แนว" ไม่ใช่ "เรื่อง" (ไทล์เลือกตามแนว/หน้าต้อนรับ): ออราเคิลคือ
+               สมาชิกของแนวนั้นในข้อมูล ⇒ ปกของไทล์ "แก้แค้น" ต้องเป็นเรื่องที่อยู่ในแนวแก้แค้นจริง
+               (ยังไม่พอจะจับ "ไทล์ทุกใบได้ปกใบเดียวกัน" เอง — ข้อนั้นคือกฎปกไม่ซ้ำ 6 ใบ ในส่วน 5) */
+            let want = null;
+            if (who && who.genre) {
+              const members = SLUGS_OF_GENRE.get(who.genre) || [];
+              if (!fileSlug || !members.includes(fileSlug)) {
+                bad.id.push(`${vpAt} ไทล์ของแนว "${who.genre}" ได้ปกของ ${fileSlug || it.img.path} `
+                  + `ซึ่งไม่ใช่เรื่องในแนวนั้น (สมาชิก: ${members.join(' ') || '-'})`);
+                continue;
+              }
+              want = wantPath(fileSlug, shape, st.by);
+            } else if (who) {
+              want = wantPath(who.slug, shape, st.by);
+              if (!want) {
+                bad.id.push(`${vpAt} identity ชี้ไปที่ "${who.slug}" ซึ่งไม่อยู่ในคลังของสถานะนี้`);
+                continue;
+              }
+            } else {
+              /* identity:false — เทียบได้แค่ "ไฟล์ของเรื่องที่ชื่อไฟล์บอกเป็นทรงที่ถูก"
+                 ซึ่งอ่อนกว่าข้ออื่นโดยหลักการ และถูกคุมด้วย SHAPE_MAX_NO_IDENTITY */
+              want = fileSlug ? wantPath(fileSlug, shape, st.by) : null;
+            }
             if (!want) { bad.file.push(`${vpAt} path ที่โหลด "${it.img.path}" แมปกลับเป็นเรื่องในคลังไม่ได้`); continue; }
             if (it.img.path !== '/' + want.replace(/^\//, '')) {
-              bad.file.push(`${vpAt} ทรง '${shape}' ควรได้ /${want} แต่โหลด ${it.img.path}`);
+              bad.file.push(`${vpAt} ทรง '${shape}'${who && who.slug ? ` ของ ${who.slug}` : ''} ควรได้ /${want} แต่โหลด ${it.img.path}`);
             }
+            if (who && who.slug) idSeen.add(who.slug);
             /* S3/S4 · ขนาดที่ประกาศต้องตรงกับขนาดไฟล์ "ที่โหลดจริง" บนดิสก์ — ไม่มีเลขในด่าน
                เทียบกับไฟล์ที่โหลด ไม่ใช่ไฟล์ที่ควรโหลด เพื่อให้ S3 ไม่พลอยแดงตาม S2
                และผู้ประกาศขนาดคือ <source> ที่ถูกเลือก ถ้ามี ไม่ใช่ <img> เสมอ */
@@ -1569,8 +1812,29 @@ try {
           bad.inline.length === 0, bad.inline.slice(0, 3).join(' · '));
         check(`${atp} · กล่องจริงตรงกับทรงที่ประกาศ ±${SHAPE_TOL * 100}%`,
           bad.box.length === 0, bad.box.slice(0, 4).join(' · '));
-        check(`${atp} · ไฟล์ที่โหลดคือไฟล์ของทรง '${pl.shape}'`,
+        /* ป้ายต้องบอกทรงที่ **บังคับจริง** ไม่ใช่ `pl.shape` — ฮีโร่ที่ ≥ เบรกพอยต์บังคับ 'wide'
+           แต่ป้ายรอบแรกพิมพ์ 'poster' ตามค่าในแผนที่ (AIO-63 N3) */
+        check(`${atp} · ไฟล์ที่โหลดคือไฟล์ของทรง '${shapesUsed.size ? [...shapesUsed].join('/') : pl.shape}'`,
           bad.file.length === 0, bad.file.slice(0, 4).join(' · '));
+        /* ข้อนี้คือสิ่งที่ปิดรอย AIO-64 R1: ถ้าการ์ดใบนี้เป็นเรื่อง A แต่โหลดปกของเรื่อง B
+           S2 ข้างบนจะแดง · และถ้าออราเคิลเองพัง (ระบุเรื่องไม่ได้เลย) ข้อนี้จะแดงแทนที่จะเงียบ */
+        if (pl.identity === false) noIdentity++;
+        check(`${atp} · ระบุได้ว่าแต่ละกล่องคือเรื่องอะไร จากลิงก์/data-slug/URL ของหน้า`
+          + `${pl.identity === false ? ' (หรือเป็นข้อยกเว้นที่ประกาศไว้)' : ` (${idSeen.size} เรื่อง: ${[...idSeen].slice(0, 3).join(' ')})`}`,
+          pl.identity === false || (bad.id.length === 0 && idSeen.size > 0),
+          bad.id.slice(0, 3).join(' · ') || 'ไม่มีกล่องใดระบุเรื่องได้ — ออราเคิล identity ตาย '
+          + 'แปลว่า S2 กลายเป็น tautology ของชื่อไฟล์ (รอย AIO-64 R1) ⇒ แก้ด่าน ไม่ใช่ผ่อนด่าน');
+        /* ที่วางที่ขอ `auto` ต้องถูกวัดกับเรื่องแนวนอน **จริง** อย่างน้อยหนึ่งเรื่อง ไม่งั้นมิวเทชัน
+           "เปลี่ยน auto กลับเป็น poster" เขียวโดยอุบัติเหตุ (รูเดียวกับ M5/M6 — AIO-63 ข้อ 4ข)
+           ⇒ เขียนเป็นกฎ ไม่ใช่สิ่งที่ต้องจำตอนซีด localStorage */
+        if (pl.shape === 'auto' && horizontals.length) {
+          const hit = [...idSeen].filter(k => st.by[k] && st.by[k].orientation === 'horizontal');
+          check(`${atp} · ทรง 'auto' ถูกวัดกับเรื่องแนวนอนจริงอย่างน้อยหนึ่งเรื่อง`
+            + `${pl.autoCoveredBy ? ` (หรือมีด่านอื่นครอบ: ${pl.autoCoveredBy})` : ''}`,
+            hit.length > 0 || !!pl.autoCoveredBy,
+            `กล่องที่วัดได้เป็นแนวตั้งทั้งหมด (${[...idSeen].join(' ')}) ขณะที่คลังมีแนวนอน `
+            + `${horizontals.map(s => s.slug).join(' ')} ⇒ เส้นทาง auto=wide ไม่ถูกวัดเลย`);
+        }
         check(`${atp} · <img width/height> = ขนาดไฟล์จริงบนดิสก์ (กฎ V15/V18)`,
           bad.attr.length === 0, bad.attr.slice(0, 4).join(' · '));
         check(`${atp} · ไบต์ที่โหลดมีขนาดตามที่ประกาศ (naturalWidth/Height)`,
@@ -1592,21 +1856,59 @@ try {
       check(`ช่องที่ไม่ประกาศสัดส่วนเลย ไม่เกิน ${SHAPE_MAX_UNDECLARED} ช่อง (เจอ ${undeclared})`,
         undeclared <= SHAPE_MAX_UNDECLARED,
         'ยามกันการย้ายที่วางเข้าช่อง declared:false เพื่อให้ด่านเงียบ แทนที่จะแก้ของ');
+      check(`ช่องที่ระบุเรื่องของตัวเองไม่ได้ ไม่เกิน ${SHAPE_MAX_NO_IDENTITY} ช่อง (เจอ ${noIdentity})`,
+        noIdentity <= SHAPE_MAX_NO_IDENTITY,
+        'ยามแบบเดียวกับ declared:false — identity:false คือช่องที่ S2 อ่อนลงเป็นการเทียบชื่อไฟล์ '
+        + 'กับตัวเอง ⇒ ห้ามเป็นทางออกของที่วางใหม่');
 
-      /* --- S5 · ฮีโร่: เบราว์เซอร์ต้องเลือกไฟล์ตามเบรกพอยต์ของจริง ไม่ใช่ตามสตริงที่เขียนไว้ --- */
+      /* --- S5 · ฮีโร่: เบราว์เซอร์ต้องเลือกไฟล์ตามเบรกพอยต์ของจริง ไม่ใช่ตามสตริงที่เขียนไว้ ---
+         ⚠️ รอบแรกข้อนี้ยืม `HERO_WIDE_BP` ตัวเดียวกับที่ผลิต `<source media>` มาเป็นทั้งโจทย์
+            และเฉลย (Reviewer-Codex · AIO-64 R6) ⇒ ถ้าใครเลื่อนค่านั้นไป 900 ขณะที่ CSS ของ
+            `.hero .bg` ยังสลับที่ 720 ด่านจะเขียวทั้งที่ภาพกับกรอบหลุดจากกันหนึ่งช่วงจอเต็ม ๆ
+         ⇒ ออราเคิลอิสระ: **ค้นหาจุดสลับของ CSS ด้วยการวัดในเบราว์เซอร์** (กฎ `.hero .bg` ตั้ง
+            aspect-ratio ที่จอแคบ แล้วเปลี่ยนเป็น height ที่จอกว้าง — อ้างด้วยชื่อ selector
+            เพราะไฟล์นั้นเป็นของ Visual) แล้วบังคับว่าค่าที่วัดได้ = ค่าที่ไปอยู่ใน `<source media>` */
       await setStorageMode('new');
-      for (const w of [HERO_WIDE_BP - 1, HERO_WIDE_BP]) {
+      await viewport({ w: 1440, h: 900 });
+      await goAt(st.base, U.home);
+      const heroAr = async w => {
+        await viewport({ w, h: 900 });
+        await settle();
+        return parseAr(await evaluate(`(function(){var e=document.querySelector('.hero .bg');
+          return e ? getComputedStyle(e).aspectRatio : null;})()`));
+      };
+      let bpLo = 320, bpHi = 1920;
+      const okEnds = (await heroAr(bpLo)) != null && (await heroAr(bpHi)) == null;
+      check(`ฐานของการค้นหาเบรกพอยต์ถูก: ที่ ${bpLo}px กล่องฮีโร่ประกาศสัดส่วน · ที่ ${bpHi}px ไม่ประกาศ`,
+        okEnds, 'ถ้าข้อนี้แดง การค้นหาข้างล่างไม่มีความหมาย — กฎ `.hero .bg` เปลี่ยนโครงไปจากที่ด่านรู้จัก');
+      if (okEnds) {
+        while (bpHi - bpLo > 1) {
+          const mid = (bpLo + bpHi) >> 1;
+          if ((await heroAr(mid)) != null) bpLo = mid; else bpHi = mid;
+        }
+        check(`เบรกพอยต์ที่ CSS สลับจริง (วัดได้ ${bpHi}px) = ค่าที่ผลิต <source media> ของฮีโร่`,
+          bpHi === HERO_WIDE_BP,
+          `CSS สลับที่ ${bpHi}px แต่โค้ดที่สร้าง <picture> ใช้ ${HERO_WIDE_BP}px ⇒ มีช่วงจอที่ `
+          + `กรอบกับไฟล์หลุดจากกัน (${Math.abs(bpHi - HERO_WIDE_BP)}px) — แก้ให้ตรงกัน ไม่ใช่แก้ด่าน`);
+      }
+      const measuredBp = okEnds ? bpHi : HERO_WIDE_BP;
+      for (const w of [measuredBp - 1, measuredBp]) {
         await viewport({ w, h: 900 });
         await goAt(st.base, U.home);
         await evaluate(SHAPE_PREP('.hero .bg'));
         const r = await evaluate(SHAPE_PROBE('.hero .bg'));
         const it = (r.items || [])[0];
         if (!it || !it.img) { check(`ฮีโร่ @${w}px · วัดได้`, false, 'ไม่พบ .hero .bg img'); continue; }
-        const slug = slugOf(it.img.path);
-        const s = slug ? st.by[slug] : null;
-        const wide = w >= HERO_WIDE_BP && s && s.coverWide;
-        const want = '/' + (wide ? s.coverWide : (s ? s.cover : '')).replace(/^\//, '');
-        check(`ฮีโร่ @${w}px · เบราว์เซอร์เลือก${wide ? 'ไฟล์กว้าง' : 'ปก 2:3'} (${want})`,
+        /* identity ของสไลด์ฮีโร่มาจากปุ่มของเรื่องนั้นใน article.hero (data-resume/data-follow)
+           ไม่ใช่จากชื่อไฟล์ที่โหลด — ไม่งั้น "ฮีโร่โชว์ปกของเรื่องอื่น" ยังเขียว (AIO-64 R1) */
+        const who = resolveId(it.id, U.home);
+        const s = who && who.slug ? st.by[who.slug] : null;
+        check(`ฮีโร่ @${w}px · ระบุได้ว่าสไลด์นี้คือเรื่องอะไร (${who && who.slug ? `${who.slug} via ${who.via}` : '-'})`,
+          !!s, `สัญญาณ identity = ${JSON.stringify(it.id)} ⇒ เทียบไฟล์กับเรื่องที่ถูกไม่ได้`);
+        if (!s) continue;
+        const wide = w >= measuredBp && s.coverWide;
+        const want = '/' + (wide ? s.coverWide : s.cover).replace(/^\//, '');
+        check(`ฮีโร่ @${w}px · เบราว์เซอร์เลือก${wide ? 'ไฟล์กว้าง' : 'ปก 2:3'} ของ ${who.slug} (${want})`,
           it.img.path === want,
           `โหลด ${it.img.path} · <source> = ${(it.sources || []).map(x => `${x.media}→${x.path}`).join(' ') || 'ไม่มี'}`);
         /* ไม่มีภาพกว้าง ⇒ ต้องไม่มี <picture>/<source> เลย ไม่ใช่ <picture> ที่ว่าง:
@@ -1614,7 +1916,8 @@ try {
         const hasWideFile = Object.values(st.by).some(x => x.coverWide);
         check(`ฮีโร่ @${w}px · ${hasWideFile ? 'มี <source media> พร้อม <picture> ที่เป็น block' : 'ไม่มี <picture> เลย (ถอยกลับเป็น HTML เดิม)'}`,
           hasWideFile
-            ? (it.sources || []).length === 1 && it.sources[0].media === `(min-width:${HERO_WIDE_BP}px)` && it.img.wrapDisplay === 'block'
+            /* เทียบ media กับ **เบรกพอยต์ที่วัดได้จาก CSS** ไม่ใช่กับค่าที่สร้างมันเอง */
+            ? (it.sources || []).length === 1 && it.sources[0].media === `(min-width:${measuredBp}px)` && it.img.wrapDisplay === 'block'
             : it.sources === null,
           `sources=${JSON.stringify(it.sources)} · picture display=${it.img.wrapDisplay}`);
       }
@@ -1663,9 +1966,9 @@ try {
         const badOrient = walk.steps.filter(x => !st.by[x.slug] || x.orientation !== st.by[x.slug].orientation);
         check(`V17 ค · ทิศบน #feedPlayer ตรงกับ orientation ของ data-slug ทุกก้าว (${walk.steps.length} ก้าว)`,
           badOrient.length === 0,
-          badPos.length === 0 && badOrient.length
-            ? badOrient.slice(0, 3).map(x => `${x.slug}: กล่องบอก ${x.orientation} แต่ข้อมูลบอก ${st.by[x.slug] && st.by[x.slug].orientation}`).join(' · ')
-            : '');
+          /* เงื่อนไขรอบแรกเขียน `badPos.length === 0 && badOrient.length` ⇒ ถ้าข้อ ข และ ค
+             ตกพร้อมกัน ข้อ ค จะแดงโดยไม่มีรายละเอียดเลย (AIO-63 N2) — คนที่ต้องแก้มองไม่เห็นว่าเรื่องไหน */
+          badOrient.slice(0, 3).map(x => `${x.slug}: กล่องบอก ${x.orientation} แต่ข้อมูลบอก ${st.by[x.slug] && st.by[x.slug].orientation}`).join(' · '));
         /* §13.5 แถว "ภาพในเพลเยอร์ฟีดตอนเลื่อนเรื่อง" · ทรง `auto` ต้องถูกเลือกใหม่ **ทุกครั้ง
            ที่สลับเรื่อง** ไม่ใช่ครั้งเดียวตอน build — ไม่งั้นเรื่องเดียวกันได้ไฟล์คนละใบระหว่าง
            "เปิดหน้ามาเจอ" กับ "ปัดมาเจอ" · เทียบสองส่วนท้ายของพาธเพราะโพรบคืนมาแค่นั้น */
@@ -1678,10 +1981,8 @@ try {
           badFile.slice(0, 3).map(x => `${x.slug} (${st.by[x.slug] && st.by[x.slug].orientation}): `
             + `โหลด ${x.file} แต่ควรได้ ${(wantPath(x.slug, 'auto', st.by) || '?').split('/').slice(-2).join('/')}`).join(' · '));
         /* ค (ครึ่งทรง) · เมื่อทิศเป็น horizontal กล่องสื่อต้องวัดได้ 16/9 ±2%
-           ⚠️ อิลิเมนต์ที่เป็น "กล่องสื่อ" และกฎกรอบของมันเป็นของ AIO-59 ซึ่งยังไม่ลงมา
-              จึงยังบังคับข้อนี้ไม่ได้ — แต่ **ไม่ซ่อน**: พิมพ์ของจริงที่วัดได้ทุกรอบ และผูกไว้กับ
-              ค่าคงที่ที่ต้องมีคนมาพลิกด้วยมือ ⇒ วันที่ AIO-59 ลง ให้ตั้งเป็น false แล้วข้อนี้
-              กลายเป็นด่านจริงทันทีโดยไม่ต้องเขียนโค้ดเพิ่ม (ADR-001 §13.10 ข้อ 7) */
+           เลื่อนได้เฉพาะเรื่องแนวนอนที่ด่านสร้างขึ้นเองในสถานะ ข (ดูบล็อก FEED_CLIP_SEL)
+           เรื่องแนวนอนที่มาจากข้อมูลจริง = บังคับเต็ม ไม่มีทางผ่อน */
         const horiz = walk.steps.filter(x => x.orientation === 'horizontal');
         if (horiz.length) {
           const lo = FEED_BOX_AR * (1 - SHAPE_TOL), hi = FEED_BOX_AR * (1 + SHAPE_TOL);
@@ -1695,14 +1996,21 @@ try {
               + (x.clip ? ` · .clip ${x.clip.w}×${x.clip.h}=${x.clip.ar}` : ' · ไม่มี .clip')
               + ` · ไฟล์ ${x.file}`).join(' · ')
             + ` · ต้องได้ ${FEED_BOX_AR.toFixed(4)} ±${SHAPE_TOL * 100}%`);
-          check(`V17 ค (ครึ่งทรง) · เรื่องแนวนอนมีกล่องสื่อ "${FEED_CLIP_SEL}" และได้ `
-            + `${FEED_BOX_AR.toFixed(3)} ±${SHAPE_TOL * 100}%`
-            + `${V17C_BOX_PENDING_AIO59 ? ' — ยังไม่บังคับ: แบบของ AIO-59 รอลูกค้าอนุมัติ' : ''}`,
-            (noClip.length === 0 && off.length === 0) || V17C_BOX_PENDING_AIO59,
-            (noClip.length ? `ไม่มี .clip ที่: ${noClip.map(x => x.slug).join(' ')} · ` : '')
-            + (off.length ? `สัดส่วนเพี้ยน: ${off.map(x => `${x.slug}=${x.clip.ar}`).join(' ')} · ` : '')
-            + 'เมื่อลูกค้าอนุมัติแบบ AIO-59: สร้าง .mwin/.clip ที่ buildFeed() + ย้าย CSS ของ UX เข้า '
-            + 'แล้วตั้ง V17C_BOX_PENDING_AIO59 = false');
+          const clipName = `V17 ค (ครึ่งทรง) · เรื่องแนวนอนมีกล่องสื่อ "${FEED_CLIP_SEL}" และได้ `
+            + `${FEED_BOX_AR.toFixed(3)} ±${SHAPE_TOL * 100}%`;
+          const clipDetail = (noClip.length ? `ไม่มี .clip ที่: ${noClip.map(x => x.slug).join(' ')} · ` : '')
+            + (off.length ? `สัดส่วนเพี้ยน: ${off.map(x => `${x.slug}=${x.clip.ar}`).join(' ')} · ` : '');
+          const clipOk = noClip.length === 0 && off.length === 0;
+          /* เลื่อนได้เฉพาะเมื่อเรื่องแนวนอนทั้งหมดในรอบนี้เป็นของที่ด่านสร้างเอง (สถานะ ข)
+             ข้อมูลจริงที่มีเรื่องแนวนอน = ไม่มีสิทธิ์เลื่อน แดงทันที */
+          if (clipOk || !st.synthetic) {
+            check(clipName, clipOk, clipDetail
+              + 'คลังจริงมีเรื่องแนวนอนแล้วแต่ฟีดยังไม่มีกล่องสื่อตามกฎ AIO-59 — '
+              + 'ADR §13.7 ห้ามสภาพนี้ตรง ๆ: สร้าง .mwin/.clip ที่ buildFeed() + ย้าย CSS ของ UX เข้า');
+          } else {
+            defer(clipName, 'เรื่องแนวนอนในรอบนี้เป็นของที่ด่านสร้างเอง และแบบของ AIO-59 ยังรอลูกค้าอนุมัติ '
+              + '(ถ้าเป็นข้อมูลจริง ข้อนี้จะแดงทันที ไม่มีสวิตช์ให้ปิด)', clipDetail);
+          }
         }
       }
       /* แถบรีล: 3 slug ต้องมีจริงในคลัง และ **ห้ามถูกเลือกด้วยทิศ** (D8 ฉบับกลับทาง)
@@ -1716,10 +2024,56 @@ try {
         reelSlugs.length === 3 && reelSlugs.every(k => k && st.by[k]),
         reelSlugs.filter(k => !k || !st.by[k]).join(' ') || 'จำนวนไม่ครบ 3 ใบ');
     }
+
+    /* ---------- M14 · มิวเทชัน "ปกผิดเรื่อง" เป็น self-test ถาวรของด่าน ----------
+       ทำไมต้องถาวร: รอบแรกด่านนี้ยอมให้ปก **ทั้งเว็บ** เป็นเรื่องเดียวกันแล้วยังรายงาน 261/0
+       (Reviewer-Codex · AIO-64 R1) · ออราเคิลใหม่ (identity จากลิงก์/data-slug/URL) แก้ข้อนั้น
+       แต่ออราเคิลที่ไม่มีใครทดสอบก็ตายเงียบได้เหมือนกัน ⇒ ด่านทดสอบตัวเองทุกรอบ:
+       ฉีดมิวเทชันลง **ต้นไม้ชั่วคราวใบเดิมที่กำลังจะถูกลบ** (ไม่แตะรีโปจริงแม้ไฟล์เดียว)
+       build ใหม่ แล้วบังคับว่าออราเคิลต้องจับได้ · ข้อนี้แดง = ด่านเชื่อถือไม่ได้ ไม่ใช่เว็บพัง */
+    if (states.length === 2) {
+      const st = states[1];
+      const uiPath = path.join(wideDir, 'build/ui.mjs');
+      const anchor = 'const slot = coverSlot(s, shape);';
+      const src = fs.readFileSync(uiPath, 'utf8');
+      const name = 'M14 (self-test) · มิวเทชัน "ทุกที่วางที่ขอ poster ได้ปกของเรื่องแรก" ต้องถูกจับได้';
+      if (!src.includes(anchor)) {
+        check(name, false, `หาจุดฉีดมิวเทชันใน build/ui.mjs ไม่เจอ ("${anchor}") — `
+          + 'ถ้า coverImg() ถูกเขียนใหม่ ให้ย้ายจุดฉีด ไม่ใช่ถอด self-test นี้ออก');
+      } else {
+        fs.writeFileSync(uiPath, src.replace(anchor, `if (shape === 'poster') s = SERIES[0];\n  ${anchor}`));
+        const rb = spawnSync('node', ['build/build.mjs'], { cwd: wideDir, encoding: 'utf8' });
+        if (rb.status !== 0) {
+          check(name, false, 'build ของต้นไม้ที่ถูกมิวเทชันล้ม ⇒ วัดไม่ได้ว่าออราเคิลจับได้หรือไม่: '
+            + (rb.stderr || rb.stdout || '').slice(-300));
+        } else {
+          await setStorageMode('new');
+          await viewport(FOLD_VIEWPORTS[1]);
+          await goAt(st.base, U.home);
+          await evaluate(SHAPE_PREP('.card .poster'));
+          const res = await evaluate(SHAPE_PROBE('.card .poster'));
+          let items = 0, caught = 0;
+          for (const it of res.items || []) {
+            if (!it.rendered || !it.img) continue;
+            items++;
+            const who = resolveId(it.id, U.home);
+            const want = who && who.slug ? wantPath(who.slug, 'poster', st.by) : null;
+            if (!want || it.img.path !== '/' + want.replace(/^\//, '')) caught++;
+          }
+          check(`${name} (${caught}/${items} กล่องถูกจับ)`, items > 0 && caught > 0,
+            `ออราเคิล identity ไม่จับมิวเทชันนี้เลย ⇒ S2 กลับไปเป็น tautology ของชื่อไฟล์แล้ว · `
+            + `ตรวจ resolveId()/ID_PROBE_FN ก่อนเชื่อเลขอื่นในรายงานนี้`);
+        }
+      }
+    }
     await setStorageMode('new');
   }
 
-  console.log(`\nผล: ผ่าน ${pass} · ตก ${fail}`);
+  console.log(`\nผล: ผ่าน ${pass} · ตก ${fail}${deferred ? ` · เลื่อนไว้ ${deferred}` : ''}`);
+  if (deferred) {
+    console.log('  ข้อที่เลื่อนไว้ (ยังไม่ถูกบังคับ — ห้ามนับเป็นผ่าน):');
+    for (const d of deferrals) console.log(`   ⊘ ${d}`);
+  }
   cleanup(fail ? 1 : 0);
 } catch (e) {
   console.error('ทดสอบล้ม: ' + e.message);

@@ -17,9 +17,31 @@ test('importer accepts version 1 without the §13 fields',()=>{
   for (const s of d.series) { delete s.orientation; delete s.coverWide; }
   assert.deepEqual(run(d),[]);
 });
-test('importer accepts coverWide when the file exists',()=>{
+// V15 path rule: coverWide must live in assets/covers-wide/, not next to the 2:3 covers.
+// This test used to be named "accepts coverWide when the file exists" while asserting a
+// rejection — the name promised the positive path nobody actually covered (AIO-64 R3).
+test('importer rejects coverWide that points outside assets/covers-wide/',()=>{
   const d=structuredClone(source);
-  d.series[0].coverWide='assets/covers/'+d.series[0].slug+'.webp';   // path rule must reject this
+  d.series[0].coverWide='assets/covers/'+d.series[0].slug+'.webp';
+  assert.ok(run(d).length);
+});
+// The positive path of V15/V16, which no test reached before: a well-formed coverWide whose
+// file exists must be accepted — on a vertical series (optional) and on a horizontal one
+// (required by V16). Existence is stubbed because the repo has no wide covers yet (AIO-60),
+// so this test states the contract instead of waiting for the asset.
+test('importer accepts a well-formed coverWide whose file exists (V15/V16 positive path)',()=>{
+  const wide='assets/covers-wide/'+source.series[0].slug+'.webp';
+  const exists=p=>p===wide||fs.existsSync(new URL('../'+p,import.meta.url));
+  for (const orientation of ['vertical','horizontal']) {
+    const d=structuredClone(source);
+    d.series[0].coverWide=wide;
+    d.series[0].orientation=orientation;
+    assert.deepEqual(validate(d,{coverExists:exists}),[],`orientation=${orientation}`);
+  }
+  // …and the same file missing from disk must still be rejected: the stub is what makes the
+  // case positive, not a hole in V15.
+  const d=structuredClone(source);
+  d.series[0].coverWide=wide;
   assert.ok(run(d).length);
 });
 for (const [name,change] of Object.entries({

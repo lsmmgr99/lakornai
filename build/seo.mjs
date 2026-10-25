@@ -87,6 +87,14 @@ export function coverSlot(s, shape = 'poster') {
     throw new Error(`coverSlot(${s && s.slug}): shape = ${JSON.stringify(shape)} `
       + `ไม่อยู่ในชุดที่สัญญารู้จัก (${COVER_SHAPES.join(' | ')}) — ADR-001 §13.5`);
   }
+  /* `auto` อ่านคำตอบจาก `s.orientation` ⇒ วัตถุที่ไม่มีทิศจะได้ `poster` **เงียบ ๆ** ซึ่งเป็น
+     การเดาที่ §13.2 ห้ามไว้ตรง ๆ · วันนี้ทุกจุดเรียกส่งเรื่องจริง (ตรวจแล้วรวม GENRE_COVER)
+     แต่ด่าน `shape` ข้างบนบังคับไว้แล้ว ขณะที่ด้านทิศไม่มีใครบังคับ — ความไม่สมมาตรที่
+     Reviewer-Claude ชี้ไว้ (AIO-63 N7) · ล้มดีกว่าเดา และราคาวันนี้เป็นศูนย์ */
+  if (shape === 'auto' && s && s.orientation !== 'vertical' && s.orientation !== 'horizontal') {
+    throw new Error(`coverSlot(${s.slug}): ที่วางขอทรง 'auto' แต่เรื่องนี้ไม่มี orientation `
+      + `(ได้ ${JSON.stringify(s.orientation)}) — ค่านี้บังคับตามกฎ V14 และห้ามเดา (ADR-001 §13.2)`);
+  }
   const wantWide = shape === 'wide' || (shape === 'auto' && s.orientation === 'horizontal');
   if (wantWide && s.coverWide) {
     return { url: '/' + String(s.coverWide).replace(/^\//, ''), w: COVER_WIDE_W, h: COVER_WIDE_H, wide: true };

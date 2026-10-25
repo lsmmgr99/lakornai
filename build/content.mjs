@@ -233,6 +233,10 @@ function fromDataJs(d) {
   const series = d.series.map(s => {
     requireFields(s);
     checkOrientation(s);
+    /* V15/V16 ต้องบังคับ **ทั้งสองเส้นทางที่โหลดข้อมูล** ไม่ใช่เฉพาะ content.json ·
+       วันนี้เส้นทางนี้ตายไปก่อนถึงบรรทัดนี้อยู่แล้ว (ข้างบนล้มเพราะ data.js ไม่มี orientation)
+       แต่ความไม่สมมาตรของกฎคือของที่จะงงรอบหน้า (Reviewer-Claude · AIO-63 N6) */
+    checkCoverWide(s);
     const ended = s.status === 'จบแล้ว';
     const th = String(s.status).replace(/^ตอนใหม่/, '');
     const day = ended ? null : DAY_ENUM[th];

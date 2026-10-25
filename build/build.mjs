@@ -4,9 +4,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SERIES, U, OPEN_TAGS, CAST_PAGES, D, VIEWS_SOURCE, HAS_VIEWS, RANK_BASIS,
-  coverWideMisses } from './content.mjs';
+  coverWideMisses, COVER_WIDE_W, COVER_WIDE_H } from './content.mjs';
 import { PAGES } from './ui.mjs';
-import { robotsTxt, sitemapXml, PUBLISHED, SITE_ORIGIN, shareMisses } from './seo.mjs';
+import { robotsTxt, sitemapXml, PUBLISHED, SITE_ORIGIN, shareMisses,
+  COVER_W, COVER_H, COVER_SHAPES } from './seo.mjs';
 import * as A from './pages-discovery.mjs';
 import * as B from './pages-watch.mjs';
 import * as C from './pages-content.mjs';
@@ -285,12 +286,69 @@ if (!HAS_VIEWS) {
       (`--faint` ใน CSS และถ้อยคำต้องห้ามใน app.js) · ถอดคอมเมนต์บล็อกออกก่อนค้นหา
       ไฟล์นี้ไม่มีคอมเมนต์แบบ `//` เลย (ตรวจแล้ว 0 บรรทัด) จึงไม่ต้องเสี่ยงถอด `//` ที่จะไป
       ตัด URL ในสตริงด้วย · ถ้าวันหน้ามีใครเพิ่ม ให้ย้ายไปใช้ตัวแยกโทเคนจริง ไม่ใช่ขยาย regex */
+const APP_CODE = fs.readFileSync(R('assets/app.js'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
 if (SERIES.some(s => s.orientation === 'horizontal')) {
-  const code = fs.readFileSync(R('assets/app.js'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-  const m = code.match(/\b(?:width|height)="\d+"/);
+  /* ค้นทั้งสองเครื่องหมายคำพูด — `width='1024'` ก็คือค่าคงที่เหมือนกัน (AIO-63 N8)
+     วันนี้ไฟล์นี้ใช้ `"` ทั้งหมด แต่ด่านที่ยืนด้วยตัวเองต้องไม่ขึ้นกับสไตล์ของวันนี้ */
+  const m = APP_CODE.match(/\b(?:width|height)=["']\d+["']/);
   if (m) {
     console.error(`✗ assets/app.js: พบขนาดภาพที่ฝังเป็นค่าคงที่ → "${m[0]}" `
       + `ขณะที่คลังมีเรื่องแนวนอนแล้ว — ขนาดต้องมาจากไฟล์ที่ตัวเลือกคืนมา (ADR-001 กฎ V18)`);
+    process.exit(1);
+  }
+}
+
+/* 4.9 ความตรงกันของ **สองท่อ** (ADR-001 §13.1 D5 · Reviewer-Claude AIO-63 ข้อ 1)
+   ปกไหลผ่านสองท่อที่แก้ไม่สมมาตรได้เงียบ ๆ: `coverSlot()` ฝั่ง build (build/seo.mjs, ESM บน
+   node) และสำเนาฝั่งเบราว์เซอร์ใน `build/app.src.js` (IIFE ที่ถูกคัดลอกตรง ๆ เป็น assets/app.js)
+   การรวมเป็นสำเนาเดียวต้องพา bundler เข้ามา ซึ่งจ่ายแพงกว่าที่ได้ ⇒ **ความซ้ำที่จำเป็นต้อง
+   มาพร้อมด่านที่เทียบมัน** ไม่ใช่มาพร้อมความระมัดระวัง · สองข้อข้างล่างล้มทุก build ไม่มีเงื่อนไข
+   (ก่อนหน้านี้ตัวที่จับการดริฟต์มีแต่ด่านเบราว์เซอร์ 25 นาทีในสถานะที่มีภาพกว้าง — ช้าเกินจะช่วย)
+
+   ⚠️ ถอดคอมเมนต์บล็อกออกก่อนค้นหา — คอมเมนต์ในไฟล์นี้พูดถึงเลขขนาดภาพและชื่อทรงอยู่หลายที่
+      ถ้านับคอมเมนต์เป็นของจริงจะได้บั๊กผี แล้วมีคนอยากผ่อนด่านแทนที่จะแก้ของ (บทเรียนเดิม) */
+{
+  /* ด่านชุดนี้อยู่หลังจุดที่ `errors` ถูกเทออกไปแล้ว (ส่วน 2) ⇒ เก็บในรายการของตัวเองแล้ว
+     ออกด้วยสถานะไม่ศูนย์เอง เหมือนกฎ V18/V10 ข้างบน ไม่ใช่ push เข้า `errors` ซึ่งจะไม่มีใครอ่าน */
+  const drift = [];
+  const pair = (re, what) => {
+    const m = re.exec(APP_CODE);
+    if (!m) {
+      drift.push(`assets/app.js: หา${what}ไม่เจอ — ถ้าเปลี่ยนชื่อตัวแปร ให้แก้ด่านนี้ให้ตรง `
+        + `ไม่ใช่ถอดด่านออก (ADR-001 §13.1)`);
+      return null;
+    }
+    return [Number(m[1]), Number(m[2])];
+  };
+  const poster = pair(/\bPOSTER_W\s*=\s*(\d+)\s*,\s*POSTER_H\s*=\s*(\d+)/, 'ค่าคงที่ขนาดปก 2:3');
+  const wide = pair(/\bWIDE_W\s*=\s*(\d+)\s*,\s*WIDE_H\s*=\s*(\d+)/, 'ค่าคงที่ขนาดภาพกว้าง');
+  if (poster && (poster[0] !== COVER_W || poster[1] !== COVER_H)) {
+    drift.push(`ขนาดปก 2:3 ของสองท่อไม่ตรงกัน: build/seo.mjs = ${COVER_W}×${COVER_H} · `
+      + `assets/app.js = ${poster[0]}×${poster[1]} — เรื่องเดียวกันจะได้แอตทริบิวต์ขนาดคนละค่า `
+      + `ระหว่างหน้าที่ build วาดกับกล่องที่ JS วาด แล้ว CLS กลับมาเฉพาะทางเดียว`);
+  }
+  if (wide && (wide[0] !== COVER_WIDE_W || wide[1] !== COVER_WIDE_H)) {
+    drift.push(`ขนาดภาพกว้างของสองท่อไม่ตรงกัน: build/content.mjs = ${COVER_WIDE_W}×${COVER_WIDE_H} · `
+      + `assets/app.js = ${wide[0]}×${wide[1]} — กฎ V15 วัดไฟล์ด้วยค่าแรก แต่ฝั่งเบราว์เซอร์ `
+      + `ประกาศค่าหลัง ⇒ ไฟล์ที่ผ่าน V15 ยังโกหกเบราว์เซอร์ได้`);
+  }
+  /* ชุด `shape` ของสองท่อต้องเป็นชุดเดียวกัน · ฝั่ง build `throw` เมื่อสะกดผิด แต่ฝั่งเบราว์เซอร์
+     **ตกไปที่ poster เงียบ ๆ** (เบราว์เซอร์ทำให้ build แดงไม่ได้ และข้อความ error ภาษาไทยในไฟล์
+     นั้นจะไปชนด่านถ้อยคำที่ tools/check-ac.mjs) ⇒ ตรวจที่นี่แทนการใส่ throw ลงไฟล์นั้น */
+  const used = [...APP_CODE.matchAll(/\bcover(?:Slot|Attrs)\(\s*[A-Za-z_$][\w$]*\s*,\s*'([^']*)'/g)]
+    .map(m => m[1]);
+  const unknown = [...new Set(used.filter(x => !COVER_SHAPES.includes(x)))];
+  if (unknown.length) {
+    drift.push(`assets/app.js: จุดเรียกขอทรงที่สัญญาไม่รู้จัก → ${unknown.map(x => JSON.stringify(x)).join(' ')} `
+      + `(ชุดที่รู้จัก: ${COVER_SHAPES.join(' | ')}) — ฝั่งนี้ไม่ throw เอง มันจะตกไปใช้ปก 2:3 เงียบ ๆ `
+      + `แล้วช่องที่ควรได้ภาพกว้างจะได้ปกครอปตั้งแต่เรื่องแนวนอนเรื่องแรก (ADR-001 §13.5)`);
+  }
+  if (!used.length) {
+    drift.push('assets/app.js: ไม่พบจุดเรียก coverSlot/coverAttrs ที่ส่งชื่อทรงเป็นสตริงเลย — '
+      + 'ด่านนี้วัดอะไรไม่ได้ ⇒ แก้ด่านให้ตรงกับโครงใหม่ ไม่ใช่ปล่อยให้มันเขียวเปล่า ๆ');
+  }
+  if (drift.length) {
+    console.error('✗ สองท่อของตัวเลือกปกหลุดจากกัน ' + drift.length + ' ข้อ\n  - ' + drift.join('\n  - '));
     process.exit(1);
   }
 }

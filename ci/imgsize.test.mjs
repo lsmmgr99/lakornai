@@ -1,0 +1,132 @@
+/* เทสต์ของตัวอ่านหัวไฟล์ภาพ `build/imgsize.mjs` — ตัวที่กฎ **V15** พึ่งอยู่
+   รัน: node --test ci/*.test.mjs   (คำสั่งเดียวกับที่ docs/publish-test.md §2 บันทึกไว้)
+
+   ทำไมอยู่ใน ci/ ทั้งที่โมดูลอยู่ใน build/: `node --test ci/*.test.mjs` คือคำสั่งที่เอกสารประกาศว่า
+   "เทสต์ของด่านทุกตัว" และ V15 เป็นด่านที่ล้ม build ได้ ⇒ เทสต์ของมันต้องอยู่ในชุดที่คนรันจริง
+   ไม่ใช่ไฟล์ที่ต้องจำว่าต้องรันเพิ่ม
+
+   ทำไมต้องมี (AIO-64 R4 + AIO-63 ข้อ 3 — สองฝั่งรีวิวจับตรงกัน): ก่อนหน้านี้ไม่มีเทสต์เลย และ
+   มีรอยจริงสองข้อที่วัดได้ด้วยบัฟเฟอร์ไม่กี่สิบไบต์ — ทั้งคู่ทำให้ V15 รายงานผิดในทางที่อันตราย:
+     (1) PNG ที่ chunk แรกไม่ใช่ IHDR เคยคืน "เลขขยะจากไบต์ 16–23" แทน null
+     (2) JPEG ที่มีไบต์เติม 0xFF (สเปกอนุญาต) เคยถูกปฏิเสธทั้งที่ถูกต้อง
+   fixtures ที่นี่เป็น **หัวไฟล์ที่ประกอบเอง** ไม่ใช่ไฟล์ในรีโป ⇒ เทสต์ไม่ขยับตามข้อมูลจริง
+   (เคสที่อ่านไฟล์จริงมีไว้ข้อเดียว เพื่อกันกรณี "ถูกทุกอย่างยกเว้นของจริง") */
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { imageSize } from '../build/imgsize.mjs';
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'lakorn-imgsize-'));
+process.on('exit', () => { try { fs.rmSync(TMP, { recursive: true, force: true }); } catch {} });
+let n = 0;
+const sizeOf = buf => {
+  const f = path.join(TMP, `fx-${++n}.bin`);
+  fs.writeFileSync(f, buf);
+  return imageSize(f);
+};
+
+const W = 2640, H = 1200;           /* ขนาดของ coverWide ตามสัญญา §13.4 — ใช้เป็นค่าทดสอบ */
+
+/* ---------- WebP ทั้งสามแบบ ----------
+   RIFF <len> WEBP <fourcc> … — ความยาวในหัว RIFF ไม่ถูกอ่านโดยตัวอ่าน จึงใส่ค่าใดก็ได้ */
+const riff = (fourcc, payload) => Buffer.concat([
+  Buffer.from('RIFF'), u32le(4 + 8 + payload.length), Buffer.from('WEBP'),
+  Buffer.from(fourcc), u32le(payload.length), payload,
+]);
+function u32le(v) { const b = Buffer.alloc(4); b.writeUInt32LE(v); return b; }
+
+test('WebP VP8 (lossy) อ่านกว้าง/สูงถูก', () => {
+  const p = Buffer.alloc(20);
+  p[3] = 0x9d; p[4] = 0x01; p[5] = 0x2a;        /* sync code อยู่ที่ไบต์ 23–25 ของไฟล์ */
+  p.writeUInt16LE(W & 0x3fff, 6); p.writeUInt16LE(H & 0x3fff, 8);
+  assert.deepEqual(sizeOf(riff('VP8 ', p)), { w: W, h: H });
+});
+
+test('WebP VP8L (lossless) อ่านกว้าง/สูงถูก', () => {
+  const p = Buffer.alloc(20);
+  p[0] = 0x2f;                                   /* signature ที่ไบต์ 20 ของไฟล์ */
+  p.writeUInt32LE(((W - 1) & 0x3fff) | (((H - 1) & 0x3fff) << 14), 1);
+  assert.deepEqual(sizeOf(riff('VP8L', p)), { w: W, h: H });
+});
+
+test('WebP VP8X (extended) อ่านกว้าง/สูงถูก', () => {
+  const p = Buffer.alloc(20);
+  p.writeUIntLE(W - 1, 4, 3); p.writeUIntLE(H - 1, 7, 3);
+  assert.deepEqual(sizeOf(riff('VP8X', p)), { w: W, h: H });
+});
+
+test('WebP ที่ลายเซ็น VP8L ไม่ถูก = null ไม่ใช่เลขเดา', () => {
+  const p = Buffer.alloc(20);
+  p[0] = 0x00;
+  p.writeUInt32LE(((W - 1) & 0x3fff) | (((H - 1) & 0x3fff) << 14), 1);
+  assert.equal(sizeOf(riff('VP8L', p)), null);
+});
+
+/* ---------- PNG ---------- */
+const PNG_SIG = Buffer.from('89504e470d0a1a0a', 'hex');
+const pngChunk = (type, len, w, h) => {
+  const b = Buffer.alloc(8 + 8);
+  b.writeUInt32BE(len, 0); b.write(type, 4, 'ascii'); b.writeUInt32BE(w, 8); b.writeUInt32BE(h, 12);
+  return Buffer.concat([PNG_SIG, b]);
+};
+test('PNG ปกติอ่านกว้าง/สูงถูก', () => {
+  assert.deepEqual(sizeOf(pngChunk('IHDR', 13, W, H)), { w: W, h: H });
+});
+test('PNG ที่ chunk แรกไม่ใช่ IHDR ต้องได้ null — ไม่ใช่เลขขยะจากไบต์ 16–23 (AIO-64 R4)', () => {
+  /* ของจริงที่เคยได้: {w:999,h:777} ⇒ V15 รายงานขนาดที่ไม่มีอยู่จริง และถ้าไบต์นั้นบังเอิญ
+     เป็น 2640×1200 ก็จะรับไฟล์ที่ไม่ตามสเปกเข้าระบบ */
+  assert.equal(sizeOf(pngChunk('eXIf', 13, 999, 777)), null);
+});
+test('PNG ที่สั้นกว่าหัวไฟล์ = null', () => {
+  assert.equal(sizeOf(PNG_SIG), null);
+});
+
+/* ---------- JPEG ---------- */
+const jpegWith = ({ fill = 0, pad = 0 } = {}) => {
+  const parts = [Buffer.from([0xff, 0xd8])];
+  /* APP1 นำหน้า SOF (EXIF/thumbnail) · ความยาวของหนึ่ง segment เป็น 16 บิต ⇒ ของจริงที่ใหญ่
+     กว่านั้นมาเป็นหลาย segment ต่อกัน ซึ่งเป็นรูปแบบเดียวกับที่ทำให้ SOF หลุดพ้น 64 KB แรก */
+  for (let left = pad; left > 0;) {
+    const chunk = Math.min(left, 60000);
+    const seg = Buffer.alloc(2 + 2 + chunk);
+    seg[0] = 0xff; seg[1] = 0xe1; seg.writeUInt16BE(2 + chunk, 2);
+    parts.push(seg);
+    left -= chunk;
+  }
+  if (fill) parts.push(Buffer.alloc(fill, 0xff)); /* fill bytes ที่สเปกอนุญาตก่อน marker */
+  const sof = Buffer.alloc(2 + 2 + 6 + 4);
+  sof[0] = 0xff; sof[1] = 0xc0; sof.writeUInt16BE(8 + 3, 2); sof[4] = 8;
+  sof.writeUInt16BE(H, 5); sof.writeUInt16BE(W, 7);
+  parts.push(sof, Buffer.alloc(16));             /* ท้ายไฟล์: ให้ลูปมีไบต์พอเดินถึง SOF */
+  return Buffer.concat(parts);
+};
+test('JPEG ปกติอ่านกว้าง/สูงถูก', () => {
+  assert.deepEqual(sizeOf(jpegWith()), { w: W, h: H });
+});
+test('JPEG ที่มีไบต์เติม 0xFF ก่อน marker ต้องอ่านออก — สเปกอนุญาต (AIO-64 R4)', () => {
+  for (const fill of [1, 2, 5]) {
+    assert.deepEqual(sizeOf(jpegWith({ fill })), { w: W, h: H }, `fill=${fill}`);
+  }
+});
+test('JPEG ที่ SOF อยู่เลย 64 KB แรก ต้องยังอ่านออก (EXIF/ICC ก้อนใหญ่ — AIO-64 R4)', () => {
+  assert.deepEqual(sizeOf(jpegWith({ pad: 100 * 1024 })), { w: W, h: H });
+});
+test('ไฟล์ที่ไม่ใช่ภาพเลย = null', () => {
+  assert.equal(sizeOf(Buffer.from('ไม่ใช่ภาพ'.repeat(10))), null);
+  assert.equal(imageSize(path.join(TMP, 'ไม่มีไฟล์นี้.webp')), null);
+});
+
+/* ---------- ของจริงในรีโป: กันกรณี "fixture ถูกหมดแต่ไฟล์จริงอ่านไม่ออก" ----------
+   ไม่ฝังขนาดไว้ในเทสต์ — เทียบกับค่าคงที่ของสัญญาที่ build ใช้จริง */
+test('อ่านปกจริงในรีโปได้ครบทุกใบ และได้ 2:3 ตามสัญญา §13.4', async () => {
+  const { SERIES } = await import('../build/content.mjs');
+  for (const s of SERIES) {
+    const dim = imageSize(path.join(ROOT, s.cover));
+    assert.ok(dim, `อ่านขนาด ${s.cover} ไม่ออก`);
+    assert.equal(+(dim.w / dim.h).toFixed(4), +(2 / 3).toFixed(4), `${s.cover} ไม่ใช่ 2:3`);
+  }
+});
