@@ -164,7 +164,22 @@ for (const { vp, after } of results) {
    เพราะไฟล์ชุดนั้นเป็นของ Visual ไม่ใช่ของใบงานนี้ */
 console.log('\n8. ข้อสังเกต (ไม่นับผล): ทำไมกล่องสื่อถึงยังไม่ใช้แผ่นกว้าง 11:5');
 console.log(`   กล่อง 16:9 ตัดเอากลางไฟล์ 11:5 ไว้ 80.8% (ขอบข้างละ 9.6%)`);
-console.log(`   ย่านคมของแผ่นวันนี้อยู่ที่ 0.55–0.91 ของความกว้าง ⇒ ซ้ายราว 44% ของกล่องเป็นพื้นเบลอ`);
+/* เลขย่านคมต้องอ่านจากไฟล์ที่วัดได้ ไม่พิมพ์มือ — เคยพิมพ์ไว้สองที่แล้วเลื่อนออกจากกัน
+   (เอกสาร 0.54 · ด่าน 0.55) ซึ่งเป็นเลขที่ส่งถึง CTO เป็นเหตุผลของกฎ M1/M2 */
+const SHARP = path.join(DIR, 'aio59-sharp.json');
+if (fs.existsSync(SHARP)) {
+  const s = JSON.parse(fs.readFileSync(SHARP, 'utf8'));
+  const st = s.rows.filter(r => r.file !== 'default.webp');
+  const sh = s.rows.map((r, i) => [r.file, s.sharpShareIn169[i]]).filter(([f]) => f !== 'default.webp').map(([, v]) => v);
+  const rng = (a, b) => `${a}–${b}`;
+  console.log(`   ย่านคมของแผ่น ${st.length} ใบที่เป็นเรื่องจริง: เริ่มที่ `
+    + `${rng(Math.min(...st.map(r => r.a)), Math.max(...st.map(r => r.a)))} `
+    + `จบที่ ${rng(Math.min(...st.map(r => r.b)), Math.max(...st.map(r => r.b)))} ของความกว้างไฟล์`);
+  console.log(`   ⇒ ในกล่อง 16:9 ส่วนที่อยู่ในย่านคมมีแค่ ${rng(Math.min(...sh), Math.max(...sh))}% ของความกว้างกล่อง`
+    + ` (วัดด้วย aio59-sharp.mjs เมื่อ ${s.at})`);
+} else {
+  console.log('   (ยังไม่มี aio59-sharp.json — รัน node design/v2/aio59-sharp.mjs เพื่อวัดย่านคม)');
+}
 console.log(`   ⇒ กฎ M2 ให้ถอยไปใช้ ${POSTER_SRC} · เทียบภาพได้ที่ shots/aio59-*-plate.png (${WIDE_SRC})`);
 
 console.log(`\nสรุป: ผ่าน ${pass} · ตก ${fail}`);

@@ -1,0 +1,134 @@
+{
+  "at": "2026-10-25",
+  "method": "central-difference luminance energy per column · smooth 2% · band >= 25% of max",
+  "cutSidePct": 9.6,
+  "band": {
+    "aMin": 0.182,
+    "aMax": 0.567,
+    "bMin": 0.812,
+    "bMax": 0.928,
+    "cMin": 0.517,
+    "cMax": 0.731
+  },
+  "rows": [
+    {
+      "file": "ayutthaya-love.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.55,
+      "b": 0.914,
+      "c": 0.724
+    },
+    {
+      "file": "billion-widow.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.536,
+      "b": 0.918,
+      "c": 0.694
+    },
+    {
+      "file": "ceo-cold.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.543,
+      "b": 0.923,
+      "c": 0.711
+    },
+    {
+      "file": "default.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.182,
+      "b": 0.812,
+      "c": 0.517
+    },
+    {
+      "file": "durian-revenge.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.545,
+      "b": 0.925,
+      "c": 0.731
+    },
+    {
+      "file": "heir-returns.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.545,
+      "b": 0.909,
+      "c": 0.699
+    },
+    {
+      "file": "house-13.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.545,
+      "b": 0.917,
+      "c": 0.713
+    },
+    {
+      "file": "mangosteen-heart.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.544,
+      "b": 0.916,
+      "c": 0.723
+    },
+    {
+      "file": "mirror-bride.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.554,
+      "b": 0.92,
+      "c": 0.727
+    },
+    {
+      "file": "one-night-bangkok.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.538,
+      "b": 0.928,
+      "c": 0.711
+    },
+    {
+      "file": "seedless-longan.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.539,
+      "b": 0.917,
+      "c": 0.708
+    },
+    {
+      "file": "undercover-tycoon.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.567,
+      "b": 0.913,
+      "c": 0.714
+    },
+    {
+      "file": "villainess-reborn.webp",
+      "w": 2640,
+      "h": 1200,
+      "a": 0.542,
+      "b": 0.92,
+      "c": 0.715
+    }
+  ],
+  "sharpShareIn169": [
+    43.8,
+    45.5,
+    44.7,
+    78,
+    44.4,
+    44.4,
+    44.4,
+    44.6,
+    43.3,
+    45.3,
+    45.2,
+    41.7,
+    44.8
+  ]
+}

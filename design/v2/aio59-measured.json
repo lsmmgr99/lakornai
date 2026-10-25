@@ -1,6 +1,6 @@
 {
   "at": "2026-10-25",
-  "feedSha": "4e183df57468",
+  "feedSha": "7e22146fd3b8",
   "demo": "durian-revenge",
   "wideSrc": "/design/v2/wide-out/durian-revenge.webp",
   "stories": 12,
@@ -38,7 +38,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -55,7 +55,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -72,7 +72,7 @@
           "fit": "contain",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "plate": {
@@ -93,7 +93,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "bisected": [],
@@ -125,7 +125,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -194,7 +194,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -211,7 +211,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -228,7 +228,7 @@
           "fit": "contain",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "plate": {
@@ -249,7 +249,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "bisected": [],
@@ -281,7 +281,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -350,7 +350,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -367,7 +367,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -384,7 +384,7 @@
           "fit": "contain",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "plate": {
@@ -405,7 +405,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "bisected": [],
@@ -437,7 +437,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -506,7 +506,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -523,7 +523,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -540,7 +540,7 @@
           "fit": "contain",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "plate": {
@@ -561,7 +561,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "bisected": [],
@@ -593,7 +593,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -662,7 +662,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -679,7 +679,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -696,7 +696,7 @@
           "fit": "contain",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "plate": {
@@ -717,7 +717,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "bisected": [],
@@ -749,7 +749,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -818,7 +818,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -835,7 +835,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -852,7 +852,7 @@
           "fit": "contain",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "plate": {
@@ -873,7 +873,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "bisected": [],
@@ -905,7 +905,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -974,7 +974,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -991,7 +991,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         },
         "fold": {
           "total": 9,
@@ -1008,7 +1008,7 @@
           "fit": "contain",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "plate": {
@@ -1029,7 +1029,7 @@
           "fit": "cover",
           "natW": 2640,
           "natH": 1200,
-          "src": "http://127.0.0.1:43757/design/v2/wide-out/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/design/v2/wide-out/durian-revenge.webp"
         }
       },
       "bisected": [],
@@ -1061,7 +1061,7 @@
           "fit": "cover",
           "natW": 1024,
           "natH": 1536,
-          "src": "http://127.0.0.1:43757/assets/covers/durian-revenge.webp"
+          "src": "http://127.0.0.1:40733/assets/covers/durian-revenge.webp"
         },
         "fold": {
           "total": 9,

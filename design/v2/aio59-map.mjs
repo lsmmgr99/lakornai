@@ -26,6 +26,17 @@ const OUT_JSON = path.join(DIR, 'aio59-measured.json');
 const DOC = path.join(DIR, 'AIO-59-FEED-ORIENTATION.md');
 const ROUND = n => +n.toFixed(1);
 
+/* ข้อความ "แผ่นกว้างคมไม่เต็มกล่อง" ต้องอ้างเลขที่วัดได้ ไม่ใช่เลขที่พิมพ์มือ —
+   เลขชุดนี้เคยอยู่สองที่แล้วเลื่อนออกจากกัน (เอกสาร 0.54 · ด่าน 0.55) */
+const SHARP_JSON = path.join(DIR, 'aio59-sharp.json');
+const SHARP_NOTE = (() => {
+  if (!fs.existsSync(SHARP_JSON)) return 'ย่านคมไม่เต็มกล่อง (รัน aio59-sharp.mjs เพื่อได้ตัวเลข)';
+  const s = JSON.parse(fs.readFileSync(SHARP_JSON, 'utf8'));
+  const sh = s.rows.map((r, i) => [r.file, s.sharpShareIn169[i]])
+    .filter(([f]) => f !== 'default.webp').map(([, v]) => v);
+  return `ส่วนที่คมมีแค่ ${Math.min(...sh)}–${Math.max(...sh)}% ของความกว้างกล่อง ที่เหลืออยู่ซ้าย`;
+})();
+
 /* ปุ่มที่ผู้ชมกดได้ในกล่องฟีด — เอามาจาก DOM ไม่ใช่รายชื่อที่เขียนมือ
    (2 ปุ่มหัวกล่อง + 4 ปุ่มแถวขวา + 2 ลูกศร + CTA "ดูทั้งเรื่อง" = 9 ชิ้นวันนี้) */
 const BTN_KEYS = ['topBtns', 'sideBtns', 'arrows', 'cta'];
@@ -213,7 +224,7 @@ const t2 = [
     const scrH = r.vp.h, fh = r.wide.frame.h;
     return [
       `| **(ค) ข้อเสนอนี้** · ${tag} | ปก 2:3 | **${pct(r.wide.clip.h, scrH)}%** | ${(r.wide.vis.seen * 100).toFixed(1)}% (ตัดบน-ล่าง) | **ใช่** | 0% | **ไม่ย้าย** |`,
-      `| (ค′) กฎเดียวกัน แต่ใส่แผ่นกว้าง 11:5 · ${tag} | coverWide | ${pct(r.plate.clip.h, scrH)}% | ${(r.plate.vis.seen * 100).toFixed(1)}% (ตัดข้างละ 9.6%) | **ไม่** — ซ้าย 44% เป็นพื้นเบลอของแผ่น | 0% | ไม่ย้าย |`,
+      `| (ค′) กฎเดียวกัน แต่ใส่แผ่นกว้าง 11:5 · ${tag} | coverWide | ${pct(r.plate.clip.h, scrH)}% | ${(r.plate.vis.seen * 100).toFixed(1)}% (ตัดข้างละ 9.6%) | **ไม่** — ${SHARP_NOTE} | 0% | ไม่ย้าย |`,
       `| (ข) เต็มจอครอปเหมือนวันนี้ · ${tag} | coverWide | ${pct(fh, scrH)}% | **${(r.crop.vis.seen * 100).toFixed(1)}%** | ไม่ | 0% | ไม่ย้าย |`,
       `| (ก2) 11:5 ในกรอบเดิมแบบ contain ปล่อยดำ · ${tag} | coverWide | ${pct(r.contain.vis.h, scrH)}% | 100% | ไม่ | **${pct(fh - r.contain.vis.h, fh)}%** | ไม่ย้าย |`,
       `| เรื่องแนวตั้งวันนี้ (ของอ้างอิง) · ${tag} | ปก 2:3 | ${pct(fh, scrH)}% | ${(r.tall.vis.seen * 100).toFixed(1)}% | ใช่ | 0% | — |`,
