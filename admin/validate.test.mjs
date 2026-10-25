@@ -10,8 +10,28 @@ test('seed inventory and preserved episode titles', () => {
   assert.equal(source.series.reduce((n,s)=>n+s.episodes.length,0),418);
   for (const s of source.series) for (const e of s.episodes) assert.deepEqual(Object.keys(e),['n','title','durationSec']);
 });
+// ADR-001 §13.3: the importer accepts v1 (legacy drafts must still open) but a v1 file
+// must not carry v2-only fields, and a v2 file must carry orientation on every series.
+test('importer accepts version 1 without the §13 fields',()=>{
+  const d=structuredClone(source);d.version=1;
+  for (const s of d.series) { delete s.orientation; delete s.coverWide; }
+  assert.deepEqual(run(d),[]);
+});
+test('importer accepts coverWide when the file exists',()=>{
+  const d=structuredClone(source);
+  d.series[0].coverWide='assets/covers/'+d.series[0].slug+'.webp';   // path rule must reject this
+  assert.ok(run(d).length);
+});
 for (const [name,change] of Object.entries({
-  version:d=>d.version=2,
+  version:d=>d.version=3,
+  orientationMissing:d=>delete d.series[0].orientation,
+  orientationCase:d=>d.series[0].orientation='Vertical',
+  orientationUnknown:d=>d.series[0].orientation='portrait',
+  orientationNull:d=>d.series[0].orientation=null,
+  orientationOnV1:d=>d.version=1,
+  horizontalWithoutWide:d=>d.series[0].orientation='horizontal',
+  wideMissingFile:d=>d.series[0].coverWide='assets/covers-wide/missing.webp',
+  wideTraversal:d=>d.series[0].coverWide='assets/covers-wide/../../content.json',
   duplicate:d=>d.series[1].slug=d.series[0].slug,
   registry:d=>d.series[0].genres=['missing'],
   numbering:d=>d.series[0].episodes[0].n=2,

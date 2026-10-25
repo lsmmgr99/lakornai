@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { imageSize } from './imgsize.mjs';
 
 export const DIR = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(DIR, '..');
@@ -16,8 +17,28 @@ export const ROOT = path.resolve(DIR, '..');
 /* ---------- ADR-001 §6: content.json ----------
    หลังบ้าน (AIO-23) เป็นคนผลิตไฟล์นี้ หน้าบ้านเป็นคนบริโภค
    วันนี้ยังไม่มีไฟล์ → ถอยไปอ่าน assets/data.js ตามที่โจทย์สั่ง ("ไม่ต้องรอ schema")
-   วันที่ไฟล์มา ให้วางที่ราก แล้ว build ใหม่ — ไม่ต้องแก้หน้าใดเลย */
-const KNOWN_VERSIONS = [1];
+   วันที่ไฟล์มา ให้วางที่ราก แล้ว build ใหม่ — ไม่ต้องแก้หน้าใดเลย
+
+   version 2 (ADR-001 §13.3 · AIO-57): เพิ่ม `orientation` บังคับ + `coverWide` ไม่บังคับ
+   `build/` รับเฉพาะ 2 — เลขขยับเพราะตัวอ่าน **เก่า** จะอ่านไฟล์ใหม่ผิดแบบเงียบ ๆ
+   (เรื่องแนวนอนลงกรอบ 9:16) ซึ่งเป็นเหตุที่ฟิลด์ `version` มีอยู่ตั้งแต่ต้น (กฎ V1)
+   ตัวนำเข้าของ `admin/` รับทั้ง 1 และ 2 เพื่อให้ไฟล์ที่ลูกค้าส่งออกไว้ก่อนหน้านี้ยังเปิดได้ */
+const KNOWN_VERSIONS = [2];
+
+/* ---------- ADR-001 §13: ทิศของเรื่อง และภาพกว้างใบที่สอง ----------
+   สองค่า ไม่มีค่าที่สาม ไม่มี null · ห้ามอนุมานจาก `genres`, จากสัดส่วนไฟล์ปก หรือจาก slug
+   (ของจริงวันนี้มีแค่ 5/12 เรื่องที่อยู่หมวด `vertical` ขณะที่ปกทั้ง 12 ใบเป็น 1024×1536
+    ⇒ อนุมานจากหมวดจะผิด 7 ใน 12 เรื่องทันทีวันแรก — ADR-001 §13.2) */
+export const ORIENTATIONS = ['vertical', 'horizontal'];
+/* ขนาด/เพดานของ `coverWide` ตามสัญญา §13.4 · กฎ V15 วัดของจริงจากหัวไฟล์ ไม่เชื่อชื่อไฟล์
+   ถ้า Visual เปลี่ยนทรง ให้แก้ตัวเลขที่นี่พร้อม §13.4/V15 ไม่ใช่เลิกกฎ "ขนาดเป๊ะ"
+   (เหตุผลของกฎคือแอตทริบิวต์ width/height ของ <img> มาจากค่าคงที่ ไม่ใช่จากไฟล์) */
+export const COVER_WIDE_W = 2640, COVER_WIDE_H = 1200;
+export const COVER_WIDE_MAX_BYTES = 300 * 1024;
+const COVER_WIDE_RE = /^assets\/covers-wide\/[a-z0-9][a-z0-9._-]*\.(webp|png|jpg|jpeg)$/;
+/* เรื่องแนวตั้งที่ยังไม่มีภาพกว้าง = เตือน ไม่ล้ม (V16) — รูปแบบเดียวกับ `shareMisses`
+   build/build.mjs เป็นปลายทางที่แสดงรายการนี้ */
+export const coverWideMisses = new Set();
 
 /* วันออกตอนเก็บเป็น enum ของสัญญา (ADR-001 §6.3.1) ทุกชั้นภายใน — ฟิลด์ `day`
    ข้อความไทยเป็น "ผลลัพธ์ปลายทาง" เท่านั้น ห้ามถอดวันกลับจากข้อความ
@@ -56,9 +77,14 @@ const thViews = n => n == null ? null
      views  → `null` ⇒ ไม่มีบรรทัด/ป้ายยอดวิวในหน้าใดเลย (ADR-001 §12.2 C1 · กฎ V12)
      tropes → `[]`   ⇒ ไม่มีชิปแท็ก (ADR-001 §6.5 ข้อ 2)
      cover  → ถอยไปใช้พาธตามแบบแผน
+     coverWide → ถอยไปใช้ `cover` ครอปแบบเดิมเป๊ะ + เตือนตอน build (V16 · §13.4)
    ไม่อยู่ในสัญญาและไม่อยู่ในรูปข้อมูลของเว็บจริงเลย
-     subs · following · cont — ดู §6.6/V9 และหมายเหตุที่ท้ายไฟล์นี้ */
-const REQUIRED_SERIES = ['slug', 'title', 'hook', 'synopsis', 'genres', 'eps', 'episodes'];
+     subs · following · cont — ดู §6.6/V9 และหมายเหตุที่ท้ายไฟล์นี้
+
+   `orientation` เข้ากลุ่ม "บังคับ" ไม่ใช่กลุ่ม "ไม่บังคับ" เพราะเกณฑ์ของกลุ่มหลังคือ
+   "หายแล้วไม่ render ส่วนนั้นเลย" ซึ่ง `orientation` ทำไม่ได้ — ไม่มีทาง "ไม่ render เพลเยอร์"
+   ค่านี้เลือกกล่องให้วิดีโอทั้งเรื่อง เดาผิดครั้งเดียวเสียหายทุกตอนของเรื่องนั้น (§13.2 D1) */
+const REQUIRED_SERIES = ['slug', 'title', 'hook', 'synopsis', 'genres', 'eps', 'episodes', 'orientation'];
 function requireFields(s) {
   for (const k of REQUIRED_SERIES) {
     const v = s[k];
@@ -72,6 +98,58 @@ function requireFields(s) {
   if (s.eps !== s.episodes.length) {
     throw new Error(`${s.slug}: eps = ${s.eps} แต่ episodes มี ${s.episodes.length} รายการ — `
       + `สองค่านี้ต้องตรงกัน (สมมติฐานของ assets/app.js ที่รีวิวด่าน 1 ชี้ไว้)`);
+  }
+}
+
+/* ---------- V14 ฝั่ง build · ทิศของเรื่อง ----------
+   `requireFields()` จับ "ขาด/ว่าง" ไปแล้ว ข้อนี้จับ "มีแต่เป็นค่าอื่น" ซึ่งอันตรายกว่า
+   เพราะ `"Vertical"` ติดตัวใหญ่หรือ `"portrait"` จะผ่านด่าน "ไม่ว่าง" ไปเงียบ ๆ */
+function checkOrientation(s) {
+  if (!ORIENTATIONS.includes(s.orientation)) {
+    throw new Error(`${s.slug}: ฟิลด์บังคับ "orientation" = ${JSON.stringify(s.orientation)} `
+      + `ซึ่งไม่อยู่ในชุดที่สัญญารู้จัก (${ORIENTATIONS.join(' | ')}) — ค่านี้เลือกกล่องให้วิดีโอ`
+      + ` ทั้งเรื่อง ห้ามเดาและห้ามมีค่าตั้งต้น (ADR-001 §13.2 · กฎ V14)`);
+  }
+}
+
+/* ---------- V15 + V16 · ภาพกว้างใบที่สอง ----------
+   V15 (ถ้ามีฟิลด์): พาธต้องตรงรูปแบบ · ไฟล์ต้องมีจริง · ขนาดต้อง 2640×1200 เป๊ะ · ≤300 KB
+   V16: แนวนอน ⇒ ต้องมี (ล้ม) · แนวตั้ง ⇒ ไม่มีก็ได้ (เตือน)
+
+   ข้อนี้ "ส่องโฟลเดอร์" เหมือน shareSlot() ไม่ได้ และเจตนาไม่เหมือนกัน (ADR-001 §13.1 D5):
+   ตัวเลือกไฟล์ต้องทำงานได้ทั้งฝั่ง build และฝั่งเบราว์เซอร์ (build/app.src.js) ซึ่งมองดิสก์
+   ไม่เห็น ⇒ แหล่งความจริงคือฟิลด์ในข้อมูล และดิสก์ย้ายบทบาทมาเป็น "ตัวตรวจ" คือข้อนี้ */
+function checkCoverWide(s) {
+  if (s.coverWide == null || s.coverWide === '') {
+    if (s.orientation === 'horizontal') {
+      throw new Error(`${s.slug}: orientation = "horizontal" แต่ไม่มี "coverWide" — `
+        + `เรื่องแนวนอนที่ไม่มีภาพกว้างได้เพลเยอร์กรอบ 16:9 ที่มีโปสเตอร์ 2:3 ครอปอยู่ข้างใน`
+        + ` ทุกการ์ดทรงกว้างครอป และภาพแชร์ครอป (ADR-001 §13.4 · กฎ V16)`);
+    }
+    coverWideMisses.add(s.slug);
+    return;
+  }
+  const rel = String(s.coverWide);
+  if (!COVER_WIDE_RE.test(rel)) {
+    throw new Error(`${s.slug}: "coverWide" = ${JSON.stringify(rel)} ไม่ตรงรูปแบบพาธที่สัญญา`
+      + `กำหนด (${COVER_WIDE_RE.source}) — โฟลเดอร์ใหม่แยกจาก assets/covers/ โดยเจตนา`
+      + ` เพราะโฟลเดอร์เดิมผูกไว้กับ "หนึ่งไฟล์ต่อเรื่อง" (ADR-001 §13.4 · กฎ V15)`);
+  }
+  const abs = path.join(ROOT, rel);
+  if (!fs.existsSync(abs)) {
+    throw new Error(`${s.slug}: "coverWide" ชี้ไป ${rel} แต่ไม่มีไฟล์นั้น — `
+      + `พาธผิดหรือไฟล์หาย = ภาพแตกบนเว็บจริง (เหตุผลเดียวกับกฎ V6 · กฎ V15)`);
+  }
+  const dim = imageSize(abs);
+  if (!dim || dim.w !== COVER_WIDE_W || dim.h !== COVER_WIDE_H) {
+    throw new Error(`${s.slug}: ${rel} ขนาด ${dim ? `${dim.w}×${dim.h}` : 'อ่านหัวไฟล์ไม่ออก'} `
+      + `แต่สัญญาบังคับ ${COVER_WIDE_W}×${COVER_WIDE_H} เป๊ะ — width/height ที่ <img> ประกาศ`
+      + ` มาจากค่าคงที่ในโค้ด ไฟล์ที่ขนาดไม่ตรงจะพา CLS กลับมาเงียบ ๆ (กฎ V15)`);
+  }
+  const bytes = fs.statSync(abs).size;
+  if (bytes > COVER_WIDE_MAX_BYTES) {
+    throw new Error(`${s.slug}: ${rel} หนัก ${Math.round(bytes / 1024)} KB เกินเพดาน `
+      + `${COVER_WIDE_MAX_BYTES / 1024} KB — ไฟล์นี้เป็นภาพ LCP ของหน้าแรก (กฎ V15)`);
   }
 }
 
@@ -91,7 +169,12 @@ function checkViewsSource(src, series) {
 
 function fromContentJson(j) {
   if (!KNOWN_VERSIONS.includes(j.version)) {
-    throw new Error(`content.json version ${j.version} — generator นี้รู้จักแค่ ${KNOWN_VERSIONS.join(',')} (ADR-001 กฎ V1)`);
+    throw new Error(`content.json version ${j.version} — generator นี้รู้จักแค่ ${KNOWN_VERSIONS.join(',')} (ADR-001 กฎ V1)`
+      + (j.version === 1
+        ? `\n  version 1 ไม่มีฟิลด์ "orientation" ⇒ build ไม่รู้ทิศของเรื่อง และทางเดียวที่เหลือคือเดา`
+          + `\n  ซึ่ง ADR-001 §13.2 ห้าม · ย้ายไฟล์ก่อนด้วย: node tools/migrate-content-orientation.mjs`
+          + `\n  (ตัวนำเข้าของ admin/ ยังรับ version 1 ได้ เพื่อให้ไฟล์ที่ส่งออกไว้ก่อนหน้านี้เปิดได้ · §13.3)`
+        : ''));
   }
   const viewsSource = (j.meta || {}).viewsSource || 'none';
   checkViewsSource(viewsSource, j.series);
@@ -107,6 +190,8 @@ function fromContentJson(j) {
     })),
     series: j.series.map(s => {
       requireFields(s);
+      checkOrientation(s);
+      checkCoverWide(s);
       const day = dayOf(s.slug, s.releaseDay, s.status === 'ended');
       return {
       slug: s.slug, title: s.title, genres: s.genres, tropes: s.tropes || [], eps: s.eps,
@@ -115,6 +200,11 @@ function fromContentJson(j) {
       c1: (s.theme || {}).c1 || '#2a2733', c2: (s.theme || {}).c2 || '#4a4556',
       cast: s.cast || [], hook: s.hook, synopsis: s.synopsis,
       cover: s.cover || `assets/covers/${s.slug}.webp`,
+      /* สองฟิลด์นี้ต้องเดินทางไปถึงเบราว์เซอร์ด้วย (assets/content.js = window.LAKORN)
+         เพราะ build/app.src.js เป็นท่อการวาดปกท่อที่สอง และเลือกไฟล์จากดิสก์ไม่ได้
+         `coverWide: null` = "ยังไม่มีภาพกว้าง" ⇒ ตัวเลือกไฟล์ถอยไปใช้ `cover` (§13.4) */
+      orientation: s.orientation,
+      coverWide: s.coverWide || null,
       episodes: s.episodes.map(e => [e.title, mmss(e.durationSec)]),
       };
     }),
@@ -131,8 +221,18 @@ function fromContentJson(j) {
      following / cont          → ตัด · §6.6 + กฎ V9 (ของผู้ใช้อยู่ที่ localStorage)
      subs (ซับไตเติลสมมติ)     → ตัด · ยังไม่มีไฟล์วิดีโอและไม่มีไฟล์ซับในสัญญา */
 function fromDataJs(d) {
+  /* ทางถอยนี้ไปต่อไม่ได้แล้วหลัง §13: `orientation` เป็นฟิลด์บังคับและ "ห้ามมีค่าตั้งต้น"
+     ขณะที่ `assets/data.js` เป็นของชั้นออกแบบซึ่ง build **ห้ามเขียนทับ** (หัวไฟล์นี้)
+     ⇒ เติมค่าให้เองไม่ได้ (ขัด D1) และแก้ไฟล์ต้นทางก็ไม่ได้ · ล้มพร้อมบอกทางออกดีกว่า
+     ปล่อยให้ requireFields() ฟ้องว่า "ขาดฟิลด์" ซึ่งชี้ให้คนไปเติมในไฟล์ที่ห้ามแก้ */
+  if (d.series.some(s => s.orientation == null)) {
+    throw new Error('assets/data.js ไม่มีฟิลด์ "orientation" และเติมให้เองไม่ได้ '
+      + '(ADR-001 §13.2 D1 ห้ามค่าตั้งต้น · และ build ห้ามเขียนทับไฟล์ของชั้นออกแบบ) — '
+      + 'เว็บจริงต้องอ่านจาก content.json version 2 ที่ราก');
+  }
   const series = d.series.map(s => {
     requireFields(s);
+    checkOrientation(s);
     const ended = s.status === 'จบแล้ว';
     const th = String(s.status).replace(/^ตอนใหม่/, '');
     const day = ended ? null : DAY_ENUM[th];
@@ -165,6 +265,17 @@ export const HAS_VIEWS = VIEWS_SOURCE !== 'none';
 
 export const SERIES = D.series;
 export const BY = Object.fromEntries(SERIES.map(s => [s.slug, s]));
+
+/* ---------- ADR-001 §13.7 D8: ฟีดไม่รวมเรื่องแนวนอน ----------
+   `/feed/` เป็นหน้าเลื่อนเต็มจอทีละเรื่อง เครื่องเรือนทุกชิ้นวางพิงกรอบแนวตั้ง
+   คลิป 16:9 ในกรอบเต็มจอมือถือ 9:16 เหลือภาพจริงราว 32% ของความสูงจอ = แย่กว่าครอป
+   เรื่องแนวนอนไม่ได้ถูกซ่อน — ยังอยู่ครบในหน้าแรก /browse/ /popular/ ตารางออกตอน
+   หน้าเรื่อง และหน้าตอน · ที่ตัดคือผิวเดียวที่รูปแบบขัดกับคอนเทนต์
+
+   ⚠️ ชื่อนี้คือ "ทิศของไฟล์" ไม่ใช่ "หมวด `vertical`" ในทะเบียน `genres` ซึ่งเป็นหมวด
+      บรรณาธิการคนละเรื่องกัน (วันนี้ 5/12 เรื่องอยู่หมวดนั้น แต่ 12/12 เรื่องเป็นทิศตั้ง) */
+export const isVertical = s => s.orientation === 'vertical';
+export const FEED_SERIES = SERIES.filter(isVertical);
 export const genreLabel = slug => (D.genres.find(g => g.slug === slug) || {}).label || slug;
 export const genreOf = slug => D.genres.find(g => g.slug === slug);
 export const seriesOfGenre = g => SERIES.filter(s => s.genres.includes(g));

@@ -3,7 +3,8 @@
    เขียนออกเป็นไฟล์เว็บจริงที่ราก · ไม่แตะไฟล์ใด ๆ ใต้ design/v2/ (Visual เป็นเจ้าของ) */
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, SERIES, U, OPEN_TAGS, CAST_PAGES, D, VIEWS_SOURCE, HAS_VIEWS, RANK_BASIS } from './content.mjs';
+import { ROOT, SERIES, U, OPEN_TAGS, CAST_PAGES, D, VIEWS_SOURCE, HAS_VIEWS, RANK_BASIS,
+  FEED_SERIES, coverWideMisses } from './content.mjs';
 import { PAGES } from './ui.mjs';
 import { robotsTxt, sitemapXml, PUBLISHED, SITE_ORIGIN, shareMisses } from './seo.mjs';
 import * as A from './pages-discovery.mjs';
@@ -340,9 +341,20 @@ write('redirects.map',
 const idx = PAGES.filter(p => !/noindex/.test(p.robots)).length;
 console.log(`✓ สร้าง ${PAGES.length} หน้า (เปิดดัชนี ${idx} · noindex ${PAGES.length - idx})`);
 console.log(`  เรื่อง ${SERIES.length} · ตอน ${SERIES.reduce((a, s) => a + s.eps, 0)} · แนว ${D.genres.length} · แท็กที่เปิด ${OPEN_TAGS.length} · หน้าตัวละคร ${CAST_PAGES.length}`);
+console.log(`  ทิศ: แนวตั้ง ${FEED_SERIES.length} · แนวนอน ${SERIES.length - FEED_SERIES.length}`
+  + ` (ฟีดรับเฉพาะแนวตั้ง · ADR-001 §13.7 D8) · ภาพกว้างที่ประกาศแล้ว ${SERIES.filter(s => s.coverWide).length}/${SERIES.length}`);
 console.log(`  sitemap ${sitemapUrls.length} URL · redirect stub ${REDIRECTS.length} ไฟล์ · robots.txt = ${PUBLISHED ? 'Allow' : 'Disallow ทั้งเว็บ (ยังไม่เผยแพร่)'}`);
 if (shareMisses.size) {
   console.log(`  ⚠ ยังไม่มีภาพแชร์ 1200×630 — og:image ถอยไปใช้ปก 2:3 ไปก่อน (AC-7)`);
   console.log(`    วางไฟล์ลง assets/share/ ตามชื่อใน build/seo.mjs แล้ว build ใหม่ ไม่ต้องแก้โค้ด`);
+}
+/* V16 ครึ่ง "เตือน" — เรื่องแนวตั้งที่ยังไม่มีภาพกว้าง ไม่ใช่ความผิด แต่ต้องมองเห็น
+   ไม่ใช่เงียบ · ครึ่ง "ล้ม" (เรื่องแนวนอนที่ไม่มีภาพกว้าง) อยู่ที่ build/content.mjs
+   ต่างจาก shareMisses ตรงที่ไฟล์ไม่ได้ถูกเลือกจากโฟลเดอร์ แต่จากฟิลด์ในข้อมูล (§13.4 D5)
+   ⇒ วาง .webp ลงโฟลเดอร์แล้ว build ใหม่ยังไม่พอ ต้องเติมฟิลด์ใน content.json ด้วย */
+if (coverWideMisses.size) {
+  console.log(`  ⚠ ยังไม่มีภาพกว้าง 2640×1200 ${coverWideMisses.size}/${SERIES.length} เรื่อง`
+    + ` — ทุกที่วางที่ขอทรงกว้างถอยไปใช้ปก 2:3 ครอปแบบเดิม (ADR-001 §13.4 · กฎ V16)`);
+  console.log(`    วางไฟล์ลง assets/covers-wide/<slug>.webp แล้ว **เติมฟิลด์ coverWide ใน content.json**`);
 }
 if (warns.length) console.log(`  ⚠ คำเตือน ${warns.length} ข้อ:\n    - ` + warns.slice(0, 12).join('\n    - '));

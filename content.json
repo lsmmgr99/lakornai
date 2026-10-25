@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "generatedAt": "2026-10-22T21:41:56.130Z",
   "meta": {
     "viewsSource": "none"
@@ -103,6 +103,7 @@
       "status": "ongoing",
       "releaseDay": "daily",
       "cover": "assets/covers/durian-revenge.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "หมอนทอง",
@@ -253,6 +254,7 @@
       "status": "ended",
       "releaseDay": null,
       "cover": "assets/covers/ceo-cold.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "ธาม",
@@ -582,6 +584,7 @@
       "status": "ongoing",
       "releaseDay": "fri",
       "cover": "assets/covers/mirror-bride.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "แพรว",
@@ -701,6 +704,7 @@
       "status": "ongoing",
       "releaseDay": "daily",
       "cover": "assets/covers/ayutthaya-love.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "ขวัญข้าว",
@@ -933,6 +937,7 @@
       "status": "ended",
       "releaseDay": null,
       "cover": "assets/covers/billion-widow.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "ดาว",
@@ -1214,6 +1219,7 @@
       "status": "ongoing",
       "releaseDay": "tue",
       "cover": "assets/covers/one-night-bangkok.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "Emma",
@@ -1395,6 +1401,7 @@
       "status": "ended",
       "releaseDay": null,
       "cover": "assets/covers/seedless-longan.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "ลำไยน้อย",
@@ -1524,6 +1531,7 @@
       "status": "ongoing",
       "releaseDay": "sat",
       "cover": "assets/covers/house-13.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "ต้นกล้า",
@@ -1614,6 +1622,7 @@
       "status": "ongoing",
       "releaseDay": "daily",
       "cover": "assets/covers/villainess-reborn.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "อรุณี",
@@ -1871,6 +1880,7 @@
       "status": "ongoing",
       "releaseDay": "daily",
       "cover": "assets/covers/undercover-tycoon.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "ลุงชัย",
@@ -2083,6 +2093,7 @@
       "status": "ended",
       "releaseDay": null,
       "cover": "assets/covers/heir-returns.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "Lucas",
@@ -2389,6 +2400,7 @@
       "status": "ongoing",
       "releaseDay": "daily",
       "cover": "assets/covers/mangosteen-heart.webp",
+      "orientation": "vertical",
       "views": null,
       "cast": [
         "มังคุดแก้ว",
