@@ -74,19 +74,27 @@
       → ตก 1 ข้อ: "เพลเยอร์หน้าตอน (เรื่องแนวนอน)" ประกาศ 9/16 แต่ต้องได้ --ar-stage-h
       ⚠️ ข้อนี้ **เคยเขียว** ตอนด่านไปแต่หน้าตอนของเรื่องแนวตั้ง — เหตุที่แผนที่ต้องมีสองรายการ
          สำหรับ `.player` และต้องหยิบเรื่องจากคลังของสถานะนั้นด้วย `atFor`
-   M6 เปลี่ยน `.cont .thumb` กลับไปขอทรง 'poster' → ตก "ไฟล์ที่โหลดคือไฟล์ของทรง 'wide'"
-   M7 ฝัง `width="1024" height="1536"` กลับที่การ์ด "ดูต่อ" (กฎ V18)
-      → ตก "<img width/height> = ขนาดไฟล์จริงบนดิสก์" (ประกาศ 1024×1536 แต่ไฟล์ 2640×1200)
-   M8 เอาตัวกรองทิศออกจากฟีดฝั่งเบราว์เซอร์ (`list = D.series`) = D8 รั่วฝั่งที่ HTML มองไม่เห็น
-      → ตก 2 ข้อ: เดินครบวงแล้วเจอเรื่องแนวนอน · ตัวนับได้ 12 ขณะฝั่ง build ได้ 11
-   M9 ถอด `.hero .bg picture{display:block}` → ตก 2 ข้อ (picture display=inline ทั้งสองความกว้าง) */
+   M6 เปลี่ยน `.cont .thumb` จาก 'auto' กลับเป็น 'poster' → ตก "ไฟล์ที่โหลดคือไฟล์ของทรง 'auto'"
+      ⚠️ ข้อนี้ก็ **เคยเขียว** ตอนรอบซีดมีแต่สองเรื่องแรกของคลัง (แนวตั้งทั้งคู่) — เหตุที่
+         สภาพ 'shape' ต้องซีดเรื่องท้ายคลังเพิ่ม (ดู SHAPE_SEED_SLUGS) · รูเดียวกับ M5
+   M7 ฝัง `width="1024" height="1536"` กลับที่การ์ด "ดูต่อ" → **build ล้มที่กฎ V18** ก่อนถึงด่าน
+      (ด่านรายงานเป็นข้อตก "build ต้นไม้ชั่วคราวผ่าน") — สองชั้นจับข้อนี้ ไม่ใช่ชั้นเดียว
+   M8 **เพิ่ม**ตัวกรองทิศกลับเข้าฟีดฝั่งเบราว์เซอร์ = ขัด D8 ฉบับกลับทาง (มติลูกค้า)
+      → ตก 3 ข้อ: V17 ก (ขาด mangosteen-heart · ซ้ำ durian-revenge) · วงไม่ปิด · V17 ข (N=11 ≠ 12)
+   M9 ถอด `.hero .bg picture{display:block}` → ตก 2 ข้อ (picture display=inline ทั้งสองความกว้าง)
+   M10 ไม่เขียนทิศลงกล่องตอนสลับเรื่องในฟีด (`box.dataset.orientation`)
+      → ตก V17 ค ครึ่งข้อมูล: กล่องบอก vertical แต่ข้อมูลบอก horizontal
+   M11 เลือกไฟล์ครั้งเดียวแทนเลือกใหม่ทุกครั้งที่สลับเรื่อง (`coverSlot(s,'poster')` ใน `show()`)
+      → ตก "ภาพในเพลเยอร์ฟีดได้ไฟล์ของทรง 'auto' ทุกก้าว" */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { D, SERIES, U, epSecs, COVER_WIDE_W, COVER_WIDE_H } from '../build/content.mjs';
+/* TOP10 เรียงด้วย `eps` (RANK_BASIS) ไม่ใช่ด้วยทิศ ⇒ TOP10[0] เท่ากันทั้งสองสถานะ
+   จึงใช้เป็นค่าอ้างอิงของ "เรื่องแรกที่ฟีดเปิด" ได้ทั้งรีโปจริงและต้นไม้ชั่วคราว */
+import { D, SERIES, TOP10, U, epSecs, COVER_WIDE_W, COVER_WIDE_H } from '../build/content.mjs';
 import { imageSize } from '../build/imgsize.mjs';
 import { HERO_WIDE_BP } from '../build/pages-discovery.mjs';
 import { siteFiles } from '../ci/site-files.mjs';
@@ -217,6 +225,19 @@ const SHAPE_TOL = 0.02;          /* ±2% ตามใบงาน — เกณ�
 const SHAPE_MAX_UNDECLARED = 3;
 const SHAPE_WIDE_DIR = 'assets/covers-wide';
 
+/* ---------- V17 ข้อ ค ครึ่งหลัง: ทรงของกล่องสื่อในฟีดเมื่อเรื่องเป็นแนวนอน ----------
+   16/9 คือทรงของ **ไฟล์วิดีโอ** ไม่ใช่คำตัดสินการวาง (ADR-001 §13.10 ข้อ 7)
+   ถ้า AIO-59 กำหนดกรอบที่ไม่ใช่ 16/9 ให้ **แก้ตัวเลขนี้ตามกฎนั้น** ไม่ใช่เลิกข้อ ค */
+const FEED_BOX_AR = 16 / 9;
+/* ❗ ช่องโหว่ที่ประกาศไว้ตรง ๆ ไม่ใช่ที่ลืม
+   ข้อ ค ครึ่งทรงอ่าน "กล่องสื่อ" ซึ่ง **อิลิเมนต์และกฎกรอบของมันเป็นของ UX-Designer (AIO-59)**
+   ตามที่ ADR-001 §13.7/§13.10 ข้อ 7 ล็อกไว้ และ AIO-59 ยังไม่ส่งกฎมา
+   ⇒ Dev เขียนกฎกรอบเองคือการตัดสินการวางแทน UX ซึ่งสัญญาห้าม · ด่านจึง **วัดและพิมพ์ของจริง
+     ทุกรอบ** แต่ยังไม่ทำให้แดง · วันที่ AIO-59 ลง: ตั้งค่านี้เป็น `false` แล้วข้อนี้เป็นด่านจริง
+     ทันทีโดยไม่ต้องเขียนโค้ดเพิ่ม · ราคาวันนี้ = ศูนย์ (0 เรื่องแนวนอนในรีโป · เจอเฉพาะใน
+     สถานะ ข ที่ด่านสร้างขึ้นเอง) · **ห้ามใช้ค่านี้ปิดข้ออื่น** — ครึ่งข้อมูลของข้อ ค บังคับอยู่ */
+const V17C_BOX_PENDING_AIO59 = true;
+
 /* ---------- แผนที่ที่วาง ----------
    ยกมาจากตารางที่วางของ ADR-001 §13.5 (ฝั่ง build 12 จุด + ฝั่งเบราว์เซอร์) และจากแผนที่
    ของ AIO-56 §1 ซึ่งวัดกล่องทุกช่องไว้แล้ว · `shape` คือ "ทรงที่ที่วางนี้ขอ" ตามสัญญา
@@ -241,7 +262,7 @@ const SHAPE_MAP = [
   /* declared:false เพราะกล่องนี้ไม่มี aspect-ratio เลย (flex:1 + ความสูงตรึง 200px) ⇒ ทรง
      เปลี่ยนตามจอโดยไม่มีใครตั้งใจ · Visual วัดเองและบันทึกเป็นข้อค้างไว้ใน AIO-56 §5
      เป็นของ Visual ไม่ใช่ของ AIO-57 — ที่นี่แค่ไม่กล่าวอ้างว่าตรวจแล้วผ่าน */
-  { key: 'แถบรีลในไทล์ฟีด', sel: '.btile .reelstrip span', at: U.home, shape: 'poster', declared: false },
+  { key: 'แถบรีลในไทล์ฟีด', sel: '.btile .reelstrip span', at: U.home, shape: 'auto', declared: false },
   { key: 'ดัชนีทุกเรื่อง', sel: '.flatlist .th2', at: U.az, shape: 'poster' },
   /* เพลเยอร์ต้องวัด **สองเรื่อง** ไม่ใช่เรื่องเดียว — นี่คือรูที่มิวเทชัน M5 เปิดให้เห็น:
      ถ้าด่านไปแต่หน้าตอนของเรื่องแนวตั้ง การคืนกฎ "เพลเยอร์ 9:16 ตายตัว" จะเขียวทั้งแผง
@@ -251,8 +272,13 @@ const SHAPE_MAP = [
     atFor: st => { const s = Object.values(st.by).find(x => x.orientation === 'vertical'); return s ? U.watch(s.slug, 1) : null; } },
   { key: 'เพลเยอร์หน้าตอน (เรื่องแนวนอน)', sel: '.player', shape: 'auto', player: true, needs: 'horizontal',
     atFor: st => { const s = Object.values(st.by).find(x => x.orientation === 'horizontal'); return s ? U.watch(s.slug, 1) : null; } },
-  { key: 'เพลเยอร์ฟีด', sel: '.player.full', at: U.feed, shape: 'poster', player: true, declared: false },
-  { key: 'การ์ดดูต่อ (หน้าแรก)', sel: '.cont .thumb', at: U.home, shape: 'wide', mode: 'shape' },
+  /* 'auto' ไม่ใช่ 'poster' ตาม D8 ฉบับกลับทาง: ช่องนี้มีกรณีกว้างจริงตั้งแต่เรื่องแนวนอนเรื่องแรก
+     declared:false เพราะกล่องตั้งใจเต็มจอ (aspect-ratio:auto + height) ⇒ ทรงของกล่องสื่อ
+     เมื่อเรื่องเป็นแนวนอนเป็นของ AIO-59 · ด่าน V17 ข้อ ค ข้างล่างเป็นที่ที่บังคับข้อนั้น */
+  { key: 'เพลเยอร์ฟีด', sel: '.player.full', at: U.feed, shape: 'auto', player: true, declared: false },
+  /* ช่องนี้ **เคยเป็น 'wide'** และเปลี่ยนเป็น 'auto' โดยคำตัดสินของ CTO ตามข้อเสนอของ Visual
+     (AIO-56 §4.2 → AIO-58 · ADR-001 §13.5) · กรอบของการ์ดยัง 16/9 เปลี่ยนเฉพาะไฟล์ที่ได้ */
+  { key: 'การ์ดดูต่อ (หน้าแรก)', sel: '.cont .thumb', at: U.home, shape: 'auto', mode: 'shape' },
   /* คลังมีสองผิวที่สลับกันด้วย media query: `.lib-list` (มือถือ) และ `.lib-grid` (≥720px)
      ทั้งคู่ถูก assets/app.js สร้างจาก localStorage ⇒ ถ้าวัดแค่ผิวเดียว อีกผิวไม่มีด่านเลย */
   { key: 'รายการในคลัง (มือถือ)', sel: '.lib-list .controw .th', at: U.library, shape: 'poster', mode: 'shape' },
@@ -281,11 +307,24 @@ const UNSEED_SCRIPT = `try{localStorage.removeItem('lakorn.cont')}catch(e){}`;
 /* สภาพที่ 3 สำหรับส่วน 6: ที่วางบางช่องต้องมีของอย่างอื่นในเครื่องด้วย ไม่ใช่แค่ `lakorn.cont`
      follows → `.notif .th` (หน้าแจ้งเตือนวาดจากรายการติดตาม)
      set.autoplay:false → การ์ด "ตอนถัดไป" ต้องไม่นับถอยหลังแล้วพาหน้าเปลี่ยนไปกลางการวัด
-   สองเรื่องแรกของคลังเหมือนรอบซีด — คำนวณจาก build นี้ ไม่ใช่รายชื่อที่เขียนมือ */
+
+   ⚠️ **ต้องซีดเรื่องท้ายคลังเพิ่มด้วย ไม่ใช่สองเรื่องแรกเหมือนรอบซีดของส่วน 2/3**
+      เรื่องที่สถานะ ข ตั้งเป็น `horizontal` คือ **เรื่องท้ายคลัง** ⇒ ถ้าซีดแค่สองเรื่องแรก
+      (ซึ่งเป็นแนวตั้งทั้งคู่) การ์ด "ดูต่อ" จะไม่มีเรื่องแนวนอนเลย แล้วมิวเทชัน M6
+      ("เปลี่ยน `.cont .thumb` จาก auto กลับเป็น poster") **เขียวทั้งแผง** — วัดแล้ว
+      นี่คือรูเดียวกับ M5 ที่เพลเยอร์: ด่านต้องเห็นของทั้งสองทิศ ไม่ใช่ทิศเดียว
+      (ไม่แก้ `SEED_CONT`/`SEED_ENTRIES` เพราะส่วน 2/3 ตรึงจำนวนการ์ดไว้ตามเกณฑ์ของ AIO-54) */
+const SHAPE_SEED_SLUGS = [...new Set([...SEED_ENTRIES.map(e => e[0]), SERIES[SERIES.length - 1].slug])];
+const SHAPE_CONT = Object.fromEntries(SHAPE_SEED_SLUGS.map((slug, i) => {
+  const s = SERIES.find(x => x.slug === slug);
+  const ep = Math.min(2, s.eps);
+  const dur = epSecs(s.episodes[ep - 1][1]);
+  return [slug, { ep, sec: Math.round(dur / 2), dur, ts: 1761000000000 - i * 60000 }];
+}));
 const SHAPE_SET = { autoplay: false, sound: false, subs: true, notify: true };
 const SHAPE_SCRIPT = `try{
-  localStorage.setItem('lakorn.cont',${JSON.stringify(JSON.stringify(SEED_CONT))});
-  localStorage.setItem('lakorn.follows',${JSON.stringify(JSON.stringify(SEED_ENTRIES.map(e => e[0])))});
+  localStorage.setItem('lakorn.cont',${JSON.stringify(JSON.stringify(SHAPE_CONT))});
+  localStorage.setItem('lakorn.follows',${JSON.stringify(JSON.stringify(SHAPE_SEED_SLUGS))});
   localStorage.setItem('lakorn.set',${JSON.stringify(JSON.stringify(SHAPE_SET))});
 }catch(e){}`;
 
@@ -451,7 +490,7 @@ async function setStorageMode(mode) {
 const MODE_LABEL = {
   new: 'ผู้ใช้ใหม่ (localStorage ว่าง)',
   seeded: `ผู้ใช้ที่กลับมา (ซีด lakorn.cont ${SEED_ENTRIES.length} เรื่อง)`,
-  shape: `ผู้ใช้ที่กลับมา + ติดตาม ${SEED_ENTRIES.length} เรื่อง + ปิดเล่นอัตโนมัติ`,
+  shape: `ผู้ใช้ที่กลับมา ${SHAPE_SEED_SLUGS.length} เรื่อง (รวมเรื่องท้ายคลัง = เรื่องแนวนอนในสถานะ ข) + ติดตามชุดเดียวกัน + ปิดเล่นอัตโนมัติ`,
 };
 
 /* ---------- 4. ตัวตรวจเรขาคณิตฮีโร่ ----------
@@ -816,21 +855,36 @@ const FINISH_SCRIPT = `(function(){
   return 'ok';
 })()`;
 
-/* ฟีด: เดินครบวงด้วยปุ่มของจริง แล้วรายงานทุก slug ที่ผ่านตา + ตัวนับที่หน้าแสดง (กฎ V17) */
+/* ฟีด: เดินครบวงด้วย **ปุ่มของจริง** (ไม่เรียกฟังก์ชันภายในของแอป) แล้วรายงานทุก slug ที่
+   ผ่านตา · ทิศที่กล่องประกาศในแต่ละก้าว · ตัวนับที่หน้าแสดง · และกล่องสื่อที่วัดได้ (กฎ V17)
+   เดิน `n` ครั้งจากจุดเริ่ม ⇒ ได้ n+1 รายการ: n รายการแรกต้องไม่ซ้ำและครบคลัง
+   รายการที่ n+1 ต้องวนกลับมาเท่ารายการแรก (พิสูจน์ว่าวงปิดพอดี ไม่ใช่ลิสต์สั้นกว่าคลัง) */
 const FEED_WALK = n => `(async function () {
   var box = document.getElementById('feedPlayer');
   if (!box) return { empty: true, text: (document.querySelector('#main') || {}).textContent || '' };
   var next = document.getElementById('feedNext');
-  var seen = [box.dataset.slug], orients = [box.dataset.orientation];
+  var step = function () {
+    var im = box.querySelector('img');
+    var r = im ? im.getBoundingClientRect() : box.getBoundingClientRect();
+    var cs = getComputedStyle(box);
+    return {
+      slug: box.dataset.slug, orientation: box.dataset.orientation,
+      pos: (document.getElementById('feedPos') || {}).textContent || '',
+      /* กล่องสื่อ = อิลิเมนต์ที่ถือภาพ · วันนี้คือรูปที่เต็มกล่อง .player.full
+         (อิลิเมนต์ที่ถูกต้องตามกฎการวางของ AIO-59 อาจเป็นตัวอื่น — ดู V17C_BOX_RULE_OWNER) */
+      boxAr: r.height > 0 ? +(r.width / r.height).toFixed(4) : null,
+      boxW: Math.round(r.width), boxH: Math.round(r.height),
+      declaredAr: cs.aspectRatio,
+      file: im ? (im.currentSrc || im.src).split('/').slice(-2).join('/') : null,
+    };
+  };
+  var steps = [step()];
   for (var i = 0; i < ${n}; i++) {
     next.click();
     await new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); });
-    seen.push(box.dataset.slug); orients.push(box.dataset.orientation);
+    steps.push(step());
   }
-  return {
-    empty: false, seen: seen, orients: orients,
-    pos: (document.getElementById('feedPos') || {}).textContent || '',
-  };
+  return { empty: false, steps: steps };
 })()`;
 
 /* ---------- 5.1.6 ต้นไม้ชั่วคราว "สถานะมีภาพกว้างจริง" ----------
@@ -1533,33 +1587,93 @@ try {
           `sources=${JSON.stringify(it.sources)} · picture display=${it.img.wrapDisplay}`);
       }
 
-      /* --- S7 · ฟีดไม่รวมเรื่องแนวนอน ทั้งใน HTML และตอนเดินด้วยปุ่มจริง (กฎ V17) --- */
-      const vSlugs = new Set(verticals.map(s => s.slug));
+      /* --- กฎ V17 (กลับขั้วแล้วโดยมติลูกค้า 25 ต.ค. 2026 · AIO-58) ---
+         ล้มเมื่อฟีด **ขาด** เรื่อง ไม่ใช่เมื่อฟีดมีเรื่องแนวนอน
+         วัดด้วย mobile emulation จริง (`viewport()` ตั้ง mobile:true เมื่อกว้าง <720px) —
+         ไม่งั้นสกรอลล์บาร์เดสก์ท็อปกิน 15px แล้วเลขไม่ตรงกับที่ลูกค้าวัดเอง */
+      const allSlugs = Object.keys(st.by);
       const feedHtml = await (await fetch(st.base + U.feed)).text();
-      const htmlSlugs = [...feedHtml.matchAll(/data-slug="([^"]+)"/g)].map(m => m[1]);
-      check(`/feed/ · HTML ที่ส่งออกไม่มีเรื่องแนวนอน (${htmlSlugs.join(',') || 'ไม่มี data-slug'})`,
-        htmlSlugs.every(k => vSlugs.has(k)), htmlSlugs.filter(k => !vSlugs.has(k)).join(' '));
-      check(`/feed/ · ตัวนับบอก N = จำนวนเรื่องแนวตั้ง (${verticals.length}) ไม่ใช่จำนวนเรื่องทั้งคลัง`,
-        new RegExp(`จาก\\s*${verticals.length}\\b`).test(feedHtml),
-        (/เรื่องที่ 1 จาก [0-9]+/.exec(feedHtml) || ['ไม่พบตัวนับ'])[0]);
+      /* ข (ครึ่งแรก) · ตัวนับใน HTML ที่ส่งออกต้องเป็นจำนวนเรื่อง **ทั้งคลัง** */
+      check(`V17 ข · /feed/ HTML ที่ส่งออกบอก "เรื่องที่ 1 จาก ${allSlugs.length}" (= series.length)`,
+        new RegExp(`เรื่องที่ 1 จาก ${allSlugs.length}(?![0-9])`).test(feedHtml),
+        (/เรื่องที่ 1 จาก [0-9]+/.exec(feedHtml) || ['ไม่พบตัวนับในหน้า'])[0]);
+      /* เรื่องแรกที่ฟีดเปิดต้องเป็น TOP10[0] ตรง ๆ ไม่ว่าทิศไหน — การดันเรื่องแนวนอนไปท้าย
+         คือตัวกรองที่ปลอมตัวมา · ด่านจึงตรวจว่า HTML ไม่ได้เลือกเรื่องแรกด้วยทิศ */
+      const firstSlug = (/id="feedPlayer" data-slug="([^"]+)"/.exec(feedHtml) || [])[1];
+      check(`V17 ก · /feed/ เรื่องแรกไม่ได้ถูกเลือกด้วยทิศ (${firstSlug} · ${firstSlug && st.by[firstSlug] ? st.by[firstSlug].orientation : '?'})`,
+        !!(firstSlug && st.by[firstSlug]) && firstSlug === TOP10[0].slug,
+        `ควรเป็น ${TOP10[0].slug} (TOP10[0]) แต่ได้ ${firstSlug} — ถ้าต่างกันเพราะทิศ นี่คือตัวกรองที่ปลอมตัวมา`);
+
       await viewport(MOBILE);
       await goAt(st.base, U.feed);
-      const walk = await evaluate(FEED_WALK(verticals.length));
-      check(`/feed/ · กดลูกศรถัดไปครบวง ${verticals.length} ครั้ง ไม่เจอเรื่องแนวนอนเลย`,
-        !walk.empty && walk.seen.every(k => vSlugs.has(k))
-          && walk.orients.every(o => o === 'vertical'),
-        walk.empty ? 'ฟีดเป็นสถานะว่าง' : walk.seen.filter(k => !vSlugs.has(k)).join(' ') || `orients=${[...new Set(walk.orients)].join(',')}`);
-      check(`/feed/ · ตัวนับฝั่งเบราว์เซอร์ได้ N เท่ากับฝั่ง build (${verticals.length})`,
-        !walk.empty && new RegExp(`จาก ${verticals.length}$`).test(walk.pos.trim()), walk.pos);
-      /* แถบรีลคือ "ตัวอย่างของฟีด" — ต้องไม่โฆษณาเรื่องที่คลิกเข้าไปแล้วไม่เจอ */
+      const walk = await evaluate(FEED_WALK(allSlugs.length));
+      if (walk.empty) {
+        check('V17 · /feed/ มีเพลเยอร์ให้วัด', false, 'ไม่พบ #feedPlayer — ฟีดว่างทั้งที่คลังไม่ว่าง');
+      } else {
+        const cycle = walk.steps.slice(0, allSlugs.length);
+        const seen = cycle.map(x => x.slug);
+        const missing = allSlugs.filter(k => !seen.includes(k));
+        const dup = seen.filter((k, i) => seen.indexOf(k) !== i);
+        /* ก (ครบ) · เซตที่เลื่อนผ่านต้องเท่ากับเซต slug ทั้งหมดใน content.json */
+        check(`V17 ก · กด #feedNext ครบ ${allSlugs.length} ครั้ง เจอทุกเรื่องในคลังไม่ขาดไม่ซ้ำ`,
+          missing.length === 0 && dup.length === 0,
+          `ขาด: ${missing.join(' ') || '-'} · ซ้ำก่อนครบรอบ: ${[...new Set(dup)].join(' ') || '-'}`
+          + ` — ขาดหรือซ้ำ = มีตัวกรองทิศหรือลิสต์สั้นกว่าคลัง`);
+        check(`V17 ก · วงปิดพอดี (ก้าวที่ ${allSlugs.length + 1} วนกลับมาที่ ${seen[0]})`,
+          walk.steps[allSlugs.length].slug === seen[0],
+          `ได้ ${walk.steps[allSlugs.length].slug}`);
+        /* ข (ครึ่งหลัง) · ตัวนับฝั่งเบราว์เซอร์ต้องได้ N เดียวกันทุกก้าว */
+        const badPos = walk.steps.filter(x => !new RegExp(`จาก ${allSlugs.length}$`).test(x.pos.trim()));
+        check(`V17 ข · #feedPos บอก N = ${allSlugs.length} เหมือนฝั่ง build ทุกก้าวที่สลับเรื่อง`,
+          badPos.length === 0, badPos.slice(0, 3).map(x => `${x.slug}: "${x.pos}"`).join(' · '));
+        /* ค (ทรงตรงกับทิศ) · ครึ่งข้อมูล: ค่าทิศบนกล่องต้องตรงกับ orientation ของ slug ทุกก้าว
+           นี่คือรอยที่ D8 ฉบับแรกปิดบังไว้ — ตอนฟีดมีแต่แนวตั้ง กล่องไม่เคยต้องเปลี่ยนรูป */
+        const badOrient = walk.steps.filter(x => !st.by[x.slug] || x.orientation !== st.by[x.slug].orientation);
+        check(`V17 ค · ทิศบน #feedPlayer ตรงกับ orientation ของ data-slug ทุกก้าว (${walk.steps.length} ก้าว)`,
+          badOrient.length === 0,
+          badPos.length === 0 && badOrient.length
+            ? badOrient.slice(0, 3).map(x => `${x.slug}: กล่องบอก ${x.orientation} แต่ข้อมูลบอก ${st.by[x.slug] && st.by[x.slug].orientation}`).join(' · ')
+            : '');
+        /* §13.5 แถว "ภาพในเพลเยอร์ฟีดตอนเลื่อนเรื่อง" · ทรง `auto` ต้องถูกเลือกใหม่ **ทุกครั้ง
+           ที่สลับเรื่อง** ไม่ใช่ครั้งเดียวตอน build — ไม่งั้นเรื่องเดียวกันได้ไฟล์คนละใบระหว่าง
+           "เปิดหน้ามาเจอ" กับ "ปัดมาเจอ" · เทียบสองส่วนท้ายของพาธเพราะโพรบคืนมาแค่นั้น */
+        const badFile = walk.steps.filter(x => {
+          const want = wantPath(x.slug, 'auto', st.by);
+          return !want || x.file !== want.split('/').slice(-2).join('/');
+        });
+        check(`V17 · ภาพในเพลเยอร์ฟีดได้ไฟล์ของทรง 'auto' ทุกก้าวที่สลับเรื่อง`,
+          badFile.length === 0,
+          badFile.slice(0, 3).map(x => `${x.slug} (${st.by[x.slug] && st.by[x.slug].orientation}): `
+            + `โหลด ${x.file} แต่ควรได้ ${(wantPath(x.slug, 'auto', st.by) || '?').split('/').slice(-2).join('/')}`).join(' · '));
+        /* ค (ครึ่งทรง) · เมื่อทิศเป็น horizontal กล่องสื่อต้องวัดได้ 16/9 ±2%
+           ⚠️ อิลิเมนต์ที่เป็น "กล่องสื่อ" และกฎกรอบของมันเป็นของ AIO-59 ซึ่งยังไม่ลงมา
+              จึงยังบังคับข้อนี้ไม่ได้ — แต่ **ไม่ซ่อน**: พิมพ์ของจริงที่วัดได้ทุกรอบ และผูกไว้กับ
+              ค่าคงที่ที่ต้องมีคนมาพลิกด้วยมือ ⇒ วันที่ AIO-59 ลง ให้ตั้งเป็น false แล้วข้อนี้
+              กลายเป็นด่านจริงทันทีโดยไม่ต้องเขียนโค้ดเพิ่ม (ADR-001 §13.10 ข้อ 7) */
+        const horiz = walk.steps.filter(x => x.orientation === 'horizontal');
+        if (horiz.length) {
+          const lo = FEED_BOX_AR * (1 - SHAPE_TOL), hi = FEED_BOX_AR * (1 + SHAPE_TOL);
+          const off = horiz.filter(x => x.boxAr == null || x.boxAr < lo || x.boxAr > hi);
+          console.log(`  ℹ V17 ค (ครึ่งทรง) · กล่องสื่อของเรื่องแนวนอน ${horiz.length} ก้าว: `
+            + horiz.slice(0, 2).map(x => `${x.slug} ${x.boxW}×${x.boxH}=${x.boxAr} (ประกาศ ${x.declaredAr}) ไฟล์ ${x.file}`).join(' · ')
+            + ` · ต้องได้ ${FEED_BOX_AR.toFixed(4)} ±${SHAPE_TOL * 100}%`);
+          check(`V17 ค (ครึ่งทรง) · กล่องสื่อของเรื่องแนวนอนได้ ${FEED_BOX_AR.toFixed(3)} ±${SHAPE_TOL * 100}%`
+            + `${V17C_BOX_PENDING_AIO59 ? ' — รอกฎกรอบจาก AIO-59 (ยังไม่บังคับ)' : ''}`,
+            off.length === 0 || V17C_BOX_PENDING_AIO59,
+            off.slice(0, 3).map(x => `${x.slug} = ${x.boxAr}`).join(' · ')
+            + ' — ถ้า AIO-59 ลงแล้ว ให้ตั้ง V17C_BOX_PENDING_AIO59 = false แล้วแก้ของ');
+        }
+      }
+      /* แถบรีล: 3 slug ต้องมีจริงในคลัง และ **ห้ามถูกเลือกด้วยทิศ** (D8 ฉบับกลับทาง)
+         เหตุผลเดิม ("ตัวอย่างห้ามโฆษณาเรื่องที่คลิกเข้าไปแล้วไม่เจอ") ตายไปกับ D8 ฉบับแรก */
       await viewport(FOLD_VIEWPORTS[1]);
       await goAt(st.base, U.home);
       await evaluate(SHAPE_PREP('.btile .reelstrip span'));
       const reel = await evaluate(SHAPE_PROBE('.btile .reelstrip span'));
       const reelSlugs = (reel.items || []).map(x => slugOf(x.img && x.img.path));
-      check(`แถบรีลในไทล์ฟีด · ทั้ง ${reelSlugs.length} ใบเป็นเรื่องแนวตั้ง (${reelSlugs.join(',')})`,
-        reelSlugs.length === 3 && reelSlugs.every(k => k && vSlugs.has(k)),
-        reelSlugs.filter(k => !vSlugs.has(k)).join(' '));
+      check(`แถบรีลในไทล์ฟีด · ทั้ง ${reelSlugs.length} ใบเป็นเรื่องที่มีจริงในคลัง (${reelSlugs.join(',')})`,
+        reelSlugs.length === 3 && reelSlugs.every(k => k && st.by[k]),
+        reelSlugs.filter(k => !k || !st.by[k]).join(' ') || 'จำนวนไม่ครบ 3 ใบ');
     }
     await setStorageMode('new');
   }

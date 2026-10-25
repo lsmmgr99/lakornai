@@ -4,7 +4,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, SERIES, U, OPEN_TAGS, CAST_PAGES, D, VIEWS_SOURCE, HAS_VIEWS, RANK_BASIS,
-  FEED_SERIES, coverWideMisses } from './content.mjs';
+  coverWideMisses } from './content.mjs';
 import { PAGES } from './ui.mjs';
 import { robotsTxt, sitemapXml, PUBLISHED, SITE_ORIGIN, shareMisses } from './seo.mjs';
 import * as A from './pages-discovery.mjs';
@@ -360,8 +360,11 @@ write('redirects.map',
 const idx = PAGES.filter(p => !/noindex/.test(p.robots)).length;
 console.log(`✓ สร้าง ${PAGES.length} หน้า (เปิดดัชนี ${idx} · noindex ${PAGES.length - idx})`);
 console.log(`  เรื่อง ${SERIES.length} · ตอน ${SERIES.reduce((a, s) => a + s.eps, 0)} · แนว ${D.genres.length} · แท็กที่เปิด ${OPEN_TAGS.length} · หน้าตัวละคร ${CAST_PAGES.length}`);
-console.log(`  ทิศ: แนวตั้ง ${FEED_SERIES.length} · แนวนอน ${SERIES.length - FEED_SERIES.length}`
-  + ` (ฟีดรับเฉพาะแนวตั้ง · ADR-001 §13.7 D8) · ภาพกว้างที่ประกาศแล้ว ${SERIES.filter(s => s.coverWide).length}/${SERIES.length}`);
+/* ฟีดมีทุกเรื่องตาม D8 ฉบับกลับทาง — บรรทัดนี้รายงานทิศเพื่อให้เห็นว่าตัวเลือกไฟล์ `auto`
+   จะหยิบไฟล์อะไรให้ใคร ไม่ใช่เพื่อบอกว่าฟีดตัดเรื่องไหนออก (ไม่ตัดเลย) */
+const nHoriz = SERIES.filter(s => s.orientation === 'horizontal').length;
+console.log(`  ทิศ: แนวตั้ง ${SERIES.length - nHoriz} · แนวนอน ${nHoriz}`
+  + ` (ฟีดมีทุกเรื่อง · ADR-001 §13.7 D8 ฉบับกลับทาง) · ภาพกว้างที่ประกาศแล้ว ${SERIES.filter(s => s.coverWide).length}/${SERIES.length}`);
 console.log(`  sitemap ${sitemapUrls.length} URL · redirect stub ${REDIRECTS.length} ไฟล์ · robots.txt = ${PUBLISHED ? 'Allow' : 'Disallow ทั้งเว็บ (ยังไม่เผยแพร่)'}`);
 if (shareMisses.size) {
   console.log(`  ⚠ ยังไม่มีภาพแชร์ 1200×630 — og:image ถอยไปใช้ปก 2:3 ไปก่อน (AC-7)`);
