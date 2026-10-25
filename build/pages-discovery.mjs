@@ -2,7 +2,7 @@
 import {
   D, U, SERIES, BY, TOP10, OPEN_TAGS, CAST, genreLabel, genreOf,
   seriesOfGenre, similar, isDaily, isAiring, tropesOf, isOpenTag, CAST_PAGES,
-  HAS_VIEWS, RANK_BASIS_TEXT, GENRE_COVER,
+  HAS_VIEWS, RANK_BASIS_TEXT, GENRE_COVER, isVertical, FEED_SERIES,
 } from './content.mjs';
 import {
   definePage, shell, pageHead, crumbs, rail, section, poster, card, rankCard, epRow,
@@ -17,6 +17,28 @@ import { collectionLd, websiteLd, breadcrumb, shareImage, coverUrl } from './seo
    ส่วน "สัปดาห์นี้" ถูกถอดถาวร — เราไม่เคยคำนวณหน้าต่างรายสัปดาห์เลย แม้วันที่มี views
    หมายเหตุใต้อันดับผูกกับ viewsSource ไม่เขียนตายไว้ (C4) */
 const TOP10_LABEL = 'TOP 10 ในคลัง';
+
+/* ---------- ฮีโร่หน้าแรก: ที่วางเดียวที่ต้องการสองทรงพร้อมกัน (ADR-001 §13.6) ----------
+   720px ไม่ใช่เลขที่เลือกเอง — มันคือจุดที่กล่องฮีโร่เปลี่ยนจากกรอบ 2:3 เป็นแถบนอน
+   (กฎ `.hero .bg` ใน @media (min-width:720px) ของ design/v2/v2.css ซึ่งตั้ง aspect-ratio:auto
+    แล้วเปลี่ยนไปใช้ height) · ถ้า Visual ย้ายเบรกพอยต์นั้น ค่านี้ต้องย้ายตาม
+   ⇒ ความไม่ตรงกันนี้ถูกจับด้วย "ด่านที่วัดของจริงที่ 719px/720px" ไม่ใช่คอมเมนต์เตือน:
+      tools/test-layout.mjs ส่วน 6 (ไม่ใช่การเทียบสตริง — เบราว์เซอร์เป็นคนเลือกไฟล์)
+   อ้างกฎของ design/v2 ด้วยชื่อ selector ไม่ใช่เลขบรรทัด (เลขบรรทัดของไฟล์ Visual เลื่อน) */
+export const HERO_WIDE_BP = 720;
+const HERO_WIDE_MEDIA = `(min-width:${HERO_WIDE_BP}px)`;
+
+/* ---------- ADR-001 §13.7 D8 · ตัวอย่างของฟีดต้องไม่โฆษณาเรื่องที่ฟีดไม่รับ ----------
+   แถบรีลในไทล์ฟีดคือ "ตัวอย่างของฟีด" 3 ใบ · ของเดิมเป็นชื่อ slug ที่เขียนไว้ตรง ๆ 3 ชื่อ
+   ซึ่งจะกลายเป็นคำโฆษณาผิดทันทีที่เรื่องใดในสามเรื่องนั้นถูกเปลี่ยนเป็นแนวนอน (คลิกเข้าฟีด
+   แล้วไม่เจอ) ⇒ กรองด้วยทิศ แล้วเติมจากคลังแนวตั้งให้ครบ 3 ใบ ไม่ใช่ปล่อยให้เหลือ 2 ใบ
+   ชื่อที่เลือกไว้เดิมยังเป็นลำดับแรก เพื่อให้หน้าตาของวันนี้ไม่ขยับแม้พิกเซลเดียว
+   (ด่าน V17 บังคับว่าทั้งสามใบต้องเป็นแนวตั้ง — ไม่ใช่พึ่งความระมัดระวัง) */
+const REEL_PREFERRED = ['ceo-cold', 'villainess-reborn', 'one-night-bangkok'];
+export const REEL_SLUGS = [
+  ...REEL_PREFERRED.filter(k => BY[k] && isVertical(BY[k])),
+  ...FEED_SERIES.map(s => s.slug).filter(k => !REEL_PREFERRED.includes(k)),
+].slice(0, 3);
 
 /* ---------- ไทล์ "เลือกตามแนว" ----------
    ใช้ที่หน้าแรกและที่ /browse/ ("หมวด" ในเมนู) · เคยเป็นสองก้อนที่เหมือนกันคนละที่
@@ -52,7 +74,7 @@ export function buildHome() {
     const hero = `<section class="sec hero-sec" aria-label="เรื่องเด่นประจำสัปดาห์">
       <div class="hero-track" id="heroTrack">${heroes.map((s, i) => `
         <article class="hero" id="hero-${i + 1}">
-          <div class="bg">${coverImg(L, s, { lazy: i > 0 })}</div>
+          <div class="bg">${coverImg(L, s, { lazy: i > 0, wideMedia: HERO_WIDE_MEDIA })}</div>
           <div class="body">
             <span class="kick">${ic('sparkle', 'sm')} เรื่องเด่นประจำสัปดาห์</span>
             <h2><a href="${L(U.series(s.slug))}">${esc(s.title)}</a></h2>
@@ -85,7 +107,7 @@ export function buildHome() {
     const feedBlock = `<section class="sec" aria-label="ฟีดแนวตั้ง">
       <div class="bento">
         <a class="btile feedtile" href="${L(U.feed)}">
-          <span class="reelstrip" aria-hidden="true">${['ceo-cold', 'villainess-reborn', 'one-night-bangkok']
+          <span class="reelstrip" aria-hidden="true">${REEL_SLUGS
             .map(k => `<span>${coverImg(L, BY[k])}</span>`).join('')}</span>
           <h3>ฟีดแนวตั้ง</h3>
           <p>ปัดขึ้นดูเรื่องถัดไป ไม่ต้องเลือกเอง — ทุกคลิปในฟีด<b class="free-c"> ดูฟรี ไม่ต้องสมัคร</b></p>
@@ -149,19 +171,43 @@ export function buildHome() {
   });
 }
 
-/* ============================ A2 ฟีดแนวตั้ง ============================ */
+/* ============================ A2 ฟีดแนวตั้ง ============================
+   ADR-001 §13.7 D8 · ฟีดรับเฉพาะเรื่องแนวตั้ง — รูปแบบนี้ผูกกับคอนเทนต์แนวตั้งโดยโครงสร้าง
+   ไม่ใช่โดยรสนิยม: หน้านี้เลื่อนเต็มจอทีละเรื่อง (`body.stage` · `.player.full`) และเครื่องเรือน
+   ทุกชิ้น (แคปชัน ปุ่มแถวขวา ตัวนับ) วางตำแหน่งสัมบูรณ์เทียบกับกล่องเต็มจอ
+   คลิป 16:9 ในกรอบเต็มจอมือถือ 9:16 เหลือภาพจริงราว 32% ของความสูงจอ = แย่กว่าครอปวันนี้
+   เรื่องแนวนอนยังอยู่ครบในหน้าแรก /browse/ /popular/ ตารางออกตอน หน้าเรื่อง และหน้าตอน
+
+   ที่นี่กรองสามรอยพร้อมกัน (ด่าน V17): เรื่องแรกที่ฟีดเปิด · ตัวนับ "เรื่องที่ 1 จาก N"
+   · รายชื่อใน JSON-LD · รอยที่สี่อยู่ฝั่งเบราว์เซอร์ (build/app.src.js) ซึ่งกรองด้วย
+   ตัวเดียวกันที่นั่น — "กรองที่เดียว" คือทางที่ปล่อยให้ลูกศรถัดไปพาผู้ชมไปเจอเรื่องแนวนอน */
 export function buildFeed() {
+  /* เรื่องแรกที่ฟีดเปิดเลือกจาก TOP10 เหมือนเดิม แต่ต้องเป็นแนวตั้ง · ถ้า TOP10 ไม่มีแนวตั้งเลย
+     ถอยไปใช้เรื่องแนวตั้งใบแรกของคลัง — ไม่ใช่ปล่อยให้เป็น undefined
+     ตัวนับและความว่างคิดจาก FEED_SERIES (ทั้งคลัง) ไม่ใช่จาก TOP10 เพราะฝั่งเบราว์เซอร์
+     เลื่อนได้ทั้งคลัง (build/app.src.js ส่วน 14) — สองฝั่งต้องได้เลข N เดียวกัน (§13.7) */
+  const first = TOP10.find(isVertical) || FEED_SERIES[0];
   const body = L => {
-    const first = TOP10[0];
+    /* ถ้าวันหนึ่งไม่มีเรื่องแนวตั้งเลย: ต้องขึ้นสถานะว่างที่มีข้อความ และ build ต้องไม่ล้ม
+       ห้ามส่งหน้าที่มีเพลเยอร์เปล่า (§13.7 ตารางรอยที่ 4) · เกิดไม่ได้วันนี้ (12/12 แนวตั้ง)
+       แต่ "เกิดไม่ได้วันนี้" ไม่ใช่เหตุผลที่จะส่ง `undefined.slug` ลงหน้าในวันนั้น */
+    if (!FEED_SERIES.length) {
+      return shell(L, { nav: 'feed', active: 'feed', main: wrap(`${pageHead('ฟีดแนวตั้ง')}
+        ${empty(L, 'feed', 'ยังไม่มีเรื่องแนวตั้งในคลัง',
+          'ฟีดเลื่อนทีละเรื่องรับเฉพาะละครแนวตั้ง — เลือกดูจากคลังทั้งหมดได้เลย ดูฟรีทุกตอน',
+          ['ดูคลังทั้งหมด', U.browse])}`) });
+    }
     const main = `<main id="main" class="stage">
       <h1 class="sr">ฟีดแนวตั้ง — ละครสั้น AI ดูทีละเรื่อง</h1>
       <div class="feed-desktop">
-        <div class="player full" id="feedPlayer" data-slug="${first.slug}">
+        ${/* `data-orientation` เขียนตายเป็น vertical ไม่ได้ ต้องมาจากข้อมูลของเรื่องที่ขึ้นจริง
+             (วันนี้ค่าเดียวกันเสมอเพราะ feedList กรองแล้ว แต่ด่านต้องวัดของจริง ไม่ใช่วัดความตั้งใจ) */ ''}<div class="player full" id="feedPlayer" data-slug="${first.slug}"
+             data-orientation="${first.orientation}">
           ${coverImg(L, first, { lazy: false })}
           <div class="vig"></div>
           <div class="ptop">
             <a class="rnd" href="${L(U.home)}" aria-label="กลับหน้าแรก">${ic('left')}</a>
-            <span class="ti"><b>ฟีดแนวตั้ง</b><span id="feedPos">เรื่องที่ 1 จาก ${SERIES.length}</span></span>
+            <span class="ti"><b>ฟีดแนวตั้ง</b><span id="feedPos">เรื่องที่ 1 จาก ${FEED_SERIES.length}</span></span>
             <a class="rnd" href="${L(U.settings)}" aria-label="ตั้งค่าการเล่น">${ic('settings')}</a>
           </div>
           <div class="pstack">
@@ -201,7 +247,9 @@ export function buildFeed() {
     desc: 'ปัดขึ้นดูละครสั้น AI ภาษาไทยทีละเรื่อง ไม่ต้องเลือกเอง เริ่มจากตอนแรกของทุกเรื่อง ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก เจอเรื่องที่ชอบแล้วกดดูทั้งเรื่องต่อได้ทันที',
     jsonLd: [collectionLd({
       url: U.feed, name: 'ฟีดแนวตั้ง',
-      description: 'ตอนแรกของทุกเรื่องในคลัง เรียงให้ปัดดูต่อเนื่อง', items: SERIES,
+      /* รายชื่อใน structured data ต้องตรงกับที่หน้านี้พาไปได้จริง — ส่งทั้งคลังเข้าไป
+         ขณะที่ฟีดไม่รับแนวนอน คือการประกาศกับ Google ว่ามีของที่หน้านี้ไปไม่ถึง */
+      description: 'ตอนแรกของทุกเรื่องแนวตั้งในคลัง เรียงให้ปัดดูต่อเนื่อง', items: FEED_SERIES,
     })],
     body,
   });

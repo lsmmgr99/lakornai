@@ -2,7 +2,7 @@
    ฐานงาน: onpage-audit (AIO-19) · ux-spec §2.4 (AIO-16) */
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, iso8601, genreLabel } from './content.mjs';
+import { ROOT, iso8601, genreLabel, COVER_WIDE_W, COVER_WIDE_H } from './content.mjs';
 
 /* ============================================================
    โดเมน — ค่าตั้งต้นอยู่ที่บรรทัดเดียวข้างล่าง และตั้งทับได้จาก env ตอน build
@@ -61,6 +61,38 @@ function shareSlot(names, fallback) {
 }
 export const coverUrl = s => '/' + (s.cover || `assets/covers/${s.slug}.webp`).replace(/^\//, '');
 export const COVER_W = 1024, COVER_H = 1536;
+
+/* ============================================================
+   ADR-001 §13.5 · ตัวเลือกไฟล์ปก — จุดเดียวในฝั่ง build ที่ตัดสินว่าได้ไฟล์ใบไหน
+
+   หลักการ: **ที่วางประกาศทรงที่ต้องการ ไม่ใช่ประกาศไฟล์ที่จะใช้**
+   ที่วางห้ามเขียนชื่อฟิลด์ `cover`/`coverWide` เองเลย — ส่ง `shape` มาแล้วให้ตัวนี้เลือก
+   เหตุผล: วันที่เพิ่มสินทรัพย์ใบที่สามหรือเปลี่ยนกฎถอยกลับ จะมีที่แก้ที่เดียว ไม่ใช่ 13 จุด
+
+     poster (ค่าตั้งต้น) · ช่องนี้เป็นกรอบ 2:3 เสมอ ไม่ว่าเรื่องจะเป็นทิศไหน → `cover` เสมอ
+     wide                · ช่องนี้เป็นกรอบกว้างเสมอ                        → coverWide ?? cover
+     auto                · ช่องนี้เปลี่ยนรูปตามทิศของเรื่อง   horizontal → coverWide ?? cover
+                                                             vertical   → cover
+
+   ค่าตั้งต้นเป็น `poster` โดยเจตนา: 10 ใน 12 จุดเรียกฝั่ง build ต้องการ 2:3 ⇒ "ลืมส่งค่า"
+   ให้ผลเท่ากับพฤติกรรมวันนี้ ไม่ใช่ผลที่เปลี่ยนเงียบ ๆ
+
+   `w`/`h` ที่คืนมาต้องมาจาก **ไฟล์ที่ถูกเลือกจริง** ไม่ใช่ค่าคงที่ของปกแนวตั้งเสมอ —
+   ไม่อย่างนั้น <img width/height> โกหกเบราว์เซอร์และ layout shift กลับมา (§13.4)
+   `wide:false` = ถอยกลับแล้ว (ที่เรียกใช้ค่านี้ตัดสินใจเรื่อง <source> ของ <picture>)
+   ============================================================ */
+export const COVER_SHAPES = ['poster', 'wide', 'auto'];
+export function coverSlot(s, shape = 'poster') {
+  if (!COVER_SHAPES.includes(shape)) {
+    throw new Error(`coverSlot(${s && s.slug}): shape = ${JSON.stringify(shape)} `
+      + `ไม่อยู่ในชุดที่สัญญารู้จัก (${COVER_SHAPES.join(' | ')}) — ADR-001 §13.5`);
+  }
+  const wantWide = shape === 'wide' || (shape === 'auto' && s.orientation === 'horizontal');
+  if (wantWide && s.coverWide) {
+    return { url: '/' + String(s.coverWide).replace(/^\//, ''), w: COVER_WIDE_W, h: COVER_WIDE_H, wide: true };
+  }
+  return { url: coverUrl(s), w: COVER_W, h: COVER_H, wide: false };
+}
 
 export function shareImage({ series = null, ep = null } = {}) {
   const fb = series

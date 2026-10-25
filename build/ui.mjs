@@ -10,7 +10,7 @@ import path from 'node:path';
 import {
   D, U, SERIES, genreLabel, tropesOf, isOpenTag, isDaily, HAS_VIEWS,
 } from './content.mjs';
-import { headTags, esc, FREE_LINE, coverUrl, COVER_W, COVER_H } from './seo.mjs';
+import { headTags, esc, FREE_LINE, coverSlot } from './seo.mjs';
 import { ROOT } from './content.mjs';
 
 export { esc, FREE_LINE };
@@ -77,12 +77,29 @@ export const ic = (name, cls = '') =>
   `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[name] || ''}</svg>`;
 
 /* ---------- ปก: <img> จริงเสมอ (AC-5) ----------
-   ไฟล์จริง 1024×1536 (2:3) · ประกาศ width/height ตามไฟล์จริง กัน CLS
-   ห้ามครอปเป็น 3:4 — CSS บังคับ aspect-ratio ไว้ที่ --ar-poster */
-export function coverImg(L, s, { lazy = true, cls = '', alt = null } = {}) {
-  return `<img class="${cls}" src="${L(coverUrl(s))}" width="${COVER_W}" height="${COVER_H}"`
+   ปกทุกใบในเว็บไหลผ่านตัวนี้ · ประกาศ width/height ตามไฟล์ที่ถูกเลือกจริง กัน CLS
+   ห้ามครอปเป็น 3:4 — CSS บังคับ aspect-ratio ไว้ที่ --ar-poster
+
+   `shape` = ทรงที่ "ที่วางนี้" ต้องการ (ADR-001 §13.5) ไม่ใช่ชื่อไฟล์ — ที่เรียกห้ามรู้จัก
+   ชื่อฟิลด์ `cover`/`coverWide` เลย · ตัวเลือกไฟล์คือ `coverSlot()` ที่ build/seo.mjs
+
+   `wideMedia` = กรณีเดียวในเว็บที่ "ที่วางเดียวต้องการสองทรงพร้อมกัน" คือฮีโร่หน้าแรก
+   (มือถือ 2:3 · เดสก์ท็อปกว้าง) · ทางที่ ADR เลือกคือ `<picture>` + `<source media>`
+   (§13.6 D6) เพราะ `<img>` ยังเป็นปก 2:3 ⇒ **ถ้าไม่มีภาพกว้าง บล็อก `<source>` หายไปทั้งก้อน
+   แล้วผลลัพธ์คือ HTML เดิมเป๊ะ byte ต่อ byte** ไม่ใช่ HTML ที่คล้ายเดิม
+   เบราว์เซอร์เลือกไฟล์ก่อนวางเลย์เอาต์ จึงไม่มีจังหวะที่ภาพผิดทรงโผล่
+   (ทางที่ทิ้ง: background-image เสีย <img> จริง/width-height/fetchpriority · <img> สองใบ
+    + display:none จ่าย bytes สองเท่าบนภาพ LCP · srcset ไม่มี media ไม่การันตี "ทรง") */
+export function coverImg(L, s, { lazy = true, cls = '', alt = null, shape = 'poster', wideMedia = null } = {}) {
+  const slot = coverSlot(s, shape);
+  const img = `<img class="${cls}" src="${L(slot.url)}" width="${slot.w}" height="${slot.h}"`
     + ` alt="${alt === null ? '' : esc(alt)}"${alt === null ? ' aria-hidden="true"' : ''}`
     + ` loading="${lazy ? 'lazy' : 'eager'}" decoding="async"${lazy ? '' : ' fetchpriority="high"'}>`;
+  if (!wideMedia) return img;
+  const wide = coverSlot(s, 'wide');
+  if (!wide.wide) return img;        /* ยังไม่มีภาพกว้าง ⇒ ถอยไปวาดเหมือนวันนี้ทุกพิกเซล */
+  return `<picture><source media="${wideMedia}" srcset="${L(wide.url)}"`
+    + ` width="${wide.w}" height="${wide.h}">${img}</picture>`;
 }
 
 export const aiBadge = `<span class="tag tag-ai">AI</span>`;

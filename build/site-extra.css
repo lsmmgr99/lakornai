@@ -46,6 +46,12 @@ input::placeholder,textarea::placeholder{color:var(--dim)}
    ด้วยเหตุเดียวกัน · `.cont .t` ไม่ต้องเติม เพราะกฎของมันใน v2.css ตั้ง display:-webkit-box เอง
    (อ้างกฎด้วยชื่อ selector ไม่ใช่เลขบรรทัด — v2.css เป็นไฟล์ของ Visual เลขบรรทัดเลื่อนทุกรอบ) */
 .cont .thumb{display:block}
+/* ADR-001 §13.6 · ฮีโร่ห่อปกด้วย <picture> เมื่อเรื่องนั้นมีภาพกว้าง (ไม่มี ⇒ ไม่มี <picture> เลย)
+   <picture> เป็น inline ตามค่าเริ่มต้น และกฎ `.hero .bg img` ตั้ง width/height:100% ไว้
+   ⇒ ตระกูลบั๊กเดียวกับ AIO-37/AIO-38 F3 รออยู่ที่นี่ตรง ๆ: ชั้นกลางที่เป็น inline
+   ทำให้ความสูงของรูปอ้างอิงผิดกล่อง และไม่มีใครเห็นจาก computed style
+   บล็อกนี้ไม่ทำงานเลยจนกว่าจะมีไฟล์ภาพกว้างใบแรก — ด่านส่วน 6 วัดทั้งสองสถานะ */
+.hero .bg picture{display:block;width:100%;height:100%}
 .cont .m{display:block}
 .ep-row .et{font-size:var(--t-sub);color:var(--fg-2)}
 .ep-row .tt{font-size:var(--t-body);font-weight:600;color:var(--fg)}
@@ -126,6 +132,29 @@ input::placeholder,textarea::placeholder{color:var(--dim)}
 .player.playing .bigplay{opacity:0;pointer-events:none}
 .player.playing:hover .bigplay,.player .bigplay:focus-visible{opacity:1;pointer-events:auto}
 .player .bigplay{transition:opacity var(--d-base) var(--ease)}
+
+/* --- กล่องเพลเยอร์มาจาก `orientation` ของเรื่อง ไม่ใช่โทเคนตายตัว (ADR-001 §13.7 D7) ---
+   กฎ `.player` ใน design/v2/v2.css ตั้ง aspect-ratio:var(--ar-reel) ให้ "ทุกเรื่อง" เท่ากันหมด
+   เรื่องแนวนอนในกรอบนั้นได้แถบดำบน-ล่างเกินครึ่งจอ ซึ่งแย่กว่าการครอป
+
+   ทิศถูกเขียนลงบนตัว `.player` เองโดย build (build/pages-watch.mjs และ build/pages-discovery.mjs)
+   แล้วกฎนี้อ่านจากกล่อง · **ห้าม** ให้ JS วัดภาพแล้วเดาทิศตอนรัน และ **ห้าม** ให้ CSS เดาจากขนาดจอ
+
+   ทำไมเป็นโทเคนใหม่ ไม่ยืม --ar-cont ที่ค่า 16/9 เท่ากันเป๊ะ: ไฟล์โทเคนเขียนขอบเขตการใช้
+   กำกับไว้ทุกตัว (--ar-reel = "เพลเยอร์ + ฟีด เท่านั้น" · --ar-cont = "การ์ดดูต่อ เท่านั้น")
+   วันที่ใครปรับค่าใดค่าหนึ่งจะลากอีกช่องไปด้วยเงียบ ๆ — §13.7 ข้อ 2 ห้ามยืมไว้ตรง ๆ
+
+   ⚠️ ชื่อและค่าของโทเคนนี้เป็นของ Visual ตามสัญญา (§13.10 ข้อ 2) · ตั้งไว้ที่นี่เพราะ
+      assets/tokens.css ถูกคัดลอกตรงจาก design/v2/tokens.css ตอน build และ Dev ห้ามแตะ
+      design/v2/ ⇒ วันที่ Visual ตั้งชื่อจริง ให้ย้ายบรรทัดประกาศไปที่นั้นแล้วลบที่นี่
+      ราคาของการรอวันนี้ = ศูนย์ (0 เรื่องแนวนอน ⇒ กฎล่างไม่ถูกใช้กับเรื่องใดเลย)
+
+   `vertical` ไม่ต้องมีกฎ เพราะค่าของ v2.css ถูกอยู่แล้ว — เขียนซ้ำคือการตั้งค่าทับของ Visual */
+:root{--ar-player-h:16/9}
+.player[data-orientation=horizontal]{aspect-ratio:var(--ar-player-h)}
+/* `.player.full` (ฟีด) ตั้ง aspect-ratio:auto + height เต็มจอไว้แล้วใน v2.css และฟีดไม่รับ
+   แนวนอนเลย (D8) ⇒ กฎข้างบนต้องไม่ไปแย่งความสูงเต็มจอคืนถ้าวันหน้ามีใครพาเข้ามา */
+.player.full[data-orientation=horizontal]{aspect-ratio:auto}
 
 /* --- ฟีด --- */
 /* ม็อกอัพคิดความสูงจาก 100dvh - navh เพราะไม่มี header ในภาพ

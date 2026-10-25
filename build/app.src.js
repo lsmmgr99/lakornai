@@ -34,6 +34,31 @@
   }
   function url(p) { return ROOT + String(p).replace(/^\//, ''); }
   function cover(s) { return url(s.cover || ('assets/covers/' + s.slug + '.webp')); }
+
+  /* ======================= ตัวเลือกไฟล์ปก (ADR-001 §13.5) =======================
+     ท่อการวาดปกมี **สองท่อ** ไม่ใช่ท่อเดียว: ฝั่ง build (build/seo.mjs coverSlot())
+     และฝั่งนี้ · ท่อนี้คือท่อที่ลืมได้ง่ายที่สุด เพราะด่านที่ตรวจ HTML ที่ส่งออกมองไม่เห็นมัน
+     กฎถอยกลับต้องเหมือนกันทั้งสองท่อ ซึ่งทำได้เพราะแหล่งความจริงคือ "ฟิลด์ในข้อมูล"
+     (`coverWide` เดินทางมาถึงที่นี่ผ่าน assets/content.js) ไม่ใช่ "การส่องโฟลเดอร์"
+     — ที่นี่มองดิสก์ของเซิร์ฟเวอร์ build ไม่เห็นเลย (§13.1 D5)
+
+     ที่วางส่ง "ทรงที่ต้องการ" มา ไม่ใช่ชื่อฟิลด์ · ค่าตั้งต้น 'poster' = พฤติกรรมเดิม
+     คืน width/height ของ **ไฟล์ที่ถูกเลือกจริง** ไม่ใช่ 1024×1536 ตายตัวอย่างที่เคยฝังไว้
+     8 จุด — การ์ด "ดูต่อ" ขอทรงกว้างและจะได้ไฟล์ 2640×1200 ⇒ แอตทริบิวต์ที่ค้างอยู่
+     จะโกหกเบราว์เซอร์เรื่องขนาดแล้ว CLS กลับมาเงียบ ๆ (กฎ V18) */
+  var POSTER_W = 1024, POSTER_H = 1536;
+  var WIDE_W = 2640, WIDE_H = 1200;
+  function coverSlot(s, shape) {
+    var wantWide = shape === 'wide' || (shape === 'auto' && s.orientation === 'horizontal');
+    if (wantWide && s.coverWide) return { src: url(s.coverWide), w: WIDE_W, h: WIDE_H };
+    return { src: cover(s), w: POSTER_W, h: POSTER_H };
+  }
+  /* แอตทริบิวต์ `width`/`height` ของ <img> — จุดเดียวที่ประกอบสองค่านี้ในไฟล์นี้
+     เขียนเป็นฟังก์ชันเพื่อให้ "ไม่มีเลขขนาดภาพที่ฝังเป็นค่าคงที่" เป็นเรื่องที่ตรวจได้ */
+  function coverAttrs(s, shape) {
+    var c = coverSlot(s, shape);
+    return 'src="' + c.src + '" width="' + c.w + '" height="' + c.h + '"';
+  }
   function secs(mmss) { var p = String(mmss).split(':'); return (+p[0]) * 60 + (+p[1]); }
   function fmt(x) { return Math.floor(x / 60) + ':' + String(Math.floor(x % 60)).padStart(2, '0'); }
 
@@ -274,7 +299,10 @@
     var s = it.s;
     return '<a class="cont" href="' + Progress.resumeHref(s.slug) + '">'
       + '<span class="thumb">'
-      + '<img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async" style="object-position:center 28%">'
+      /* ช่องเดียวในไฟล์นี้ที่ขอทรง 'wide': `.cont .thumb` บังคับ 16/9 ไว้แล้ว (กฎ `.cont .thumb`
+         ใน design/v2/v2.css) และวันนี้ชดเชยด้วย object-position:center 28% ⇒ เป็นช่องที่
+         ได้ประโยชน์จาก coverWide มากที่สุดต่อหนึ่งไฟล์ และเป็นช่องที่การส่องโฟลเดอร์ช่วยไม่ได้ */
+      + '<img ' + coverAttrs(s, 'wide') + ' alt="" loading="lazy" decoding="async" style="object-position:center 28%">'
       + '<span class="play"><i><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.2 19 12 8 18.8z" fill="currentColor"/></svg></i></span>'
       + '<span class="ep num">EP.' + it.ep + '</span>'
       + '<span class="pbar"><i style="width:' + it.pct + '%"></i></span>'
@@ -286,7 +314,7 @@
   function contRowHtml(it) {
     var s = it.s;
     return '<a class="controw" href="' + Progress.resumeHref(s.slug) + '">'
-      + '<span class="th"><img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async">'
+      + '<span class="th"><img ' + coverAttrs(s, 'poster') + ' alt="" loading="lazy" decoding="async">'
       + (it.ep === s.eps ? '<span class="last">ตอนสุดท้าย</span>' : '') + '</span>'
       + '<span class="bd"><b>' + esc(s.title) + '</b>'
       + '<span class="st num">EP.' + it.ep + '/' + s.eps + ' · ดูไปแล้ว ' + it.pct + '% ของตอนนี้</span>'
@@ -300,7 +328,7 @@
     var s = it.s;
     return '<a class="card libcard" href="' + Progress.resumeHref(s.slug) + '">'
       + '<span class="poster" style="--c1:' + s.c1 + ';--c2:' + s.c2 + '">'
-      + '<img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async">'
+      + '<img ' + coverAttrs(s, 'poster') + ' alt="" loading="lazy" decoding="async">'
       + '<span class="scrim"></span><span class="epb num">EP.' + it.ep + '</span>'
       + '<span class="pbar"><i style="width:' + it.pct + '%"></i></span></span>'
       + '<span class="t">' + esc(s.title) + '</span>'
@@ -310,7 +338,7 @@
   function posterCardHtml(s, badge) {
     return '<a class="card" href="' + url('series/' + s.slug + '/') + '">'
       + '<span class="poster" style="--c1:' + s.c1 + ';--c2:' + s.c2 + '">'
-      + '<img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async">'
+      + '<img ' + coverAttrs(s, 'poster') + ' alt="" loading="lazy" decoding="async">'
       + (badge ? '<span class="tl">' + badge + '</span>' : '') + '</span>'
       + '<span class="t">' + esc(s.title) + '</span>'
       + '<span class="m">' + esc(GL[s.genres[0]] || '') + ' · ' + s.eps + ' ตอน</span></a>';
@@ -543,7 +571,7 @@
       nextUp.setAttribute('aria-label', 'ตอนถัดไป EP.' + (ep + 1) + (auto ? ' เริ่มใน ' + left + ' วินาที' : ''));
       nextUp.innerHTML = '<div class="nh">'
         + (auto ? '<span class="ring" id="nuRing" style="--p:0%" aria-hidden="true"><b class="num" id="nuLeft">' + left + '</b></span>' : '')
-        + '<span class="thumb"><img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async"></span>'
+        + '<span class="thumb"><img ' + coverAttrs(s, 'poster') + ' alt="" loading="lazy" decoding="async"></span>'
         + '<span class="nt"><b class="num">ตอนถัดไป · EP.' + (ep + 1) + '</b><span>' + esc(nx[0]) + ' · ' + nx[1] + ' นาที</span></span>'
         + '</div><div class="na">'
         + '<a class="btn btn-accent" href="' + nextHref + '">เล่นเลย</a>'
@@ -585,7 +613,7 @@
         + '<h3 id="ec-h">ดูจบแล้วทั้ง ' + s.eps + ' ตอน</h3>'
         + '<p>' + esc(s.title) + ' — เรื่องนี้ย้ายไปอยู่ในแท็บ “ดูจบแล้ว” ของคลังคุณแล้ว</p></div>'
         + '<a class="ec-next" href="' + url('watch/' + nextS.slug + '/ep-1/') + '">'
-        + '<span class="thumb"><img src="' + cover(nextS) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async"></span>'
+        + '<span class="thumb"><img ' + coverAttrs(nextS, 'poster') + ' alt="" loading="lazy" decoding="async"></span>'
         + '<span class="et"><span>ดูเรื่องถัดไป</span><b>' + esc(nextS.title) + '</b></span>'
         + '<svg class="ico" viewBox="0 0 24 24"><path d="M8 5.2 19 12 8 18.8z" fill="currentColor"/></svg></a>'
         + '<div class="ec-sec">'
@@ -726,7 +754,7 @@
         ? '<div class="list">' + h.map(function (x) {
             var s = x.s;
             return '<a class="ep-row" href="' + url('watch/' + s.slug + '/ep-' + x.ep + '/') + '">'
-              + '<span class="th"><img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async"></span>'
+              + '<span class="th"><img ' + coverAttrs(s, 'poster') + ' alt="" loading="lazy" decoding="async"></span>'
               + '<span class="bd"><span class="h"><b class="num">EP.' + x.ep + '</b>'
               + '<span class="et">' + esc((s.episodes[x.ep - 1] || [''])[0]) + '</span></span>'
               + '<span class="st">' + esc(s.title) + ' · ' + timeAgo(x.ts) + '</span></span></a>';
@@ -870,7 +898,12 @@
   /* ======================= 14. ฟีด ======================= */
   function initFeed() {
     var box = $('#feedPlayer'); if (!box) return;
-    var i = 0, list = D.series;
+    /* ADR-001 §13.7 D8 · ฟีดไม่รวมเรื่องแนวนอน และต้องกรอง **สองที่** ไม่ใช่ที่เดียว
+       ของเดิมคือ `D.series` = ทุกเรื่อง ⇒ กรองแค่ตอน build แล้วปล่อยที่นี่ไว้ หมายความว่า
+       การกดลูกศร "เรื่องถัดไป" จะพาผู้ชมไปเจอเรื่องแนวนอนในกรอบที่หน้าไม่ได้เตรียมไว้
+       ตัวนับ "เรื่องที่ 1 จาก N" ก็ต้องได้ N เท่ากับฝั่ง build (วันนี้ 12 = 12 จึงยังไม่เห็นปัญหา) */
+    var i = 0, list = D.series.filter(function (s) { return s.orientation === 'vertical'; });
+    if (!list.length) return;      /* HTML ที่ส่งมาเป็นสถานะว่างอยู่แล้ว — ห้ามเขียนทับด้วยเพลเยอร์เปล่า */
     var img = box.querySelector('img');
     var bar = box.querySelector('.bar i');
     var tick = null, t = 0;
@@ -879,7 +912,10 @@
       i = (n + list.length) % list.length;
       var s = list[i];
       box.dataset.slug = s.slug;
-      img.src = cover(s);
+      /* ฟีดรับเฉพาะแนวตั้ง (D8) ⇒ ช่องนี้ขอทรง 'poster' ซึ่งประกาศเจตนาชัดกว่า 'auto'
+         ว่าช่องนี้ไม่มีกรณีกว้าง · ทิศของกล่องยังต้องตามเรื่องที่ขึ้นจริง ไม่ใช่เขียนตาย */
+      box.dataset.orientation = s.orientation;
+      img.src = coverSlot(s, 'poster').src;
       $('#feedTitle').innerHTML = esc(s.title) + ' <span class="num" lang="en">EP.1</span>';
       $('#feedHook').textContent = s.hook;
       $('#feedPos').textContent = 'เรื่องที่ ' + (i + 1) + ' จาก ' + list.length;
@@ -964,7 +1000,7 @@
       var isNew = s.status !== 'จบแล้ว';
       return '<a class="notif' + (isNew ? ' unread' : '') + '" href="'
         + url('watch/' + s.slug + '/ep-' + s.eps + '/') + '">'
-        + '<span class="th"><img src="' + cover(s) + '" width="1024" height="1536" alt="" loading="lazy" decoding="async"></span>'
+        + '<span class="th"><img ' + coverAttrs(s, 'poster') + ' alt="" loading="lazy" decoding="async"></span>'
         + '<span class="bd"><b>' + (isNew ? 'EP.' + s.eps + ' ออกแล้ว' : 'เรื่องนี้จบแล้ว ครบ ' + s.eps + ' ตอน') + '</b>'
         + '<p>' + esc(s.title) + ' · ' + esc(s.episodes[s.eps - 1][0]) + '</p></span>'
         + '<span class="tm">' + esc(s.status) + '</span></a>';

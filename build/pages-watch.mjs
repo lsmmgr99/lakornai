@@ -129,11 +129,16 @@ export function buildWatch() {
           main: `<main id="main" class="page watch-page"><div class="wrap">
             <div class="watch-col">
               <div>
-                <div class="player" id="player"
+                ${/* ทิศถูก "เขียนลงบนกล่องเพลเยอร์โดย build" ไม่ใช่ให้ JS วัดภาพแล้วเดาตอนรัน
+                     และไม่ใช่ให้ CSS เดาจากขนาดจอ (ADR-001 §13.7 D7 ข้อ 1)
+                     โปสเตอร์ในกล่องนี้ขอทรง `auto` = ตามทิศของเรื่อง ไม่ใช่ตามช่อง: ภาพนี้คือ
+                     เฟรมแรกแทนวิดีโอ ถ้ากรอบเป็น 16:9 แต่ภาพเป็น 2:3 ผู้ชมจะเห็นภาพครอป
+                     เต็มจอก่อนวิดีโอขึ้น · กฎ aspect-ratio ของกล่องอยู่ที่ build/site-extra.css */ ''}<div class="player" id="player"
+                     data-orientation="${s.orientation}"
                      data-dur="${epSecs(e[1])}"
                      data-next="${next ? L(U.watch(s.slug, next)) : ''}"
                      data-series="${L(U.series(s.slug))}">
-                  ${coverImg(L, s, { lazy: false })}
+                  ${coverImg(L, s, { lazy: false, shape: 'auto' })}
                   <div class="vig"></div>
                   <div class="ptop">
                     <a class="rnd" href="${L(U.series(s.slug))}" aria-label="กลับไปหน้าเรื่อง">${ic('left')}</a>
