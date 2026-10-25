@@ -277,8 +277,12 @@ export const BY = Object.fromEntries(SERIES.map(s => [s.slug, s]));
       เหตุผลทางเทคนิคของฉบับแรก (คลิป 16:9 ในกรอบเต็มจอ 9:16 เหลือภาพจริงราว 32% ของ
       ความสูงจอ · เครื่องเรือนของฟีดวางพิงกรอบแนวตั้ง) **ยังจริงทุกข้อ แต่กลายเป็นโจทย์
       ของ UX (AIO-59) ไม่ใช่เหตุผลให้กรอง** · ใครอ่านรอบหน้าแล้วเห็นเหตุผลพวกนั้นแล้วคิดจะ
-      เอาตัวกรองกลับมา ให้อ่าน ADR-001 §13.7 ให้จบก่อน · ด่าน V17 ข้อ ก ล้มถ้าฟีด **ขาด** เรื่อง */
-export const isVertical = s => s.orientation === 'vertical';
+      เอาตัวกรองกลับมา ให้อ่าน ADR-001 §13.7 ให้จบก่อน · ด่าน V17 ข้อ ก ล้มถ้าฟีด **ขาด** เรื่อง
+
+   ตัวช่วย `isVertical` ก็ถูกถอนออกด้วยหลังไม่มีใครเรียก: สัญญาอนุญาตให้เก็บไว้ได้ แต่
+   helper ชื่อนี้ที่ไม่มีคนใช้ นั่งอยู่ข้างคอมเมนต์ที่ห้ามกรองด้วยทิศ คือคำเชิญให้ใครมา
+   `SERIES.filter(isVertical)` รอบหน้า · ที่ที่ "ถามทิศ" ได้จริงมีที่เดียวคือตัวเลือกไฟล์
+   `coverSlot()` ที่ build/seo.mjs ซึ่งถาม `orientation === 'horizontal'` ตรง ๆ อยู่แล้ว */
 export const genreLabel = slug => (D.genres.find(g => g.slug === slug) || {}).label || slug;
 export const genreOf = slug => D.genres.find(g => g.slug === slug);
 export const seriesOfGenre = g => SERIES.filter(s => s.genres.includes(g));
