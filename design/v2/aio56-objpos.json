@@ -1,0 +1,1097 @@
+{
+  "at": "2026-10-25",
+  "sha": "(ไม่ทราบ)",
+  "tree": "/tmp/aio56-pin",
+  "safe": 0.121,
+  "rows": [
+    {
+      "kind": "hero",
+      "tag": "1920x1080",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 22%",
+      "box": [
+        1248,
+        480
+      ],
+      "arBox": 2.6,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        251,
+        1024,
+        394
+      ],
+      "cut": {
+        "top": 16.36,
+        "bottom": 58,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 251,
+        "bottom": 891,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "1920x1080",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 22%",
+      "box": [
+        1248,
+        480
+      ],
+      "arBox": 2.6,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        41,
+        2640,
+        1015
+      ],
+      "cut": {
+        "top": 3.38,
+        "bottom": 12,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 41,
+        "bottom": 144,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "1920x1080",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        1248,
+        480
+      ],
+      "arBox": 2.6,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        92,
+        2640,
+        1015
+      ],
+      "cut": {
+        "top": 7.69,
+        "bottom": 7.69,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 92,
+        "bottom": 92,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "ceo-cold.webp"
+    },
+    {
+      "kind": "hero",
+      "tag": "1440x900",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 22%",
+      "box": [
+        1248,
+        480
+      ],
+      "arBox": 2.6,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        251,
+        1024,
+        394
+      ],
+      "cut": {
+        "top": 16.36,
+        "bottom": 58,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 251,
+        "bottom": 891,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "1440x900",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 22%",
+      "box": [
+        1248,
+        480
+      ],
+      "arBox": 2.6,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        41,
+        2640,
+        1015
+      ],
+      "cut": {
+        "top": 3.38,
+        "bottom": 12,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 41,
+        "bottom": 144,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "1440x900",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        1248,
+        480
+      ],
+      "arBox": 2.6,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        92,
+        2640,
+        1015
+      ],
+      "cut": {
+        "top": 7.69,
+        "bottom": 7.69,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 92,
+        "bottom": 92,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "ceo-cold.webp"
+    },
+    {
+      "kind": "hero",
+      "tag": "1366x768",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 22%",
+      "box": [
+        1248,
+        430.1
+      ],
+      "arBox": 2.902,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        260,
+        1024,
+        353
+      ],
+      "cut": {
+        "top": 16.95,
+        "bottom": 60.08,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 260,
+        "bottom": 923,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "1366x768",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 22%",
+      "box": [
+        1248,
+        430.1
+      ],
+      "arBox": 2.902,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        64,
+        2640,
+        910
+      ],
+      "cut": {
+        "top": 5.32,
+        "bottom": 18.86,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 64,
+        "bottom": 226,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "1366x768",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        1248,
+        430.1
+      ],
+      "arBox": 2.902,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        145,
+        2640,
+        910
+      ],
+      "cut": {
+        "top": 12.09,
+        "bottom": 12.09,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 145,
+        "bottom": 145,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "ceo-cold.webp"
+    },
+    {
+      "kind": "hero",
+      "tag": "768x1024",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 22%",
+      "box": [
+        736,
+        440
+      ],
+      "arBox": 1.673,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        203,
+        1024,
+        612
+      ],
+      "cut": {
+        "top": 13.23,
+        "bottom": 46.91,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 203,
+        "bottom": 721,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "768x1024",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 22%",
+      "box": [
+        736,
+        440
+      ],
+      "arBox": 1.673,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        316,
+        0,
+        2007,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 11.98,
+        "right": 11.98
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 316,
+        "right": 316
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "768x1024",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        736,
+        440
+      ],
+      "arBox": 1.673,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        316,
+        0,
+        2007,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 11.98,
+        "right": 11.98
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 316,
+        "right": 316
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "ceo-cold.webp"
+    },
+    {
+      "kind": "hero",
+      "tag": "390x844",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        315.1,
+        472.6
+      ],
+      "arBox": 0.667,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        0,
+        1024,
+        1536
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "390x844",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        315.1,
+        472.6
+      ],
+      "arBox": 0.667,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        920,
+        0,
+        800,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 34.85,
+        "right": 34.85
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 920,
+        "right": 920
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "hero",
+      "tag": "390x844",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        315.1,
+        472.6
+      ],
+      "arBox": 0.667,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        920,
+        0,
+        800,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 34.85,
+        "right": 34.85
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 920,
+        "right": 920
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "ceo-cold.webp"
+    },
+    {
+      "kind": "cont",
+      "tag": "1440x900",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 28%",
+      "box": [
+        300,
+        168.8
+      ],
+      "arBox": 1.778,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "durian-revenge.webp",
+      "vis": [
+        0,
+        269,
+        1024,
+        576
+      ],
+      "cut": {
+        "top": 17.5,
+        "bottom": 45,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 269,
+        "bottom": 691,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "cont",
+      "tag": "1440x900",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 28%",
+      "box": [
+        300,
+        168.8
+      ],
+      "arBox": 1.778,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "durian-revenge.webp",
+      "vis": [
+        253,
+        0,
+        2133,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 9.6,
+        "right": 9.6
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 253,
+        "right": 253
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "cont",
+      "tag": "1440x900",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        300,
+        168.8
+      ],
+      "arBox": 1.778,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "durian-revenge.webp",
+      "vis": [
+        253,
+        0,
+        2133,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 9.6,
+        "right": 9.6
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 253,
+        "right": 253
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "durian-revenge.webp"
+    },
+    {
+      "kind": "cont",
+      "tag": "390x844",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 28%",
+      "box": [
+        232,
+        130.5
+      ],
+      "arBox": 1.778,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "durian-revenge.webp",
+      "vis": [
+        0,
+        269,
+        1024,
+        576
+      ],
+      "cut": {
+        "top": 17.5,
+        "bottom": 45,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 269,
+        "bottom": 691,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "cont",
+      "tag": "390x844",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 28%",
+      "box": [
+        232,
+        130.5
+      ],
+      "arBox": 1.778,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "durian-revenge.webp",
+      "vis": [
+        253,
+        0,
+        2133,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 9.6,
+        "right": 9.6
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 253,
+        "right": 253
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "cont",
+      "tag": "390x844",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        232,
+        130.5
+      ],
+      "arBox": 1.778,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "durian-revenge.webp",
+      "vis": [
+        253,
+        0,
+        2133,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 9.6,
+        "right": 9.6
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 253,
+        "right": 253
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "durian-revenge.webp"
+    },
+    {
+      "kind": "reel",
+      "tag": "1440x900",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        220.6,
+        200
+      ],
+      "arBox": 1.103,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "ceo-cold.webp",
+      "vis": [
+        0,
+        304,
+        1024,
+        928
+      ],
+      "cut": {
+        "top": 19.78,
+        "bottom": 19.78,
+        "left": 0,
+        "right": 0
+      },
+      "cutPx": {
+        "top": 304,
+        "bottom": 304,
+        "left": 0,
+        "right": 0
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "reel",
+      "tag": "1440x900",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        220.6,
+        200
+      ],
+      "arBox": 1.103,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        658,
+        0,
+        1323,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 24.93,
+        "right": 24.93
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 658,
+        "right": 658
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "reel",
+      "tag": "1440x900",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        220.6,
+        200
+      ],
+      "arBox": 1.103,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        658,
+        0,
+        1323,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 24.93,
+        "right": 24.93
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 658,
+        "right": 658
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "ceo-cold.webp"
+    },
+    {
+      "kind": "reel",
+      "tag": "390x844",
+      "state": "today",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        104,
+        200
+      ],
+      "arBox": 0.52,
+      "nat": [
+        1024,
+        1536
+      ],
+      "arImg": 0.667,
+      "src": "ceo-cold.webp",
+      "vis": [
+        113,
+        0,
+        799,
+        1536
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 11,
+        "right": 11
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 113,
+        "right": 113
+      },
+      "attrWH": [
+        "1024",
+        "1536"
+      ]
+    },
+    {
+      "kind": "reel",
+      "tag": "390x844",
+      "state": "wide22",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        104,
+        200
+      ],
+      "arBox": 0.52,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        1008,
+        0,
+        624,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 38.18,
+        "right": 38.18
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 1008,
+        "right": 1008
+      },
+      "attrWH": [
+        null,
+        null
+      ]
+    },
+    {
+      "kind": "reel",
+      "tag": "390x844",
+      "state": "wide50",
+      "objectFit": "cover",
+      "op": "50% 50%",
+      "box": [
+        104,
+        200
+      ],
+      "arBox": 0.52,
+      "nat": [
+        2640,
+        1200
+      ],
+      "arImg": 2.2,
+      "src": "ceo-cold.webp",
+      "vis": [
+        1008,
+        0,
+        624,
+        1200
+      ],
+      "cut": {
+        "top": 0,
+        "bottom": 0,
+        "left": 38.18,
+        "right": 38.18
+      },
+      "cutPx": {
+        "top": 0,
+        "bottom": 0,
+        "left": 1008,
+        "right": 1008
+      },
+      "attrWH": [
+        null,
+        null
+      ],
+      "pairedWith": "ceo-cold.webp"
+    }
+  ]
+}
