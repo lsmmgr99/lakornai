@@ -113,7 +113,20 @@
       → ตก "พาธภาพใน JSON-LD มีไฟล์จริงบนดิสก์ทุกเส้น" ในสถานะ ข
       ⚠️ ของจริงที่ fixture ของ M16 เปิดให้เห็น: ที่วางนั้นประกอบพาธปกเองและฝังขนาด 1024×1536
          ไว้ตรง ๆ ⇒ เรื่องที่ชื่อไฟล์ปกไม่เท่ากับ slug ส่งพาธที่ไม่มีไฟล์เข้า structured data
-         โดยไม่มีด่านใดเห็น (ด่านวัดกล่องอ่านแต่ DOM ไม่อ่าน JSON-LD) */
+         โดยไม่มีด่านใดเห็น (ด่านวัดกล่องอ่านแต่ DOM ไม่อ่าน JSON-LD)
+   M18 เลื่อนเบรกพอยต์ของ CSS ฝั่ง `design/v2` ฝ่ายเดียว (ห้ามทำในรีโปจริง — ทำในสำเนาตรึง)
+      → ตก "เบรกพอยต์ที่ CSS สลับจริง = ค่าที่ผลิต <source media>" เพราะด่านวัดจุดสลับใน
+      เบราว์เซอร์ด้วย binary search แล้วเทียบกับค่าที่ตัวสร้างใช้
+   M19 เลื่อน `HERO_WIDE_BP` 720 → 900 ที่ `build/pages-discovery.mjs` โดยไม่แตะ CSS เลย
+      → ตก 5 ข้อ (วัดแล้วทั้งฝั่ง Dev และทั้งสองฝั่งรีวิว) ⇒ ข้ออ้าง "720 คือจุดที่ CSS สลับ"
+      มีด่านค้ำแล้ว ไม่ใช่ค่าที่ยืมมาจากตัวสร้างเป็นทั้งโจทย์และเฉลย (AIO-64 R6)
+   M20 ให้ run อื่นถือพอร์ตของเว็บไว้ก่อน แล้วรันด่านด้วย `LAY_PORT=<พอร์ตนั้น>`
+      → ด่าน **ออกก่อนพิมพ์ตัวเลขใด ๆ** ด้วยข้อความว่าพอร์ตนั้นไม่ใช่เซิร์ฟเวอร์ของรันนี้
+      ⚠️ ของเดิม: ด่านวัดเว็บของ run อื่นแล้วรายงานเลขที่ไม่ใช่ของต้นไม้ที่กำลังตรวจ — ทั้งทิศแดง
+         ผิดและ **ทิศเขียวผิด** (AIO-66 P1-1 · AIO-67 P2-1) · เคสนี้เป็นเทสต์ถาวรที่
+         `ci/gate-lifecycle.test.mjs` ไม่ใช่มิวเทชันที่ต้องทำมือ
+   M21 ถอด `await die(...)` ของทางออกตอนเริ่ม (ONLY สะกดผิด) กลับเป็น `process.exit(1)`
+      → `ci/gate-lifecycle.test.mjs` แดง เพราะเหลือ `/tmp/lkn-*` ค้างสองโฟลเดอร์ต่อการรัน */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -147,22 +160,84 @@ const TMP_ROOT = (() => {
   }
   return os.tmpdir();
 })();
-const PROFILE = fs.mkdtempSync(path.join(TMP_ROOT, 'lkn-lay-'));
-/* chrome สร้างไดเรกทอรีของตัวเองใน TMPDIR **ของมันเอง** ไม่ใช่ใน --user-data-dir ⇒ cleanup ที่ลบ
-   แต่ PROFILE ยังเหลือขยะทิ้งไว้ทุกรอบที่ถูกตัดด้วยสัญญาณ (วัดเองตอนปิด AIO-64 R5: SIGTERM
-   แล้วเหลือ 1 ไดเรกทอรี) · จะเดาชื่อแล้วลบตามแพตเทิร์นไม่ได้ — TMPDIR แชร์กับ run อื่น เดี๋ยวลบ
-   ของเขา ⇒ **ยก TMPDIR ของ chrome ให้เป็นโฟลเดอร์ของเราเอง** แล้วลบทั้งโฟลเดอร์
-   ยามกันรอยที่เพิ่งเจอ: ถ้าพาธยังยาวเกินงบของ socket ให้คืนไปใช้ TMPDIR ที่สืบทอดมา
-   (เหลือขยะ 1 โฟลเดอร์ดีกว่าด่านที่ล้มทุกรอบด้วยข้อความที่ชี้ผิดทาง) */
-const CHROME_TMP = fs.mkdtempSync(path.join(TMP_ROOT, 'lkn-ct-'));
-const CHROME_TMP_FITS = CHROME_TMP.length + '/org.chromium.Chromium.XXXXXX/SingletonSocket'.length < 104;
+/* ---------- ทรัพยากรทุกชิ้นถูกประกาศที่นี่ แต่ **ยังไม่ถูกสร้าง** (AIO-66 P2-1 · AIO-67 P2-3) ----------
+   รอบก่อน PROFILE/CHROME_TMP ถูก mkdtemp ที่บรรทัดนี้ ขณะที่ตัวเก็บกวาดถูกติดตั้งอีกหลายร้อย
+   บรรทัดถัดไป ⇒ ทางออก `process.exit(1)` ที่อยู่ระหว่างสองจุดนั้น (ONLY สะกดผิด · ไม่พบม็อกอัพ ·
+   build ล้ม) ทิ้ง `/tmp/lkn-*` ไว้สองโฟลเดอร์ต่อการรันหนึ่งครั้ง — ทั้งสองฝั่งรีวิวทำซ้ำได้จริง
+   ⇒ สร้างทรัพยากร **หลัง** ติดตั้ง handler และให้ทุกทางออกก่อนหน้านั้นเดินผ่าน cleanup() */
+let PROFILE = null, CHROME_TMP = null, CHROME_TMP_FITS = false;
+let server = null, chrome = null, wideServer = null, wideDir = null;
 const ONLY = process.env.ONLY || '';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+/* ---------- ตัวเก็บกวาด + ทางออกทั้งหมด ติดตั้งก่อนมีทรัพยากรชิ้นแรก ----------
+   ส่วน 6 เปิดเซิร์ฟเวอร์ตัวที่สองบนต้นไม้ชั่วคราว — ต้องถูกเก็บทุกทางออก รวมทางที่โยน exception
+   (ถ้าหลุด จะเหลือ node ค้างถือพอร์ตแล้วการรันครั้งถัดไปแดงแบบสุ่ม — บทเรียน AIO-45) */
+let cleaning = false;
+async function cleanup(code) {
+  if (cleaning) return;                /* สัญญาณที่มาสองครั้ง (SIGTERM แล้ว SIGINT) ต้องไม่ลบซ้อนกัน */
+  cleaning = true;
+  const kids = [server, wideServer, chrome].filter(Boolean);
+  /* ฆ่าเป็น **กลุ่มโปรเซส** ไม่ใช่เฉพาะตัวลูก — chrome แตกลูกหลานอีกหลายตัว (zygote/renderer/GPU)
+     ที่ไม่ตายตามพ่อเมื่อพ่อถูกฆ่า แล้วมันยังเขียนลงโปรไฟล์ต่อ ⇒ rm ล้มแล้วเหลือโฟลเดอร์ค้าง
+     (เจอเองตอนเขียน ci/gate-lifecycle.test.mjs: SIGTERM กลางสตาร์ต chrome → เหลือ lkn-lay-*)
+     ⇒ spawnWatched ตั้ง detached:true ให้ลูกทุกตัวมีกลุ่มของตัวเอง แล้วส่งสัญญาณถึงทั้งกลุ่ม
+     (ข้อนี้ตอบของที่ฝั่ง Codex วัดไว้ด้วย: SIGKILL ที่ harness เหลือ 13 โปรเซส) */
+  const killGroup = (p, sig) => {
+    try { process.kill(-p.pid, sig); } catch { try { p.kill(sig); } catch {} }
+  };
+  for (const p of kids) killGroup(p, 'SIGTERM');
+  /* **รอให้ลูกปิดจริงก่อนลบ** — chrome ที่ยังไม่ตายเขียนไฟล์กลับลงโปรไฟล์ได้หลัง rm
+     แล้วเหลือไดเรกทอรีค้างใน tmp ของเครื่องที่แชร์กัน (AIO-64 R5 · AIO-63 ข้อ 5) */
+  const waitExit = p => (p.exitCode != null ? null : new Promise(r => p.once('exit', r)));
+  await Promise.race([Promise.all(kids.map(waitExit)), sleep(3000)]);
+  /* ลูกที่ไม่ยอมออกด้วย SIGTERM ต้องถูกยืนยันว่าออกจริง **หลัง** SIGKILL ด้วย ไม่ใช่ยิงแล้วลบเลย
+     (AIO-67 P2-3: "การ retry ลบไฟล์ไม่ใช่การยืนยัน child exit") */
+  const killed = kids.filter(p => p.exitCode == null);
+  for (const p of killed) killGroup(p, 'SIGKILL');
+  if (killed.length) await Promise.race([Promise.all(killed.map(waitExit)), sleep(2000)]);
+  const stuck = kids.filter(p => p.exitCode == null && p.signalCode == null);
+  if (stuck.length) {
+    console.error(`⚠ ลูกที่ไม่ยอมออกแม้หลัง SIGKILL: pid ${stuck.map(p => p.pid).join(' ')}`
+      + ' — เครื่องนี้แชร์กับ run อื่น ให้ตรวจด้วยมือก่อนรันรอบถัดไป');
+  }
+  /* SIGKILL ไม่ได้ตายทันทีในจังหวะเดียวกับที่เราเรียก rm — chrome ที่กำลังเขียนโปรไฟล์อยู่ทำให้
+     rm ล้ม แล้ว `catch {}` กลืนความล้มนั้นไปเงียบ ๆ ⇒ เหลือโปรไฟล์ค้างใน /tmp ทุกครั้งที่ถูกตัด
+     (วัดเองรอบนี้: SIGTERM กลางทาง → wideDir หายแต่ PROFILE ค้าง 1 โฟลเดอร์)
+     ⇒ ลองซ้ำพร้อมเว้นจังหวะ และถ้าสุดท้ายยังลบไม่ได้ ให้ **พูดออกมา** ไม่ใช่เงียบ */
+  const rmHard = p => {
+    if (!p) return true;
+    for (let i = 0; i < 6; i++) {
+      try { fs.rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 120 }); } catch { /* ลองรอบถัดไป */ }
+      if (!fs.existsSync(p)) return true;
+      const t = Date.now() + 200; while (Date.now() < t) { /* เว้นจังหวะแบบ sync เพราะ handler อาจอยู่ท้ายคิวแล้ว */ }
+    }
+    console.error(`⚠ ลบไฟล์ชั่วคราวไม่สำเร็จ: ${p} — เครื่องนี้แชร์กับ run อื่น ให้ลบด้วยมือ`);
+    return false;
+  };
+  rmHard(PROFILE);
+  rmHard(CHROME_TMP);
+  rmHard(wideDir);
+  process.exit(code);
+}
+/* ถูก `timeout` หรือ Ctrl-C ตัด = ต้องไม่ทิ้งเซิร์ฟเวอร์สองตัว + chrome + สำเนารีโปใน tmp
+   (รูนี้เปิดอยู่จริงจนถึงรอบนี้ และเป็นอาการเดียวกับ AIO-45 ที่ทำให้การรันครั้งถัดไปแดงแบบสุ่ม)
+   ⚠️ SIGKILL ดักไม่ได้โดยธรรมชาติของมัน — ของที่เหลือจากทางนั้น (โปรไฟล์ 2 โฟลเดอร์ + ลูกที่
+   ยังอยู่) เป็น **เพดานที่รู้ตัว** ไม่ใช่ข้อที่ปิดแล้ว · ปิดได้ด้วย supervisor ภายนอกเท่านั้น
+   (AIO-66 P2-1 · AIO-67 P2-3 วัดตรงกัน) ⇒ ใครรันด้วย `timeout` ให้ใช้ค่าตั้งต้น (SIGTERM) */
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+  process.on(sig, () => { console.log(`\n(ถูก ${sig} — เก็บเซิร์ฟเวอร์/chrome/ไฟล์ชั่วคราวก่อนออก)`); cleanup(130); });
+}
+/* ทางออกที่เหลืออีกสองทาง: ข้อผิดพลาดที่ไม่มีใครรับ และ promise ที่ reject ลอย ๆ
+   ทั้งคู่เคยออกได้โดยไม่เรียก cleanup เลย เพราะโค้ดก่อน `try` หลักอยู่นอก handler */
+process.on('uncaughtException', e => { console.error('ทดสอบล้ม (uncaught): ' + e.message); cleanup(1); });
+process.on('unhandledRejection', e => { console.error('ทดสอบล้ม (rejection): ' + (e && e.message || e)); cleanup(1); });
+/* ทางออกแบบ "ล้มตอนเริ่ม" ทุกทางต้องเดินผ่านตัวเก็บกวาด ไม่ใช่ process.exit ตรง ๆ */
+const die = async msg => { console.error(msg); await cleanup(1); };
+
 /* ONLY ที่สะกดผิดเคยรันทุกส่วนเงียบ ๆ ทั้งที่คนสั่งคิดว่ารันส่วนเดียว — ล้มทันทีดีกว่า */
 if (!['', 'hero', 'sweep', 'fold', 'bento', 'shape'].includes(ONLY)) {
-  console.error(`✗ ONLY=${ONLY} ไม่รู้จัก — ใช้ได้เฉพาะ hero | sweep | fold | bento | shape (หรือไม่ตั้งเลย = ทุกส่วน)`);
-  process.exit(1);
+  await die(`✗ ONLY=${ONLY} ไม่รู้จัก — ใช้ได้เฉพาะ hero | sweep | fold | bento | shape (หรือไม่ตั้งเลย = ทุกส่วน)`);
 }
 
 const HOME = '/';
@@ -304,10 +379,21 @@ const SHAPE_WIDE_DIR = 'assets/covers-wide';
    ซอร์สจริงแล้วเทียบกับตัวเลขของสัญญา · เพิ่มที่วางใหม่แล้วไม่แตะแผนที่ = แดงทันที
    (นับจากซอร์ส ไม่ใช่จากไฟล์ที่ build ออกมา และถอดคอมเมนต์บล็อกออกก่อนนับ — บทเรียนเดิม
     ของรีโปนี้: ด่าน regex ที่นับคอมเมนต์เป็นของจริงได้บั๊กผี) */
-const SHAPE_CALLSITES_BUILD = 12;      /* ADR-001 §13.5 ตารางฝั่ง build */
+/* นับ **แยกไฟล์** ไม่ใช่ยอดรวม: ยอดรวมเท่าเดิมได้จากการเพิ่มที่วางใหม่ในไฟล์หนึ่งพร้อมลบของเก่า
+   ในอีกไฟล์ ⇒ แผนที่ขาดรายการแต่ด่านเขียว (AIO-66 P3-3) · แยกไฟล์ปิดกรณีข้ามไฟล์ได้ทั้งหมด
+   และแคบกรณีในไฟล์เดียวลงเหลือ "ย้ายที่วางภายในไฟล์เดิมโดยคงจำนวน" ซึ่งข้อ "ทุกที่วางในแผนที่
+   ต้องมีคู่ (selector, หน้า) ไม่ซ้ำ" + ออราเคิล identity ต่อกล่องเป็นชั้นถัดไปที่จับได้ */
+const SHAPE_CALLSITES_BUILD = {        /* ADR-001 §13.5 ตารางฝั่ง build */
+  'build/pages-discovery.mjs': 8, 'build/pages-watch.mjs': 1,
+  'build/pages-content.mjs': 1, 'build/ui.mjs': 2,
+};
 const SHAPE_CALLSITES_APP = 8;         /* ADR-001 §13.5 ตารางฝั่งเบราว์เซอร์ (ไม่นับตัวนิยาม) */
 function countCalls(rel, name) {
-  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  /* ถอดคอมเมนต์ **ทั้งสองแบบ** — ของเดิมถอดแต่ `/* *‌/` ⇒ คอมเมนต์บรรทัดเดียวที่เขียนชื่อ
+     ฟังก์ชันไว้ (เช่นอธิบายว่าที่วางนี้เคยเรียก coverImg()) ทำให้ตัวนับเพี้ยน · บทเรียนเดิมของ
+     รีโปนี้: ด่าน regex ที่นับคอมเมนต์เป็นของจริงได้บั๊กผี (AIO-66 P3-2) */
+  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8')
+    .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   return (src.match(new RegExp(`(?<!function\\s)\\b${name}\\s*\\(`, 'g')) || []).length;
 }
 
@@ -363,7 +449,14 @@ const SHAPE_MAP = [
   /* declared:false ไม่ใช่การผ่อนด่าน แต่เป็นคำตัดสินของ Visual ที่เขียนกำกับไว้ในกฎเอง:
      คอมเมนต์เหนือกฎ `.gtile` ตัวฐานใน design/v2/v2.css บอกตรง ๆ ว่าช่อง onboarding
      "เป็นตัวเลือกในฟอร์ม ไม่ใช่ปกในคลัง ⇒ รูปทรงแนวตั้งผูกไว้กับ .genre-bento เท่านั้น"
-     ⇒ ช่องนี้เป็นแถบนอนโดยเจตนา · ด่านยังบังคับ S2/S3/S4 กับมันเต็มรูปแบบ */
+     ⇒ ช่องนี้เป็นแถบนอนโดยเจตนา · ด่านยังบังคับ S2/S3/S4 กับมันเต็มรูปแบบ
+     ⚠️ เพดานที่รู้ตัวของช่องนี้ (AIO-66 P3-7 — บันทึกไว้ ไม่ใช่ลืม): ไทล์ที่ผูกกับ "แนว" ไม่มี
+     slug ของตัวเองใน DOM ⇒ S2 ที่บังคับได้คือ **สมาชิกภาพ** ("ปกที่ขึ้นเป็นเรื่องในแนวนั้นจริง")
+     ส่วนท่อนเทียบพาธย้อนกลับมาจากไฟล์ใบเดิมจึงเป็น tautology โดยโครงสร้าง · ที่ `/` และ
+     `/browse/` มีข้อ "ปกของไทล์ไม่ซ้ำกันเลย" ของ AIO-54 ค้ำอีกชั้น แต่ `/welcome/` ไม่มีข้อนั้น
+     ครอบ ⇒ ชั้นที่ครอบหน้านี้คือข้อ "ทุกพาธใต้ assets/covers* อยู่ในทะเบียน" (จับการเดาชื่อไฟล์
+     จาก slug ได้ในสถานะ ข) · การบังคับ identity เต็มรูปแบบต้องให้ build เขียน slug ลงไทล์ ซึ่ง
+     เป็นการเปลี่ยน DOM ของหน้าที่ Visual เป็นเจ้าของ ⇒ ไม่ใช่ของที่ Dev ตัดสินในใบนี้ */
   { key: 'ไทล์เลือกแนวหน้าต้อนรับ', sel: '.pickgrid .gtile', at: U.welcome, shape: 'poster', declared: false },
   { key: 'แถวตอน', sel: '.ep-row .th', at: U.newEp, shape: 'poster' },
   /* สามรายการข้างล่างเป็นจุดเรียกที่ **แผนที่รอบแรกไม่มีเลย** ทั้งที่อยู่ในตารางของ ADR §13.5
@@ -455,14 +548,12 @@ const SHAPE_SCRIPT = `try{
 }catch(e){}`;
 
 if (!fs.existsSync(path.join(ROOT, 'design/v2/home.html'))) {
-  console.error('✗ ไม่พบ design/v2/home.html — ด่านนี้ใช้ม็อกอัพที่อนุมัติเป็นค่าอ้างอิง');
-  process.exit(1);
+  await die('✗ ไม่พบ design/v2/home.html — ด่านนี้ใช้ม็อกอัพที่อนุมัติเป็นค่าอ้างอิง');
 }
 if (!process.env.SKIP_BUILD) {
   const r = spawnSync('node', ['build/build.mjs'], { cwd: ROOT, encoding: 'utf8' });
   if (r.status !== 0) {
-    console.error('✗ build/build.mjs ล้ม — วัดไฟล์ที่ส่งมอบต่อไม่ได้\n' + (r.stderr || r.stdout));
-    process.exit(1);
+    await die('✗ build/build.mjs ล้ม — วัดไฟล์ที่ส่งมอบต่อไม่ได้\n' + (r.stderr || r.stdout));
   }
 }
 
@@ -517,63 +608,165 @@ const PUBLISHED = new Set(siteFiles(ROOT, { ext: '.html' })
   .map(rel => '/' + rel.replace(/index\.html$/, '')));
 const FOLD_PAGES = PAGES.filter(p => PUBLISHED.has(p));
 
-/* ---------- 3. เบราว์เซอร์ ---------- */
-const server = spawn(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)], { stdio: 'ignore' });
-const chrome = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dbus',
+/* ---------- 3. ทรัพยากร + ข้อพิสูจน์ว่า "เว็บที่กำลังจะวัด เป็นของรันนี้" ----------
+   รอยที่ปิดด้วยบล็อกนี้ (ทั้งสองฝั่งรีวิวทำซ้ำได้จริง · AIO-66 P1-1 · AIO-67 P2-1):
+   เซิร์ฟเวอร์หลักถูก spawn แล้วด่านเปิด BASE ต่อทันทีโดย **ไม่มี readiness และไม่พิสูจน์เจ้าของ**
+   ⇒ ถ้า run อื่นถือพอร์ตนั้นอยู่ (หรือมีคนตั้ง LAY_PORT ชนของเขา) ลูกของเราตายด้วย EADDRINUSE
+   อย่างเงียบ ๆ (`stdio:'ignore'` กลืน stderr) แล้วด่านไป **วัดเว็บของคนอื่น** โดยป้ายยังเขียนว่า
+   "สถานะ ก · ถอยกลับ" · ทิศที่อันตรายกว่าคือทิศกลับ: ต้นไม้ของเราพัง + ของเขาดี ⇒ เขียวทั้งแผง
+   ข้อพิสูจน์ที่ใช้คือ **เทียบไบต์** ของไฟล์ที่ส่งมอบกับไฟล์บนดิสก์ของต้นไม้นั้น — ไม่ใช่ "มีใคร
+   ตอบ HTTP" และไม่ใช่คุณสมบัติที่ต้นไม้ชนิดเดียวกันของ run อื่นก็มีได้ (เช่น "ทุกเรื่องมี coverWide")
+   ล้มที่นี่ = ออกก่อนพิมพ์ตัวเลขใด ๆ เพราะตัวเลขที่วัดจากต้นไม้ผิด แย่กว่าไม่มีตัวเลข */
+try {
+  PROFILE = fs.mkdtempSync(path.join(TMP_ROOT, 'lkn-lay-'));
+  /* chrome สร้างไดเรกทอรีของตัวเองใน TMPDIR **ของมันเอง** ไม่ใช่ใน --user-data-dir ⇒ cleanup ที่ลบ
+     แต่ PROFILE ยังเหลือขยะทิ้งไว้ทุกรอบที่ถูกตัดด้วยสัญญาณ (วัดเองตอนปิด AIO-64 R5: SIGTERM
+     แล้วเหลือ 1 ไดเรกทอรี) · จะเดาชื่อแล้วลบตามแพตเทิร์นไม่ได้ — TMPDIR แชร์กับ run อื่น เดี๋ยวลบ
+     ของเขา ⇒ **ยก TMPDIR ของ chrome ให้เป็นโฟลเดอร์ของเราเอง** แล้วลบทั้งโฟลเดอร์
+     ยามกันรอยที่เพิ่งเจอ: ถ้าพาธยังยาวเกินงบของ socket ให้คืนไปใช้ TMPDIR ที่สืบทอดมา
+     (เหลือขยะ 1 โฟลเดอร์ดีกว่าด่านที่ล้มทุกรอบด้วยข้อความที่ชี้ผิดทาง) */
+  CHROME_TMP = fs.mkdtempSync(path.join(TMP_ROOT, 'lkn-ct-'));
+  CHROME_TMP_FITS = CHROME_TMP.length + '/org.chromium.Chromium.XXXXXX/SingletonSocket'.length < 104;
+} catch (e) {
+  /* ชิ้นที่สองสร้างไม่ได้ ⇒ ชิ้นแรกต้องไม่ค้าง (ฝั่ง Codex ฉีด exception ที่จุดนี้แล้วเหลือ PROFILE) */
+  await die('✗ สร้างที่เก็บของชั่วคราวไม่ได้: ' + (e && e.message || e));
+}
+
+/* stderr ของลูกต้องไม่ถูกกลืน — `EADDRINUSE` และ `FATAL: Socket path too long` ของ chrome
+   เป็นสองข้อความที่เคยหายไปทั้งที่เป็นเหตุจริงของความล้ม แล้วด่านรายงานอาการที่ชี้ผิดทาง */
+function spawnWatched(cmd, args, opts = {}) {
+  /* detached: ให้ลูกเป็นหัวกลุ่มโปรเซสของตัวเอง ⇒ ตัวเก็บกวาดฆ่าได้ทั้งกลุ่ม (ดู cleanup) */
+  const p = spawn(cmd, args, { ...opts, detached: true, stdio: ['ignore', 'ignore', 'pipe'] });
+  p.err = '';
+  p.stderr.on('data', d => { if (p.err.length < 4000) p.err += d.toString(); });
+  p.on('error', e => { p.err += `spawn ล้ม: ${e.message}\n`; });
+  return p;
+}
+/* ไฟล์ที่ใช้เป็นลายนิ้วมือ: ต้องเป็นของที่ build สร้าง (ไม่ใช่ของนิ่งอย่าง robots.txt) และต้อง
+   ต่างกันแน่นอนระหว่างสถานะ ก กับต้นไม้ชั่วคราวของสถานะ ข — `content.json` ต่างที่ orientation/
+   coverWide · `assets/app.js` + `assets/site.css` ต่างเมื่อมีใครแก้ท่อเบราว์เซอร์/CSS ใต้มือเรา */
+const OWNERSHIP_FILES = ['/content.json', '/assets/app.js', '/assets/site.css'];
+async function proveServesTree(base, root) {
+  for (const rel of OWNERSHIP_FILES) {
+    const onDisk = fs.readFileSync(path.join(root, rel.slice(1)));
+    let got;
+    try {
+      const r = await fetch(base + rel);
+      if (!r.ok) return `${base}${rel} ตอบ HTTP ${r.status}`;
+      got = Buffer.from(await r.arrayBuffer());
+    } catch (e) { return `${base}${rel} เรียกไม่ได้: ${e && e.message || e}`; }
+    if (!got.equals(onDisk)) {
+      const at = [...onDisk].findIndex((b, i) => got[i] !== b);
+      return `${base}${rel} ไม่ตรงกับไฟล์บนดิสก์ของต้นไม้ที่กำลังตรวจ`
+        + ` (จากพอร์ต ${got.length} ไบต์ · บนดิสก์ ${onDisk.length} ไบต์ · ต่างกันที่ไบต์ที่ ${at})`
+        + ` ⇒ พอร์ตนี้ไม่ได้เสิร์ฟ ${root}`;
+    }
+  }
+  return null;
+}
+/* "ตอบ HTTP" ไม่ใช่หลักฐานว่าพร้อม และ "ลูกยังไม่ตาย" ก็ไม่ใช่ ⇒ ตรวจทั้งสองทางพร้อมกัน */
+async function awaitServe(child, base, root, label, tries = 150) {
+  for (let i = 0; i < tries; i++) {
+    if (child.exitCode != null || child.signalCode != null) {
+      return `เซิร์ฟเวอร์ของ${label} ออกก่อนพร้อม (exit ${child.exitCode ?? child.signalCode})`
+        + ` — พอร์ตถูก run อื่นถืออยู่หรือเปล่า?\n${child.err.trim().slice(-600)}`;
+    }
+    try {
+      const r = await fetch(base + '/content.json');
+      if (r.ok) {
+        const bad = await proveServesTree(base, root);
+        if (bad) return bad;
+        /* ❗ เทียบไบต์ผ่านยังไม่พอ: ถ้า run อื่นถือพอร์ตนี้อยู่ด้วย **ต้นไม้ที่ไบต์เหมือนกัน**
+           (เช่นเสิร์ฟรีโปเดียวกัน) ลูกของเราตายด้วย EADDRINUSE แต่การเทียบไบต์ยังผ่าน
+           ⇒ ด่านวัดผ่านโปรเซสของคนอื่นซึ่งอาจถูกฆ่า/เปลี่ยนต้นไม้กลางการวัดเมื่อไรก็ได้
+           (เจอเองตอนเขียน ci/gate-lifecycle.test.mjs รอบนี้ — เทสต์เปิดรอยนี้ให้เห็น)
+           ⇒ ต้องยืนยันว่า **ลูกของเรายังอยู่** ด้วย · เว้นจังหวะให้ EADDRINUSE โผล่ก่อนตัดสิน */
+        await sleep(300);
+        if (child.exitCode != null || child.signalCode != null) {
+          return `มีคนตอบที่พอร์ตนั้นด้วยไบต์เดียวกัน แต่เซิร์ฟเวอร์ลูกของรันนี้ตายแล้ว`
+            + ` (exit ${child.exitCode ?? child.signalCode}) ⇒ พอร์ตเป็นของ run อื่น`
+            + `\n${child.err.trim().slice(-600)}`;
+        }
+        return null;
+      }
+    } catch { /* ยังไม่ขึ้น */ }
+    await sleep(100);
+  }
+  return `เซิร์ฟเวอร์ของ${label} ไม่ตอบใน ${Math.round(tries / 10)} วินาที`;
+}
+
+server = spawnWatched(process.execPath, [path.join(ROOT, 'tools/serve.mjs'), String(PORT)]);
+{
+  const bad = await awaitServe(server, BASE, ROOT, 'สถานะ ก (เว็บที่ส่งมอบ)');
+  if (bad) {
+    await die(`✗ ไม่ยืนยันได้ว่าพอร์ต ${PORT} เป็นเซิร์ฟเวอร์ของรันนี้ ⇒ ไม่วัดต่อ: ${bad}\n`
+      + '  (ตัวเลขที่วัดจากต้นไม้ของ run อื่น เขียวหรือแดงก็ไม่มีความหมาย — '
+      + 'ปล่อย LAY_PORT ว่างไว้เพื่อให้ OS เลือกพอร์ตให้ หรือเก็บของค้างของรอบก่อนก่อนรันใหม่)');
+  }
+}
+
+chrome = spawnWatched(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-dbus',
   '--hide-scrollbars', `--user-data-dir=${PROFILE}`, `--remote-debugging-port=${CDP}`,
   '--remote-allow-origins=*', 'about:blank'],
-  { stdio: 'ignore', env: CHROME_TMP_FITS ? { ...process.env, TMPDIR: CHROME_TMP } : process.env });
-
-/* ส่วน 6 เปิดเซิร์ฟเวอร์ตัวที่สองบนต้นไม้ชั่วคราว — ต้องถูกเก็บทุกทางออก รวมทางที่โยน exception
-   (ถ้าหลุด จะเหลือ node ค้างถือพอร์ตแล้วการรันครั้งถัดไปแดงแบบสุ่ม — บทเรียน AIO-45) */
-let wideServer = null, wideDir = null;
-let cleaning = false;
-async function cleanup(code) {
-  if (cleaning) return;                /* สัญญาณที่มาสองครั้ง (SIGTERM แล้ว SIGINT) ต้องไม่ลบซ้อนกัน */
-  cleaning = true;
-  const kids = [server, wideServer, chrome].filter(Boolean);
-  for (const p of kids) { try { p.kill('SIGTERM'); } catch {} }
-  /* **รอให้ลูกปิดจริงก่อนลบ** — chrome ที่ยังไม่ตายเขียนไฟล์กลับลงโปรไฟล์ได้หลัง rm
-     แล้วเหลือไดเรกทอรีค้างใน tmp ของเครื่องที่แชร์กัน (AIO-64 R5 · AIO-63 ข้อ 5) */
-  await Promise.race([
-    Promise.all(kids.map(p => (p.exitCode != null || p.killed === false
-      ? null : new Promise(r => p.once('exit', r))))),
-    sleep(3000),
-  ]);
-  for (const p of kids) { try { if (p.exitCode == null) p.kill('SIGKILL'); } catch {} }
-  /* SIGKILL ไม่ได้ตายทันทีในจังหวะเดียวกับที่เราเรียก rm — chrome ที่กำลังเขียนโปรไฟล์อยู่ทำให้
-     rm ล้ม แล้ว `catch {}` กลืนความล้มนั้นไปเงียบ ๆ ⇒ เหลือโปรไฟล์ค้างใน /tmp ทุกครั้งที่ถูกตัด
-     (วัดเองรอบนี้: SIGTERM กลางทาง → wideDir หายแต่ PROFILE ค้าง 1 โฟลเดอร์)
-     ⇒ ลองซ้ำพร้อมเว้นจังหวะ และถ้าสุดท้ายยังลบไม่ได้ ให้ **พูดออกมา** ไม่ใช่เงียบ */
-  const rmHard = p => {
-    if (!p) return true;
-    for (let i = 0; i < 6; i++) {
-      try { fs.rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 120 }); } catch { /* ลองรอบถัดไป */ }
-      if (!fs.existsSync(p)) return true;
-      const t = Date.now() + 200; while (Date.now() < t) { /* เว้นจังหวะแบบ sync เพราะ handler อาจอยู่ท้ายคิวแล้ว */ }
-    }
-    console.error(`⚠ ลบไฟล์ชั่วคราวไม่สำเร็จ: ${p} — เครื่องนี้แชร์กับ run อื่น ให้ลบด้วยมือ`);
-    return false;
-  };
-  rmHard(PROFILE);
-  rmHard(CHROME_TMP);
-  rmHard(wideDir);
-  process.exit(code);
-}
-/* ถูก `timeout` หรือ Ctrl-C ตัด = ต้องไม่ทิ้งเซิร์ฟเวอร์สองตัว + chrome + สำเนารีโปใน tmp
-   (รูนี้เปิดอยู่จริงจนถึงรอบนี้ และเป็นอาการเดียวกับ AIO-45 ที่ทำให้การรันครั้งถัดไปแดงแบบสุ่ม) */
-for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
-  process.on(sig, () => { console.log(`\n(ถูก ${sig} — เก็บเซิร์ฟเวอร์/chrome/ไฟล์ชั่วคราวก่อนออก)`); cleanup(130); });
-}
-/* ทางออกที่เหลืออีกสองทาง: ข้อผิดพลาดที่ไม่มีใครรับ และ promise ที่ reject ลอย ๆ
-   ทั้งคู่เคยออกได้โดยไม่เรียก cleanup เลย เพราะโค้ดก่อน `try` หลักอยู่นอก handler */
-process.on('uncaughtException', e => { console.error('ทดสอบล้ม (uncaught): ' + e.message); cleanup(1); });
-process.on('unhandledRejection', e => { console.error('ทดสอบล้ม (rejection): ' + (e && e.message || e)); cleanup(1); });
+  { env: CHROME_TMP_FITS ? { ...process.env, TMPDIR: CHROME_TMP } : process.env });
 
 /* งบเวลารอ chrome ขึ้น: 240 × 250ms = 60 วินาที · ของเดิม 20 วินาที ซึ่ง **ไม่พอจริง** เมื่อ
    เครื่องนี้มี run อื่นถือ chrome อยู่ด้วย (วัดเอง: สามรันพร้อมกันล้มทั้งสามที่ "ต่อ chrome ไม่ได้"
    ทั้งที่ chrome ขึ้นได้ปกติเมื่อรันเดี่ยว) ⇒ ด่านที่แดงเพราะเครื่องช้าคือด่านที่เชื่อถือไม่ได้
    เท่ากับด่านที่เขียวผิด — คนอ่านจะเลิกเชื่อผลทั้งชุด */
+/* ---------- พอร์ต CDP นี้เป็น chrome ของรันนี้จริงไหม (AIO-66 P1-1 · AIO-67 P2-1) ----------
+   "ตอบ `/json/new` ได้" ไม่ใช่หลักฐาน — chrome ของ run อื่นตอบเหมือนกัน และเมื่อพอร์ตชน chrome
+   ของเราตายหรือไปขึ้นที่ `[::1]` แต่เรายังต่อติดกับของเขาแล้ววัดต่อไปเงียบ ๆ (บทเรียนของรีโปนี้)
+   ของที่ผูกกับทรัพยากรของรันนี้จริงคือ **pid**: `SystemInfo.getProcessInfo` บอก pid ของ
+   process ชนิด `browser` ที่ปลายสายนั้น ⇒ ต้องเป็นลูกที่เรา spawn เอง
+   (ทางที่ลองแล้วใช้ไม่ได้กับ chrome รุ่นนี้ จึงบันทึกไว้ไม่ให้ใครเสียเวลาซ้ำ:
+    `<user-data-dir>/DevToolsActivePort` — chrome 153 **ไม่เขียนไฟล์นี้เลย** เมื่อระบุพอร์ตตรง ๆ ·
+    `Browser.getBrowserCommandLine` — ปฏิเสธด้วย "Command line not returned because
+    --enable-automation not set" และ `--enable-automation` เปลี่ยนพฤติกรรมเบราว์เซอร์ที่เรากำลังวัด) */
+function ancestryHas(pid, want, hops = 6) {
+  for (let i = 0, p = pid; i < hops && p > 1; i++) {
+    if (p === want) return true;
+    try { p = +fs.readFileSync(`/proc/${p}/stat`, 'utf8').split(') ')[1].split(' ')[1]; } catch { return false; }
+  }
+  return pid === want;
+}
+async function proveOwnChrome() {
+  let v = null;
+  for (let i = 0; i < 240; i++) {
+    if (chrome.exitCode != null || chrome.signalCode != null) {
+      throw new Error(`chrome ของรันนี้ออกก่อนพร้อม (exit ${chrome.exitCode ?? chrome.signalCode})\n`
+        + chrome.err.trim().slice(-600));
+    }
+    try {
+      const r = await fetch(`http://127.0.0.1:${CDP}/json/version`);
+      if (r.ok) { v = await r.json(); break; }
+    } catch { /* ยังไม่ขึ้น */ }
+    await sleep(250);
+  }
+  if (!v || !v.webSocketDebuggerUrl) {
+    throw new Error(`ไม่มีใครตอบ /json/version ที่พอร์ต ${CDP} ใน 60 วินาที\n` + chrome.err.trim().slice(-600));
+  }
+  const bws = new WebSocket(v.webSocketDebuggerUrl);
+  try {
+    await new Promise((res, rej) => { bws.onopen = res; bws.onerror = () => rej(new Error('ต่อ ws ระดับเบราว์เซอร์ไม่ได้')); });
+    const info = await new Promise((res, rej) => {
+      bws.onmessage = e => { const m = JSON.parse(e.data); if (m.id === 1) (m.error ? rej(new Error(m.error.message)) : res(m.result)); };
+      bws.send(JSON.stringify({ id: 1, method: 'SystemInfo.getProcessInfo' }));
+      setTimeout(() => rej(new Error('SystemInfo.getProcessInfo ไม่ตอบ')), 15000);
+    });
+    const browser = (info.processInfo || []).find(p => p.type === 'browser');
+    if (!browser) throw new Error('CDP ไม่บอก pid ของ process ชนิด browser');
+    if (!ancestryHas(browser.id, chrome.pid)) {
+      throw new Error(`พอร์ต ${CDP} เป็นของ chrome ตัวอื่น (pid ที่ปลายสาย ${browser.id}`
+        + ` · ลูกที่รันนี้ spawn เองคือ pid ${chrome.pid}) — run อื่นถือพอร์ตนี้อยู่`
+        + ' ⇒ ถ้าวัดต่อ จะเป็นการวัดผ่านเบราว์เซอร์ของเขาโดยไม่มีใครรู้');
+    }
+  } finally {
+    try { bws.close(); } catch {}
+  }
+}
+/* งบเวลารอ chrome ขึ้น: 240 × 250ms = 60 วินาที · ของเดิม 20 วินาที ซึ่ง **ไม่พอจริง** เมื่อ
+   เครื่องนี้มี run อื่นถือ chrome อยู่ด้วย */
 async function wsUrl() {
   for (let i = 0; i < 240; i++) {
     try {
@@ -590,6 +783,7 @@ async function wsUrl() {
    บรรทัด DevTools ตามปกติ) · ถ้าไม่จับที่นี่ กระบวนการตายโดยไม่เรียก cleanup เลย */
 let ws;
 try {
+  await proveOwnChrome();
   ws = new WebSocket(await wsUrl());
   await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
 } catch (e) {
@@ -1609,11 +1803,13 @@ try {
   if (ONLY === '' || ONLY === 'shape') {
     console.log('\nส่วน 6 · ความครบของแผนที่ที่วาง (เทียบจำนวนจุดเรียกในซอร์สกับตารางของ ADR §13.5)');
     {
-      const nBuild = ['build/pages-discovery.mjs', 'build/pages-watch.mjs', 'build/pages-content.mjs', 'build/ui.mjs']
-        .reduce((n, f) => n + countCalls(f, 'coverImg'), 0);
-      check(`จุดเรียก coverImg() ฝั่ง build = ${SHAPE_CALLSITES_BUILD} จุดตามตารางของสัญญา (นับได้ ${nBuild})`,
-        nBuild === SHAPE_CALLSITES_BUILD,
-        'จำนวนที่วางเปลี่ยนไปจากที่สัญญาประกาศ ⇒ ถ้าเพิ่มที่วางใหม่ ต้องเพิ่มรายการใน SHAPE_MAP '
+      const perFile = Object.entries(SHAPE_CALLSITES_BUILD)
+        .map(([f, want]) => ({ f, want, got: countCalls(f, 'coverImg') }));
+      const nBuild = perFile.reduce((n, x) => n + x.got, 0);
+      check(`จุดเรียก coverImg() ฝั่ง build = ${nBuild} จุดตามตารางของสัญญา แยกรายไฟล์ครบทุกไฟล์`,
+        perFile.every(x => x.got === x.want),
+        perFile.filter(x => x.got !== x.want).map(x => `${x.f} ควรมี ${x.want} แต่นับได้ ${x.got}`).join(' · ')
+        + ' ⇒ ถ้าเพิ่มที่วางใหม่ ต้องเพิ่มรายการใน SHAPE_MAP '
         + 'พร้อมแก้ตารางใน ADR-001 §13.5 แล้วอัปเดตตัวเลขนี้ · ห้ามอัปเดตตัวเลขอย่างเดียว');
       const nApp = countCalls('build/app.src.js', 'coverAttrs');
       check(`จุดเรียก coverAttrs() ฝั่งเบราว์เซอร์ = ${SHAPE_CALLSITES_APP} จุดตามตารางของสัญญา (นับได้ ${nApp})`,
@@ -1743,27 +1939,17 @@ try {
            ไฟล์อื่น (tools/serve.mjs คิด ROOT จาก import.meta.url ไม่ใช่ process.cwd()) ⇒ ถ้าวันหน้า
            มีคนแก้ serve.mjs ไปใช้ cwd สถานะ ข จะกลายเป็นการวัด **รีโปจริง** เงียบ ๆ ทั้งที่ป้าย
            บอกว่า "มีภาพกว้างครบ" (AIO-63 ข้อ 5) · ตั้งให้ตรงเสียเลย ไม่เสียอะไร */
-        wideServer = spawn(process.execPath, [path.join(wideDir, 'tools/serve.mjs'), String(widePort)],
-          { stdio: 'ignore', cwd: wideDir });
+        wideServer = spawnWatched(process.execPath, [path.join(wideDir, 'tools/serve.mjs'), String(widePort)],
+          { cwd: wideDir });
         const wideBase = `http://127.0.0.1:${widePort}`;
-        let wideReady = null;
-        for (let i = 0; i < 80; i++) {
-          try {
-            const r = await fetch(wideBase + '/content.json');
-            if (r.ok) { wideReady = await r.json(); break; }
-          } catch { /* ยังไม่ขึ้น */ }
-          await sleep(100);
-        }
         /* "มีใครตอบ HTTP ที่พอร์ตนี้" ไม่ใช่หลักฐานว่าเป็นเซิร์ฟเวอร์ของ run นี้ — ด่านเขียวจาก
-           ไฟล์ของ run อื่นได้ (บทเรียนของรีโปนี้) ⇒ พิสูจน์ความเป็นเจ้าของด้วยของที่มีแต่ที่นี่:
-           ต้นไม้ชั่วคราวเท่านั้นที่ทุกเรื่องประกาศ coverWide */
-        check('เซิร์ฟเวอร์ของสถานะ ข เสิร์ฟต้นไม้ชั่วคราวจริง (ไม่ใช่พอร์ตของ run อื่น)',
-          !!wideReady && Array.isArray(wideReady.series)
-            && wideReady.series.length > 0 && wideReady.series.every(s => s.coverWide),
-          wideReady ? `content.json ที่พอร์ตนั้นประกาศ coverWide ${(wideReady.series || []).filter(s => s.coverWide).length}`
-            + `/${(wideReady.series || []).length} เรื่อง — ถ้าไม่ครบ นี่ไม่ใช่ต้นไม้ของด่านนี้`
-            : 'ไม่มีใครตอบที่พอร์ตนั้นเลย');
-        states.push({
+           ไฟล์ของ run อื่นได้ (บทเรียนของรีโปนี้) · และของที่เคยใช้พิสูจน์ ("ทุกเรื่องประกาศ
+           coverWide") พิสูจน์ได้แค่ว่า *เป็นต้นไม้ชนิดนั้น* ⇒ ต้นไม้ชั่วคราวของ run อื่นที่รันด่าน
+           เดียวกันก็ผ่าน (AIO-66 P1-1 ท้ายข้อ) ⇒ เทียบไบต์กับไฟล์บนดิสก์ของต้นไม้ใบนี้ */
+        const wideBad = await awaitServe(wideServer, wideBase, wideDir, 'สถานะ ข (ต้นไม้ชั่วคราว)', 80);
+        check('เซิร์ฟเวอร์ของสถานะ ข เสิร์ฟต้นไม้ชั่วคราวจริง (เทียบไบต์ ไม่ใช่เชื่อว่ามีใครตอบ)',
+          !wideBad, wideBad || '');
+        if (!wideBad) states.push({
           label: `ข · มีภาพกว้างครบ ${cj.series.length} เรื่อง + แนวนอน 1 เรื่อง (${cj.series[cj.series.length - 1].slug})`
             + ` + ปกของ ${idFix.slug} ชื่อไฟล์ไม่เท่ากับ slug (${idFixRel.split('/').pop()})`,
           idFixture: { slug: idFix.slug, path: '/' + idFixRel },
@@ -1791,6 +1977,36 @@ try {
         for (const f of [s.cover, s.coverWide]) {
           if (f) fileOwner.set('/' + String(f).replace(/^\//, ''), slug);
         }
+      }
+      /* ---------- ทุกพาธปกในหน้าที่ส่งมอบ ต้องอยู่ในทะเบียน ไม่ใช่แค่ "มีไฟล์อยู่" ----------
+         ด่านชั้นแรกที่ห้ามประกอบพาธเองเป็น **regex ไม่ใช่ตัววิเคราะห์ JavaScript** ⇒ เลี่ยงได้ด้วย
+         การพักสตริงไว้ในตัวแปรก่อนต่อ (`const dir = '/assets/covers/'; dir + s.slug + '.webp'`)
+         — ทั้งสองฝั่งรีวิวชี้ตรงกัน (AIO-66 P3-4 · AIO-67 ท้ายข้อ R1) ⇒ ชั้นนี้ไม่สนใจว่าพาธถูก
+         เขียนมาอย่างไร มันอ่าน **ผลลัพธ์ที่ส่งมอบ** แล้วถามทะเบียน (`cover`/`coverWide` ใน
+         content.json · สัญญา §13.4 บอกว่าชื่อไฟล์ไม่ใช่ทะเบียน) ⇒ จับได้ทุกวิธีประกอบพาธ
+         รวมถึง srcset/JSON-LD/og:image ที่ด่านวัดกล่องมองไม่เห็น
+         สถานะ ข เป็นสถานะที่แยกแยะได้จริง เพราะที่นั่นมีเรื่องที่ชื่อไฟล์ปก ≠ slug */
+      {
+        const htmls = [];
+        (function w(d) {
+          for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+            if (SKIP.has(e.name)) continue;
+            const f = path.join(d, e.name);
+            if (e.isDirectory()) w(f); else if (e.name.endsWith('.html')) htmls.push(f);
+          }
+        })(st.root);
+        const off = new Map();
+        for (const f of htmls) {
+          for (const m of fs.readFileSync(f, 'utf8').matchAll(/\/?assets\/covers[^"'\s)]*/g)) {
+            const p = '/' + m[0].replace(/^\//, '');
+            if (!fileOwner.has(p)) off.set(p, (off.get(p) || 0) + 1);
+          }
+        }
+        check(`ทุกพาธใต้ assets/covers* ใน ${htmls.length} หน้าที่ส่งมอบ อยู่ในทะเบียนของ content.json`,
+          off.size === 0 && htmls.length >= MIN_PAGES,
+          off.size ? [...off].map(([p, n]) => `${p} (${n} จุด)`).slice(0, 6).join(' · ')
+            + ' ⇒ ที่วางใดประกอบพาธเองหรือเดาชื่อไฟล์จาก slug ให้ขอจากตัวเลือกไฟล์แทน'
+            : `กวาดได้ ${htmls.length} หน้า — น้อยกว่าพื้น ${MIN_PAGES} ⇒ ข้อนี้ไม่ได้ตรวจอะไรจริง`);
       }
 
       for (const pl of SHAPE_MAP) {
@@ -2224,16 +2440,23 @@ try {
           await goAt(st.base, U.home);
           await evaluate(SHAPE_PREP('.card .poster'));
           const res = await evaluate(SHAPE_PROBE('.card .poster'));
-          let items = 0, caught = 0;
+          let items = 0, caught = 0, dead = 0;
           for (const it of res.items || []) {
             if (!it.rendered || !it.img) continue;
             items++;
             const who = resolveId(it.id, U.home);
             const want = who && who.slug ? wantPath(who.slug, 'poster', st.by) : null;
-            if (!want || it.img.path !== '/' + want.replace(/^\//, '')) caught++;
+            /* ❗ "ออราเคิลตาย" ต้องไม่ถูกนับเป็น "จับได้" — ของเดิมนับ `!want` เป็น caught ⇒ ถ้า
+               ID_PROBE_FN คืน null ทุกกล่อง (ออราเคิลพังสนิท) self-test นี้จะเขียวด้วยเหตุผลที่
+               ตรงข้ามกับที่มันตั้งใจวัด (AIO-66 P3-1) ⇒ นับเฉพาะกล่องที่รู้คำตอบแล้วพาธไม่ตรง
+               และแยกนับกล่องที่ออราเคิลอ่านไม่ออกไว้ต่างหากเพื่อให้ข้อนี้แดงด้วยข้อความที่ถูก */
+            if (!want) { dead++; continue; }
+            if (it.img.path !== '/' + want.replace(/^\//, '')) caught++;
           }
-          check(`${name} (${caught}/${items} กล่องถูกจับ)`, items > 0 && caught > 0,
-            `ออราเคิล identity ไม่จับมิวเทชันนี้เลย ⇒ S2 กลับไปเป็น tautology ของชื่อไฟล์แล้ว · `
+          check(`${name} (${caught}/${items} กล่องถูกจับ${dead ? ` · ออราเคิลอ่านไม่ออก ${dead}` : ''})`,
+            items > 0 && caught > 0 && dead === 0,
+            `ออราเคิล identity ไม่จับมิวเทชันนี้ หรืออ่าน identity ของกล่องไม่ออกเลย ⇒ `
+            + `S2 กลับไปเป็น tautology ของชื่อไฟล์แล้ว · `
             + `ตรวจ resolveId()/ID_PROBE_FN ก่อนเชื่อเลขอื่นในรายงานนี้`);
         }
       }
@@ -2241,7 +2464,9 @@ try {
     await setStorageMode('new');
   }
 
-  console.log(`\nผล: ผ่าน ${pass} · ตก ${fail}${deferred ? ` · เลื่อนไว้ ${deferred}` : ''}`);
+  /* รูปแบบเดียวทุกรอบ รวมตอนที่ช่อง "เลื่อนไว้" เป็นศูนย์ — สองรอบที่พิมพ์คนละรูปแบบคือสองรอบ
+     ที่ diff กันไม่ได้ และคนอ่านจะไม่รู้ว่าช่องนั้นหายไปหรือเป็นศูนย์ (AIO-66 P3-8) */
+  console.log(`\nผล: ผ่าน ${pass} · ตก ${fail} · เลื่อนไว้ ${deferred}`);
   if (deferred) {
     console.log('  ข้อที่เลื่อนไว้ (ยังไม่ถูกบังคับ — ห้ามนับเป็นผ่าน):');
     for (const d of deferrals) console.log(`   ⊘ ${d}`);

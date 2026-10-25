@@ -20,10 +20,13 @@ test('importer accepts version 1 without the §13 fields',()=>{
 // V15 path rule: coverWide must live in assets/covers-wide/, not next to the 2:3 covers.
 // This test used to be named "accepts coverWide when the file exists" while asserting a
 // rejection — the name promised the positive path nobody actually covered (AIO-64 R3).
-test('importer rejects coverWide that points outside assets/covers-wide/',()=>{
+// It asserts **which rule fired** for the same reason the table below does: a `.length`
+// assertion stays green under a mutation that reports the wrong rule code, and the Codex-side
+// review proved it — swapping this case's code to `V6` kept the suite at 28/0 (AIO-67 P2-4).
+test('importer rejects coverWide that points outside assets/covers-wide/ (V15)',()=>{
   const d=structuredClone(source);
   d.series[0].coverWide='assets/covers/'+d.series[0].slug+'.webp';
-  assert.ok(run(d).length);
+  assert.ok(run(d).includes('series[0].coverWide: V15'),JSON.stringify(run(d).slice(0,4)));
 });
 // The positive path of V15/V16, which no test reached before: a well-formed coverWide whose
 // file exists must be accepted — on a vertical series (optional) and on a horizontal one
@@ -42,7 +45,7 @@ test('importer accepts a well-formed coverWide whose file exists (V15/V16 positi
   // case positive, not a hole in V15.
   const d=structuredClone(source);
   d.series[0].coverWide=wide;
-  assert.ok(run(d).length);
+  assert.ok(run(d).includes('series[0].coverWide: V15'),JSON.stringify(run(d).slice(0,4)));
 });
 // Each negative case asserts **which rule fired**, not just that something failed: a
 // `.length` assertion passes when an unrelated rule rejects the draft, so a mutation that

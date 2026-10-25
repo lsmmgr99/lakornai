@@ -32,12 +32,20 @@ const sizeOf = buf => {
 const W = 2640, H = 1200;           /* ขนาดของ coverWide ตามสัญญา §13.4 — ใช้เป็นค่าทดสอบ */
 
 /* ---------- WebP ทั้งสามแบบ ----------
-   RIFF <len> WEBP <fourcc> … — ความยาวในหัว RIFF ไม่ถูกอ่านโดยตัวอ่าน จึงใส่ค่าใดก็ได้ */
-const riff = (fourcc, payload) => Buffer.concat([
-  Buffer.from('RIFF'), u32le(4 + 8 + payload.length), Buffer.from('WEBP'),
-  Buffer.from(fourcc), u32le(payload.length), payload,
+   RIFF <len> WEBP <fourcc> <len> … — **ความยาวทั้งสองตัวถูกอ่านแล้ว** ตั้งแต่ AIO-66/67 P2-2
+   (ก่อนหน้านี้ไม่ถูกอ่านเลย ⇒ ไฟล์ 30 ไบต์ที่ความยาวเป็นศูนย์ผ่านกฎ V15 ด้วยขนาดที่สัญญาต้องการ)
+   ⇒ helper นี้คำนวณความยาวให้ถูกตามสเปก และเคสลบข้างล่างเป็นตัวที่จงใจทำให้ความยาวผิด */
+const riff = (fourcc, payload, { riffLen = null, chunkLen = null } = {}) => Buffer.concat([
+  Buffer.from('RIFF'), u32le(riffLen == null ? 4 + 8 + payload.length : riffLen), Buffer.from('WEBP'),
+  Buffer.from(fourcc), u32le(chunkLen == null ? payload.length : chunkLen), payload,
 ]);
 function u32le(v) { const b = Buffer.alloc(4); b.writeUInt32LE(v); return b; }
+/* VP8X ตามสเปกยาว **10 ไบต์เป๊ะ**: flags 1 + สงวน 3 + (กว้าง−1) 3 + (สูง−1) 3 */
+const vp8xPayload = (w, h) => {
+  const p = Buffer.alloc(10);
+  p.writeUIntLE(w - 1, 4, 3); p.writeUIntLE(h - 1, 7, 3);
+  return p;
+};
 
 test('WebP VP8 (lossy) อ่านกว้าง/สูงถูก', () => {
   const p = Buffer.alloc(20);
@@ -54,9 +62,7 @@ test('WebP VP8L (lossless) อ่านกว้าง/สูงถูก', () =
 });
 
 test('WebP VP8X (extended) อ่านกว้าง/สูงถูก', () => {
-  const p = Buffer.alloc(20);
-  p.writeUIntLE(W - 1, 4, 3); p.writeUIntLE(H - 1, 7, 3);
-  assert.deepEqual(sizeOf(riff('VP8X', p)), { w: W, h: H });
+  assert.deepEqual(sizeOf(riff('VP8X', vp8xPayload(W, H))), { w: W, h: H });
 });
 
 test('WebP ที่ลายเซ็น VP8L ไม่ถูก = null ไม่ใช่เลขเดา', () => {
@@ -66,23 +72,91 @@ test('WebP ที่ลายเซ็น VP8L ไม่ถูก = null ไม�
   assert.equal(sizeOf(riff('VP8L', p)), null);
 });
 
-/* ---------- PNG ---------- */
+/* ---------- เคสลบของความยาวที่หัวไฟล์ประกาศ (AIO-66 P2-2 · AIO-67 P2-2) ----------
+   ทั้งสามข้อนี้คือไฟล์ที่ **เคยผ่านกฎ V15 ด้วยขนาด 2640×1200 เป๊ะ** ทั้งที่ไม่มีข้อมูลภาพเลย
+   มิวเทชันที่ต้องทำให้ชุดนี้แดง: ถอดบรรทัด `if (chunkLen !== 10 || !has(10)) return null;`
+   หรือบรรทัด `if (riffLen < 12 || riffLen + 8 > size) return null;` ออกจาก build/imgsize.mjs */
+test('WebP VP8X ที่ความยาว chunk ไม่ใช่ 10 ต้องได้ null — สเปกล็อกไว้ 10 ไบต์เป๊ะ', () => {
+  const p = vp8xPayload(W, H);
+  assert.equal(sizeOf(riff('VP8X', p, { chunkLen: 0 })), null, 'chunkLen=0');
+  assert.equal(sizeOf(riff('VP8X', Buffer.concat([p, Buffer.alloc(10)]))), null, 'chunkLen=20');
+});
+
+test('WebP ที่ความยาว RIFF โกหก (ไฟล์ถูกตัดกลาง) ต้องได้ null', () => {
+  const p = vp8xPayload(W, H);
+  /* หัวบอกว่ายังมีอีก 10 KB ตามมา แต่ไฟล์จบแล้ว — คือไฟล์ที่ถูกตัดกลางของจริง */
+  assert.equal(sizeOf(riff('VP8X', p, { riffLen: 10 * 1024 })), null, 'RIFF ใหญ่กว่าไฟล์');
+  assert.equal(sizeOf(riff('VP8X', p, { riffLen: 0 })), null, 'RIFF = 0 (ไฟล์ปลอมของฝั่ง Codex)');
+});
+
+test('WebP ที่ chunk เลยปลายไฟล์ ต้องได้ null', () => {
+  assert.equal(sizeOf(riff('VP8X', vp8xPayload(W, H), { chunkLen: 10, riffLen: 12 })), null);
+});
+
+/* ---------- PNG ----------
+   **fixture ของเคสบวกต้องเป็นไฟล์ที่ถูกโครงสร้างจริง** ไม่ใช่หัวไฟล์ 24 ไบต์ที่จบลงตรงหลัง
+   กว้าง/สูง (ของเดิมเป็นแบบนั้น ⇒ เคสบวกกำลัง **ล็อกพฤติกรรมผิดไว้** ตามที่ฝั่ง Codex ชี้)
+   ⇒ ประกอบ chunk ให้ครบตามสเปกพร้อม CRC32 ที่คำนวณจริง: IHDR(13) + IDAT + IEND
+   (ตัวอ่านไม่ตรวจ CRC และไม่ควรตรวจ — แต่ fixture ที่เครื่องมือจริงจะไม่เคยออกให้ ก็ไม่ใช่
+    หลักฐานว่า "ไฟล์ปกติอ่านออก") */
 const PNG_SIG = Buffer.from('89504e470d0a1a0a', 'hex');
-const pngChunk = (type, len, w, h) => {
-  const b = Buffer.alloc(8 + 8);
-  b.writeUInt32BE(len, 0); b.write(type, 4, 'ascii'); b.writeUInt32BE(w, 8); b.writeUInt32BE(h, 12);
-  return Buffer.concat([PNG_SIG, b]);
+const CRC_TAB = Array.from({ length: 256 }, (_, n) => {
+  let c = n;
+  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+  return c >>> 0;
+});
+const crc32 = buf => {
+  let c = 0xffffffff;
+  for (const byte of buf) c = CRC_TAB[(c ^ byte) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
 };
-test('PNG ปกติอ่านกว้าง/สูงถูก', () => {
-  assert.deepEqual(sizeOf(pngChunk('IHDR', 13, W, H)), { w: W, h: H });
+const chunk = (type, data) => {
+  const head = Buffer.alloc(8);
+  head.writeUInt32BE(data.length, 0); head.write(type, 4, 'ascii');
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(Buffer.concat([Buffer.from(type, 'ascii'), data])));
+  return Buffer.concat([head, data, crc]);
+};
+const ihdrData = (w, h) => {
+  const d = Buffer.alloc(13);
+  d.writeUInt32BE(w, 0); d.writeUInt32BE(h, 4);
+  d[8] = 8; d[9] = 6;                 /* bit depth 8 · color type 6 (RGBA) */
+  return d;
+};
+const png = (w, h, { type = 'IHDR', len = null, cut = 0 } = {}) => {
+  const d = ihdrData(w, h);
+  const parts = [PNG_SIG, chunk(type, d), chunk('IDAT', Buffer.alloc(16)), chunk('IEND', Buffer.alloc(0))];
+  if (len != null) parts[1].writeUInt32BE(len, 0);   /* โกหกความยาวโดยไม่แตะข้อมูล */
+  const all = Buffer.concat(parts);
+  return cut ? all.subarray(0, cut) : all;
+};
+test('PNG ปกติ (IHDR ครบ 13 ไบต์ + IDAT + IEND + CRC จริง) อ่านกว้าง/สูงถูก', () => {
+  assert.deepEqual(sizeOf(png(W, H)), { w: W, h: H });
 });
 test('PNG ที่ chunk แรกไม่ใช่ IHDR ต้องได้ null — ไม่ใช่เลขขยะจากไบต์ 16–23 (AIO-64 R4)', () => {
   /* ของจริงที่เคยได้: {w:999,h:777} ⇒ V15 รายงานขนาดที่ไม่มีอยู่จริง และถ้าไบต์นั้นบังเอิญ
      เป็น 2640×1200 ก็จะรับไฟล์ที่ไม่ตามสเปกเข้าระบบ */
-  assert.equal(sizeOf(pngChunk('eXIf', 13, 999, 777)), null);
+  assert.equal(sizeOf(png(999, 777, { type: 'eXIf' })), null);
 });
 test('PNG ที่สั้นกว่าหัวไฟล์ = null', () => {
   assert.equal(sizeOf(PNG_SIG), null);
+});
+/* ---------- เคสลบของ IHDR (AIO-66 P2-2 · AIO-67 P2-2) ----------
+   มิวเทชันที่ต้องทำให้ชุดนี้แดง: ถอด `if (b.readUInt32BE(8) !== 13 || size < 33) return null;` */
+test('PNG ที่ความยาว IHDR ไม่ใช่ 13 ต้องได้ null — สเปกล็อกไว้ 13 ไบต์เป๊ะ', () => {
+  for (const len of [0, 12, 14, 0x7fffffff]) {
+    assert.equal(sizeOf(png(W, H, { len })), null, `len=${len}`);
+  }
+});
+test('PNG ที่จบลงตรงหลังกว้าง/สูง (24 ไบต์) ต้องได้ null — ไฟล์ปลอมของทั้งสองฝั่งรีวิว', () => {
+  /* ไฟล์นี้คือตัวที่ฝั่ง Codex ใช้ทำให้ `node build/build.mjs` ออก 0 ทั้งที่ไม่มี IHDR ครบ */
+  assert.equal(sizeOf(png(W, H, { cut: 24 })), null, '24 ไบต์');
+  assert.equal(sizeOf(png(W, H, { cut: 32 })), null, '32 ไบต์ (ขาด CRC ของ IHDR ไปหนึ่งไบต์)');
+  assert.deepEqual(sizeOf(png(W, H, { cut: 33 })), { w: W, h: H }, '33 ไบต์ = IHDR ครบก้อนพอดี');
+});
+test('ขนาดศูนย์ไม่ใช่ขนาดภาพ — ต้องได้ null ไม่ใช่ {w:0,h:0} ที่ปลายทางเอาไปหาร', () => {
+  assert.equal(sizeOf(png(0, 0)), null);
+  assert.equal(sizeOf(png(W, 0)), null);
 });
 
 /* ---------- JPEG ---------- */
