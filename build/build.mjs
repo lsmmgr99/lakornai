@@ -322,7 +322,6 @@ if (SERIES.some(s => s.orientation === 'horizontal')) {
    วันนี้ `coverAttrs()` คืนขนาดของไฟล์ที่เลือกจริงแล้ว (AIO-57) ⇒ V18 เขียวและ V19 แดงเองได้
    มิวเทชัน M23 จึงไม่ต้องแตะ `app.src.js` เลย · ถ้าวันหน้าใครฝังค่าคงที่กลับมา มิวเทชันของ V19
    จะเห็นสีแดงของ V18 ก่อน ⇒ ให้แก้ของ ไม่ใช่สลับลำดับด่าน */
-const FEED_OUT = 'feed/index.html';
 /* ลูกโดยตรงสามชั้น: คลาสของกล่อง → คลาสของพ่อ → คลาสของปู่ · คืน true ทันทีที่เจอใบแรก */
 function hasFeedMediaWindow(html) {
   const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
@@ -350,6 +349,15 @@ function hasFeedMediaWindow(html) {
 {
   const horizontal = SERIES.filter(s => s.orientation === 'horizontal');
   if (horizontal.length) {
+    /* ชื่อไฟล์มาจากตาราง PAGES ไม่ใช่พาธที่พิมพ์ไว้ — ถ้าเส้นทางฟีดย้าย ด่านต้องบอกว่า
+       "หาไม่เจอ" ด้วยข้อความของตัวเอง ไม่ใช่ตาย ENOENT ที่อ่านไม่รู้เรื่อง */
+    const feedPage = PAGES.find(p => p.url === U.feed);
+    if (!feedPage) {
+      console.error(`✗ กฎ V19: หาหน้าของ ${U.feed} ในตาราง PAGES ไม่เจอ — ถ้าเส้นทางฟีดย้าย `
+        + `ให้แก้ด่านนี้ให้ตรง ไม่ใช่ถอดด่านออก (ADR-001 กฎ V19)`);
+      process.exit(1);
+    }
+    const FEED_OUT = feedPage.out;
     const feedHtml = fs.readFileSync(R(FEED_OUT), 'utf8')
       .replace(/<!--[\s\S]*?-->/g, '')
       .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
