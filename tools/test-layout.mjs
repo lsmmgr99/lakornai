@@ -1698,6 +1698,10 @@ try {
         let seen = 0, hiddenAt = [], declaredSome = false;
         const shapesUsed = new Set();
         const idSeen = new Set();        /* เรื่องที่ "การ์ดในกล่องที่วัดได้" เป็น — ตาม identity ไม่ใช่ตามชื่อไฟล์ */
+        /* นับแยกจาก `idSeen` เพราะที่วางที่ผูกกับ **แนว** (ไทล์เลือกตามแนว) ระบุตัวเองได้
+           แต่ไม่ได้ชี้ไปที่เรื่องใดเรื่องหนึ่ง ⇒ ถ้าใช้ขนาดของ idSeen เป็นเงื่อนไข ช่องพวกนั้น
+           จะแดงทั้งที่ออราเคิลทำงานถูก (รอบแรกของคอมมิตนี้แดงจริงด้วยเหตุนี้) */
+        let idResolved = 0;
         for (const vp of FOLD_VIEWPORTS) {
           await viewport(vp);
           await goAt(st.base, at);             /* นำทางใหม่ทุกขนาดจอ: ที่วางบางช่องมาจาก JS */
@@ -1757,6 +1761,7 @@ try {
                   + `ซึ่งไม่ใช่เรื่องในแนวนั้น (สมาชิก: ${members.join(' ') || '-'})`);
                 continue;
               }
+              idResolved++;
               want = wantPath(fileSlug, shape, st.by);
             } else if (who) {
               want = wantPath(who.slug, shape, st.by);
@@ -1773,7 +1778,7 @@ try {
             if (it.img.path !== '/' + want.replace(/^\//, '')) {
               bad.file.push(`${vpAt} ทรง '${shape}'${who && who.slug ? ` ของ ${who.slug}` : ''} ควรได้ /${want} แต่โหลด ${it.img.path}`);
             }
-            if (who && who.slug) idSeen.add(who.slug);
+            if (who && who.slug) { idSeen.add(who.slug); idResolved++; }
             /* S3/S4 · ขนาดที่ประกาศต้องตรงกับขนาดไฟล์ "ที่โหลดจริง" บนดิสก์ — ไม่มีเลขในด่าน
                เทียบกับไฟล์ที่โหลด ไม่ใช่ไฟล์ที่ควรโหลด เพื่อให้ S3 ไม่พลอยแดงตาม S2
                และผู้ประกาศขนาดคือ <source> ที่ถูกเลือก ถ้ามี ไม่ใช่ <img> เสมอ */
@@ -1819,9 +1824,10 @@ try {
         /* ข้อนี้คือสิ่งที่ปิดรอย AIO-64 R1: ถ้าการ์ดใบนี้เป็นเรื่อง A แต่โหลดปกของเรื่อง B
            S2 ข้างบนจะแดง · และถ้าออราเคิลเองพัง (ระบุเรื่องไม่ได้เลย) ข้อนี้จะแดงแทนที่จะเงียบ */
         if (pl.identity === false) noIdentity++;
-        check(`${atp} · ระบุได้ว่าแต่ละกล่องคือเรื่องอะไร จากลิงก์/data-slug/URL ของหน้า`
-          + `${pl.identity === false ? ' (หรือเป็นข้อยกเว้นที่ประกาศไว้)' : ` (${idSeen.size} เรื่อง: ${[...idSeen].slice(0, 3).join(' ')})`}`,
-          pl.identity === false || (bad.id.length === 0 && idSeen.size > 0),
+        check(`${atp} · ระบุได้ว่าแต่ละกล่องคือเรื่อง/แนวอะไร จากลิงก์/data-slug/URL ของหน้า`
+          + `${pl.identity === false ? ' (หรือเป็นข้อยกเว้นที่ประกาศไว้)'
+            : ` (${idResolved} กล่อง${idSeen.size ? ` · ${idSeen.size} เรื่อง: ${[...idSeen].slice(0, 3).join(' ')}` : ' · ผูกกับแนว'})`}`,
+          pl.identity === false || (bad.id.length === 0 && idResolved > 0),
           bad.id.slice(0, 3).join(' · ') || 'ไม่มีกล่องใดระบุเรื่องได้ — ออราเคิล identity ตาย '
           + 'แปลว่า S2 กลายเป็น tautology ของชื่อไฟล์ (รอย AIO-64 R1) ⇒ แก้ด่าน ไม่ใช่ผ่อนด่าน');
         /* ที่วางที่ขอ `auto` ต้องถูกวัดกับเรื่องแนวนอน **จริง** อย่างน้อยหนึ่งเรื่อง ไม่งั้นมิวเทชัน
