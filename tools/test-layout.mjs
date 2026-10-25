@@ -541,9 +541,23 @@ async function cleanup(code) {
     sleep(3000),
   ]);
   for (const p of kids) { try { if (p.exitCode == null) p.kill('SIGKILL'); } catch {} }
-  try { fs.rmSync(PROFILE, { recursive: true, force: true }); } catch {}
-  try { fs.rmSync(CHROME_TMP, { recursive: true, force: true }); } catch {}
-  try { if (wideDir) fs.rmSync(wideDir, { recursive: true, force: true }); } catch {}
+  /* SIGKILL ไม่ได้ตายทันทีในจังหวะเดียวกับที่เราเรียก rm — chrome ที่กำลังเขียนโปรไฟล์อยู่ทำให้
+     rm ล้ม แล้ว `catch {}` กลืนความล้มนั้นไปเงียบ ๆ ⇒ เหลือโปรไฟล์ค้างใน /tmp ทุกครั้งที่ถูกตัด
+     (วัดเองรอบนี้: SIGTERM กลางทาง → wideDir หายแต่ PROFILE ค้าง 1 โฟลเดอร์)
+     ⇒ ลองซ้ำพร้อมเว้นจังหวะ และถ้าสุดท้ายยังลบไม่ได้ ให้ **พูดออกมา** ไม่ใช่เงียบ */
+  const rmHard = p => {
+    if (!p) return true;
+    for (let i = 0; i < 6; i++) {
+      try { fs.rmSync(p, { recursive: true, force: true, maxRetries: 3, retryDelay: 120 }); } catch { /* ลองรอบถัดไป */ }
+      if (!fs.existsSync(p)) return true;
+      const t = Date.now() + 200; while (Date.now() < t) { /* เว้นจังหวะแบบ sync เพราะ handler อาจอยู่ท้ายคิวแล้ว */ }
+    }
+    console.error(`⚠ ลบไฟล์ชั่วคราวไม่สำเร็จ: ${p} — เครื่องนี้แชร์กับ run อื่น ให้ลบด้วยมือ`);
+    return false;
+  };
+  rmHard(PROFILE);
+  rmHard(CHROME_TMP);
+  rmHard(wideDir);
   process.exit(code);
 }
 /* ถูก `timeout` หรือ Ctrl-C ตัด = ต้องไม่ทิ้งเซิร์ฟเวอร์สองตัว + chrome + สำเนารีโปใน tmp
