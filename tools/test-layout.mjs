@@ -58,6 +58,12 @@
    6) ทรงของ **ทุกที่วาง** ในแผนที่ของ ADR-001 §13.5 + AIO-56 × 7 ขนาดจอ × **สองสถานะ**
       (ไม่มีไฟล์ภาพกว้าง = เส้นถอยกลับ · มีไฟล์ภาพกว้างครบ + เรื่องแนวนอน 1 เรื่อง)
       รายละเอียดเกณฑ์ S1–S7 อยู่ที่บล็อก SHAPE_TOL/SHAPE_MAP ข้างล่าง
+      ⚠️ ตั้งแต่กฎ V19 เข้า (26 ต.ค. 2026) **สถานะ ข สร้างไม่ได้** จนกว่า AIO-62 จะลง
+         `.mwin`/`.clip` ให้ `/feed/` — เหตุผลครบที่บล็อก defer ข้างล่าง (ค้นคำว่า "กฎ V19")
+      และก่อนจะวัดอะไรเลย: **เฉลยของส่วนนี้แกะจาก ADR §13.5 ด้วย tools/adr-shape-table.mjs**
+      (คู่ selector → ทรง · เลขรายไฟล์ · รายการที่วางของ `coverSlot()`) ⇒ แก้ renderer กับ
+      SHAPE_MAP พร้อมกันก็ยังแดง เพราะสัญญาเป็นฝั่งที่สาม · เทสต์ของตัวแกะ + มิวเทชันทั้งชุด
+      อยู่ที่ ci/adr-shape-table.test.mjs (ไม่ต้องมีเบราว์เซอร์ · `node --test ci/*.test.mjs`)
 
    มิวเทชันเทสต์ (ทำซ้ำได้ ทุกข้อรันแล้วและต้องแดงจริง):
    M1 เปลี่ยน `<div class="bg">` ของฮีโร่ใน build/pages-discovery.mjs กลับเป็น `<span>`
@@ -126,7 +132,18 @@
          ผิดและ **ทิศเขียวผิด** (AIO-66 P1-1 · AIO-67 P2-1) · เคสนี้เป็นเทสต์ถาวรที่
          `ci/gate-lifecycle.test.mjs` ไม่ใช่มิวเทชันที่ต้องทำมือ
    M21 ถอด `await die(...)` ของทางออกตอนเริ่ม (ONLY สะกดผิด) กลับเป็น `process.exit(1)`
-      → `ci/gate-lifecycle.test.mjs` แดง เพราะเหลือ `/tmp/lkn-*` ค้างสองโฟลเดอร์ต่อการรัน */
+      → `ci/gate-lifecycle.test.mjs` แดง เพราะเหลือ `/tmp/lkn-*` ค้างสองโฟลเดอร์ต่อการรัน
+   ---- รอบ AIO-71 (กฎ V19 + ด่านแกะตาราง §13.5) · เป็นเทสต์ถาวร ไม่ใช่มิวเทชันที่ต้องทำมือ ----
+   M22 แก้ทรงของที่วางพร้อมกัน **ทั้ง renderer และ `SHAPE_MAP`** (รอยที่ Reviewer-Claude ชี้ไว้
+      · AIO-66 P2-3 — มิวเทชันแบบนี้เคยเขียวทั้งแผง)
+      → แดงที่ข้อ "คู่ (selector → ทรง) ตรงกับตาราง §13.5" เพราะเฉลยอยู่ในไฟล์ ADR ไม่ใช่ในด่าน
+      ⚠️ ชุดเต็ม (เลขรายไฟล์ · ชุดไฟล์ · ฮีโร่สองทรง · เลขบรรทัดที่ต้องไม่ถูกเทียบ · เอกสารที่
+         แกะไม่ออกต้อง throw) อยู่ที่ `ci/adr-shape-table.test.mjs` 20 ข้อ · รันในไม่ถึงวินาที
+   M23 ตั้ง `orientation:"horizontal"` + `coverWide` ให้เรื่องหนึ่งในสำเนาที่ตรึงคอมมิต ขณะที่
+      `/feed/` ยังไม่มี `.mwin`/`.clip` → **build ล้มที่กฎ V19** พร้อมชื่อเรื่องแนวนอน
+      วัดสามทิศเทียบกัน: ใส่ `.mwin > .clip` ซ้อนกันจริง → build ผ่าน · วางสองคลาสเป็นพี่น้องกัน
+      (ไม่ซ้อน) → ยังแดง · เขียนสองคลาสไว้ใน `<!-- -->` + ในสตริงของ `<script>` → ยังแดง
+      ⇒ V19 วัด "ความเป็นลูกหลาน" ไม่ใช่ "มีคำนี้ในไฟล์" (ดูบล็อก 4.8ข ของ build/build.mjs) */
 import { spawn, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import net from 'node:net';
@@ -143,6 +160,10 @@ import { imageSize } from '../build/imgsize.mjs';
    โหลดจริง** เทียบกับพาธที่ `content.json` ของเรื่องในตำแหน่งนั้นควรได้ ไม่ใช่เทียบรายชื่อกับตัวเอง */
 import { HERO_WIDE_BP, REEL_SLUGS } from '../build/pages-discovery.mjs';
 import { siteFiles } from '../ci/site-files.mjs';
+/* ตัวแกะตาราง §13.5 ของสัญญา — เฉลยของส่วน 6 ต้องมาจาก ADR ไม่ใช่จากสำเนามือในไฟล์นี้
+   (ADR-001 §13.9 "ด่านที่ไม่ใช่กฎ V แต่ต้องมี — ข้อที่สอง" · AIO-70 ข้อ 1+4 → AIO-71) */
+import { ADR_REL, parseShapeTables, shapeMapProblems, callsiteProblems, slotProblems, countCallsIn }
+  from './adr-shape-table.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CHROME = '/root/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome';
@@ -383,19 +404,26 @@ const SHAPE_WIDE_DIR = 'assets/covers-wide';
    ในอีกไฟล์ ⇒ แผนที่ขาดรายการแต่ด่านเขียว (AIO-66 P3-3) · แยกไฟล์ปิดกรณีข้ามไฟล์ได้ทั้งหมด
    และแคบกรณีในไฟล์เดียวลงเหลือ "ย้ายที่วางภายในไฟล์เดิมโดยคงจำนวน" ซึ่งข้อ "ทุกที่วางในแผนที่
    ต้องมีคู่ (selector, หน้า) ไม่ซ้ำ" + ออราเคิล identity ต่อกล่องเป็นชั้นถัดไปที่จับได้ */
-const SHAPE_CALLSITES_BUILD = {        /* ADR-001 §13.5 ตารางฝั่ง build */
-  'build/pages-discovery.mjs': 8, 'build/pages-watch.mjs': 1,
-  'build/pages-content.mjs': 1, 'build/ui.mjs': 2,
-};
-const SHAPE_CALLSITES_APP = 8;         /* ADR-001 §13.5 ตารางฝั่งเบราว์เซอร์ (ไม่นับตัวนิยาม) */
-function countCalls(rel, name) {
-  /* ถอดคอมเมนต์ **ทั้งสองแบบ** — ของเดิมถอดแต่ `/* *‌/` ⇒ คอมเมนต์บรรทัดเดียวที่เขียนชื่อ
-     ฟังก์ชันไว้ (เช่นอธิบายว่าที่วางนี้เคยเรียก coverImg()) ทำให้ตัวนับเพี้ยน · บทเรียนเดิมของ
-     รีโปนี้: ด่าน regex ที่นับคอมเมนต์เป็นของจริงได้บั๊กผี (AIO-66 P3-2) */
-  const src = fs.readFileSync(path.join(ROOT, rel), 'utf8')
-    .replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
-  return (src.match(new RegExp(`(?<!function\\s)\\b${name}\\s*\\(`, 'g')) || []).length;
+/* ---------- เฉลยมาจากสัญญา ไม่ใช่จากสำเนามือในด่าน (AIO-70 ข้อ 1+4 · AIO-71 ส่วน B) ----------
+   เลขรายไฟล์กับคู่ (selector → ทรง) **เคยเป็นค่าที่เขียนไว้ในไฟล์นี้** ⇒ ด่านเอาเฉลยมาจากตาราง
+   ของตัวเอง และมิวเทชันที่แก้ทั้ง renderer และสำเนามือพร้อมกันจึงเขียว (Reviewer-Claude ·
+   AIO-66 P2-3) · ตอนนี้ทั้งสองอย่างถูกแกะจาก `docs/adr/001-backend-architecture.md` §13.5
+   ตามรูปแบบที่หัวข้อ "กฎการแกะตารางนี้ด้วยเครื่อง" ของสัญญาล็อกไว้ (ตัวแกะ: tools/adr-shape-table.mjs)
+   ⚠️ แกะไม่ได้ = **ออกก่อนวัดอะไรเลย** ไม่ใช่ข้ามไปเงียบ ๆ — ด่านที่อ่านเฉลยไม่ออกแล้วเขียว
+      คือด่านที่ไม่มีอยู่ (จุดนี้อยู่ก่อนสั่ง serve/chrome ⇒ ยังไม่มีอะไรต้องเก็บกวาด) */
+let ADR_SHAPES = null;
+try {
+  ADR_SHAPES = parseShapeTables(fs.readFileSync(path.join(ROOT, ADR_REL), 'utf8'));
+} catch (e) {
+  await die(`✗ ${e.message}`);
 }
+const SHAPE_CALLSITES_BUILD = ADR_SHAPES.perFile;   /* ADR-001 §13.5 "จำนวนจุดเรียกต่อไฟล์" */
+const SHAPE_CALLSITES_APP = ADR_SHAPES.appCallsites; /* ADR-001 §13.5 ตารางฝั่งเบราว์เซอร์ (ไม่นับตัวนิยาม) */
+/* ตัวนับอยู่ที่ tools/adr-shape-table.mjs (`countCallsIn`) เพราะ ci/adr-shape-table.test.mjs
+   ต้องนับด้วยตัวเดียวกัน — สองสำเนาของ "วิธีนับ" ดริฟต์กันได้เงียบ ๆ แล้วเลขในรายงานสองที่
+   ไม่ตรงกันโดยไม่มีใครผิดชัด ๆ (บทเรียน "เลขที่รายงานต้องถูกสร้าง ไม่ใช่พิมพ์ซ้ำ") */
+const countCalls = (rel, name) =>
+  countCallsIn(fs.readFileSync(path.join(ROOT, rel), 'utf8'), name);
 
 /* ---------- V17 ข้อ ค ครึ่งหลัง: ทรงของกล่องสื่อในฟีดเมื่อเรื่องเป็นแนวนอน ----------
    สามค่าข้างล่าง **ไม่ใช่ของ Dev** — UX-Designer ตอบมาให้ตรง ๆ ใน AIO-59 §10.1–§10.3
@@ -1803,18 +1831,41 @@ try {
   if (ONLY === '' || ONLY === 'shape') {
     console.log('\nส่วน 6 · ความครบของแผนที่ที่วาง (เทียบจำนวนจุดเรียกในซอร์สกับตารางของ ADR §13.5)');
     {
-      const perFile = Object.entries(SHAPE_CALLSITES_BUILD)
-        .map(([f, want]) => ({ f, want, got: countCalls(f, 'coverImg') }));
-      const nBuild = perFile.reduce((n, x) => n + x.got, 0);
-      check(`จุดเรียก coverImg() ฝั่ง build = ${nBuild} จุดตามตารางของสัญญา แยกรายไฟล์ครบทุกไฟล์`,
-        perFile.every(x => x.got === x.want),
-        perFile.filter(x => x.got !== x.want).map(x => `${x.f} ควรมี ${x.want} แต่นับได้ ${x.got}`).join(' · ')
-        + ' ⇒ ถ้าเพิ่มที่วางใหม่ ต้องเพิ่มรายการใน SHAPE_MAP '
-        + 'พร้อมแก้ตารางใน ADR-001 §13.5 แล้วอัปเดตตัวเลขนี้ · ห้ามอัปเดตตัวเลขอย่างเดียว');
+      /* เลขรายไฟล์ + เลขฝั่งเบราว์เซอร์ + ชุดไฟล์ของสองที่ในสัญญา — ทุกเลขมาจาก ADR §13.5
+         (`SHAPE_CALLSITES_*` ข้างบนคือค่าที่แกะมา ไม่ใช่ค่าที่เขียนไว้ในด่านแล้ว) */
+      const nBuild = Object.keys(SHAPE_CALLSITES_BUILD)
+        .reduce((n, f) => n + countCalls(f, 'coverImg'), 0);
       const nApp = countCalls('build/app.src.js', 'coverAttrs');
-      check(`จุดเรียก coverAttrs() ฝั่งเบราว์เซอร์ = ${SHAPE_CALLSITES_APP} จุดตามตารางของสัญญา (นับได้ ${nApp})`,
-        nApp === SHAPE_CALLSITES_APP,
-        'ท่อเบราว์เซอร์คือท่อที่ด่านซึ่งอ่าน HTML มองไม่เห็น (§13.1) ⇒ ที่วางใหม่ที่นี่ต้องมีรายการในแผนที่');
+      const csProblems = callsiteProblems(ADR_SHAPES, countCalls);
+      check(`จุดเรียกตรงกับเลขที่ §13.5 ประกาศ · coverImg() ฝั่ง build ${nBuild}/${ADR_SHAPES.declaredTotal} `
+        + `แยกรายไฟล์ครบ ${Object.keys(SHAPE_CALLSITES_BUILD).length} ไฟล์ · `
+        + `coverAttrs() ฝั่งเบราว์เซอร์ ${nApp}/${SHAPE_CALLSITES_APP}`,
+        csProblems.length === 0,
+        csProblems.join(' · ')
+        + ' ⇒ ถ้าเพิ่มที่วางใหม่ ต้องเพิ่มรายการใน SHAPE_MAP พร้อมแก้ตารางใน ADR-001 §13.5 '
+        + '(เลขในด่านนี้แกะมาจากสัญญา ⇒ แก้ด่านฝ่ายเดียวไม่ได้แล้ว)');
+      /* ---------- ตาราง §13.5 ⇄ SHAPE_MAP สองทาง (ADR §13.9 ด่านบังคับข้อที่สอง) ----------
+         เทียบ **คู่ (selector → ทรง)** ตามกฎการแกะข้อ 3 (สองทาง ไม่เทียบจำนวนแถว) และข้อ 4
+         (ฮีโร่ "สองทรง" = shape:'poster' + wideAtBp:true) · ฟิลด์ที่เป็นของด่านไม่ถูกเทียบเลย (ข้อ 5) */
+      {
+        const problems = [...ADR_SHAPES.docProblems, ...shapeMapProblems(ADR_SHAPES, SHAPE_MAP)];
+        check(`คู่ (selector → ทรง) ของ SHAPE_MAP ตรงกับตาราง §13.5 ที่แกะจาก ${ADR_REL} สองทาง `
+          + `(ตาราง ${ADR_SHAPES.buildRows.length}+${ADR_SHAPES.appRows.length} แถว ⇄ แผนที่ ${SHAPE_MAP.length} รายการ)`,
+          problems.length === 0,
+          problems.join(' · '));
+      }
+      /* ---------- ที่วางที่เรียก `coverSlot()` ตรง ๆ — เทียบ **รายการ** ไม่ใช่จำนวน ----------
+         สัญญาไม่ประกาศจำนวนของ `coverSlot(` ไว้เลย และเขียนเหตุผลกำกับว่าทำไม (ตัวนับที่ถอดแต่
+         คอมเมนต์ได้ 7 ทั้งที่ที่วางจริงมี 2) ⇒ ด่านนี้เทียบว่า "ทุกแถวมีจุดเรียกจริง" และ
+         "ไม่มีไฟล์ไหนเรียกตัวเลือกไฟล์ตรง ๆ โดยไม่มีแถวในสัญญา" */
+      {
+        const scanned = [...fs.readdirSync(path.join(ROOT, 'build'))
+          .filter(n => n.endsWith('.mjs')).map(n => `build/${n}`), 'build/app.src.js'];
+        const problems = slotProblems(ADR_SHAPES, f => fs.readFileSync(path.join(ROOT, f), 'utf8'), scanned);
+        check(`ที่วางที่เรียก coverSlot() ตรง ๆ ตรงกับรายการใน §13.5 ทั้ง ${ADR_SHAPES.slotRows.length} แถว `
+          + `(กวาด ${scanned.length} ไฟล์)`,
+          problems.length === 0, problems.join(' · '));
+      }
       /* ---------- ห้ามที่วางประกอบพาธปกเอง (ADR-001 §13.5 หลักข้อแรก) ----------
          รอยที่ปิดด้วยข้อนี้: `build/pages-content.mjs` ประกอบ `/assets/covers/${slug}.webp` เอง
          ใส่ JSON-LD ของหน้า "เบื้องหลังการสร้างด้วย AI" ⇒ เรื่องที่ชื่อไฟล์ปกไม่เท่ากับ slug
@@ -1931,8 +1982,24 @@ try {
       idFix.cover = idFixRel;
       fs.writeFileSync(path.join(wideDir, 'content.json'), JSON.stringify(cj, null, 2) + '\n');
       const rb = spawnSync('node', ['build/build.mjs'], { cwd: wideDir, encoding: 'utf8' });
-      check('build ต้นไม้ชั่วคราว "มีภาพกว้าง + เรื่องแนวนอน 1 เรื่อง" ผ่าน (กฎ V14–V16 ไม่ล้ม)',
+      check('build ต้นไม้ชั่วคราว "มีภาพกว้าง + เรื่องแนวนอน 1 เรื่อง" ผ่าน (กฎ V14–V19 ไม่ล้ม)',
         rb.status === 0, (rb.stderr || rb.stdout || '').slice(-600));
+      /* ❗ กฎ V19 (เข้าเมื่อ 26 ต.ค. 2026 · AIO-71) ทำให้สถานะนี้ **สร้างไม่ได้ตามสัญญา**:
+         ต้นไม้นี้คือโลกที่ §13.7 ห้ามตรง ๆ (มีเรื่องแนวนอนขณะที่ `/feed/` ยังไม่มี `.mwin`/`.clip`)
+         ⇒ build ล้มที่ V19 ก่อนเขียน sitemap/stub และสถานะ ข ทั้งสถานะไม่ถูกวัดรอบนั้น
+         **ห้ามแก้ด้วยการผ่อน V19 หรือด้วยการให้ด่านเขียน `.mwin`/`.clip` ลงต้นไม้เอง** —
+         ข้อแรกคือผ่อนด่าน ข้อสองคือสร้าง DOM ของแบบที่ยังรอลูกค้าอนุมัติ (ADR §13.9 เขียนห้ามไว้
+         ตรง ๆ ว่า "V19 ไม่ใช่ใบอนุญาตให้สร้าง DOM สองชั้น" และนั่นเป็นงาน AIO-62)
+         ⇒ ของที่ถูกคือ **บอกให้ครบว่าอะไรไม่ได้ถูกวัด** แล้วให้ CTO ตัดสินลำดับ (รายงานใน AIO-71)
+         ไม่ใช่ปล่อยให้บรรทัดสรุปอ่านว่า "เลื่อนไว้ 0" ซึ่งแปลว่า "ทุกข้อถูกบังคับแล้ว" (AIO-66 P3-8) */
+      if (rb.status !== 0 && /กฎ V19/.test(rb.stderr || rb.stdout || '')) {
+        defer('สถานะ ข ทั้งสถานะ (ทรงของทุกที่วางเมื่อมีภาพกว้างครบ + เรื่องแนวนอน 1 เรื่อง '
+          + '· รวม V17 ค ครึ่งทรง และ self-test M14)',
+          'กฎ V19 ห้ามสภาพ "มีเรื่องแนวนอนแต่ฟีดยังไม่มีกล่องสื่อสองชั้น" ⇒ ต้นไม้ของสถานะนี้ '
+          + 'build ไม่ผ่านโดยเจตนาของสัญญา · ปลดเมื่อ AIO-62 ลง `.mwin`/`.clip` ให้ `/feed/` '
+          + '(คำตัดสินลำดับอยู่ที่ CTO · รายงานไว้ใน AIO-71) — ข้อนี้ไม่ใช่ "ผ่าน" และไม่ใช่ "ตก" '
+          + 'ของโค้ด แต่คือ "ไม่ได้วัด"');
+      }
       if (rb.status === 0) {
         const widePort = await freePort('LAY_PORT_WIDE');
         /* `cwd: wideDir` ไม่ใช่ของประดับ: วันนี้ความถูกต้องของสถานะ ข แขวนอยู่กับคุณสมบัติของ

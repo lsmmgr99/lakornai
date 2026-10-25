@@ -298,6 +298,72 @@ if (SERIES.some(s => s.orientation === 'horizontal')) {
   }
 }
 
+/* 4.8ข กฎ V19 (ADR-001 §13.9) — ข้อห้ามของ §13.7 ("ห้ามส่งขั้นที่ปลดตัวกรองโดยที่กล่องสื่อ
+   ยังไม่ได้ทรงจาก `orientation`") วันนี้มีเครื่องบังคับชิ้นเดียวคือด่านเลย์เอาต์ ซึ่งต้องมีเบราว์เซอร์
+   + CDP และไม่อยู่ในเส้นทาง build ⇒ ข้อมูลที่เข้ามาทาง `admin/` สร้างเว็บที่ส่งต่อได้โดยที่ฟีด
+   มีแถบว่างครึ่งจอ **ก่อน**ที่ใครจะรันด่าน 25 นาที · กฎนี้ย้ายการจับมาไว้ที่ด่านที่ถูกที่สุด
+   เงื่อนไขและจุดลงเป็นของ CTO (AIO-70 → AIO-71): รูปแบบเดียวกับ V18 ข้างบนเป๊ะ และอ่าน
+   **ไฟล์ที่ส่งออก** (`feed/index.html` ที่ส่วน 3 เพิ่งเขียน) ไม่ใช่ซอร์สเทมเพลตของมัน
+
+   ⚠️ สามข้อที่ทำให้ด่านนี้ไม่ใช่ `grep '.mwin'`:
+   1) **ไม่นับคอมเมนต์/สตริงเป็นของจริง** — บทเรียนเดิมของรีโปนี้ (`--faint` ใน CSS · ถ้อยคำ
+      ต้องห้ามใน app.js) ⇒ ถอด `<!-- -->` และบล็อก `<script>` ออกก่อน (ชื่อคลาสที่อยู่ในสตริง
+      ของ JS คือ "โค้ดที่อาจสร้างมันตอนรัน" ไม่ใช่โครงของหน้าที่ส่งออก)
+   2) **ความเป็นลูกหลานเป็นของจริง ไม่ใช่การอยู่ร่วมไฟล์** — `.mwin` ที่ไหนก็ได้ + `.clip` ที่ไหน
+      ก็ได้ ผ่าน regex ได้ทั้งคู่โดยไม่เคยเป็นกล่องเดียวกัน ⇒ เดินแท็กด้วยสแต็กแล้วเทียบ
+      ลูกโดยตรงสามชั้นตาม selector ของ AIO-59 §10.1 (`.player.full > .mwin > .clip`)
+      ซึ่งเป็นโครงเดียวกับที่ V17 ข้อ ค วัดในเบราว์เซอร์ (FEED_CLIP_SEL ของ tools/test-layout.mjs)
+      ⇒ ไม่เปิดช่องว่าง "build เขียวแต่ด่านเลย์เอาต์แดง"
+   3) กฎนี้ **ไม่ใช่ใบอนุญาตสร้าง DOM สองชั้น** — `.mwin`/`.clip` เป็นงาน AIO-62 และราคาวันนี้
+      เป็นศูนย์เพราะคลังเป็นแนวตั้ง 12/12 ⇒ บล็อกนี้ไม่ทำงานเลยจนกว่าข้อมูลแนวนอนเข้ามา
+
+   หมายเหตุลำดับ (วัดแล้ว ไม่ใช่สันนิษฐาน): V18 ข้างบนผูกกับเงื่อนไขเดียวกันและออกก่อน ⇒ ถ้า
+   `assets/app.js` ยังฝังขนาดคงที่อยู่ สภาพ "มีเรื่องแนวนอน" จะแดงที่ V18 แล้วบรรทัดนี้ไม่ถูกรัน
+   วันนี้ `coverAttrs()` คืนขนาดของไฟล์ที่เลือกจริงแล้ว (AIO-57) ⇒ V18 เขียวและ V19 แดงเองได้
+   มิวเทชัน M23 จึงไม่ต้องแตะ `app.src.js` เลย · ถ้าวันหน้าใครฝังค่าคงที่กลับมา มิวเทชันของ V19
+   จะเห็นสีแดงของ V18 ก่อน ⇒ ให้แก้ของ ไม่ใช่สลับลำดับด่าน */
+const FEED_OUT = 'feed/index.html';
+/* ลูกโดยตรงสามชั้น: คลาสของกล่อง → คลาสของพ่อ → คลาสของปู่ · คืน true ทันทีที่เจอใบแรก */
+function hasFeedMediaWindow(html) {
+  const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+    'link', 'meta', 'param', 'source', 'track', 'wbr']);
+  const classesOf = tag => {
+    const m = tag.match(/\sclass\s*=\s*"([^"]*)"/i) || tag.match(/\sclass\s*=\s*'([^']*)'/i);
+    return new Set(m ? m[1].trim().split(/\s+/).filter(Boolean) : []);
+  };
+  const stack = [];
+  const re = /<(\/?)([a-zA-Z][\w-]*)((?:"[^"]*"|'[^']*'|[^>])*?)(\/?)>/g;
+  for (let m; (m = re.exec(html));) {
+    const [whole, closing, rawTag, , selfClosed] = m;
+    const tag = rawTag.toLowerCase();
+    if (closing) {
+      for (let i = stack.length - 1; i >= 0; i--) if (stack[i].tag === tag) { stack.length = i; break; }
+      continue;
+    }
+    const node = { tag, cls: classesOf(whole) };
+    const p = stack[stack.length - 1], g = stack[stack.length - 2];
+    if (node.cls.has('clip') && p && p.cls.has('mwin') && g && g.cls.has('player') && g.cls.has('full')) return true;
+    if (!VOID.has(tag) && !selfClosed) stack.push(node);
+  }
+  return false;
+}
+{
+  const horizontal = SERIES.filter(s => s.orientation === 'horizontal');
+  if (horizontal.length) {
+    const feedHtml = fs.readFileSync(R(FEED_OUT), 'utf8')
+      .replace(/<!--[\s\S]*?-->/g, '')
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
+    if (!hasFeedMediaWindow(feedHtml)) {
+      console.error(`✗ ${FEED_OUT}: ไม่มีกล่องสื่อสองชั้นตามกฎ AIO-59 `
+        + `(\`.player.full\` > \`.mwin\` > \`.clip\` เป็นลูกโดยตรงต่อกัน) `
+        + `ขณะที่คลังมีเรื่องแนวนอนแล้ว ${horizontal.length} เรื่อง: `
+        + horizontal.map(s => `${s.title} (${s.slug})`).join(' · ')
+        + ` — ฟีดจะครอปภาพของเรื่องแนวนอนลงกรอบเต็มจอแนวตั้ง (ADR-001 กฎ V19 · §13.7)`);
+      process.exit(1);
+    }
+  }
+}
+
 /* 4.9 ความตรงกันของ **สองท่อ** (ADR-001 §13.1 D5 · Reviewer-Claude AIO-63 ข้อ 1)
    ปกไหลผ่านสองท่อที่แก้ไม่สมมาตรได้เงียบ ๆ: `coverSlot()` ฝั่ง build (build/seo.mjs, ESM บน
    node) และสำเนาฝั่งเบราว์เซอร์ใน `build/app.src.js` (IIFE ที่ถูกคัดลอกตรง ๆ เป็น assets/app.js)
