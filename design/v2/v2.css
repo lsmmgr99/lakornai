@@ -246,12 +246,28 @@ svg.ico.lg{width:26px;height:26px}
 .cont .m{margin-top:2px;font-size:var(--t-meta);color:var(--muted)}
 
 /* ===================== 9. HERO ===================== */
-.hero{position:relative;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--e2);background:var(--surface)}
+/* AIO-74 · `.hero` เป็นคอนเทนเนอร์ของตัวเอง เพื่อให้กล่องภาพอ้าง "ความกว้างของการ์ดใบนี้"
+   ได้ตรง ๆ ด้วย cqw แทนการพึ่งสัดส่วน · ดู design/v2/AIO-74-HERO-WIDTH.md */
+.hero{position:relative;border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--e2);background:var(--surface);
+  container-type:inline-size}
 /* F4 (AIO-38) · ฮีโร่กินจอ 86–89% ที่ 1366×768 และ 390×844 ⇒ เพดาน 56vh ตามค่าที่ UX ทดสอบมา
-   เขียนเป็น min()/max-height ไม่ใช่ 56vh เปล่า ๆ เพื่อให้จอสูงยังได้ความสูงที่อนุมัติไว้เท่าเดิม
-   (ที่ 1440×900 → min(480px,504px)=480px · ที่ 1920×1080 → min(480px,605px)=480px ⇒ ไม่ขยับ) */
-.hero .bg{position:relative;aspect-ratio:var(--ar-poster);max-height:56vh}
-.hero .bg img{width:100%;height:100%;object-fit:cover}
+   เขียนเป็น min() ไม่ใช่ 56vh เปล่า ๆ เพื่อให้จอสูงยังได้ความสูงที่อนุมัติไว้เท่าเดิม
+   (ที่ 1440×900 → min(480px,504px)=480px · ที่ 1920×1080 → min(480px,605px)=480px ⇒ ไม่ขยับ)
+   **มติ F4 ไม่ถูกถอน** — ความสูงทุกจอเท่าเดิมทุกพิกเซล (ตาราง §3 ของ AIO-74-HERO-WIDTH.md)
+
+   AIO-74 · ทำไมมือถือเลิกใช้ aspect-ratio + max-height คู่กัน:
+   กล่องที่ความกว้างเป็น auto + มี aspect-ratio + มี max-height ที่แน่นอน ถูกกฎ CSS Sizing
+   ส่ง max-height ผ่านสัดส่วนไปเป็น max-width ด้วย ⇒ กล่องหดทั้งสองด้านพร้อมกัน เหลือแถบ
+   พื้นการ์ดข้างรูป 8.9–27.2% (วัด 6 ขนาดจอมือถือ) ทั้งที่สัดส่วนยัง 2:3 เป๊ะ
+   ⇒ เขียนความสูงตรง ๆ ด้วยสำนวนเดียวกับสาขาเดสก์ท็อป: 150cqw = 1.5 × ความกว้างการ์ด
+   = ความสูงของปก 2:3 เมื่อยังไม่ติดเพดาน · ไม่มีสัดส่วนให้ส่งผ่าน ⇒ กว้างเต็มการ์ดเสมอ
+   (รูปแบบอื่นที่ให้กล่องเท่ากันทุกพิกเซลก็ใช้ได้ — กฎที่ผูกไว้คือ "กล่องต้องกว้างเท่าการ์ด
+    ±1px และสูง min(1.5 × ความกว้างการ์ด, 56vh) ±1px" ไม่ใช่ตัวสะกด) */
+.hero .bg{position:relative;height:min(150cqw,56vh)}
+/* AIO-74 · จุดยึดภาพย้ายมาอยู่ที่กฎฐาน = ค่าเดียวทั้งมือถือและเดสก์ท็อป
+   เหตุ: ปกทั้ง 12 ใบวางหน้าตัวละครไว้ "ค่อนบน" ⇒ ครอปตรงกลาง (50% 50%) ตัดหัวที่จอเตี้ย
+   ตรวจปกจริงครบ 12 ใบ ที่จอครอปลึกสุด (360×640 · ตัดบน-ล่างรวม 27.2%) แล้ว */
+.hero .bg img{width:100%;height:100%;object-fit:cover;object-position:center 22%}
 .hero .bg::after{content:"";position:absolute;inset:0;
   background:linear-gradient(180deg,rgba(9,8,12,.1) 0%,rgba(9,8,12,.05) 34%,rgba(9,8,12,.82) 72%,rgba(9,8,12,.97) 100%)}
 .hero .body{position:absolute;left:0;right:0;bottom:0;padding:var(--s5)}
@@ -268,8 +284,12 @@ svg.ico.lg{width:26px;height:26px}
 .dots i{width:7px;height:7px;border-radius:50%;background:var(--border-i)}
 .dots i.on{width:22px;border-radius:4px;background:var(--accent)}
 @media (min-width:720px){
-  .hero .bg{aspect-ratio:auto;height:min(440px,56vh)}
-  .hero .bg img{object-position:center 22%}
+  /* AIO-74 · `aspect-ratio:auto` ถูกถอดออกจากข้อนี้ เพราะกฎฐานไม่ประกาศสัดส่วนแล้ว
+     (ของเดิมมีไว้ล้างสัดส่วนของสาขามือถือ) · `object-position` ย้ายไปอยู่ที่กฎฐานเช่นกัน
+     ⚠️ ถึงด่าน: ตัวค้นหาเบรกพอยต์ที่อาศัย "กล่องประกาศสัดส่วนที่จอแคบ" ใช้ไม่ได้อีกต่อไป
+        สัญญาณที่ยังสลับที่ 720px เหมือนเดิมและวัดได้: `.hero .body` right = 0px ที่ <720
+        และ 48%/52% ที่ ≥720 (ดู §7 ของ AIO-74-HERO-WIDTH.md) */
+  .hero .bg{height:min(440px,56vh)}
   .hero .bg::after{background:linear-gradient(95deg,rgba(9,8,12,.96) 0%,rgba(9,8,12,.9) 34%,rgba(9,8,12,.35) 70%,rgba(9,8,12,.2) 100%)}
   .hero .body{right:48%;display:flex;flex-direction:column;justify-content:center;top:0;padding:var(--s7)}
   .hero .btn-row .btn{flex:0 0 auto}
