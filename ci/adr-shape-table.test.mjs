@@ -144,8 +144,11 @@ test('ฮีโร่ "สองทรง" = shape:poster + wideAtBp:true ห้
   /* ของจริงต้องเขียว แต่ทั้งสองครึ่งของการเข้ารหัสต้องล้มได้ */
   assert.ok(shapeMapProblems(ADR, mapWith('.hero .bg', { wideAtBp: false })).some(x => x.includes('.hero .bg')));
   assert.ok(shapeMapProblems(ADR, mapWith('.hero .bg', { shape: 'wide' })).some(x => x.includes('.hero .bg')));
-  /* และสตริง "สองทรง" ในแผนที่ไม่ใช่ทางผ่าน */
-  assert.ok(shapeMapProblems(ADR, mapWith('.hero .bg', { shape: DUAL, wideAtBp: true })).length >= 1);
+  /* และสตริง "สองทรง" ในแผนที่ไม่ใช่ทางผ่าน — เทียบ **ข้อใหม่** ไม่ใช่ `length >= 1`
+     (ข้อเดิมเขียวได้แม้ตัวตรวจไม่แตะฮีโร่ เพราะฐานมีข้อค้างอยู่ · Reviewer-Codex R6) */
+  const dualStr = shapeMapProblems(ADR, mapWith('.hero .bg', { shape: DUAL, wideAtBp: true }))
+    .filter(x => !shapeMapProblems(ADR, SHAPE_MAP).includes(x));
+  assert.ok(dualStr.some(x => x.includes('.hero .bg')), dualStr.join(' · '));
 });
 
 /* ================= 4. มิวเทชันฝั่งเอกสาร ================= */
