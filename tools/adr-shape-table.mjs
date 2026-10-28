@@ -36,8 +36,77 @@ const H_APP = 'ตารางที่วาง — ฝั่งเบราว
 export const SHAPES = ['poster', 'wide', 'auto'];
 export const DUAL = 'สองทรง';
 
+/* แถวที่ **ไม่ใช่กล่องที่ render** จึงไม่มี selector ได้โดยชอบ — ประกาศด้วยชื่อ ไม่ใช่ปล่อยว่าง
+   (ดูเหตุผลที่จุดใช้ใน parseShapeTables · สัญญายังไม่ได้ล็อกคำนิยามนี้ ⇒ ขอ CTO ไว้แล้ว) */
+export const NON_RENDER_ROWS = ['ภาพในเพลเยอร์ฟีดตอนเลื่อนเรื่อง'];
+
 /* ---------- ตัวช่วยระดับตัวอักษร ---------- */
 const stripEmphasis = s => s.replace(/\*\*/g, '').replace(/`/g, '').trim();
+
+/* ---------- ถอดคอมเมนต์และ "ข้อความ" ออกจากซอร์ส JS ----------
+   เดินทีละตัวอักษรด้วยสแต็กของโหมด ไม่ใช่ regex สี่ชั้น · สองรอยที่รูปแบบ regex เปิดไว้และ
+   รีวิวรอบที่สี่วัดได้ทั้งคู่:
+     · `const q = "\`";` (backtick เดี่ยวในสตริง) ทำให้ regex ของเทมเพลตจับคู่ข้ามโค้ดจริง
+       แล้ว **กลืนจุดเรียกที่อยู่ระหว่างนั้นทิ้ง** ⇒ ด่านกวาดไฟล์ใหม่เงียบ (Reviewer-Claude ข 5)
+     · `` `<img src="${coverSlot(s,'wide').src}">` `` ถูกลบทั้งก้อนรวม `${...}` ⇒ **จุดเรียกจริง**
+       ที่อยู่ในนิพจน์แทรกหายไปจากสายตาของด่าน ทั้งที่มันคือรูปที่ renderer ใช้จริงทุกไฟล์
+       (Reviewer-Codex R4) ⇒ เนื้อของ `${...}` ต้องถูกเก็บไว้เป็น **โค้ด** และซ้อนกันได้ไม่จำกัดชั้น
+   กับดักที่ต้องรับมือด้วยเพราะมันอยู่ในไฟล์จริง: literal ของ regex (`/['"`]/`) ⇒ ถ้าอ่านเป็นตัว
+   เปิดสตริง สแต็กจะเลื่อนทั้งไฟล์ · ตัดสินด้วยตัวอักษรที่ไม่ใช่ช่องว่างตัวก่อนหน้า ตามแบบที่
+   tokenizer ของ JS ใช้ (ตำแหน่งที่ "คาดว่าเป็นนิพจน์" เท่านั้นที่ `/` เปิด regex ได้) */
+const RE_ALLOWED_BEFORE = new Set(['(', ',', '=', ':', '[', '!', '&', '|', '?', '{', '}', ';', '+', '-', '*', '%', '<', '>', '~', '^', undefined]);
+export function stripCommentsAndStrings(src) {
+  let out = '';
+  /* frame: { kind:'code'|'tmpl', depth } — `depth` คือวงเล็บปีกกาที่เปิดอยู่ในเฟรมโค้ดนั้น */
+  const stack = [{ kind: 'code', depth: 0 }];
+  const lastCode = () => {
+    for (let k = out.length - 1; k >= 0; k--) if (!/\s/.test(out[k])) return out[k];
+    return undefined;
+  };
+  let i = 0;
+  while (i < src.length) {
+    const f = stack[stack.length - 1];
+    const c = src[i];
+    if (f.kind === 'tmpl') {
+      if (c === '\\') { i += 2; continue; }
+      if (c === '`') { stack.pop(); i++; continue; }
+      if (c === '$' && src[i + 1] === '{') { stack.push({ kind: 'code', depth: 0 }); i += 2; out += ' '; continue; }
+      i++;
+      continue;
+    }
+    if (c === '/' && src[i + 1] === '*') { const e = src.indexOf('*/', i + 2); i = e < 0 ? src.length : e + 2; out += ' '; continue; }
+    if (c === '/' && src[i + 1] === '/') { const e = src.indexOf('\n', i); i = e < 0 ? src.length : e; out += ' '; continue; }
+    if (c === '"' || c === "'") {
+      let j = i + 1;
+      while (j < src.length && src[j] !== c) { if (src[j] === '\\') j++; j++; }
+      out += c + c;
+      i = j + 1;
+      continue;
+    }
+    if (c === '`') { stack.push({ kind: 'tmpl' }); out += '``'; i++; continue; }
+    if (c === '/' && RE_ALLOWED_BEFORE.has(lastCode())) {
+      /* literal ของ regex: ข้ามถึง `/` ที่ไม่ได้ถูก escape และไม่ได้อยู่ในคลาส [...] */
+      let j = i + 1, inClass = false, closed = false;
+      for (; j < src.length; j++) {
+        const d = src[j];
+        if (d === '\\') { j++; continue; }
+        if (d === '\n') break;                       /* ขึ้นบรรทัดใหม่ = ไม่ใช่ regex */
+        if (inClass) { if (d === ']') inClass = false; continue; }
+        if (d === '[') { inClass = true; continue; }
+        if (d === '/') { closed = true; break; }
+      }
+      if (closed) { out += ' '; i = j + 1; continue; }
+    }
+    if (c === '{') f.depth++;
+    else if (c === '}') {
+      if (f.depth === 0 && stack.length > 1) { stack.pop(); i++; out += ' '; continue; }
+      f.depth--;
+    }
+    out += c;
+    i++;
+  }
+  return out;
+}
 
 /* เนื้อของหัวข้อหนึ่ง = บรรทัดหลังหัวข้อนั้น จนถึงหัวข้อถัดไป (ระดับใดก็ได้) */
 function sectionOf(md, heading) {
@@ -64,13 +133,45 @@ function tableRows(lines, heading) {
   return body.slice(1);                     /* แถวแรกคือหัวตาราง */
 }
 
-/* selector ในช่อง "ที่วาง" — เอาเฉพาะโทเคนใน backtick ที่เป็นรูป CSS จริง
-   (ขึ้นต้นด้วย `.` หรือ `#` แล้วต่อด้วยคลาส/ไอดี/ชื่อแท็กคั่นด้วยช่องว่าง)
-   ⇒ `poster()` `coverImg()` `build/ui.mjs:99` `--ar-poster` `:495` ไม่ถูกหยิบมาเป็น selector
-   หนึ่งช่องมีได้หลาย selector (แถว "รายการแจ้งเตือน · คลัง · รายการแบน" มีสาม) */
-const SEL_RE = /^[.#][-\w.]+(?:\s+[.#]?[-\w.]+)*$/;
-export function selectorsIn(cell) {
-  return [...cell.matchAll(/`([^`]+)`/g)].map(m => m[1].trim()).filter(s => SEL_RE.test(s));
+/* selector ในช่อง "ที่วาง" — โทเคนใน backtick ที่เป็นรูป CSS
+   หนึ่งช่องมีได้หลาย selector (แถว "รายการแจ้งเตือน · คลัง · รายการแบน" มีสาม)
+
+   ⚠️ ของเดิมคัดด้วย regex เส้นเดียวแล้ว **ทิ้งโทเคนที่อ่านไม่ออกอย่างเงียบ ๆ** ⇒ `>` และ
+   attribute selector (ซึ่งสัญญาไม่ได้ห้าม และ §10.1 ของ UX ใช้อยู่จริง) หลุดออกจากการเทียบ
+   ทั้งสองทางโดยไม่มีใครรู้ (Reviewer-Codex R5 · Reviewer-Claude P2) ⇒ ตอนนี้แยกเป็นสามกอง:
+     · ไม่เหมือน selector เลย (`poster()` · `build/ui.mjs:99` · `:495` · `--ar-poster`) ⇒ ข้าม เงียบได้
+     · เหมือน selector และแกะออก ⇒ ใช้เทียบ
+     · **เหมือน selector แต่แกะไม่ออก ⇒ เป็นข้อตกของเอกสาร** ไม่ใช่ของที่หายไปเฉย ๆ */
+const COMPOUND_RE = /^(?:[a-zA-Z][-\w]*)?(?:[.#][-\w]+|\[[^\]]+\]|::?[-\w]+(?:\([^)]*\))?)*$/;
+/* "เหมือน selector" = ขึ้นต้นด้วย `.` `#` หรือ `[` — ทุกแถวของสัญญาวันนี้เขียนรูปนี้ทั้งหมด
+   (ตั้งไว้แคบโดยเจตนา: โทเคนอย่าง `s.slug` หรือ `ImageObject` ในช่องเดียวกันต้องไม่กลาย
+   เป็น "selector ที่แกะไม่ออก" ซึ่งจะเป็นข้อแดงของเอกสารที่ไม่ใช่ความผิดของเอกสาร ·
+   ถ้าวันหน้าสัญญาเขียน `span.cls` แถวนั้นจะไม่มี selector เลย ⇒ ตกที่ข้อ "ทุกแถวที่วางต้องมี
+   selector" ข้างล่าง ไม่ใช่หลุดเงียบ) */
+const LOOKS_LIKE_SEL = /^[.#[]/;
+export function selectorTokens(cell) {
+  const selectors = [], unreadable = [];
+  for (const m of cell.matchAll(/`([^`]+)`/g)) {
+    const raw = m[1].trim();
+    if (!LOOKS_LIKE_SEL.test(raw)) continue;
+    const parts = raw.split(/\s*([>+~])\s*|\s+/).filter(Boolean);
+    const ok = parts.length > 0 && parts.every(p => /^[>+~]$/.test(p) || COMPOUND_RE.test(p))
+      && /[.#[]/.test(raw);
+    (ok ? selectors : unreadable).push(raw);
+  }
+  return { selectors, unreadable };
+}
+export const selectorsIn = cell => selectorTokens(cell).selectors;
+
+/* คลาสของ "กล่องที่ถือภาพ" = compound สุดท้ายของ selector ที่มีคลาส (ข้าม `span` ท้าย
+   ของ `.btile .reelstrip span` ไปใช้ `.reelstrip`) · ใช้ผูกแถวกับไฟล์ที่สัญญาบอกว่า render มัน */
+export function hostClasses(sel) {
+  const parts = sel.split(/\s*[>+~]\s*|\s+/).filter(Boolean);
+  for (let k = parts.length - 1; k >= 0; k--) {
+    const cls = [...parts[k].matchAll(/\.([-\w]+)/g)].map(x => x[1]);
+    if (cls.length) return cls;
+  }
+  return [];
 }
 
 /* ค่าในช่อง "ขอทรง" — `poster` | `wide` | `auto` | สองทรง (ฮีโร่)
@@ -96,21 +197,58 @@ function filesIn(cell) {
 export function parseShapeTables(md) {
   const docProblems = [];
 
+  /* จำนวนจุดเรียกที่ **แถวเดียว** ประกาศ: ช่องไฟล์เขียนที่ตั้งของทุกจุดไว้ (`:489` · `:495`)
+     ⇒ นับ *จำนวน* ที่ตั้ง ไม่ใช่เทียบค่าของมัน (กฎการแกะข้อ 2 ห้ามเทียบค่า ไม่ได้ห้ามนับ)
+     แถวที่อ้างด้วยชื่อสัญลักษณ์ (บล็อก/ฟังก์ชัน) นับเป็น 1 ⇒ ใช้เทียบกับแถว "รวม" ของสัญญา
+     ซึ่งเขียนเงื่อนไขนี้ไว้เองว่า "ต้องเท่ากับจำนวนแถวที่ตารางฝั่ง build ประกาศ (แถว
+     'ตารางออกตอน' นับ 2)" — เฉลยอยู่ในสัญญาแล้ว ของเดิมแค่ไม่หยิบไปใช้ (Reviewer-Claude P2) */
+  const markersIn = cell => Math.max(1, (cell.match(/:\d+/g) || []).length);
+
+  const rowOf = (r, i, where) => {
+    const { selectors, unreadable } = selectorTokens(r[0]);
+    const placement = stripEmphasis(r[0]);
+    for (const u of unreadable) {
+      docProblems.push(`§13.5 แถว "${placement}" (${where} #${i + 1}): โทเคน \`${u}\` เขียนในรูป `
+        + `selector แต่ตัวแกะอ่านไม่ออก ⇒ ถ้ามันคือ selector ให้แก้ตัวแกะให้รองรับ `
+        + `ถ้าไม่ใช่ให้เอา backtick ออก — ห้ามปล่อยให้มันหายไปจากการเทียบเงียบ ๆ`);
+    }
+    return {
+      placement,
+      selectors,
+      shape: shapeIn(r[1], `${where} #${i + 1}`),
+      files: filesIn(r[2] || ''),
+      callsites: markersIn(r[2] || ''),
+    };
+  };
+
   const buildLines = sectionOf(md, H_BUILD);
-  const buildRows = tableRows(buildLines, H_BUILD).map((r, i) => ({
-    placement: stripEmphasis(r[0]),
-    selectors: selectorsIn(r[0]),
-    shape: shapeIn(r[1], `${H_BUILD} #${i + 1}`),
-    files: filesIn(r[2] || ''),
-  }));
+  const buildRows = tableRows(buildLines, H_BUILD).map((r, i) => rowOf(r, i, H_BUILD));
 
   const appLines = sectionOf(md, H_APP);
-  const appRows = tableRows(appLines, H_APP).map((r, i) => ({
-    placement: stripEmphasis(r[0]),
-    selectors: selectorsIn(r[0]),
-    shape: shapeIn(r[1], `${H_APP} #${i + 1}`),
-    files: filesIn(r[2] || ''),
-  }));
+  const appRows = tableRows(appLines, H_APP).map((r, i) => rowOf(r, i, H_APP));
+
+  /* ทุกแถว "ที่วาง" ต้องมี selector อย่างน้อยหนึ่งตัว ยกเว้นแถวที่ **ไม่ใช่กล่องที่ render**
+     ซึ่งต้องถูกยกเว้น **โดยเขียนชื่อไว้ตรง ๆ** ไม่ใช่โดยการที่ช่องว่างแล้วเครื่องเดาเอง
+     (ข้อนี้ผมเขียนไว้เองใน AIO-71 ว่าต้องมี แล้วไม่ได้ลง · ทั้งสองฝั่งรีวิวจับได้)
+     ⚠️ สัญญายังไม่ได้ประกาศว่าแถวแบบนี้คืออะไร (Reviewer-Claude ค3 — ขอให้ CTO ล็อก)
+        ⇒ รายการข้างล่างคือสิ่งที่ **ด่าน** รู้ และถ้ามันไม่ตรงกับเอกสารอีกต่อไป มันจะแดงเอง
+        ทั้งสองทิศ: แถวใหม่ที่ไม่มี selector = แดง · ชื่อในรายการที่ไม่ตรงแถวไหนแล้ว = แดง */
+  const used = new Set();
+  for (const row of [...buildRows, ...appRows]) {
+    if (row.selectors.length) continue;
+    const hit = NON_RENDER_ROWS.find(x => row.placement.includes(x));
+    if (hit) { used.add(hit); continue; }
+    docProblems.push(`§13.5 แถว "${row.placement}" ไม่มี selector ให้เทียบเลย ⇒ ที่วางนั้นไม่ถูกวัด `
+      + `· ถ้าเป็นกล่องที่ render จริง ให้เติม selector ในช่อง "ที่วาง" (งานของ CTO) `
+      + `· ถ้าไม่ใช่กล่อง ให้ประกาศยกเว้นด้วยชื่อใน NON_RENDER_ROWS ของ tools/adr-shape-table.mjs`);
+  }
+  for (const x of NON_RENDER_ROWS) {
+    if (!used.has(x)) {
+      docProblems.push(`รายการยกเว้น "${x}" ของ tools/adr-shape-table.mjs ไม่ตรงกับแถวใดใน §13.5 `
+        + `ที่ไม่มี selector แล้ว ⇒ เอกสารขยับแล้วแต่รายการยกเว้นยังอยู่ (รายการยกเว้นที่ค้าง `
+        + `คือใบอนุญาตที่ไม่มีใครขอ)`);
+    }
+  }
 
   /* ตาราง `coverSlot()` ประกาศ **รายการชื่อ** ไม่ใช่จำนวน — สัญญาเขียนเหตุผลไว้เองว่าทำไม
      (`coverSlot(` นับไม่สะอาด: อยู่ในสตริง error ของ build/seo.mjs สองที่ และถูกเรียกข้างใน
@@ -156,6 +294,17 @@ export function parseShapeTables(md) {
   }
   if (!Object.keys(perFile).length || declaredTotal == null) {
     throw new Error(`แกะ ${ADR_REL} ไม่ได้: หัวข้อ "${H_PERFILE}" ต้องมีทั้งแถวรายไฟล์และแถว "รวม"`);
+  }
+  /* ยอดรวมของสัญญา ⇄ **จำนวนจุดเรียกที่ตารางที่วางประกาศ** — ปิดรอย "ลบแถวที่วางได้เงียบ ๆ
+     เมื่อ selector ซ้ำกับแถวอื่น" (ทิศ ก ของ shapeMapProblems คีย์ด้วย selector ไม่ใช่แถว
+     ⇒ ลบแถว `.ep-row .th` แถวใดแถวหนึ่งทิ้งแล้วไม่มีอะไรรู้สึก · Reviewer-Claude P2) */
+  const rowCallsites = buildRows.reduce((n, r) => n + r.callsites, 0);
+  if (declaredTotal != null && rowCallsites !== declaredTotal) {
+    docProblems.push(`§13.5: แถว "รวม" ประกาศ ${declaredTotal} จุดเรียก แต่ตารางที่วางฝั่ง build `
+      + `ประกาศที่ตั้งรวม ${rowCallsites} จุด (${buildRows.length} แถว) — สองที่ในเอกสารไม่ตรงกัน `
+      + `⇒ สาเหตุที่พบบ่อยคือ **ลบ/เพิ่มแถวที่วางแล้วไม่แก้ยอดรวม** · ถ้าเอกสารถอดเลขบรรทัดออก `
+      + `ตามที่รีวิวเสนอ ให้สัญญาประกาศ "จำนวนจุดเรียก" เป็นช่องของแถวแทนการนับที่ตั้ง `
+      + `(ขอไว้ที่ AIO-71) — ห้ามแก้ด้วยการถอดด่านนี้ออก`);
   }
   const sum = Object.values(perFile).reduce((a, b) => a + b, 0);
   if (sum !== declaredTotal) {
@@ -247,13 +396,86 @@ export function shapeMapProblems(adr, shapeMap) {
    ถอดคอมเมนต์ **ทั้งสองแบบ** และไม่นับตัวนิยาม — คอมเมนต์บรรทัดเดียวที่เขียนชื่อฟังก์ชันไว้
    ทำให้ตัวนับเพี้ยนมาแล้ว (AIO-66 P3-2) */
 export function countCallsIn(src, name) {
-  return (stripComments(src).match(new RegExp(`(?<!function\\s)\\b${name}\\s*\\(`, 'g')) || []).length;
+  /* ถอด **สตริงด้วย** ไม่ใช่แค่คอมเมนต์: `const msg = "coverImg(";` ทำให้เลขรายไฟล์เท่าเดิมได้
+     ทั้งที่จุดเรียกจริงถูกลบไปแล้ว (Reviewer-Claude ข 1) · สัญญาเตือนภัยชนิดนี้ไว้เองสำหรับ
+     `coverSlot(` ⇒ ความไม่สมมาตรเดิมไม่มีเหตุผลรองรับ */
+  return (stripCommentsAndStrings(src).match(new RegExp(`(?<!function\\s)\\b${name}\\s*\\(`, 'g')) || []).length;
 }
 
 /* ---------- เลขรายไฟล์ของสัญญา ⇄ จำนวนจุดเรียกในซอร์สจริง (กฎการแกะข้อ 1) ----------
    `count(rel, name)` = ตัวนับของผู้เรียก (ควรเป็น `countCallsIn` ข้างบนห่อด้วยตัวอ่านไฟล์) */
-export function callsiteProblems(adr, count) {
+export const APP_REL = 'build/app.src.js';
+
+/* คลาสนี้ถูก render **ในไฟล์นี้** ไหม — มองหาคลาสในบริบท `class=…` ของมาร์กอัปที่ไฟล์นั้นพ่น
+   (ไม่ใช่ "มีคำนี้อยู่ที่ไหนก็ได้ในไฟล์" ซึ่งจะเขียวให้กับไฟล์ที่แค่พูดถึงมัน) */
+const rendersClass = (src, cls) =>
+  new RegExp(`class\\s*=\\s*["'\`][^"'\`]{0,200}\\b${cls}\\b`).test(stripComments(src));
+
+export function callsiteProblems(adr, count, read, files) {
   const out = [];
+  if (typeof read !== 'function' || !Array.isArray(files)) {
+    throw new Error('callsiteProblems ต้องได้ทั้ง read() และรายชื่อไฟล์ที่ต้องกวาด — '
+      + 'สองข้อนั้นคือทิศ (ข) ของด่านนี้ (ไฟล์ที่มีจุดเรียกแต่ไม่มีแถว) ⇒ เรียกแบบไม่ส่งมา '
+      + 'คือการปิดครึ่งหนึ่งของด่านเงียบ ๆ');
+  }
+
+  /* ---------- (ก) แถว ⇄ ไฟล์ที่แถวนั้นอ้าง (กฎการแกะข้อ 1: **ชื่อไฟล์** เป็นช่องที่ผูกพัน) ----------
+     ของเดิมเทียบแต่ "ชุดไฟล์" กับ "เลขรายไฟล์" ⇒ ย้ายชื่อไฟล์ของแถวหนึ่งไปเป็นไฟล์อื่นที่อยู่ใน
+     ตารางแล้ว ด่านไม่รู้สึกเลย (Reviewer-Codex R3 · วัดด้วยแถว `.card .poster` → pages-watch)
+     ⇒ ผูกด้วยของที่วัดได้และไม่ใช่เลขบรรทัด: ไฟล์ที่แถวอ้าง ต้อง render คลาสของกล่องที่ถือภาพ */
+  const hostRows = [
+    ...adr.buildRows.map(r => ({ row: r, files: r.files })),
+    /* ตารางฝั่งเบราว์เซอร์ประกาศไฟล์ไว้ที่หัวตารางของมันเอง (`build/app.src.js` = `assets/app.js`)
+       ⇒ ช่องที่สามของแถวเป็นที่ตั้ง ไม่ใช่ชื่อไฟล์ */
+    ...adr.appRows.map(r => ({ row: r, files: r.files.length ? r.files : [APP_REL] })),
+  ];
+  for (const { row, files: rowFiles } of hostRows) {
+    const src = new Map();
+    for (const f of rowFiles) {
+      try { src.set(f, read(f)); }
+      catch (e) { out.push(`${f}: §13.5 แถว "${row.placement}" อ้างไฟล์นี้ แต่อ่านไฟล์ไม่ได้ — ${e.message}`); }
+    }
+    const hostedBy = sel => [...src.entries()]
+      .filter(([, s]) => hostClasses(sel).length && hostClasses(sel).every(c => rendersClass(s, c)))
+      .map(([f]) => f);
+    for (const sel of row.selectors) {
+      if (!src.size) continue;
+      if (!hostedBy(sel).length) {
+        out.push(`§13.5 แถว "${row.placement}": \`${sel}\` ไม่ถูก render ในไฟล์ที่แถวนี้อ้าง `
+          + `(${rowFiles.join(' · ')}) — หาคลาส ${hostClasses(sel).map(c => `"${c}"`).join('+')} `
+          + `ในบริบท class= ของไฟล์นั้นไม่เจอ ⇒ ที่วางย้ายไฟล์แล้วแต่ตารางยังชี้ที่เดิม `
+          + `หรือ selector ในแถวไม่ใช่ของจริง`);
+      }
+    }
+    for (const f of rowFiles) {
+      if (!src.has(f) || !row.selectors.length) continue;
+      if (!row.selectors.some(sel => hostedBy(sel).includes(f))) {
+        out.push(`${f}: §13.5 แถว "${row.placement}" อ้างไฟล์นี้ แต่ไฟล์นี้ไม่ render selector ใด `
+          + `ของแถวเลย (${row.selectors.join(' · ')}) ⇒ ชื่อไฟล์ในแถวไม่ตรงกับของจริง`);
+      }
+    }
+  }
+
+  /* ---------- (ข) ไฟล์ที่ **มีจุดเรียกแต่ไม่มีแถว** ----------
+     หัวข้อ "จำนวนจุดเรียกต่อไฟล์" มีไว้ปิดภัย "ย้ายจุดเรียกข้ามไฟล์แล้วยอดรวมเท่าเดิม" แต่ของเดิม
+     วนแต่ไฟล์ที่สัญญาลิสต์ ⇒ ย้าย **ออกไปไฟล์ที่ไม่ได้ลิสต์** ไม่ถูกวัดเลย (Reviewer-Claude P2)
+     ⇒ กวาดแบบเดียวกับที่ทิศ (ข) ของ slotProblems ทำอยู่แล้ว · เจ้าของท่อ (ตัวนิยาม) ไม่นับ */
+  /* ⚠️ ที่นี่ **ไม่** ยกเว้น SLOT_PIPE_OWNERS — นั่นเป็นรายการของท่อ `coverSlot()` ไม่ใช่ของ
+     `coverImg()`/`coverAttrs()` · ถ้ายกเว้นมันด้วย การเติม `coverImg(` ลง build/seo.mjs
+     (เคสที่ทั้งสองฝั่งรีวิววัดแล้วว่าเขียว) จะยังเขียวอยู่ · ตัวนิยามของสองฟังก์ชันนี้ไม่ถูกนับ
+     อยู่แล้วที่ countCallsIn ⇒ ไม่ต้องมีรายการยกเว้นเพิ่ม */
+  const listed = new Set([...Object.keys(adr.perFile), APP_REL]);
+  for (const f of files) {
+    if (listed.has(f)) continue;
+    let n = 0;
+    try { n = count(f, 'coverImg') + count(f, 'coverAttrs'); }
+    catch { continue; }                     /* ไฟล์ในรายการกวาดที่เปิดไม่ได้ ไม่ใช่เรื่องของข้อนี้ */
+    if (n > 0) {
+      out.push(`${f}: มีจุดเรียกตัวเลือกภาพ ${n} จุด แต่ไม่มีแถวในหัวข้อ "จำนวนจุดเรียกต่อไฟล์" `
+        + `ของ §13.5 ⇒ ที่วางย้ายมาอยู่ไฟล์ใหม่โดยยอดรวมเท่าเดิมได้ ซึ่งเป็นภัยที่หัวข้อนั้น `
+        + `เขียนเองว่ามีไว้ปิด (เพิ่มแถว = งานของ CTO · ห้ามถอดไฟล์ออกจากรายการกวาด)`);
+    }
+  }
   /* ชุดไฟล์ของสองที่ในสัญญาต้องเป็นชุดเดียวกัน — ถ้าที่วางย้ายไฟล์แล้วแก้แต่ตารางที่วาง
      (หรือแก้แต่ตารางเลขรายไฟล์) ด่านจะเห็นเลขของไฟล์ที่ไม่มีที่วาง และที่วางที่ไม่มีเลข */
   const rowFiles = new Set(adr.buildRows.flatMap(r => r.files));
@@ -305,10 +527,6 @@ export const SLOT_PIPE_OWNERS = ['build/seo.mjs', 'build/ui.mjs', 'build/app.src
 export const stripComments = src => src
   .replace(/\/\*[\s\S]*?\*\//g, '')
   .replace(/^\s*\/\/.*$/gm, '');
-export const stripCommentsAndStrings = src => stripComments(src)
-  .replace(/`(?:\\[\s\S]|\$\{[^}]*\}|[^`\\])*`/g, '``')
-  .replace(/'(?:\\.|[^'\\])*'/g, "''")
-  .replace(/"(?:\\.|[^"\\])*"/g, '""');
 export function slotProblems(adr, read, files) {
   const out = [];
   for (const row of adr.slotRows) {
@@ -331,12 +549,57 @@ export function slotProblems(adr, read, files) {
         + `⇒ ที่วางย้ายไฟล์/เปลี่ยนทรงแล้วแต่ตารางยังไม่ขยับตาม`);
     }
   }
-  const allowed = new Set([...adr.slotRows.map(r => r.file), ...SLOT_PIPE_OWNERS]);
+  /* ---------- ทิศ (ข) · นับ **จุดเรียก** ไม่ใช่อนุญาตทั้งไฟล์ ----------
+     ของเดิมใส่ไฟล์ของทุกแถวไว้ใน allowlist ⇒ เติมจุดเรียกใหม่ลงไฟล์ที่มีแถวอยู่แล้วก็เขียว
+     ทั้งที่มันคือที่วางใหม่ที่ไม่มีแถว (Reviewer-Codex R4 เคส new-slot-same-file)
+     ⇒ ไฟล์ที่ไม่ใช่เจ้าของท่อ: **จำนวนจุดเรียกต่อ (ไฟล์, ทรง) ต้องเท่ากับที่สัญญาประกาศ**
+     เจ้าของท่อเรียกตัวเลือกไฟล์จากข้างใน (ท่อ ไม่ใช่ที่วาง) ⇒ นับไม่ได้ จึงยกเว้นด้วยชื่อ
+     และ **รายการยกเว้นต้องไม่ค้าง**: เจ้าของท่อที่ไม่มีจุดเรียกเลย = รายการที่หมดอายุ */
+  const owners = new Set(SLOT_PIPE_OWNERS);
+  const declared = new Map();                 /* `${file}|${shape}` → จำนวนแถว */
+  for (const r of adr.slotRows) {
+    const k = `${r.file}|${r.callShape}`;
+    declared.set(k, (declared.get(k) || 0) + 1);
+  }
+  const seen = new Map();
   for (const f of files) {
-    if (allowed.has(f)) continue;
-    if (/\bcoverSlot\s*\(/.test(stripCommentsAndStrings(read(f)))) {
-      out.push(`${f}: มีจุดเรียก coverSlot() แต่ไม่มีแถวในตาราง "${H_SLOT}" ของ §13.5 `
-        + `⇒ ที่วางที่ขอ URL เปล่า ๆ ก็ต้องประกาศทรงในสัญญา (เพิ่มแถว = งานของ CTO)`);
+    let src;
+    try { src = read(f); } catch { continue; }
+    const bare = stripCommentsAndStrings(src);
+    const total = (bare.match(/\bcoverSlot\s*\(/g) || []).length;
+    const shaped = [...stripComments(src).matchAll(/\bcoverSlot\s*\(\s*\w+\s*,\s*'(poster|wide|auto)'\s*\)/g)]
+      .map(m => m[1]);
+    const anyCall = total > 0;
+    if (owners.has(f)) {
+      if (!anyCall) {
+        out.push(`${f}: อยู่ในรายการ "เจ้าของท่อ coverSlot()" ของ tools/adr-shape-table.mjs `
+          + `แต่ไม่มีจุดเรียกเลย ⇒ รายการยกเว้นค้างอยู่หลังจากท่อย้ายไปที่อื่นแล้ว`);
+      }
+      continue;
+    }
+    for (const shape of new Set(shaped)) {
+      const got = shaped.filter(s => s === shape).length;
+      const want = declared.get(`${f}|${shape}`) || 0;
+      seen.set(`${f}|${shape}`, got);
+      if (got !== want) {
+        out.push(`${f}: มีจุดเรียก coverSlot(…, '${shape}') ${got} จุด แต่ตาราง "${H_SLOT}" `
+          + `ของ §13.5 ประกาศ ${want} แถวสำหรับคู่นี้ ⇒ ที่วางที่ขอ URL เปล่า ๆ ก็ต้องประกาศทรง `
+          + `ในสัญญา (เพิ่ม/ลบแถว = งานของ CTO · ห้ามถอดไฟล์ออกจากรายการกวาด)`);
+      }
+    }
+    /* จุดเรียกที่อ่านทรงไม่ออก (ส่งทรงมาเป็นตัวแปร) ในไฟล์ที่ไม่ใช่เจ้าของท่อ = ที่วางที่สัญญา
+       ไม่มีทางประกาศทรงให้ได้ ⇒ ต้องแดง ไม่ใช่ข้ามเพราะ regex จับไม่ได้ */
+    if (anyCall && total > shaped.length) {
+      out.push(`${f}: มีจุดเรียก coverSlot() ที่ไม่ได้ส่งชื่อทรงเป็นค่าคงที่ (${total - shaped.length} จุด) `
+        + `และไฟล์นี้ไม่ใช่เจ้าของท่อ ⇒ สัญญาประกาศทรงของที่วางนั้นไม่ได้ `
+        + `· ที่วางต้องขอทรงตรง ๆ ('poster'/'wide'/'auto') ไม่ใช่ส่งต่อตัวแปร`);
+    }
+  }
+  for (const [k, want] of declared) {
+    if (!seen.has(k) && !owners.has(k.split('|')[0])) {
+      const [f, shape] = k.split('|');
+      out.push(`${f}: §13.5 ประกาศ ${want} แถวของ coverSlot(…, '${shape}') ในไฟล์นี้ `
+        + `แต่ไฟล์นี้ไม่อยู่ในรายการกวาด หรือไม่มีจุดเรียกชนิดนั้นเลย`);
     }
   }
   return out;

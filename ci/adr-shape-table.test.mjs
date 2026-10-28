@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { SERIES, U } from '../build/content.mjs';
 import {
   ADR_REL, DUAL, parseShapeTables, shapeMapProblems, callsiteProblems, slotProblems,
-  countCallsIn, selectorsIn,
+  countCallsIn, selectorsIn, stripCommentsAndStrings,
 } from '../tools/adr-shape-table.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -25,6 +25,11 @@ const read = rel => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 const MD = read(ADR_REL);
 const ADR = parseShapeTables(MD);
 const count = (rel, name) => countCallsIn(read(rel), name);
+/* รายการไฟล์ที่ต้องกวาด = ของจริงในโฟลเดอร์ ไม่ใช่รายชื่อที่พิมพ์ไว้ที่นี่ (ไฟล์ใหม่ต้องเข้า
+   การกวาดเองโดยไม่มีใครต้องจำ) · ชุดเดียวกับที่ tools/test-layout.mjs ใช้ */
+const SCAN = [...fs.readdirSync(path.join(ROOT, 'build'))
+  .filter(n => n.endsWith('.mjs')).map(n => `build/${n}`), 'build/app.src.js'];
+const callsites = (adr, c = count, r = read, files = SCAN) => callsiteProblems(adr, c, r, files);
 
 /* ---------- `SHAPE_MAP` ตัวจริงจาก tools/test-layout.mjs ----------
    ตัดตั้งแต่ `const LAST_SERIES` (สองค่าที่แผนที่ใช้) ถึงท้ายอาเรย์ แล้วประเมินด้วย new Function
@@ -60,7 +65,7 @@ test('แกะตาราง §13.5 จากเอกสารจริงไ
 });
 
 test('เลขรายไฟล์ของสัญญาตรงกับจำนวนจุดเรียกในซอร์สจริง', () => {
-  assert.deepEqual(callsiteProblems(ADR, count), []);
+  assert.deepEqual(callsites(ADR), []);
 });
 
 test('ที่วางที่เรียก coverSlot() ตรง ๆ ตรงกับรายการใน §13.5', () => {
@@ -92,7 +97,7 @@ test('เลื่อนเลขบรรทัดทุกตัวในเ�
   const after = parseShapeTables(moved);
   assert.deepEqual(after.perFile, ADR.perFile);
   assert.deepEqual(shapeMapProblems(after, SHAPE_MAP), shapeMapProblems(ADR, SHAPE_MAP));
-  assert.deepEqual(callsiteProblems(after, count), callsiteProblems(ADR, count));
+  assert.deepEqual(callsites(after), callsites(ADR));
 });
 
 /* ================= 3. มิวเทชัน: แก้สองฝั่งพร้อมกันก็ยังแดง =================
@@ -157,7 +162,7 @@ test('แก้ทรงในเอกสารฝ่ายเดียว ⇒ 
 
 test('แก้เลขรายไฟล์ในเอกสารฝ่ายเดียว ⇒ แดง', () => {
   const mutated = parseShapeTables(mdWith('| `build/pages-watch.mjs` | **1** |', '| `build/pages-watch.mjs` | **2** |'));
-  const problems = callsiteProblems(mutated, count);
+  const problems = callsites(mutated);
   assert.ok(problems.some(x => x.includes('build/pages-watch.mjs')), problems.join(' · '));
 });
 
@@ -168,7 +173,7 @@ test('ผลรวมในเอกสารไม่ตรงกับแถ�
 
 test('ชุดไฟล์ของสองที่ในสัญญาไม่ตรงกัน ⇒ แดง · และไฟล์ที่ไม่มีจริงต้องแดงด้วยข้อความที่อ่านรู้เรื่อง', () => {
   const mutated = parseShapeTables(mdWith('| `build/pages-watch.mjs` | **1** |', '| `build/pages-seo.mjs` | **1** |'));
-  const problems = callsiteProblems(mutated, count);
+  const problems = callsites(mutated);
   /* `build/pages-watch.mjs` ยังมีแถวที่วางแต่ไม่มีเลข · `build/pages-seo.mjs` มีเลขแต่ไม่มีแถว
      และเปิดไฟล์ไม่ได้ ⇒ ต้องได้ข้อตกทั้งสองทิศ ไม่ใช่ ENOENT ที่ทำให้ข้ออื่นไม่ถูกวัด */
   assert.ok(problems.some(x => x.includes('build/pages-watch.mjs')), problems.join(' · '));
@@ -213,4 +218,142 @@ test('ตัวหยิบ selector ไม่หยิบของที่ไ�
 test('ตัวนับจุดเรียกไม่นับคอมเมนต์และไม่นับตัวนิยาม', () => {
   const src = 'function coverImg(a) {}\n/* coverImg( ในคอมเมนต์ */\n// coverImg(\nx = coverImg(1);\ny = coverImg(2);\n';
   assert.equal(countCallsIn(src, 'coverImg'), 2);
+});
+
+/* ================= 6. คำตัดสินรีวิวรอบที่สี่ (AIO-72 · AIO-73) =================
+   ทุกข้อในส่วนนี้คือรอยที่ **ทั้งสองฝั่งรีวิววัดแล้วว่าด่านเขียวทั้งที่ควรแดง** ⇒ แต่ละข้อถือ
+   มิวเทชันของตัวเองไว้ถาวร · และข้อที่อ้างว่า "แดง" ต้องพิสูจน์ว่าแดง **ด้วยข้อใหม่** ไม่ใช่
+   เพราะมีข้อเดิมค้างอยู่ (รอยที่ Reviewer-Codex R6 จับได้: `problems.length >= 1` เขียวได้
+   แม้ตัวตรวจไม่แตะของที่มิวเทชันแก้ เพราะ baseline มีข้อค้างอยู่แล้วหนึ่งข้อ) */
+const BASE_SHAPE = shapeMapProblems(ADR, SHAPE_MAP);
+const BASE_CALLSITE = callsites(ADR);
+const added = (after, before) => after.filter(x => !before.includes(x));
+
+test('R6 · ข้อที่อ้างว่าแดง ต้องแดงด้วย "ข้อใหม่" ไม่ใช่ด้วยข้อที่ค้างอยู่', () => {
+  /* ฐานต้องสะอาดหรือไม่สะอาดก็ได้ — ที่บังคับคือทุกมิวเทชันข้างล่างต้องเพิ่มข้อใหม่ที่ชี้
+     ของที่มันแก้จริง ๆ · ข้อนี้คือตัวที่ทำให้ `>= 1` ใช้ไม่ได้อีก */
+  const oneOfThree = SHAPE_MAP.map(p => (p.sel === '.ep-row .th' && p.at === U.schedule
+    ? { ...p, shape: 'auto' } : p));
+  const delta = added(shapeMapProblems(ADR, oneOfThree), BASE_SHAPE);
+  assert.ok(delta.length >= 1, 'แก้รายการของ /schedule/ แล้วต้องมีข้อ **ใหม่**');
+  assert.ok(delta.every(x => x.includes('.ep-row .th')), delta.join(' · '));
+  const key = SHAPE_MAP.find(p => p.sel === '.ep-row .th' && p.at === U.schedule).key;
+  assert.ok(delta.some(x => x.includes(key)), `ข้อใหม่ต้องชี้รายการที่ถูกแก้ ("${key}") · ${delta.join(' · ')}`);
+
+  const heroStr = mapWith('.hero .bg', { shape: DUAL, wideAtBp: true });
+  const d2 = added(shapeMapProblems(ADR, heroStr), BASE_SHAPE);
+  assert.ok(d2.some(x => x.includes('.hero .bg')), d2.join(' · '));
+});
+
+/* ---------- R5 + P2 · selector ที่อ่านไม่ออกต้องไม่หายเงียบ ---------- */
+test('R5 · โทเคนที่เขียนเป็น selector แต่แกะไม่ออก ⇒ เป็นข้อตกของเอกสาร ไม่ใช่หายเงียบ', () => {
+  const mutated = parseShapeTables(mdWith('| ดัชนีทุกเรื่อง `.flatlist .th2` 34px |',
+    '| ดัชนีทุกเรื่อง `.flatlist .th2` 34px · `.new..broken` |'));
+  assert.ok(mutated.docProblems.some(x => x.includes('.new..broken')), mutated.docProblems.join(' · '));
+});
+
+test('R5 · selector ที่มี `>` และ attribute selector ต้องแกะได้ ไม่ใช่ถูกทิ้ง', () => {
+  assert.deepEqual(selectorsIn('`.player.full[data-orientation=horizontal] > .mwin > .clip`'),
+    ['.player.full[data-orientation=horizontal] > .mwin > .clip']);
+  assert.deepEqual(selectorsIn('ไทล์ใหม่ `.new > .surface`'), ['.new > .surface']);
+  /* และของที่ไม่ใช่ selector ยังต้องไม่ถูกหยิบ (ไม่ใช่แลกความเงียบด้านหนึ่งกับความจุ้นอีกด้าน) */
+  assert.deepEqual(selectorsIn('`poster()` `coverImg()` `build/ui.mjs:99` `:128` `--ar-poster` `s.slug`'), []);
+});
+
+test('P2 · แถวที่วางที่ไม่มี selector เลย ⇒ แดง ยกเว้นแถวที่ประกาศยกเว้นไว้ด้วยชื่อ', () => {
+  const mutated = parseShapeTables(mdWith('| ดัชนีทุกเรื่อง `.flatlist .th2` 34px |',
+    '| ดัชนีทุกเรื่อง (ไม่บอก selector) 34px |'));
+  assert.ok(mutated.docProblems.some(x => x.includes('ดัชนีทุกเรื่อง') && x.includes('ไม่มี selector')),
+    mutated.docProblems.join(' · '));
+  /* แถวที่ยกเว้นไว้จริงต้องไม่ทำให้เอกสารแดงวันนี้ */
+  assert.deepEqual(ADR.docProblems, []);
+});
+
+test('P2 · รายการยกเว้นที่ค้าง (ไม่ตรงแถวใดแล้ว) ⇒ แดง', () => {
+  /* แถวที่ยกเว้นไว้มีสองแถวที่ขึ้นต้นเหมือนกัน (ตาราง coverSlot() กับตารางฝั่งเบราว์เซอร์)
+     ⇒ ต้องมิวเทชัน **แถวของตารางฝั่งเบราว์เซอร์** ซึ่งเป็นแถวที่ถูกตรวจ selector */
+  const row = [...MD.matchAll(/^\| ภาพในเพลเยอร์ฟีดตอนเลื่อนเรื่อง .*$/gm)].map(m => m[0]);
+  assert.equal(row.length, 2, 'โครงของเอกสารเปลี่ยน — ย้ายจุดมิวเทชัน ไม่ใช่ลบเทสต์');
+  const mutated = parseShapeTables(MD.replace(row[1],
+    row[1].replace('ภาพในเพลเยอร์ฟีดตอนเลื่อนเรื่อง', 'ภาพในเพลเยอร์ฟีด `.player.full` (เปลี่ยนชื่อแถว)')));
+  assert.ok(mutated.docProblems.some(x => x.includes('รายการยกเว้น')), mutated.docProblems.join(' · '));
+});
+
+/* ---------- R3 · ชื่อไฟล์ของแถวต้องถูกผูกกับของจริง ไม่ใช่แค่ "มีชื่อนี้ในตารางเลข" ---------- */
+test('R3 · ย้ายชื่อไฟล์ของแถวไปเป็นไฟล์อื่นที่อยู่ในตารางแล้ว ⇒ ยังแดง', () => {
+  const mutated = parseShapeTables(mdWith('| ปกในการ์ดทุกแบบ `.card .poster` (กล่องที่ `poster()` สร้าง) | `poster` | `build/ui.mjs:99`',
+    '| ปกในการ์ดทุกแบบ `.card .poster` (กล่องที่ `poster()` สร้าง) | `poster` | `build/pages-watch.mjs:99`'));
+  const delta = added(callsites(mutated), BASE_CALLSITE);
+  assert.ok(delta.some(x => x.includes('.card .poster') || x.includes('pages-watch')), delta.join(' · '));
+});
+
+/* ---------- P2 · ไฟล์ที่มีจุดเรียกแต่ไม่มีแถว (ทิศที่เคยไม่มีเลย) ---------- */
+test('P2 · เติมจุดเรียก coverImg() ลงไฟล์ที่สัญญาไม่ได้ลิสต์ ⇒ แดง', () => {
+  const FAKE = 'build/zz-newcomer.mjs';
+  const stubRead = rel => (rel === FAKE ? 'export const x = coverImg(s, "poster");\n' : read(rel));
+  const stubCount = (rel, name) => countCallsIn(stubRead(rel), name);
+  const delta = added(callsites(ADR, stubCount, stubRead, [...SCAN, FAKE]), BASE_CALLSITE);
+  assert.ok(delta.some(x => x.includes(FAKE)), delta.join(' · '));
+});
+
+/* ---------- P2 · ลบแถวที่วางทิ้งเมื่อ selector ซ้ำกับแถวอื่น ---------- */
+test('P2 · ลบแถวที่วางออกจากตารางฝั่ง build ⇒ แดง แม้ selector นั้นยังมีแถวอื่น', () => {
+  const row = [...MD.matchAll(/^\| อันดับ 4–10 .*$/gm)].map(m => m[0])[0];
+  assert.ok(row, 'ไม่พบแถว "อันดับ 4–10" ให้ลบ — ย้ายจุดมิวเทชัน ไม่ใช่ลบเทสต์');
+  const mutated = parseShapeTables(MD.replace(row + '\n', ''));
+  assert.ok(mutated.docProblems.some(x => x.includes('แถว "รวม"')), mutated.docProblems.join(' · '));
+  /* และทิศ selector ยังเขียวอยู่จริง ⇒ ถ้าไม่มีข้อนี้ การลบแถวจะเงียบทั้งแผง */
+  assert.deepEqual(added(shapeMapProblems(mutated, SHAPE_MAP), BASE_SHAPE), []);
+});
+
+/* ---------- R4 · coverSlot: นับจุดเรียก ไม่ใช่อนุญาตทั้งไฟล์ ---------- */
+test('R4 · เติมจุดเรียก coverSlot() ใหม่ในไฟล์ที่มีแถวอยู่แล้ว ⇒ แดง', () => {
+  const stub = rel => (rel === 'build/pages-content.mjs'
+    ? read(rel) + "\nconst added = coverSlot(s, 'wide');\n" : read(rel));
+  const problems = slotProblems(ADR, stub, SCAN);
+  assert.ok(problems.some(x => x.includes('pages-content') && x.includes('wide')), problems.join(' · '));
+});
+
+test('R4 · จุดเรียกที่อยู่ในนิพจน์แทรกของ template literal ก็ต้องเห็น', () => {
+  const FAKE = 'build/zz-template.mjs';
+  const stub = rel => (rel === FAKE
+    ? 'export const html = s => `<img src="${coverSlot(s, \'wide\').src}">`;\n' : read(rel));
+  const problems = slotProblems(ADR, stub, [...SCAN, FAKE]);
+  assert.ok(problems.some(x => x.includes(FAKE)), problems.join(' · '));
+});
+
+test('R4 · เจ้าของท่อที่ไม่มีจุดเรียกเลย = รายการยกเว้นที่ค้าง ⇒ แดง', () => {
+  const stub = rel => (rel === 'build/ui.mjs' ? 'export const nothing = 1;\n' : read(rel));
+  const problems = slotProblems(ADR, stub, SCAN);
+  assert.ok(problems.some(x => x.includes('build/ui.mjs') && x.includes('เจ้าของท่อ')), problems.join(' · '));
+});
+
+test('R4 · จุดเรียกที่ส่งทรงเป็นตัวแปรในไฟล์ที่ไม่ใช่เจ้าของท่อ ⇒ แดง', () => {
+  const FAKE = 'build/zz-varshape.mjs';
+  const stub = rel => (rel === FAKE ? 'export const f = (s, k) => coverSlot(s, k);\n' : read(rel));
+  const problems = slotProblems(ADR, stub, [...SCAN, FAKE]);
+  assert.ok(problems.some(x => x.includes(FAKE) && x.includes('ค่าคงที่')), problems.join(' · '));
+});
+
+/* ---------- P3 · ตัวนับและตัวถอดสตริง ---------- */
+test('P3 · ตัวนับจุดเรียกไม่นับคำที่อยู่ในสตริง (ลบของจริงแล้วเติมสตริงให้เลขเท่าเดิม = ต้องจับได้)', () => {
+  assert.equal(countCallsIn('const msg = "coverImg(";\nx = coverImg(1);\n', 'coverImg'), 1);
+  assert.equal(countCallsIn("const msg = 'coverImg(';\n", 'coverImg'), 0);
+  assert.equal(countCallsIn('const msg = `coverImg(`;\n', 'coverImg'), 0);
+  /* แต่จุดเรียกจริงในนิพจน์แทรกยังต้องนับ */
+  assert.equal(countCallsIn('const h = `<i>${coverImg(s)}</i>`;\n', 'coverImg'), 1);
+});
+
+test('P3 · backtick เดี่ยวในสตริงต้องไม่กลืนโค้ดที่อยู่ถัดไป', () => {
+  const src = 'const q = "`";\nconst a = coverSlot(s, \'poster\');\nconst r = /[\'"`]/;\nconst b = coverImg(s);\n';
+  const bare = stripCommentsAndStrings(src);
+  assert.match(bare, /coverSlot\s*\(/);
+  assert.match(bare, /coverImg\s*\(/);
+  assert.equal(countCallsIn(src, 'coverImg'), 1);
+});
+
+test('P3 · นิพจน์แทรกซ้อนหลายชั้นยังถูกเก็บไว้เป็นโค้ด', () => {
+  const src = 'const h = `a${ `b${ coverImg(s) }c` }d`;\n';
+  assert.match(stripCommentsAndStrings(src), /coverImg\s*\(/);
+  assert.equal(countCallsIn(src, 'coverImg'), 1);
 });

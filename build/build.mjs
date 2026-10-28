@@ -6,6 +6,7 @@ import path from 'node:path';
 import { ROOT, SERIES, U, OPEN_TAGS, CAST_PAGES, D, VIEWS_SOURCE, HAS_VIEWS, RANK_BASIS,
   coverWideMisses, COVER_WIDE_W, COVER_WIDE_H } from './content.mjs';
 import { PAGES } from './ui.mjs';
+import { parseHtml, findDirectChain, findByClasses } from './html-tree.mjs';
 import { robotsTxt, sitemapXml, PUBLISHED, SITE_ORIGIN, shareMisses,
   COVER_W, COVER_H, COVER_SHAPES } from './seo.mjs';
 import * as A from './pages-discovery.mjs';
@@ -306,46 +307,37 @@ if (SERIES.some(s => s.orientation === 'horizontal')) {
    **ไฟล์ที่ส่งออก** (`feed/index.html` ที่ส่วน 3 เพิ่งเขียน) ไม่ใช่ซอร์สเทมเพลตของมัน
 
    ⚠️ สามข้อที่ทำให้ด่านนี้ไม่ใช่ `grep '.mwin'`:
-   1) **ไม่นับคอมเมนต์/สตริงเป็นของจริง** — บทเรียนเดิมของรีโปนี้ (`--faint` ใน CSS · ถ้อยคำ
-      ต้องห้ามใน app.js) ⇒ ถอด `<!-- -->` และบล็อก `<script>` ออกก่อน (ชื่อคลาสที่อยู่ในสตริง
-      ของ JS คือ "โค้ดที่อาจสร้างมันตอนรัน" ไม่ใช่โครงของหน้าที่ส่งออก)
+   1) **ของจริงคือสิ่งที่อยู่ใน DOM ของหน้า** ไม่ใช่สิ่งที่หน้าตาเหมือนแท็ก ⇒ คอมเมนต์ · เนื้อของ
+      `<script>`/`<style>`/`<textarea>`/`<noscript>` · ข้างใน `<template>` · และข้อความที่อยู่ใน
+      **ค่าแอตทริบิวต์** ไม่นับเป็นของจริง · กลับกัน `class=mwin` ที่ไม่ใส่ quote และ `<p>` ที่ไม่ปิด
+      **นับเป็นของจริง** เพราะเบราว์เซอร์อ่านมันเป็น DOM เดียวกัน ⇒ การตัดสินทั้งสองทิศอยู่ที่
+      ตัวแกะ `build/html-tree.mjs` ไม่ใช่ที่ regex ในบล็อกนี้ (ของเดิมตอบผิดทั้งสองทิศ —
+      Reviewer-Codex R1/R2 · Reviewer-Claude ข 2–3 · วัดซ้ำแล้วทุกเคส) · เทสต์ถาวร 26 เคสที่
+      `ci/feed-media-window.test.mjs` ⇒ รอยพวกนี้กลับมาเงียบ ๆ ไม่ได้อีก
    2) **ความเป็นลูกหลานเป็นของจริง ไม่ใช่การอยู่ร่วมไฟล์** — `.mwin` ที่ไหนก็ได้ + `.clip` ที่ไหน
-      ก็ได้ ผ่าน regex ได้ทั้งคู่โดยไม่เคยเป็นกล่องเดียวกัน ⇒ เดินแท็กด้วยสแต็กแล้วเทียบ
-      ลูกโดยตรงสามชั้นตาม selector ของ AIO-59 §10.1 (`.player.full > .mwin > .clip`)
-      ซึ่งเป็นโครงเดียวกับที่ V17 ข้อ ค วัดในเบราว์เซอร์ (FEED_CLIP_SEL ของ tools/test-layout.mjs)
+      ก็ได้ ผ่าน regex ได้ทั้งคู่โดยไม่เคยเป็นกล่องเดียวกัน ⇒ เทียบลูกโดยตรงสามชั้นตาม selector
+      ของ AIO-59 §10.1 (`.player.full > .mwin > .clip`) ซึ่งเป็นโครงเดียวกับที่ V17 ข้อ ค วัดใน
+      เบราว์เซอร์ (FEED_CLIP_SEL ของ tools/test-layout.mjs)
       ⇒ ไม่เปิดช่องว่าง "build เขียวแต่ด่านเลย์เอาต์แดง"
    3) กฎนี้ **ไม่ใช่ใบอนุญาตสร้าง DOM สองชั้น** — `.mwin`/`.clip` เป็นงาน AIO-62 และราคาวันนี้
       เป็นศูนย์เพราะคลังเป็นแนวตั้ง 12/12 ⇒ บล็อกนี้ไม่ทำงานเลยจนกว่าข้อมูลแนวนอนเข้ามา
+
+   ⚠️ **เพดานที่กฎนี้คุมได้ และของที่มันไม่ได้คุม** (Reviewer-Claude C4): มันอ่าน HTML ที่ส่งออก
+      ของ `/feed/` ⇒ เห็นกล่องสื่อของ **เรื่องที่ถูกอบลงไฟล์ใบเดียว** เท่านั้น · อีก 11 เรื่องได้กล่อง
+      ของมันจากเส้นทาง `show()` ใน `build/app.src.js` ซึ่ง build มองไม่เห็น ⇒ **V19 เขียวไม่ได้
+      แปลว่าข้อ (ข) ของ §13.7 ครบ** · ชั้นที่วัดอีก 11 เรื่องคือ V17 ข้อ ค ในเบราว์เซอร์
+   ⚠️ **เงื่อนไขข้างล่างผูกกับ "คลังมีเรื่องแนวนอน ≥ 1" ตามถ้อยคำของ §13.9 — และถ้อยคำนั้น
+      กำลังรอคำตัดสินของ CTO** · ทั้งสองฝั่งรีวิวรอบที่สี่ชี้ตรงกันว่ามันไม่ตรงกับ AIO-59 §10.1
+      ("เคสแนวตั้งไม่มี `.mwin`/`.clip`"): ถ้าฟีดหยิบเรื่อง**แนวตั้ง**ขึ้นมาเป็นใบแรกขณะที่คลังมี
+      เรื่องแนวนอนอยู่ที่อื่น renderer ที่ทำตาม UX ทุกบรรทัดจะถูกกฎนี้ปฏิเสธ ⇒ ผมไม่แก้เงื่อนไข
+      เองเพราะมันคือการแก้ค่าในสัญญา · ของที่ผมแก้ได้และแก้แล้วคือ **ความแม่นของข้อความ**
+      (บอกทิศที่กล่องของฟีดประกาศจริงด้วย) · รายงานพร้อมวิธีทำซ้ำอยู่ที่ AIO-71
 
    หมายเหตุลำดับ (วัดแล้ว ไม่ใช่สันนิษฐาน): V18 ข้างบนผูกกับเงื่อนไขเดียวกันและออกก่อน ⇒ ถ้า
    `assets/app.js` ยังฝังขนาดคงที่อยู่ สภาพ "มีเรื่องแนวนอน" จะแดงที่ V18 แล้วบรรทัดนี้ไม่ถูกรัน
    วันนี้ `coverAttrs()` คืนขนาดของไฟล์ที่เลือกจริงแล้ว (AIO-57) ⇒ V18 เขียวและ V19 แดงเองได้
    มิวเทชัน M23 จึงไม่ต้องแตะ `app.src.js` เลย · ถ้าวันหน้าใครฝังค่าคงที่กลับมา มิวเทชันของ V19
    จะเห็นสีแดงของ V18 ก่อน ⇒ ให้แก้ของ ไม่ใช่สลับลำดับด่าน */
-/* ลูกโดยตรงสามชั้น: คลาสของกล่อง → คลาสของพ่อ → คลาสของปู่ · คืน true ทันทีที่เจอใบแรก */
-function hasFeedMediaWindow(html) {
-  const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
-    'link', 'meta', 'param', 'source', 'track', 'wbr']);
-  const classesOf = tag => {
-    const m = tag.match(/\sclass\s*=\s*"([^"]*)"/i) || tag.match(/\sclass\s*=\s*'([^']*)'/i);
-    return new Set(m ? m[1].trim().split(/\s+/).filter(Boolean) : []);
-  };
-  const stack = [];
-  const re = /<(\/?)([a-zA-Z][\w-]*)((?:"[^"]*"|'[^']*'|[^>])*?)(\/?)>/g;
-  for (let m; (m = re.exec(html));) {
-    const [whole, closing, rawTag, , selfClosed] = m;
-    const tag = rawTag.toLowerCase();
-    if (closing) {
-      for (let i = stack.length - 1; i >= 0; i--) if (stack[i].tag === tag) { stack.length = i; break; }
-      continue;
-    }
-    const node = { tag, cls: classesOf(whole) };
-    const p = stack[stack.length - 1], g = stack[stack.length - 2];
-    if (node.cls.has('clip') && p && p.cls.has('mwin') && g && g.cls.has('player') && g.cls.has('full')) return true;
-    if (!VOID.has(tag) && !selfClosed) stack.push(node);
-  }
-  return false;
-}
 {
   const horizontal = SERIES.filter(s => s.orientation === 'horizontal');
   if (horizontal.length) {
@@ -358,15 +350,19 @@ function hasFeedMediaWindow(html) {
       process.exit(1);
     }
     const FEED_OUT = feedPage.out;
-    const feedHtml = fs.readFileSync(R(FEED_OUT), 'utf8')
-      .replace(/<!--[\s\S]*?-->/g, '')
-      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
-    if (!hasFeedMediaWindow(feedHtml)) {
+    const doc = parseHtml(fs.readFileSync(R(FEED_OUT), 'utf8'));
+    if (!findDirectChain(doc, [['player', 'full'], ['mwin'], ['clip']])) {
+      /* ทิศที่ **หน้านั้นประกาศเอง** — อ่านจากกล่องสื่อของฟีดที่ส่งออก ไม่ใช่เดาจากคลัง
+         (§13.7 D7 ข้อ 1 บังคับให้กล่องถือทิศไว้อยู่แล้ว) · ใส่ไว้ในข้อความเพราะคนที่เจอ
+         ข้อแดงนี้ต้องรู้ทันทีว่า "ฟีดกำลัง render เรื่องไหน" ไม่ใช่แค่ "คลังมีอะไรบ้าง" */
+      const box = findByClasses(doc, ['player', 'full']);
+      const declared = box ? (box.attrs.get('data-orientation') || '(ไม่ได้ประกาศ)') : '(ไม่พบกล่อง .player.full)';
       console.error(`✗ ${FEED_OUT}: ไม่มีกล่องสื่อสองชั้นตามกฎ AIO-59 `
         + `(\`.player.full\` > \`.mwin\` > \`.clip\` เป็นลูกโดยตรงต่อกัน) `
         + `ขณะที่คลังมีเรื่องแนวนอนแล้ว ${horizontal.length} เรื่อง: `
         + horizontal.map(s => `${s.title} (${s.slug})`).join(' · ')
-        + ` — ฟีดจะครอปภาพของเรื่องแนวนอนลงกรอบเต็มจอแนวตั้ง (ADR-001 กฎ V19 · §13.7)`);
+        + ` · กล่องสื่อของฟีดในไฟล์นี้ประกาศ data-orientation="${declared}"`
+        + ` — เรื่องแนวนอนที่ฟีดหยิบขึ้นมาจะถูกครอปลงกรอบเต็มจอแนวตั้ง (ADR-001 กฎ V19 · §13.7)`);
       process.exit(1);
     }
   }
