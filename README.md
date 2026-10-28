@@ -47,8 +47,13 @@ node --test ci/*.test.mjs     # เทสต์ของตัวด่านเ
                               # ผิดและทำซ้ำไม่ได้ · วัดด้วย /usr/bin/time ต่อไฟล์) — รวมด่าน
                               # แกะตาราง ADR-001 §13.5 มาเทียบ SHAPE_MAP สองทาง + เลขรายไฟล์
                               # (ci/adr-shape-table.test.mjs · เฉลยมาจากสัญญา ไม่ใช่จากตัวด่าน)
-                              # และรูปมาร์กอัปที่กฎ V19 ต้องรับ/ปฏิเสธ 26 เคส
-                              # (ci/feed-media-window.test.mjs)
+                              # และรูปมาร์กอัปที่กฎ V19 ต้องรับ/ปฏิเสธ (ci/feed-media-window.test.mjs
+                              # · เฉลยของ 30 เคสมาจาก Chrome จริง ที่ ci/html-tree-cases.mjs)
+node ci/html-tree-oracle.mjs  # ยิง 30 เคสเข้า Chrome จริงแล้วเทียบสามทาง: เบราว์เซอร์ ⇄ เลขที่
+                              # บันทึกไว้ ⇄ คำตอบของ build/html-tree.mjs (ต้องมีเบราว์เซอร์ ~20 วิ
+                              # · CHROME=/path ตั้งทับได้) — ตัวกันเลขเฉลยเน่า
+node ci/aio71-m23.mjs [sha..]  # มิวเทชัน M23 ที่ระดับ build จริง 18 ทิศต่อคอมมิต (ตรึงด้วย
+                              # git archive · M23_GIT_DIR ชี้ที่เก็บได้ · M23_JSON=ไฟล์ เก็บผลดิบ)
 node tools/test-serve.mjs     # ยิงจริงเช็ก MIME ของ .mjs ที่ tools/serve.mjs ส่งออก (SV_PORT ตั้งทับได้)
 node tools/test-ports.mjs     # พอร์ตชน/ลูกตายกลางทาง → ด่านต้องแดงเร็วพร้อมบอกสาเหตุ ไม่ค้าง
                               # ห้ามเขียวจากเซิร์ฟเวอร์/เบราว์เซอร์ของ run อื่น · ต้องไม่เหลือลูก
