@@ -1,0 +1,6826 @@
+{
+  "ticket": "AIO-81",
+  "generated_by": "docs/seo/name-research.mjs",
+  "research_date": "2026-10-28",
+  "ahrefs_country": "th",
+  "ahrefs_transport": "claude.ai Ahrefs MCP connector (ไม่มี AHREFS_API_TOKEN ในเครื่องนี้ — api.ahrefs.com ตอบ 403 ถ้าเรียกตรง)",
+  "old_name": "LakornAI",
+  "disclaimers": [
+    "ไม่มีตัวเลขใดในไฟล์นี้ที่เป็นข้อมูลของเว็บเราเอง (robots ยัง Disallow: / และยังไม่มีโดเมนจริง)",
+    "สถานะโดเมนคือ \"มีร่องรอยเว็บหรือไม่\" ไม่ใช่ \"จดได้หรือไม่\" — ไม่มีสถานะที่ชื่อว่าว่าง",
+    "ไม่มีการจด ซื้อ หรือสมัครบริการใด ๆ และไม่มีการแก้ชื่อในโค้ดในงานนี้"
+  ],
+  "keywords": {
+    "ละครสั้นจีน": {
+      "keyword": "ละครสั้นจีน",
+      "volume": 8100,
+      "difficulty": 43,
+      "cps": null,
+      "cpc": 6,
+      "traffic_potential": 200,
+      "parent_topic": "ซีรี่ย์จีนสั้น",
+      "parent_volume": 1700,
+      "global_volume": 8200,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": "2026-10-27T18:57:22Z",
+      "_call": "category"
+    },
+    "ดูละครออนไลน์": {
+      "keyword": "ดูละครออนไลน์",
+      "volume": 1000,
+      "difficulty": 72,
+      "cps": 1.1,
+      "cpc": 2,
+      "traffic_potential": 614000,
+      "parent_topic": "ดูทีวีออนไลน์ช่อง33",
+      "parent_volume": 144000,
+      "global_volume": 1200,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": true,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": "2026-10-24T11:21:52Z",
+      "_call": "category"
+    },
+    "ละครแนวตั้ง": {
+      "keyword": "ละครแนวตั้ง",
+      "volume": 1300,
+      "difficulty": 0,
+      "cps": null,
+      "cpc": 10,
+      "traffic_potential": null,
+      "parent_topic": "หนังจีนแนวตั้ง",
+      "parent_volume": 1900,
+      "global_volume": 1300,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": "2026-07-31T15:29:56Z",
+      "_call": "category"
+    },
+    "ละครสั้นฟรี": {
+      "keyword": "ละครสั้นฟรี",
+      "volume": 40,
+      "difficulty": null,
+      "cps": null,
+      "cpc": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 40,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": null,
+      "_call": "category"
+    },
+    "ละครฟรี": {
+      "keyword": "ละครฟรี",
+      "volume": 200,
+      "difficulty": null,
+      "cps": null,
+      "cpc": 7,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 250,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": null,
+      "_call": "category"
+    },
+    "ดูละครย้อนหลัง": {
+      "keyword": "ดูละครย้อนหลัง",
+      "volume": 3700,
+      "difficulty": 66,
+      "cps": 0.97,
+      "cpc": 3,
+      "traffic_potential": 20000,
+      "parent_topic": "ละครช่องวัน",
+      "parent_volume": 9500,
+      "global_volume": 6300,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": "2026-10-25T15:22:53Z",
+      "_call": "category"
+    },
+    "ละครสั้น": {
+      "keyword": "ละครสั้น",
+      "volume": 2300,
+      "difficulty": 0,
+      "cps": 0.5,
+      "cpc": 3,
+      "traffic_potential": 0,
+      "parent_topic": "หนังเรื่องสั้น",
+      "parent_volume": 20,
+      "global_volume": 2400,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": "2026-10-23T21:49:31Z",
+      "_call": "category"
+    },
+    "ซีรีส์สั้น": {
+      "keyword": "ซีรีส์สั้น",
+      "volume": 40,
+      "difficulty": null,
+      "cps": null,
+      "cpc": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 40,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": null,
+      "_call": "category"
+    },
+    "แอพดูละคร": {
+      "keyword": "แอพดูละคร",
+      "volume": 0,
+      "difficulty": null,
+      "cps": null,
+      "cpc": 7,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 0,
+      "intents": {},
+      "serp_last_update": null,
+      "_call": "category"
+    },
+    "ละครสั้น ai": {
+      "keyword": "ละครสั้น ai",
+      "volume": 600,
+      "difficulty": null,
+      "cps": null,
+      "cpc": 10,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 600,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": null,
+      "_call": "category"
+    },
+    "netshort": {
+      "keyword": "netshort",
+      "volume": 350,
+      "difficulty": null,
+      "cps": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 42000,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "serp_last_update": null,
+      "_call": "brands"
+    },
+    "lakorn": {
+      "keyword": "lakorn",
+      "volume": 250,
+      "difficulty": 0,
+      "cps": 0.83,
+      "traffic_potential": 4200,
+      "parent_topic": "วอทละคร",
+      "parent_volume": 800,
+      "global_volume": 3000,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "serp_last_update": "2026-10-01T13:08:24Z",
+      "_call": "brands"
+    },
+    "goodshort": {
+      "keyword": "goodshort",
+      "volume": 20,
+      "difficulty": null,
+      "cps": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 3600,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": true,
+        "branded": true,
+        "local": false
+      },
+      "serp_last_update": null,
+      "_call": "brands"
+    },
+    "reelshort": {
+      "keyword": "reelshort",
+      "volume": 1500,
+      "difficulty": 37,
+      "cps": null,
+      "traffic_potential": 700,
+      "parent_topic": "reelshort",
+      "parent_volume": 1300,
+      "global_volume": 70000,
+      "intents": {
+        "informational": true,
+        "navigational": true,
+        "commercial": false,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "serp_last_update": "2026-10-20T02:54:41Z",
+      "_call": "brands"
+    },
+    "wetv": {
+      "keyword": "wetv",
+      "volume": 202000,
+      "difficulty": 70,
+      "cps": 0.51,
+      "traffic_potential": 9200,
+      "parent_topic": "วีทีวี",
+      "parent_volume": 4500,
+      "global_volume": 579000,
+      "intents": {
+        "informational": true,
+        "navigational": true,
+        "commercial": false,
+        "transactional": true,
+        "branded": true,
+        "local": false
+      },
+      "serp_last_update": "2026-10-21T20:59:49Z",
+      "_call": "brands"
+    },
+    "dramabox": {
+      "keyword": "dramabox",
+      "volume": 2700,
+      "difficulty": 0,
+      "cps": null,
+      "traffic_potential": 4000,
+      "parent_topic": "dramabox",
+      "parent_volume": 4300,
+      "global_volume": 86000,
+      "intents": {
+        "informational": true,
+        "navigational": true,
+        "commercial": false,
+        "transactional": true,
+        "branded": true,
+        "local": false
+      },
+      "serp_last_update": "2026-10-21T03:54:08Z",
+      "_call": "brands"
+    },
+    "shortmax": {
+      "keyword": "shortmax",
+      "volume": 600,
+      "difficulty": 4,
+      "cps": null,
+      "traffic_potential": 0,
+      "parent_topic": "short tv",
+      "parent_volume": 50,
+      "global_volume": 63000,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": true,
+        "branded": true,
+        "local": false
+      },
+      "serp_last_update": "2026-10-25T14:34:56Z",
+      "_call": "brands"
+    },
+    "viu": {
+      "keyword": "viu",
+      "volume": 50000,
+      "difficulty": 62,
+      "cps": 1.03,
+      "traffic_potential": 29000,
+      "parent_topic": "viu",
+      "parent_volume": 50000,
+      "global_volume": 443000,
+      "intents": {
+        "informational": true,
+        "navigational": true,
+        "commercial": false,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "serp_last_update": "2026-10-24T17:59:19Z",
+      "_call": "brands"
+    },
+    "plearn": {
+      "keyword": "plearn",
+      "volume": 300,
+      "difficulty": 3,
+      "traffic_potential": 60,
+      "parent_topic": "plearn",
+      "global_volume": 700,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "doodee": {
+      "keyword": "doodee",
+      "volume": 70,
+      "difficulty": 23,
+      "traffic_potential": 20,
+      "parent_topic": "doodee",
+      "global_volume": 700,
+      "intents": {
+        "informational": true,
+        "navigational": true,
+        "commercial": true,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "lakorn tv": {
+      "keyword": "lakorn tv",
+      "volume": 0,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 10,
+      "intents": {},
+      "_call": "candidates-1"
+    },
+    "ทันใจ": {
+      "keyword": "ทันใจ",
+      "volume": 900,
+      "difficulty": 0,
+      "traffic_potential": 150,
+      "parent_topic": "ทันใจ",
+      "global_volume": 900,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": true,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "sunsun": {
+      "keyword": "sunsun",
+      "volume": 150,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 12000,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": true,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "plern": {
+      "keyword": "plern",
+      "volume": 200,
+      "difficulty": 0,
+      "traffic_potential": 30,
+      "parent_topic": "plern",
+      "global_volume": 450,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": true,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "นิด": {
+      "keyword": "นิด",
+      "volume": 200,
+      "difficulty": 0,
+      "traffic_potential": 10,
+      "parent_topic": "นิดๆ",
+      "global_volume": 200,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": true,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "ยิ้ม": {
+      "keyword": "ยิ้ม",
+      "volume": 9600,
+      "difficulty": 0,
+      "traffic_potential": 500,
+      "parent_topic": "ยิ้ม",
+      "global_volume": 9800,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "ละคร ai": {
+      "keyword": "ละคร ai",
+      "volume": 700,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 700,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "ดูดี": {
+      "keyword": "ดูดี",
+      "volume": 900,
+      "difficulty": 0,
+      "traffic_potential": 60,
+      "parent_topic": "ที่สุดเลยเว้ยแก",
+      "global_volume": 900,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "จบในตอน": {
+      "keyword": "จบในตอน",
+      "volume": 0,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 0,
+      "intents": {},
+      "_call": "candidates-1"
+    },
+    "muan": {
+      "keyword": "muan",
+      "volume": 20,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 1100,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": true,
+        "branded": true,
+        "local": true
+      },
+      "_call": "candidates-1"
+    },
+    "ม่วน": {
+      "keyword": "ม่วน",
+      "volume": 250,
+      "difficulty": 0,
+      "traffic_potential": 0,
+      "parent_topic": "รายชื่อเพลง ลูกทุ่ง มัน ๆ รถแห่",
+      "global_volume": 250,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "tanjai": {
+      "keyword": "tanjai",
+      "volume": 100,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 200,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": true,
+        "branded": true,
+        "local": true
+      },
+      "_call": "candidates-1"
+    },
+    "เพลิน": {
+      "keyword": "เพลิน",
+      "volume": 1300,
+      "difficulty": 0,
+      "traffic_potential": 2600,
+      "parent_topic": "ร้านอาหารเพลิน",
+      "global_volume": 1400,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": false,
+        "branded": true,
+        "local": true
+      },
+      "_call": "candidates-1"
+    },
+    "lakora": {
+      "keyword": "lakora",
+      "volume": 0,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 60,
+      "intents": {},
+      "_call": "candidates-1"
+    },
+    "สั้นสั้น": {
+      "keyword": "สั้นสั้น",
+      "volume": 30,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 30,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-1"
+    },
+    "ละครสั้นไทย": {
+      "keyword": "ละครสั้นไทย",
+      "volume": 60,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 60,
+      "cps": null,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "ละคอน": {
+      "keyword": "ละคอน",
+      "volume": 40,
+      "difficulty": 0,
+      "traffic_potential": 0,
+      "parent_topic": "ดูละ",
+      "parent_volume": 40,
+      "global_volume": 70,
+      "cps": 0.68,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "ดูละครสั้น": {
+      "keyword": "ดูละครสั้น",
+      "volume": 150,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 150,
+      "cps": null,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "ม่วนใจ": {
+      "keyword": "ม่วนใจ",
+      "volume": 10,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 10,
+      "cps": null,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "ซีรี่ย์สั้น": {
+      "keyword": "ซีรี่ย์สั้น",
+      "volume": 150,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 150,
+      "cps": null,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "jaidee": {
+      "keyword": "jaidee",
+      "volume": 150,
+      "difficulty": 44,
+      "traffic_potential": 60,
+      "parent_topic": "jaidee",
+      "parent_volume": 150,
+      "global_volume": 1400,
+      "cps": 0.36,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "muanjai": {
+      "keyword": "muanjai",
+      "volume": 10,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 30,
+      "cps": null,
+      "intents": {},
+      "_call": "candidates-2"
+    },
+    "ใจดี": {
+      "keyword": "ใจดี",
+      "volume": 2800,
+      "difficulty": 0,
+      "traffic_potential": 0,
+      "parent_topic": "ใจดี",
+      "parent_volume": 2800,
+      "global_volume": 2800,
+      "cps": 0.19,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": false,
+        "branded": false,
+        "local": true
+      },
+      "_call": "candidates-2"
+    },
+    "ละคร": {
+      "keyword": "ละคร",
+      "volume": 9000,
+      "difficulty": 61,
+      "traffic_potential": 20000,
+      "parent_topic": "ละครช่องวัน",
+      "parent_volume": 9500,
+      "global_volume": 11000,
+      "cps": 0.69,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "หนังสั้น": {
+      "keyword": "หนังสั้น",
+      "volume": 2400,
+      "difficulty": 0,
+      "traffic_potential": 50,
+      "parent_topic": "หนังสั้นสะท้อนสังคม",
+      "parent_volume": 70,
+      "global_volume": 2500,
+      "cps": 0.58,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "เว็บดูละครสั้น": {
+      "keyword": "เว็บดูละครสั้น",
+      "volume": 10,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 10,
+      "cps": null,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "lakhon": {
+      "keyword": "lakhon",
+      "volume": 0,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 100,
+      "cps": null,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-2"
+    },
+    "ละครสั้น ดูฟรี": {
+      "keyword": "ละครสั้น ดูฟรี",
+      "volume": 0,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "parent_volume": null,
+      "global_volume": 0,
+      "cps": null,
+      "intents": {},
+      "_call": "candidates-2"
+    },
+    "ดูฟรี": {
+      "keyword": "ดูฟรี",
+      "volume": 1900,
+      "difficulty": 53,
+      "traffic_potential": 1060000,
+      "parent_topic": "ดูหนัง",
+      "global_volume": 2100,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-3"
+    },
+    "thai short drama": {
+      "keyword": "thai short drama",
+      "volume": 0,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 10,
+      "intents": {},
+      "_call": "candidates-3"
+    },
+    "เว็บละครสั้น": {
+      "keyword": "เว็บละครสั้น",
+      "volume": 10,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 10,
+      "intents": {},
+      "_call": "candidates-3"
+    },
+    "ละครสั้นai": {
+      "keyword": "ละครสั้นai",
+      "volume": 100,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 100,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-3"
+    },
+    "fin": {
+      "keyword": "fin",
+      "volume": 4200,
+      "difficulty": 12,
+      "traffic_potential": 9000,
+      "parent_topic": "finn",
+      "global_volume": 256000,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-4"
+    },
+    "มินิซีรีส์": {
+      "keyword": "มินิซีรีส์",
+      "volume": 30,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 30,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-4"
+    },
+    "ฟิน": {
+      "keyword": "ฟิน",
+      "volume": 2700,
+      "difficulty": 59,
+      "traffic_potential": 8900,
+      "parent_topic": "finn",
+      "global_volume": 2800,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-4"
+    },
+    "lanla": {
+      "keyword": "lanla",
+      "volume": 10,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 600,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": true,
+        "transactional": true,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-4"
+    },
+    "watchlakorn": {
+      "keyword": "watchlakorn",
+      "volume": 7800,
+      "difficulty": 27,
+      "traffic_potential": 12000,
+      "parent_topic": "watchlakorn",
+      "global_volume": 9700,
+      "intents": {
+        "informational": true,
+        "navigational": true,
+        "commercial": false,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-4"
+    },
+    "ละครสั้นแนวตั้ง": {
+      "keyword": "ละครสั้นแนวตั้ง",
+      "volume": 100,
+      "difficulty": null,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 100,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-4"
+    },
+    "ลั้นลา": {
+      "keyword": "ลั้นลา",
+      "volume": 500,
+      "difficulty": 0,
+      "traffic_potential": 0,
+      "parent_topic": "ชลาสินธุ์",
+      "global_volume": 500,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-4"
+    },
+    "ดารา": {
+      "keyword": "ดารา",
+      "volume": 17000,
+      "difficulty": 64,
+      "traffic_potential": 19000,
+      "parent_topic": "ดารา",
+      "global_volume": 18000,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-5"
+    },
+    "doomuan": {
+      "keyword": "doomuan",
+      "volume": 40,
+      "difficulty": 1,
+      "traffic_potential": null,
+      "parent_topic": null,
+      "global_volume": 40,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": true,
+        "local": false
+      },
+      "_call": "candidates-5"
+    },
+    "dara": {
+      "keyword": "dara",
+      "volume": 500,
+      "difficulty": 4,
+      "traffic_potential": 250,
+      "parent_topic": "dara",
+      "global_volume": 67000,
+      "intents": {
+        "informational": true,
+        "navigational": false,
+        "commercial": false,
+        "transactional": false,
+        "branded": false,
+        "local": false
+      },
+      "_call": "candidates-5"
+    }
+  },
+  "keywords_without_data": [
+    {
+      "keyword": "lakornai",
+      "call": "brands"
+    },
+    {
+      "keyword": "lakorn ai",
+      "call": "brands"
+    },
+    {
+      "keyword": "ชอร์ตละคร",
+      "call": "candidates-1"
+    },
+    {
+      "keyword": "shortlakorn",
+      "call": "candidates-1"
+    },
+    {
+      "keyword": "ลครา",
+      "call": "candidates-1"
+    },
+    {
+      "keyword": "ai lakorn",
+      "call": "candidates-1"
+    },
+    {
+      "keyword": "lakorntv",
+      "call": "candidates-1"
+    },
+    {
+      "keyword": "ดูสั้น",
+      "call": "candidates-1"
+    },
+    {
+      "keyword": "dooshort",
+      "call": "candidates-1"
+    },
+    {
+      "keyword": "lakorn.ai",
+      "call": "candidates-2"
+    },
+    {
+      "keyword": "แอพดูละครสั้น",
+      "call": "candidates-2"
+    },
+    {
+      "keyword": "ไทยชอร์ต",
+      "call": "candidates-3"
+    },
+    {
+      "keyword": "thaishort",
+      "call": "candidates-3"
+    },
+    {
+      "keyword": "ลาโครา",
+      "call": "candidates-3"
+    },
+    {
+      "keyword": "สั้นไทย",
+      "call": "candidates-3"
+    },
+    {
+      "keyword": "มินิละคร",
+      "call": "candidates-4"
+    },
+    {
+      "keyword": "minilakorn",
+      "call": "candidates-4"
+    },
+    {
+      "keyword": "ปัดดู",
+      "call": "candidates-5"
+    },
+    {
+      "keyword": "patdoo",
+      "call": "candidates-5"
+    },
+    {
+      "keyword": "ดูม่วน",
+      "call": "candidates-5"
+    },
+    {
+      "keyword": "มะลิละคร",
+      "call": "candidates-5"
+    }
+  ],
+  "serp": {
+    "serp-lakorn-san": {
+      "keyword": "ละครสั้น",
+      "rows": 10,
+      "positions": [
+        {
+          "position": 1,
+          "type": [
+            "video"
+          ],
+          "url": "https://www.youtube.com/watch?v=SitO8en3osY",
+          "title": "เมื่อสะใภ้แสนดี กลายเป็นแม่ผัวตัวแสบ (หนังสั้น) (ละครสั้น) | BSC Films",
+          "domain_rating": null,
+          "traffic": null,
+          "keywords": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 1,
+          "type": [
+            "video"
+          ],
+          "url": "https://www.facebook.com/bangrak.channel/videos/%E0%B8%8B%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%81%E0%B8%B4%E0%B8%99%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B8%AB%E0%B8%A1%E0%B8%94-ep6-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%98%E0%B8%A3%E0%B8%A3%E0%B8%A1-%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%87%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B8%AA%E0%B8%B0%E0%B8%97%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AA%E0%B8%B1%E0%B8%87%E0%B8%84%E0%B8%A1-%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%87%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99-%E0%B8%9A%E0%B8%B2%E0%B8%87%E0%B8%A3%E0%B8%B1%E0%B8%81%E0%B8%8A%E0%B8%B2%E0%B9%81%E0%B8%99%E0%B8%A5/1081308544902247/",
+          "title": "ซื่อกินไม่หมด ep.6 - #ละครคุณธรรม - #หนังสั้นสะท้อนสังคม",
+          "domain_rating": null,
+          "traffic": null,
+          "keywords": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 1,
+          "type": [
+            "video"
+          ],
+          "url": "https://www.facebook.com/bangrak.channel/videos/%E0%B8%8B%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%81%E0%B8%B4%E0%B8%99%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B8%AB%E0%B8%A1%E0%B8%94-ep7-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%98%E0%B8%A3%E0%B8%A3%E0%B8%A1-%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%87%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B8%AA%E0%B8%B0%E0%B8%97%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AA%E0%B8%B1%E0%B8%87%E0%B8%84%E0%B8%A1-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99-%E0%B8%9A%E0%B8%B2%E0%B8%87%E0%B8%A3%E0%B8%B1%E0%B8%81%E0%B8%8A%E0%B8%B2%E0%B9%81%E0%B8%99%E0%B8%A5/1863737135001653/",
+          "title": "ซื่อกินไม่หมด ep.7 - #ละครคุณธรรม - #หนังสั้นสะท้อนสังคม",
+          "domain_rating": null,
+          "traffic": null,
+          "keywords": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.youtube.com/@Todayshortsdrama",
+          "title": "Today ละครสั้น",
+          "domain_rating": 99,
+          "traffic": 183,
+          "keywords": 6,
+          "top_keyword": "ละครสั้น",
+          "top_keyword_volume": 2300
+        },
+        {
+          "position": 3,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.flickreels.net/th/classify",
+          "title": "ละครสั้นทั้งหมด - FlickReels",
+          "domain_rating": 49,
+          "traffic": 3058,
+          "keywords": 49,
+          "top_keyword": "หนังสั้นจีน",
+          "top_keyword_volume": 16000
+        },
+        {
+          "position": 4,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.youtube.com/@bscfilms1119",
+          "title": "หนังสั้น BSC Films",
+          "domain_rating": 99,
+          "traffic": 10,
+          "keywords": 5,
+          "top_keyword": "ละครสั้น",
+          "top_keyword_volume": 2300
+        },
+        {
+          "position": 5,
+          "type": [
+            "organic",
+            "video_th"
+          ],
+          "url": "https://www.youtube.com/watch?v=v6XqbKNLgGM",
+          "title": "คนเก่งจริง ไม่กลัวใครเก่งกว่า ตอนจบ (หนังสั้น) (ละครสั้น) | BSC Films",
+          "domain_rating": 99,
+          "traffic": 1,
+          "keywords": 3,
+          "top_keyword": "ละครสั้น",
+          "top_keyword_volume": 2300
+        },
+        {
+          "position": 6,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.goodshort.com/dramas/%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99",
+          "title": "รับชมละครสั้นและวิดีโอสั้นออนไลน์ที่",
+          "domain_rating": 62,
+          "traffic": 6,
+          "keywords": 2,
+          "top_keyword": "ดูหนังสั้น",
+          "top_keyword_volume": 250
+        },
+        {
+          "position": 7,
+          "type": [
+            "organic",
+            "video_th"
+          ],
+          "url": "https://www.youtube.com/watch?v=KZnOpdfYEto",
+          "title": "ความซื่อสัตย์วัดกันตอนสบาย (หนังสั้น) (ละครสั้น) | BSC Films",
+          "domain_rating": 99,
+          "traffic": 0,
+          "keywords": 1,
+          "top_keyword": "ละครสั้น",
+          "top_keyword_volume": 2300
+        },
+        {
+          "position": 8,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.youtube.com/playlist?list=PLyxjdO_gh0nIJpuQYJf0mpOEAMSrzfj1K",
+          "title": "🌟รวมละครสั้นจีน พากย์ไทยเต็มเรื่องทั้งหมด‼️",
+          "domain_rating": 99,
+          "traffic": 1784,
+          "keywords": 16,
+          "top_keyword": "หนังสั้นจีนพากย์ไทย",
+          "top_keyword_volume": 7500
+        }
+      ]
+    },
+    "serp-lakorn-naewtang": {
+      "keyword": "ละครแนวตั้ง",
+      "rows": 13,
+      "positions": [
+        {
+          "position": 1,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.youtube.com/playlist?list=PLdlK-IVFgTJ6Jpfo9b9TFDl3dTqiklgF4",
+          "title": "🔥ละครแนวตั้งจีน หนังจีนพากย์ไทย เรื่องใหม่ล่าสุดก่อนใคร❗💥",
+          "domain_rating": 99,
+          "traffic": 488,
+          "top_keyword": "ซีรี่ย์จีนแนวตั้งพากย์ไทย",
+          "top_keyword_volume": 1400
+        },
+        {
+          "position": 2,
+          "type": [
+            "ai_overview"
+          ],
+          "url": null,
+          "title": null,
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.youtube.com/watch?v=6XXns8gDXSA",
+          "title": "24:15",
+          "domain_rating": 99,
+          "traffic": 9,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.youtube.com/watch?v=N4WuMI6RbFc",
+          "title": "13:37",
+          "domain_rating": 99,
+          "traffic": 17,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.youtube.com/watch?v=Dt5QhhQ6jjg",
+          "title": "8:01",
+          "domain_rating": 99,
+          "traffic": 161,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.facebook.com/isatamp/videos/%E0%B8%9E%E0%B8%B2%E0%B8%81%E0%B8%A2%E0%B9%8C%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B8%A1%E0%B8%B2%E0%B9%81%E0%B8%A5%E0%B9%89%E0%B8%A7%E0%B8%84%E0%B9%88%E0%B8%B0%EF%B8%8F-%E0%B9%81%E0%B8%8B%E0%B9%88%E0%B8%9A%E0%B8%99%E0%B8%B1%E0%B8%A7%E0%B8%A3%E0%B9%8C-%E0%B8%A5%E0%B8%B0%E0%B8%A1%E0%B8%B8%E0%B8%99%E0%B8%A1%E0%B8%B2%E0%B8%81-%E0%B8%95%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%94%E0%B8%B9-%E0%B9%80%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87-%E0%B8%9B%E0%B8%8F%E0%B8%B4%E0%B8%9A%E0%B8%B1%E0%B8%95%E0%B8%B4%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B9%80%E0%B8%9B%E0%B9%87%E0%B8%99%E0%B8%84%E0%B8%99%E0%B8%A3%E0%B8%B1%E0%B8%8160-%E0%B8%95/1722086129113121/",
+          "title": "1:26",
+          "domain_rating": 100,
+          "traffic": 51,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://salehere.co.th/articles/best-vertical-chinese-dramas",
+          "title": "มัดรวม 20 ซีรี่ส์จีนแนวตั้ง ดูเพลินทุกตอน สนุกจนหยุดดูไม่ได้! | Sale Here",
+          "domain_rating": 50,
+          "traffic": 539,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.bilibili.tv/th/space/1967559152",
+          "title": "ช่องของ มินิซีรีส์จีนแนวตั้ง",
+          "domain_rating": 76,
+          "traffic": 1547,
+          "top_keyword": "bilibili ซี รี ย์ จีน พากย์ไทยเต็มเรื่อง",
+          "top_keyword_volume": 10000
+        },
+        {
+          "position": 4,
+          "type": [
+            "organic",
+            "video_th"
+          ],
+          "url": "https://www.facebook.com/ThaiPBS/videos/%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B9%81%E0%B8%99%E0%B8%A7%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87-%E0%B8%A1%E0%B8%B2%E0%B9%81%E0%B8%A3%E0%B8%87%E0%B9%83%E0%B8%99%E0%B8%88%E0%B8%B5%E0%B8%99%E0%B9%81%E0%B8%9C%E0%B9%88%E0%B8%99%E0%B8%94%E0%B8%B4%E0%B8%99%E0%B9%83%E0%B8%AB%E0%B8%8D%E0%B9%88-%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B8%9A%E0%B8%B1%E0%B8%99%E0%B9%80%E0%B8%97%E0%B8%B4%E0%B8%87/791585300636845/",
+          "title": "ละครสั้นแนวตั้ง มาแรงในจีนแผ่นดินใหญ่ . คอนเทนต์หนึ่งที่มักขึ้นฟีดบน ...",
+          "domain_rating": 100,
+          "traffic": 24,
+          "top_keyword": "หนังแนวตั้ง",
+          "top_keyword_volume": 1100
+        },
+        {
+          "position": 5,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.facebook.com/groups/829998527541559/posts/1878572679350800/",
+          "title": "ซีรีส์แนวตั้ง มันคืออะไรเหรอครับ ช่วยอธิบายหน่อย ไม่รู้จักกับเขาเลย",
+          "domain_rating": 100,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 6,
+          "type": [
+            "organic"
+          ],
+          "url": "https://salehere.co.th/articles/best-vertical-chinese-dramas",
+          "title": "มัดรวม 20 ซีรี่ส์จีนแนวตั้ง ดูเพลินทุกตอน สนุกจนหยุดดูไม่ได้!",
+          "domain_rating": 50,
+          "traffic": 369,
+          "top_keyword": "หนังจีนแนวตั้ง",
+          "top_keyword_volume": 4800
+        },
+        {
+          "position": 7,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.youtube.com/playlist?list=PL7LI2C4GPyPh1La6cgnu3KzL776DLFKNK",
+          "title": "Shop ละคร & โรงหนังจีน CCAP | การแก้แค้นของภรรยาเศรษฐี ซีรี ...",
+          "domain_rating": 99,
+          "traffic": 91,
+          "top_keyword": "หนังแนวตั้ง",
+          "top_keyword_volume": 1100
+        },
+        {
+          "position": 8,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.tiktok.com/tag/%E0%B8%A1%E0%B8%B4%E0%B8%99%E0%B8%B4%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B8%88%E0%B8%B5%E0%B8%99%E0%B9%81%E0%B8%99%E0%B8%A7%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87",
+          "title": "มินิซีรี่ย์จีนแนวตั้ง",
+          "domain_rating": 97,
+          "traffic": 376,
+          "top_keyword": "ซีรีย์แนวตั้ง",
+          "top_keyword_volume": 2900
+        }
+      ]
+    },
+    "serp-plern": {
+      "keyword": "เพลิน",
+      "rows": 16,
+      "positions": [
+        {
+          "position": 1,
+          "type": [
+            "local_pack"
+          ],
+          "url": null,
+          "title": "ร้านอาหารเพลิน",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 1,
+          "type": [
+            "local_pack"
+          ],
+          "url": null,
+          "title": "ร้านอาหารเพลิน",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 1,
+          "type": [
+            "local_pack"
+          ],
+          "url": null,
+          "title": "ร้านเพลินภูเก็ต",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "video"
+          ],
+          "url": "https://www.youtube.com/watch?v=NoXHe9Pt26M",
+          "title": "เพลิน - สุชาติ ชวางกูร (คอนเสิร์ท ความงามและความรัก)",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "video"
+          ],
+          "url": "https://www.facebook.com/ploen.restaurant/videos/3-%E0%B9%80%E0%B8%AB%E0%B8%95%E0%B8%B8%E0%B8%9C%E0%B8%A5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%95%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%A1%E0%B8%B2%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9E%E0%B8%A5%E0%B8%B4%E0%B8%99%E0%B8%9A%E0%B8%AD%E0%B8%81%E0%B9%80%E0%B8%A5%E0%B8%A2%E0%B8%A7%E0%B9%88%E0%B8%B2%E0%B8%94%E0%B8%B9%E0%B8%84%E0%B8%A5%E0%B8%B4%E0%B8%9B%E0%B8%99%E0%B8%B5%E0%B9%89%E0%B8%88%E0%B8%9A-%E0%B8%A1%E0%B8%B5%E0%B8%99%E0%B8%B1%E0%B8%94%E0%B8%A1%E0%B8%B7%E0%B9%89%E0%B8%AD%E0%B8%96%E0%B8%B1%E0%B8%94%E0%B9%84%E0%B8%9B%E0%B9%81%E0%B8%99%E0%B9%88%E0%B8%99%E0%B8%AD%E0%B8%99%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9E%E0%B8%A5%E0%B8%B4%E0%B8%99-plo/1437190891439121/",
+          "title": "3 เหตุผลที่ต้องมาร้านเพลิน…บอกเลยว่าดูคลิปนี้จบ มีนัดมื้อถัดไป ...",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "video"
+          ],
+          "url": "https://www.youtube.com/watch?v=iC14PXXMVKo",
+          "title": "เพลิน - อุมาพร บัวพึ่ง (Official Audio)",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "question"
+          ],
+          "url": null,
+          "title": "เพลิน สะกด ยัง ไง",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "question"
+          ],
+          "url": null,
+          "title": "ร้านเพลินมีเมนูอะไรบ้าง?",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "question"
+          ],
+          "url": null,
+          "title": "\"เพลิน\" แปลว่าอะไร?",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "question"
+          ],
+          "url": null,
+          "title": "เพลินพุง ร้านใคร",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 4,
+          "type": [
+            "organic",
+            "image_th"
+          ],
+          "url": "https://www.facebook.com/ploen.restaurant/?locale=th_TH",
+          "title": "Ploen Restaurant/ร้านอาหารเพลิน | Bangkok",
+          "domain_rating": 100,
+          "traffic": 2097,
+          "top_keyword": "ร้านอาหารเพลิน",
+          "top_keyword_volume": 1300
+        },
+        {
+          "position": 5,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.caretery.com/ploen/",
+          "title": "ร้านอาหารเพลิน (เพลินซีฟู้ด วิภาวดีฯ) | Ploen/ ...",
+          "domain_rating": 16,
+          "traffic": 233,
+          "top_keyword": "ร้านเพลิน วิภาวดี",
+          "top_keyword_volume": 1100
+        },
+        {
+          "position": 6,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.wongnai.com/restaurants/5829MP-%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B8%AD%E0%B8%B2%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B9%80%E0%B8%9E%E0%B8%A5%E0%B8%B4%E0%B8%99-ploen-restaurant",
+          "title": "[รีวิว] ร้าน ร้านอาหารเพลิน (Ploen Restaurant) | เมนูแนะนำ ...",
+          "domain_rating": 74,
+          "traffic": 481,
+          "top_keyword": "ร้านเพลิน วิภาวดี",
+          "top_keyword_volume": 1100
+        },
+        {
+          "position": 7,
+          "type": [
+            "organic"
+          ],
+          "url": "https://page.line.me/zvp8242d",
+          "title": "ร้านอาหารเพลิน | LINE Official Account",
+          "domain_rating": 96,
+          "traffic": 27,
+          "top_keyword": "เพลิน วิภาวดี",
+          "top_keyword_volume": 700
+        },
+        {
+          "position": 8,
+          "type": [
+            "organic"
+          ],
+          "url": "https://shellshuanshim.com/restaurant/detail/ploen",
+          "title": "ร้านอาหารเพลิน",
+          "domain_rating": 21,
+          "traffic": 87,
+          "top_keyword": "ร้านเพลิน",
+          "top_keyword_volume": 1600
+        },
+        {
+          "position": 9,
+          "type": [
+            "organic",
+            "image_th"
+          ],
+          "url": "https://www.centerwedding.com/bangkok/venues/433191/",
+          "title": "ร้านอาหารเพลิน (Ploen), จังหวัดกรุงเทพมหานคร",
+          "domain_rating": 35,
+          "traffic": 13,
+          "top_keyword": "ร้านอาหารเพลิน วิภาวดี",
+          "top_keyword_volume": 250
+        }
+      ]
+    },
+    "serp-lakorn-en": {
+      "keyword": "lakorn",
+      "rows": 17,
+      "positions": [
+        {
+          "position": 1,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.watchlakorn.org/",
+          "title": "WatchLakorn.org: หน้าแรก",
+          "domain_rating": 0,
+          "traffic": 11259,
+          "top_keyword": "watchlakorn",
+          "top_keyword_volume": 7800
+        },
+        {
+          "position": 2,
+          "type": [
+            "video"
+          ],
+          "url": "https://www.youtube.com/watch?v=835WSH3q1mU",
+          "title": "FIN | กูแค่อยากหาเหตุผล ทำไมเขาถึงไม่เลือกกู | สองหัวใจ EP.15",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "video"
+          ],
+          "url": "https://www.youtube.com/watch?v=eRMed_VXn3I",
+          "title": "Lakorn Nok: Suwannahong, The Episode of ...",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "video"
+          ],
+          "url": "https://wetv.vip/th/short/k3278n39h2q",
+          "title": "#lakorn #thai #dramaTop 10 Lakorn / T drama / Thailand ...",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "ai_overview"
+          ],
+          "url": null,
+          "title": null,
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.watchlakorn.org/",
+          "title": "WatchLakorn.org: หน้าแรก",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.rosewoodhotels.com/en/bangkok/dining/lakorn",
+          "title": "Bangkok Authentic Thai Restaurant | Lakorn at Rosewood",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.one31.net/shows/drama",
+          "title": "📺 ละครช่องวัน 31 ดูละครย้อนหลัง oneD ดูฟรี มีตอนใหม่ทุกวัน",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://ch3plus.com/drama",
+          "title": "ละคร/ซีรีส์ - ช่อง3",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 3,
+          "type": [
+            "ai_overview_sitelink"
+          ],
+          "url": "https://www.oned.net/content/drama",
+          "title": "oneD ดูละครย้อนหลัง ฟรี ช่องวัน 31 และ GMM25",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 4,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.youtube.com/@oneLakorn",
+          "title": "one Lakorn",
+          "domain_rating": 99,
+          "traffic": 40,
+          "top_keyword": "lakorn",
+          "top_keyword_volume": 250
+        },
+        {
+          "position": 5,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.facebook.com/lakorn.bkk/",
+          "title": "Lakorn | Bangkok",
+          "domain_rating": 100,
+          "traffic": 4,
+          "top_keyword": "lakorn",
+          "top_keyword_volume": 250
+        },
+        {
+          "position": 6,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.wongnai.com/restaurants/397269vB-lakorn",
+          "title": "ร้าน Lakorn | รีวิวร้านอาหาร",
+          "domain_rating": 74,
+          "traffic": 2,
+          "top_keyword": "lakorn",
+          "top_keyword_volume": 250
+        },
+        {
+          "position": 7,
+          "type": [
+            "organic"
+          ],
+          "url": "https://en.wikipedia.org/wiki/Thai_television_soap_opera",
+          "title": "Thai television soap opera",
+          "domain_rating": 97,
+          "traffic": 13,
+          "top_keyword": "thai drama",
+          "top_keyword_volume": 200
+        },
+        {
+          "position": 8,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.instagram.com/lakorn.bkk/",
+          "title": "lakorn.bkk - Bangkok",
+          "domain_rating": 100,
+          "traffic": 0,
+          "top_keyword": "lakorn",
+          "top_keyword_volume": 250
+        },
+        {
+          "position": 9,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.themoviedb.org/keyword/204211-lakorn/tv?language=th-TH",
+          "title": "\"lakorn\" TV Shows — The Movie Database ...",
+          "domain_rating": 89,
+          "traffic": 6,
+          "top_keyword": "thai lakorn",
+          "top_keyword_volume": 30
+        },
+        {
+          "position": 10,
+          "type": [
+            "organic"
+          ],
+          "url": "https://thailandfoundation.or.th/thai-series-101-your-ultimate-guide-to-lakorns-shows-and-dramas/",
+          "title": "Thai Series 101: Your Ultimate Guide to Lakorns, Shows, ...",
+          "domain_rating": 55,
+          "traffic": 1,
+          "top_keyword": "lakorn thai",
+          "top_keyword_volume": 20
+        }
+      ]
+    },
+    "serp-lakhon-th": {
+      "keyword": "ละคอน",
+      "rows": 15,
+      "positions": [
+        {
+          "position": 1,
+          "type": [
+            "ai_overview"
+          ],
+          "url": null,
+          "title": null,
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 1,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.facebook.com/lakornvarasarn/photos/%E0%B8%AB%E0%B8%A5%E0%B8%B2%E0%B8%A2%E0%B8%84%E0%B8%99%E0%B8%AA%E0%B8%87%E0%B8%AA%E0%B8%B1%E0%B8%A2%E0%B8%A7%E0%B9%88%E0%B8%B2%E0%B8%97%E0%B8%B3%E0%B9%84%E0%B8%A1%E0%B9%80%E0%B8%A3%E0%B8%B2%E0%B8%9E%E0%B8%B4%E0%B8%A1%E0%B8%9E%E0%B9%8C%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%AB%E0%B8%A3%E0%B8%B7%E0%B8%AD%E0%B9%80%E0%B8%9B%E0%B8%A5%E0%B9%88%E0%B8%B2-%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B9%83%E0%B8%8A%E0%B9%89%E0%B8%84%E0%B8%B3%E0%B8%A7%E0%B9%88%E0%B8%B2-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%AD%E0%B8%99-%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%83%E0%B8%8A%E0%B9%89%E0%B8%84%E0%B8%B3%E0%B8%A7%E0%B9%88%E0%B8%B2-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3-%E0%B9%81%E0%B8%97%E0%B8%99-%E0%B8%A7%E0%B8%B1/569941823066545/",
+          "title": "Lakorn - หลายคนสงสัยว่าทำไมเราพิมพ์ผิดหรือเปล่า ที่ใช้คำว่า “ละคอน” ไม่ใช้ ...",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 1,
+          "type": [
+            "ai_overview_sitelink",
+            "image_th"
+          ],
+          "url": "https://www.instagram.com/tapadkarnlakorn/",
+          "title": "ถาปัดการละคอน Atlantis (@tapadkarnlakorn) - Instagram",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 2,
+          "type": [
+            "organic",
+            "video_th"
+          ],
+          "url": "https://www.youtube.com/watch?v=y3v3lo1_C58",
+          "title": "ความรักครั้งนี้ จะลงเอยอย่างไร!? | ละคอนTENT",
+          "domain_rating": 99,
+          "traffic": 14,
+          "top_keyword": "ละคอน",
+          "top_keyword_volume": 40
+        },
+        {
+          "position": 3,
+          "type": [
+            "organic"
+          ],
+          "url": "https://pantip.com/topic/37828980",
+          "title": "ละคร กับ ละคอน {สงสัยมากมาย}",
+          "domain_rating": 77,
+          "traffic": 1,
+          "top_keyword": "ละคอน",
+          "top_keyword_volume": 40
+        },
+        {
+          "position": 4,
+          "type": [
+            "question"
+          ],
+          "url": null,
+          "title": "\"ละคอน\" แปลว่าอะไร?",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 4,
+          "type": [
+            "question"
+          ],
+          "url": null,
+          "title": "การละคอน มธ เรียนอะไร",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 4,
+          "type": [
+            "question"
+          ],
+          "url": null,
+          "title": "โรง ละ คอน คือ อะไร",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 4,
+          "type": [
+            "question"
+          ],
+          "url": null,
+          "title": "คำว่าละครเขียนยังไง",
+          "domain_rating": null,
+          "traffic": null,
+          "top_keyword": null,
+          "top_keyword_volume": null
+        },
+        {
+          "position": 5,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.youtube.com/playlist?list=PLJx-XkJhYuVd7Mm6AJ3E7Qg5soTudbolM",
+          "title": "ละคอนTENT เพลงรักรอยแค้น",
+          "domain_rating": 99,
+          "traffic": 0,
+          "top_keyword": "ละคอน",
+          "top_keyword_volume": 40
+        },
+        {
+          "position": 6,
+          "type": [
+            "organic"
+          ],
+          "url": "https://theatre.fineart.tu.ac.th/",
+          "title": "การละคอน คณะศิลปกรรมศาสตร์ มหาวิทยาลัยธรรมศาสตร์: หน้าหลัก",
+          "domain_rating": 76,
+          "traffic": 7,
+          "top_keyword": "การละคอน มธ",
+          "top_keyword_volume": 20
+        },
+        {
+          "position": 7,
+          "type": [
+            "organic"
+          ],
+          "url": "http://legacy.orst.go.th/?knowledges=%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%AB%E0%B8%A3%E0%B8%B7%E0%B8%AD%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%AD%E0%B8%99-%E0%B9%92-%E0%B8%AA%E0%B8%B4%E0%B8%87%E0%B8%AB%E0%B8%B2%E0%B8%84%E0%B8%A1",
+          "title": "ละครหรือละคอน (๒ สิงหาคม ๒๕๕๔)",
+          "domain_rating": 64,
+          "traffic": 0,
+          "top_keyword": "ละคอน",
+          "top_keyword_volume": 40
+        },
+        {
+          "position": 8,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.youtube.com/playlist?list=PLJx-XkJhYuVd1FzPoEggGDjlCI0O-fSL_",
+          "title": "ละคอนTENT",
+          "domain_rating": 99,
+          "traffic": 0,
+          "top_keyword": "ละคอน",
+          "top_keyword_volume": 40
+        },
+        {
+          "position": 9,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.facebook.com/tapadkarnlakorn/?locale=th_TH",
+          "title": "ถาปัดการละคอน (@tapadkarnlakorn)",
+          "domain_rating": 100,
+          "traffic": 0,
+          "top_keyword": "ละคอน",
+          "top_keyword_volume": 40
+        },
+        {
+          "position": 10,
+          "type": [
+            "organic"
+          ],
+          "url": "https://www.wordyguru.com/a/%E0%B8%84%E0%B8%B3%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A1%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%82%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%9C%E0%B8%B4%E0%B8%94/q/%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3",
+          "title": "ละคร หรือ ละคอน เขียนยังไงถูก พร้อมความหมายและวิธีจำ",
+          "domain_rating": 43,
+          "traffic": 0,
+          "top_keyword": "ละคอน",
+          "top_keyword_volume": 40
+        }
+      ]
+    },
+    "serp-muanjai": {
+      "keyword": "ม่วนใจ",
+      "rows": 0,
+      "positions": []
+    },
+    "serp-doosan": {
+      "keyword": "ดูสั้น",
+      "rows": 0,
+      "positions": []
+    },
+    "serp-thaishort": {
+      "keyword": "ไทยชอร์ต",
+      "rows": 0,
+      "positions": []
+    },
+    "serp-minilakorn": {
+      "keyword": "มินิละคร",
+      "rows": 0,
+      "positions": []
+    },
+    "serp-patdoo": {
+      "keyword": "ปัดดู",
+      "rows": 0,
+      "positions": []
+    }
+  },
+  "domains": {
+    "dooshort.com": {
+      "url": "dooshort.com/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 1492,
+      "refdomains": 901,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "172.67.171.67",
+      "ahrefs_rank": 0,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "dooshort.tv": {
+      "url": "dooshort.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "muanjai.com": {
+      "url": "muanjai.com/",
+      "domain_rating": 7,
+      "url_rating": 4.8,
+      "backlinks": 1114,
+      "refdomains": 960,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "3.14.223.155",
+      "ahrefs_rank": 25000330,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "muanjai.tv": {
+      "url": "muanjai.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "lakhon.com": {
+      "url": "lakhon.com/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 64,
+      "refdomains": 53,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "lakhon.tv": {
+      "url": "lakhon.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "lakorn.tv": {
+      "url": "lakorn.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 268867938,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "lakorn.ai": {
+      "url": "lakorn.ai/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 377,
+      "refdomains": 349,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "lakornai.tv": {
+      "url": "lakornai.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "lakornai.com": {
+      "url": "lakornai.com/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 912,
+      "refdomains": 838,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "91.195.240.94",
+      "ahrefs_rank": 0,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "plern.com": {
+      "url": "plern.com/",
+      "domain_rating": 0.1,
+      "url_rating": 0,
+      "backlinks": 1469,
+      "refdomains": 802,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "64.187.239.229",
+      "ahrefs_rank": 85217345,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "plern.tv": {
+      "url": "plern.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "thaishort.com": {
+      "url": "thaishort.com/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 1022,
+      "refdomains": 935,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "54.243.117.197",
+      "ahrefs_rank": 165109405,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "thaishort.tv": {
+      "url": "thaishort.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "jaidee.com": {
+      "url": "jaidee.com/",
+      "domain_rating": 0.2,
+      "url_rating": 0,
+      "backlinks": 942,
+      "refdomains": 844,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "3.33.243.145",
+      "ahrefs_rank": 82840864,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "lakora.com": {
+      "url": "lakora.com/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 716,
+      "refdomains": 630,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "35.182.125.245",
+      "ahrefs_rank": 0,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "dramabox.com": {
+      "url": "dramabox.com/",
+      "domain_rating": 58,
+      "url_rating": 5,
+      "backlinks": 8921929,
+      "refdomains": 3525,
+      "org_traffic": 3062,
+      "org_keywords": 157,
+      "ip": "54.254.1.28",
+      "ahrefs_rank": 330611,
+      "state": "operating",
+      "state_label": "มีเว็บทำงานอยู่"
+    },
+    "reelshort.com": {
+      "url": "reelshort.com/",
+      "domain_rating": 72,
+      "url_rating": 4.5,
+      "backlinks": 575336,
+      "refdomains": 6239,
+      "org_traffic": 2471,
+      "org_keywords": 78,
+      "ip": "47.251.7.125",
+      "ahrefs_rank": 79580,
+      "state": "operating",
+      "state_label": "มีเว็บทำงานอยู่"
+    },
+    "goodshort.com": {
+      "url": "goodshort.com/",
+      "domain_rating": 62,
+      "url_rating": 4.7,
+      "backlinks": 661950,
+      "refdomains": 4356,
+      "org_traffic": 2577,
+      "org_keywords": 257,
+      "ip": "13.251.144.82",
+      "ahrefs_rank": 235461,
+      "state": "operating",
+      "state_label": "มีเว็บทำงานอยู่"
+    },
+    "flickreels.net": {
+      "url": "flickreels.net/",
+      "domain_rating": 49,
+      "url_rating": 4.6,
+      "backlinks": 76233,
+      "refdomains": 3339,
+      "org_traffic": 5724,
+      "org_keywords": 255,
+      "ip": "104.18.2.128",
+      "ahrefs_rank": 798120,
+      "state": "operating",
+      "state_label": "มีเว็บทำงานอยู่"
+    },
+    "shortmax.com": {
+      "url": "shortmax.com/",
+      "domain_rating": 15,
+      "url_rating": 4.4,
+      "backlinks": 1242,
+      "refdomains": 958,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "3.33.251.168",
+      "ahrefs_rank": 12551883,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "netshort.com": {
+      "url": "netshort.com/",
+      "domain_rating": 61,
+      "url_rating": 20,
+      "backlinks": 461049,
+      "refdomains": 4678,
+      "org_traffic": 8929,
+      "org_keywords": 361,
+      "ip": "104.18.20.248",
+      "ahrefs_rank": 271852,
+      "state": "operating",
+      "state_label": "มีเว็บทำงานอยู่"
+    },
+    "minilakorn.com": {
+      "url": "minilakorn.com/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "minilakorn.tv": {
+      "url": "minilakorn.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "patdoo.com": {
+      "url": "patdoo.com/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "patdoo.tv": {
+      "url": "patdoo.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "dooshort.co.th": {
+      "url": "dooshort.co.th/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "thaishort.co.th": {
+      "url": "thaishort.co.th/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "minilakorn.co.th": {
+      "url": "minilakorn.co.th/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "muanjai.co.th": {
+      "url": "muanjai.co.th/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "patdoo.co.th": {
+      "url": "patdoo.co.th/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "lakorn.co.th": {
+      "url": "lakorn.co.th/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "watchlakorn.org": {
+      "url": "watchlakorn.org/",
+      "domain_rating": 0.7,
+      "url_rating": 0,
+      "backlinks": 96717,
+      "refdomains": 2499,
+      "org_traffic": 11493,
+      "org_keywords": 41,
+      "ip": "104.21.22.212",
+      "ahrefs_rank": 65552965,
+      "state": "operating",
+      "state_label": "มีเว็บทำงานอยู่"
+    },
+    "lakhon.co.th": {
+      "url": "lakhon.co.th/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 0,
+      "refdomains": 0,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 0,
+      "state": "no-signal",
+      "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+    },
+    "plern.co.th": {
+      "url": "plern.co.th/",
+      "domain_rating": 0.1,
+      "url_rating": 0,
+      "backlinks": 35,
+      "refdomains": 32,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "43.249.35.149",
+      "ahrefs_rank": 86549217,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "jaidee.co.th": {
+      "url": "jaidee.co.th/",
+      "domain_rating": 18,
+      "url_rating": 0,
+      "backlinks": 8,
+      "refdomains": 2,
+      "org_traffic": 12,
+      "org_keywords": 9,
+      "ip": "31.43.161.6",
+      "ahrefs_rank": 10815221,
+      "state": "operating",
+      "state_label": "มีเว็บทำงานอยู่"
+    },
+    "sunsun.tv": {
+      "url": "sunsun.tv/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 712,
+      "refdomains": 636,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": "15.197.172.60",
+      "ahrefs_rank": 0,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    },
+    "doodee.com": {
+      "url": "doodee.com/",
+      "domain_rating": 0,
+      "url_rating": 0,
+      "backlinks": 1039,
+      "refdomains": 936,
+      "org_traffic": 0,
+      "org_keywords": 0,
+      "ip": null,
+      "ahrefs_rank": 133862222,
+      "state": "held",
+      "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+    }
+  },
+  "rename_cost": {
+    "census": {
+      "total": 2301,
+      "generated_html": 2063,
+      "generated_html_files": 504,
+      "html_all": 2192,
+      "html_all_files": 568,
+      "design_html": 129,
+      "design_html_files": 64,
+      "design_dir": 150,
+      "design_dir_files": 73,
+      "build_dir": 65,
+      "build_dir_files": 7,
+      "docs_dir": 3,
+      "any_case": 10234,
+      "origin_literal": 7664,
+      "repo_path_literal": 18,
+      "remainder": 20,
+      "other_casing": 7933,
+      "remainder_files": [
+        ".github/workflows/content-ci.yml",
+        "README-POSTERS.txt",
+        "README.md",
+        "admin/broker.mjs",
+        "admin/github.mjs",
+        "assets/app.js",
+        "assets/data.js",
+        "assets/site.css",
+        "assets/tokens.css",
+        "ci/README.md",
+        "redirects.map",
+        "robots.txt",
+        "tools/migrate-content-v2.mjs",
+        "tools/serve.mjs"
+      ]
+    },
+    "site_name": {
+      "decl_file": "build/seo.mjs",
+      "decl_line": 34,
+      "refs": [
+        {
+          "file": "build/pages-content.mjs",
+          "line": 7
+        },
+        {
+          "file": "build/pages-content.mjs",
+          "line": 191
+        },
+        {
+          "file": "build/seo.mjs",
+          "line": 128
+        },
+        {
+          "file": "build/seo.mjs",
+          "line": 156
+        },
+        {
+          "file": "build/seo.mjs",
+          "line": 259
+        }
+      ],
+      "import_refs": [
+        {
+          "file": "build/pages-content.mjs",
+          "line": 7
+        }
+      ],
+      "use_refs": [
+        {
+          "file": "build/pages-content.mjs",
+          "line": 191
+        },
+        {
+          "file": "build/seo.mjs",
+          "line": 128
+        },
+        {
+          "file": "build/seo.mjs",
+          "line": 156
+        },
+        {
+          "file": "build/seo.mjs",
+          "line": 259
+        }
+      ]
+    },
+    "origin": {
+      "file": "build/seo.mjs",
+      "line": 14,
+      "value": "https://lakornai.tv"
+    },
+    "logo": {
+      "file": "build/ui.mjs",
+      "line": 212,
+      "footer_line": 239,
+      "footer_text": "© LakornAI · lakornai.tv"
+    },
+    "share": {
+      "jpg_count": 13,
+      "src_html_count": 14,
+      "card_src_count": 13,
+      "src_with_wordmark": 13,
+      "generator": "design/v2/share-cards.mjs",
+      "wordmark_lines": [
+        213,
+        243
+      ],
+      "title_line": 235
+    },
+    "ceo_line_claims": [
+      {
+        "file": "build/pages-content.mjs",
+        "line": 186,
+        "has_name": true
+      },
+      {
+        "file": "build/pages-content.mjs",
+        "line": 197,
+        "has_name": true
+      },
+      {
+        "file": "build/pages-content.mjs",
+        "line": 268,
+        "has_name": true
+      },
+      {
+        "file": "build/pages-content.mjs",
+        "line": 270,
+        "has_name": true
+      },
+      {
+        "file": "build/pages-discovery.mjs",
+        "line": 177,
+        "has_name": true
+      },
+      {
+        "file": "build/pages-discovery.mjs",
+        "line": 352,
+        "has_name": true
+      },
+      {
+        "file": "build/pages-discovery.mjs",
+        "line": 356,
+        "has_name": true
+      }
+    ],
+    "ceo_line_claims_ok": 7
+  },
+  "proposals": [
+    {
+      "id": "doo-san",
+      "thai": "ดูสั้น",
+      "latin": "DooShort",
+      "axes": [
+        "kw",
+        "noai"
+      ],
+      "idea": "ดู + สั้น · เรียงคำแบบที่คนไทยพูดจริง และฝั่งอังกฤษมีคำ short เหมือน 4 แบรนด์ในหมวด",
+      "hook_keywords": [
+        {
+          "keyword": "ละครสั้น",
+          "volume": 2300,
+          "difficulty": 0,
+          "traffic_potential": 0
+        },
+        {
+          "keyword": "ดูละครสั้น",
+          "volume": 150,
+          "difficulty": null,
+          "traffic_potential": null
+        },
+        {
+          "keyword": "ละครสั้นฟรี",
+          "volume": 40,
+          "difficulty": null,
+          "traffic_potential": null
+        }
+      ],
+      "name_as_keyword": [
+        {
+          "keyword": "ดูสั้น",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        },
+        {
+          "keyword": "dooshort",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        }
+      ],
+      "serp_checked": [
+        {
+          "id": "serp-doosan",
+          "keyword": "ดูสั้น",
+          "rows": 0
+        },
+        {
+          "id": "serp-lakorn-san",
+          "keyword": "ละครสั้น",
+          "rows": 10
+        }
+      ],
+      "domains": [
+        {
+          "host": "dooshort.com",
+          "state": "held",
+          "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+        },
+        {
+          "host": "dooshort.tv",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        },
+        {
+          "host": "dooshort.co.th",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        }
+      ],
+      "spelling": {
+        "thai_length": 6,
+        "latin_length": 8,
+        "read_aloud": "ไทยอ่าน \"ดู-สั้น\" · อังกฤษอ่าน \"ดู-ชอร์ต\" — คนละเสียงกันระหว่างสองภาษา",
+        "typing": [
+          "ไทยพิมพ์ได้ ไม่มีวรรณยุกต์ที่พิมพ์ยาก",
+          "อังกฤษพิมพ์ได้ แต่ Doo/Du/Dhu สะกดได้หลายทาง"
+        ]
+      },
+      "downsides": [
+        "คำนำหน้า \"ดู...\" เป็นตระกูลชื่อที่เว็บดูหนังเถื่อนใช้กันทั้งหมวด ชื่อจะถูกจัดกลุ่มไปกับของพวกนั้นโดยอัตโนมัติ",
+        "ชื่อไทยกับชื่ออังกฤษออกเสียงไม่ตรงกัน (สั้น ≠ short) ⇒ คนบอกต่อปากเปล่าแล้วพิมพ์ไม่ถูก",
+        "เอาคำหมวดมาเป็นชื่อ แปลว่าจดเป็นเครื่องหมายการค้าได้ยาก"
+      ]
+    },
+    {
+      "id": "thai-short",
+      "thai": "ไทยชอร์ต",
+      "latin": "ThaiShort",
+      "axes": [
+        "kw",
+        "noai"
+      ],
+      "idea": "เกาะคำ short ที่หมวดนี้ใช้ แล้วเติม \"ไทย\" เป็นตัวแยกจากแอปจีน — ตรงกับเส้นในใบงานที่ห้ามทำตัวเป็นละครจีน",
+      "hook_keywords": [
+        {
+          "keyword": "ละครสั้น",
+          "volume": 2300,
+          "difficulty": 0,
+          "traffic_potential": 0
+        },
+        {
+          "keyword": "ละครสั้นไทย",
+          "volume": 60,
+          "difficulty": null,
+          "traffic_potential": null
+        },
+        {
+          "keyword": "ละครสั้นฟรี",
+          "volume": 40,
+          "difficulty": null,
+          "traffic_potential": null
+        }
+      ],
+      "name_as_keyword": [
+        {
+          "keyword": "ไทยชอร์ต",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        },
+        {
+          "keyword": "thaishort",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        },
+        {
+          "keyword": "thai short drama",
+          "volume": 0,
+          "difficulty": null,
+          "has_ahrefs_row": true
+        }
+      ],
+      "serp_checked": [
+        {
+          "id": "serp-thaishort",
+          "keyword": "ไทยชอร์ต",
+          "rows": 0
+        },
+        {
+          "id": "serp-lakorn-san",
+          "keyword": "ละครสั้น",
+          "rows": 10
+        }
+      ],
+      "domains": [
+        {
+          "host": "thaishort.com",
+          "state": "held",
+          "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+        },
+        {
+          "host": "thaishort.tv",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        },
+        {
+          "host": "thaishort.co.th",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        }
+      ],
+      "spelling": {
+        "thai_length": 8,
+        "latin_length": 9,
+        "read_aloud": "ไทยอ่าน \"ไทย-ชอร์ต\" · อังกฤษอ่าน \"ไทย-ชอร์ต\" — ตรงกันทั้งสองภาษา",
+        "typing": [
+          "ไทยพิมพ์ได้ แต่ \"ชอร์ต\" มี ร์ (ไม้ทัณฑฆาต) ที่คนพิมพ์ผิดเป็น ชอร์ท/ช็อต บ่อย",
+          "อังกฤษพิมพ์ได้ ตรงตัว"
+        ]
+      },
+      "downsides": [
+        "ลงท้าย \"…Short\" เหมือน ReelShort / ShortMax / GoodShort / NetShort ⇒ ดูเหมือนของเลียนแบบแอปจีน ซึ่งเป็นภาพที่ใบงานสั่งให้เลี่ยง",
+        "\"ชอร์ต\" สะกดไทยได้หลายแบบ (ชอร์ต/ชอร์ท/ช็อต) ⇒ คนค้นผิดแล้วหาไม่เจอ",
+        "ขึ้นต้นด้วย \"ไทย\" ทำให้ขยายไปตลาดอื่นภายหลังลำบาก"
+      ]
+    },
+    {
+      "id": "mini-lakorn",
+      "thai": "มินิละคร",
+      "latin": "MiniLakorn",
+      "axes": [
+        "kw",
+        "noai"
+      ],
+      "idea": "มินิ (คำยืมที่ทุกคนพิมพ์ได้) + ละคร (คำที่ WatchLakorn พิสูจน์แล้วว่าคนจำเป็นแบรนด์ได้)",
+      "hook_keywords": [
+        {
+          "keyword": "ละคร",
+          "volume": 9000,
+          "difficulty": 61,
+          "traffic_potential": 20000
+        },
+        {
+          "keyword": "ละครสั้น",
+          "volume": 2300,
+          "difficulty": 0,
+          "traffic_potential": 0
+        },
+        {
+          "keyword": "มินิซีรีส์",
+          "volume": 30,
+          "difficulty": null,
+          "traffic_potential": null
+        }
+      ],
+      "name_as_keyword": [
+        {
+          "keyword": "มินิละคร",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        },
+        {
+          "keyword": "minilakorn",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        }
+      ],
+      "serp_checked": [
+        {
+          "id": "serp-minilakorn",
+          "keyword": "มินิละคร",
+          "rows": 0
+        },
+        {
+          "id": "serp-lakorn-en",
+          "keyword": "lakorn",
+          "rows": 17
+        }
+      ],
+      "domains": [
+        {
+          "host": "minilakorn.com",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        },
+        {
+          "host": "minilakorn.tv",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        },
+        {
+          "host": "minilakorn.co.th",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        }
+      ],
+      "spelling": {
+        "thai_length": 8,
+        "latin_length": 10,
+        "read_aloud": "ไทยอ่าน \"มิ-นิ-ละ-คอน\" · อังกฤษอ่าน \"มิ-นิ-ละ-คอร์น\" — ใกล้กันพอให้บอกต่อปากเปล่าได้",
+        "typing": [
+          "ไทยพิมพ์ได้ ไม่มีวรรณยุกต์",
+          "อังกฤษพิมพ์ได้ แต่เป็นชื่อที่ยาวที่สุดในชุดนี้"
+        ]
+      },
+      "downsides": [
+        "ยาวที่สุดในชุดนี้ (ดูจำนวนตัวอักษรที่ช่องการสะกด) และยาวกว่าชื่อคู่แข่งทุกตัวในหมวด",
+        "\"มินิ\" ชวนให้คิดว่าเนื้อหาเล็กกว่า/ด้อยกว่าของจริง ไม่ใช่ \"จบไว\"",
+        "คำว่า ละคร อยู่ในชื่อ ⇒ คนที่ค้นคำ ละคร เฉย ๆ จะไปเจอหน้าของช่องทีวี ไม่ใช่เรา และเราไปแย่งไม่ได้ (ดูค่า KD ของคำนั้น)"
+      ]
+    },
+    {
+      "id": "muanjai",
+      "thai": "ม่วนใจ",
+      "latin": "Muanjai",
+      "axes": [
+        "brand",
+        "noai"
+      ],
+      "idea": "แบรนด์ล้วน ไม่มีคำค้นในชื่อ · ม่วน = สนุก (อีสาน/เหนือ) + ใจ ⇒ ความรู้สึกหลังดูจบ",
+      "hook_keywords": [],
+      "name_as_keyword": [
+        {
+          "keyword": "ม่วนใจ",
+          "volume": 10,
+          "difficulty": null,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "muanjai",
+          "volume": 10,
+          "difficulty": null,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "ม่วน",
+          "volume": 250,
+          "difficulty": 0,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "muan",
+          "volume": 20,
+          "difficulty": null,
+          "has_ahrefs_row": true
+        }
+      ],
+      "serp_checked": [
+        {
+          "id": "serp-muanjai",
+          "keyword": "ม่วนใจ",
+          "rows": 0
+        }
+      ],
+      "domains": [
+        {
+          "host": "muanjai.com",
+          "state": "held",
+          "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+        },
+        {
+          "host": "muanjai.tv",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        },
+        {
+          "host": "muanjai.co.th",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        }
+      ],
+      "spelling": {
+        "thai_length": 6,
+        "latin_length": 7,
+        "read_aloud": "ไทยอ่าน \"ม่วน-ใจ\" · อังกฤษอ่าน \"ม่วน-ใจ\" — ตรงกัน",
+        "typing": [
+          "ไทยพิมพ์ได้ มีไม้เอก 1 ตัว",
+          "อังกฤษพิมพ์ได้ แต่ Muanjai อาจถูกอ่านเป็น \"มู-อัน-ใจ\""
+        ]
+      },
+      "downsides": [
+        "ม่วน เป็นคำอีสาน/เหนือ คนกรุงเทพจำนวนหนึ่งไม่รู้ความหมาย ⇒ ชื่อไม่สื่ออะไรกับคนกลุ่มใหญ่",
+        "เพื่อนบ้านในผลค้นของคำ ม่วน คือเพลงลูกทุ่ง/รถแห่ ไม่ใช่ละคร ⇒ บริบทของชื่อไม่พาคนมาหาละคร",
+        "ชื่อไม่บอกว่าขายอะไรเลย ต้องลงแรงอธิบายเองทั้งหมด"
+      ]
+    },
+    {
+      "id": "patdoo",
+      "thai": "ปัดดู",
+      "latin": "PatDoo",
+      "axes": [
+        "brand",
+        "noai"
+      ],
+      "idea": "แบรนด์ล้วน ไม่มีคำค้นในชื่อ · ตั้งจากท่าที่ผู้ใช้ทำจริงบนฟีดแนวตั้ง — ปัดแล้วดู",
+      "hook_keywords": [],
+      "name_as_keyword": [
+        {
+          "keyword": "ปัดดู",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        },
+        {
+          "keyword": "patdoo",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        }
+      ],
+      "serp_checked": [
+        {
+          "id": "serp-patdoo",
+          "keyword": "ปัดดู",
+          "rows": 0
+        }
+      ],
+      "domains": [
+        {
+          "host": "patdoo.com",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        },
+        {
+          "host": "patdoo.tv",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        },
+        {
+          "host": "patdoo.co.th",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        }
+      ],
+      "spelling": {
+        "thai_length": 5,
+        "latin_length": 6,
+        "read_aloud": "ไทยอ่าน \"ปัด-ดู\" · อังกฤษอ่าน \"แพท-ดู\" — เพี้ยนจากกันพอสมควร",
+        "typing": [
+          "ไทยพิมพ์ได้ สั้น ไม่มีวรรณยุกต์",
+          "อังกฤษสะกดได้หลายทาง (Patdoo/Paddoo/Patdu) ⇒ จุดอ่อนที่สุดของชื่อนี้"
+        ]
+      },
+      "downsides": [
+        "ฝั่งอังกฤษสะกดไม่นิ่ง — ซึ่งเป็นเกณฑ์ที่สำคัญที่สุดสำหรับชื่อที่คนต้องพิมพ์หาเอง",
+        "ชื่อผูกกับท่าทางบนมือถือ ถ้าวันหนึ่งมีจอใหญ่/ทีวี ชื่อจะเล่าไม่ตรงของ",
+        "คำว่า \"ปัด\" มีความหมายอื่นในภาษาไทย (ปัดฝุ่น ปัดทิ้ง) ⇒ อาจอ่านเป็น \"ปัดไม่ดู\""
+      ]
+    },
+    {
+      "id": "lakorn-ai",
+      "thai": "ละคร.ai",
+      "latin": "Lakorn.ai",
+      "axes": [
+        "kw",
+        "keepai"
+      ],
+      "idea": "ทางเลือกเดียวในชุดนี้ที่ \"เก็บคำ AI ไว้\" — ย้ายคำ AI ไปอยู่ที่นามสกุลโดเมนแทนการต่อท้ายชื่อ",
+      "hook_keywords": [
+        {
+          "keyword": "lakorn",
+          "volume": 250,
+          "difficulty": 0,
+          "traffic_potential": 4200
+        },
+        {
+          "keyword": "ละคร ai",
+          "volume": 700,
+          "difficulty": null,
+          "traffic_potential": null
+        },
+        {
+          "keyword": "ละครสั้น ai",
+          "volume": 600,
+          "difficulty": null,
+          "traffic_potential": null
+        }
+      ],
+      "name_as_keyword": [
+        {
+          "keyword": "lakorn",
+          "volume": 250,
+          "difficulty": 0,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "lakorn.ai",
+          "volume": null,
+          "difficulty": null,
+          "has_ahrefs_row": false
+        }
+      ],
+      "serp_checked": [
+        {
+          "id": "serp-lakorn-en",
+          "keyword": "lakorn",
+          "rows": 17
+        }
+      ],
+      "domains": [
+        {
+          "host": "lakorn.ai",
+          "state": "held",
+          "state_label": "มีร่องรอยว่าโดเมนถูกถือไว้ แต่ไม่มีเว็บที่ติดอันดับ"
+        },
+        {
+          "host": "lakorn.tv",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        },
+        {
+          "host": "lakorn.co.th",
+          "state": "no-signal",
+          "state_label": "Ahrefs ไม่มีข้อมูลโดเมนนี้ — สรุปไม่ได้ว่าจดได้หรือไม่"
+        }
+      ],
+      "spelling": {
+        "thai_length": 7,
+        "latin_length": 9,
+        "read_aloud": "ไทยอ่าน \"ละคร-ดอท-เอ-ไอ\" · อังกฤษอ่าน \"ละคอร์น-ดอท-เอ-ไอ\"",
+        "typing": [
+          "ไทยพิมพ์ได้ แต่ชื่อมีจุดกับตัวอังกฤษปนอยู่ ⇒ พิมพ์สลับแป้นภาษา",
+          "อังกฤษพิมพ์ได้ ตรงตัว แล้วต่อนามสกุลโดเมน"
+        ]
+      },
+      "downsides": [
+        "ชื่อผูกกับนามสกุลโดเมน ถ้าวันหนึ่งไม่ได้ใช้ .ai ชื่อจะพัง — ผิดหลักที่ว่าชื่อเว็บกับโดเมนต้องเป็นสองคำถามแยกกัน",
+        "สตริง Lakorn มีคนใช้เป็นแบรนด์อยู่แล้วทั้งร้านอาหารในกรุงเทพและเว็บดูละครไทยที่ยังเปิดอยู่ ⇒ หน้าแรกของคำนั้นไม่ใช่ของเรา",
+        "ใกล้ชื่อเดิมมาก ลูกค้าสั่ง \"เปลี่ยนชื่อ\" อาจไม่นับว่าเปลี่ยน"
+      ]
+    }
+  ],
+  "cuts": [
+    {
+      "name": "เพลิน / Plern",
+      "reason": "หน้าแรกของคำ เพลิน เป็นของร้านอาหารเพลินทั้งหน้า (local_pack หลายช่อง + เพจเฟซบุ๊ก Ploen Restaurant + Wongnai + LINE OA) และในหน้าเดียวกันมีคำถามยอดนิยม \"เพลิน สะกด ยัง ไง\" ติดอยู่ ⇒ ทั้งชนแบรนด์ที่เปิดอยู่จริงและตกเกณฑ์สะกดง่ายในหลักฐานชิ้นเดียวกัน",
+      "keywords": [
+        {
+          "keyword": "เพลิน",
+          "volume": 1300,
+          "difficulty": 0,
+          "global_volume": 1400,
+          "branded": true,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "plern",
+          "volume": 200,
+          "difficulty": 0,
+          "global_volume": 450,
+          "branded": true,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "plearn",
+          "volume": 300,
+          "difficulty": 3,
+          "global_volume": 700,
+          "branded": true,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": [
+        {
+          "host": "plern.com",
+          "state": "held"
+        },
+        {
+          "host": "plern.co.th",
+          "state": "held"
+        }
+      ]
+    },
+    {
+      "name": "ละคอน / Lakhon",
+      "reason": "หน้าแรกของคำ ละคอน คือหน้าที่คนเถียงกันว่าสะกดถูกหรือผิด (Pantip \"ละคร กับ ละคอน\", wordyguru \"ละคร หรือ ละคอน เขียนยังไงถูก\", ราชบัณฑิตยสภา, และคำถาม \"คำว่าละครเขียนยังไง\") บวกกับคณะการละคอน มธ. ที่เป็นเจ้าของคำในเชิงสถาบัน ⇒ ชื่อที่คนเข้าใจว่าเราพิมพ์ผิด",
+      "keywords": [
+        {
+          "keyword": "ละคอน",
+          "volume": 40,
+          "difficulty": 0,
+          "global_volume": 70,
+          "branded": false,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "lakhon",
+          "volume": 0,
+          "difficulty": null,
+          "global_volume": 100,
+          "branded": false,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": [
+        {
+          "host": "lakhon.com",
+          "state": "held"
+        },
+        {
+          "host": "lakhon.co.th",
+          "state": "no-signal"
+        }
+      ]
+    },
+    {
+      "name": "ใจดี / Jaidee",
+      "reason": "jaidee.co.th มีเว็บทำงานอยู่จริง (ติดอันดับอยู่แล้ว) และคำ jaidee เป็นคำแบรนด์ที่ KD สูงกว่าคำหมวดที่เราจะไปแข่งเสียอีก ⇒ ชื่อที่เราจะแพ้ในคำของตัวเอง",
+      "keywords": [
+        {
+          "keyword": "ใจดี",
+          "volume": 2800,
+          "difficulty": 0,
+          "global_volume": 2800,
+          "branded": false,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "jaidee",
+          "volume": 150,
+          "difficulty": 44,
+          "global_volume": 1400,
+          "branded": true,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": [
+        {
+          "host": "jaidee.co.th",
+          "state": "operating"
+        },
+        {
+          "host": "jaidee.com",
+          "state": "held"
+        }
+      ]
+    },
+    {
+      "name": "สั้นสั้น / SunSun",
+      "reason": "sunsun เป็นแบรนด์ที่มีคนใช้อยู่แล้วในระดับโลก (ปริมาณค้นทั่วโลกสูงกว่าในไทยหลายสิบเท่า และ Ahrefs ตีว่าเป็นคำแบรนด์) ⇒ เราจะเป็นรายที่สองของชื่อตัวเอง",
+      "keywords": [
+        {
+          "keyword": "สั้นสั้น",
+          "volume": 30,
+          "difficulty": null,
+          "global_volume": 30,
+          "branded": false,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "sunsun",
+          "volume": 150,
+          "difficulty": null,
+          "global_volume": 12000,
+          "branded": true,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": [
+        {
+          "host": "sunsun.tv",
+          "state": "held"
+        }
+      ]
+    },
+    {
+      "name": "ดูดี / Doodee",
+      "reason": "doodee เป็นคำแบรนด์ที่มีเจตนาค้นแบบ navigational อยู่แล้ว (คนค้นเพื่อไปที่แบรนด์นั้น) ⇒ ชนของที่มีอยู่",
+      "keywords": [
+        {
+          "keyword": "ดูดี",
+          "volume": 900,
+          "difficulty": 0,
+          "global_volume": 900,
+          "branded": true,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "doodee",
+          "volume": 70,
+          "difficulty": 23,
+          "global_volume": 700,
+          "branded": true,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": [
+        {
+          "host": "doodee.com",
+          "state": "held"
+        }
+      ]
+    },
+    {
+      "name": "ยิ้ม / Yim",
+      "reason": "เป็นคำไทยทั่วไปที่คนค้นเยอะมากด้วยความหมายอื่น ชื่อแบบนี้ KD ต่ำก็จริงแต่ยึดเป็นของตัวเองไม่ได้",
+      "keywords": [
+        {
+          "keyword": "ยิ้ม",
+          "volume": 9600,
+          "difficulty": 0,
+          "global_volume": 9800,
+          "branded": false,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": []
+    },
+    {
+      "name": "ฟิน / Fin",
+      "reason": "KD สูงทั้งฝั่งไทยและอังกฤษ และช่องทีวีไทยใช้คำ FIN เป็นป้ายคลิปไฮไลต์ละครอยู่แล้ว (เห็นได้ในหน้าผลค้นคำ lakorn) ⇒ ชื่อจมไปกับคลิปของคนอื่น",
+      "keywords": [
+        {
+          "keyword": "ฟิน",
+          "volume": 2700,
+          "difficulty": 59,
+          "global_volume": 2800,
+          "branded": false,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "fin",
+          "volume": 4200,
+          "difficulty": 12,
+          "global_volume": 256000,
+          "branded": true,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": []
+    },
+    {
+      "name": "ดารา / Dara",
+      "reason": "เป็นคำข่าวบันเทิงที่มีคนค้นมากและ KD สูง ⇒ ชื่อที่ไปยืนในผลค้นของตัวเองไม่ได้เลย",
+      "keywords": [
+        {
+          "keyword": "ดารา",
+          "volume": 17000,
+          "difficulty": 64,
+          "global_volume": 18000,
+          "branded": false,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "dara",
+          "volume": 500,
+          "difficulty": 4,
+          "global_volume": 67000,
+          "branded": false,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": []
+    },
+    {
+      "name": "ทันใจ / Tanjai · ลั้นลา / Lanla",
+      "reason": "ทั้งสองคำ Ahrefs ตีเป็นคำแบรนด์ที่มีธุรกิจใช้อยู่ (tanjai มี local intent, lanla มีปริมาณค้นทั่วโลกสูงกว่าในไทยมาก) ⇒ ชนของเดิม",
+      "keywords": [
+        {
+          "keyword": "ทันใจ",
+          "volume": 900,
+          "difficulty": 0,
+          "global_volume": 900,
+          "branded": false,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "tanjai",
+          "volume": 100,
+          "difficulty": null,
+          "global_volume": 200,
+          "branded": true,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "ลั้นลา",
+          "volume": 500,
+          "difficulty": 0,
+          "global_volume": 500,
+          "branded": false,
+          "has_ahrefs_row": true
+        },
+        {
+          "keyword": "lanla",
+          "volume": 10,
+          "difficulty": null,
+          "global_volume": 600,
+          "branded": true,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": []
+    },
+    {
+      "name": "ชื่อที่สื่อว่าเป็นละครจีน",
+      "reason": "ใบงานขีดเส้นห้าม และผมปฏิเสธคำนี้เองไว้ใน AIO-19 แล้ว — คลิกมาแล้วเด้งออกเพราะของไม่ตรงปก ยืนยันด้วยค่า traffic_potential ที่ต่ำผิดส่วนกับปริมาณค้น",
+      "keywords": [
+        {
+          "keyword": "ละครสั้นจีน",
+          "volume": 8100,
+          "difficulty": 43,
+          "global_volume": 8200,
+          "branded": false,
+          "has_ahrefs_row": true
+        }
+      ],
+      "domains": []
+    }
+  ],
+  "ahrefs_units_used": 6635,
+  "report_numbers": [
+    {
+      "kind": "label",
+      "path": "label.section.0",
+      "value": null,
+      "text": "0"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.1",
+      "value": null,
+      "text": "1"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.3",
+      "value": null,
+      "text": "3"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.4",
+      "value": null,
+      "text": "4"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.5",
+      "value": null,
+      "text": "5"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.6",
+      "value": null,
+      "text": "6"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.7",
+      "value": null,
+      "text": "7"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.8",
+      "value": null,
+      "text": "8"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.9",
+      "value": null,
+      "text": "9"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.10",
+      "value": null,
+      "text": "10"
+    },
+    {
+      "kind": "label",
+      "path": "label.section.11",
+      "value": null,
+      "text": "11"
+    },
+    {
+      "kind": "label",
+      "path": "label:AIO-81",
+      "value": null,
+      "text": "AIO-81"
+    },
+    {
+      "kind": "label",
+      "path": "label:6",
+      "value": null,
+      "text": "6"
+    },
+    {
+      "kind": "label",
+      "path": "label:2026-10-28",
+      "value": null,
+      "text": "2026-10-28"
+    },
+    {
+      "kind": "label",
+      "path": "label:AC-1",
+      "value": null,
+      "text": "AC-1"
+    },
+    {
+      "kind": "label",
+      "path": "label:3",
+      "value": null,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "ahrefs.direct_http",
+      "value": 403,
+      "text": "403"
+    },
+    {
+      "kind": "measured",
+      "path": "ahrefs.units_used",
+      "value": 6635,
+      "text": "6,635"
+    },
+    {
+      "kind": "measured",
+      "path": "ahrefs.units_limit",
+      "value": 200000,
+      "text": "200,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้นจีน.volume",
+      "value": 8100,
+      "text": "8,100"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้นจีน.kd",
+      "value": 43,
+      "text": "43"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้นจีน.tp",
+      "value": 200,
+      "text": "200"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้นจีน.cps",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "label",
+      "path": "label:ซีรี่ย์จีนสั้น",
+      "value": null,
+      "text": "ซีรี่ย์จีนสั้น"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ดูละครย้อนหลัง.volume",
+      "value": 3700,
+      "text": "3,700"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ดูละครย้อนหลัง.kd",
+      "value": 66,
+      "text": "66"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ดูละครย้อนหลัง.tp",
+      "value": 20000,
+      "text": "20,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ดูละครย้อนหลัง.cps",
+      "value": 0.97,
+      "text": "0.97"
+    },
+    {
+      "kind": "label",
+      "path": "label:ละครช่องวัน",
+      "value": null,
+      "text": "ละครช่องวัน"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้น.volume",
+      "value": 2300,
+      "text": "2,300"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้น.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้น.tp",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้น.cps",
+      "value": 0.5,
+      "text": "0.5"
+    },
+    {
+      "kind": "label",
+      "path": "label:หนังเรื่องสั้น",
+      "value": null,
+      "text": "หนังเรื่องสั้น"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครแนวตั้ง.volume",
+      "value": 1300,
+      "text": "1,300"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครแนวตั้ง.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครแนวตั้ง.tp",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครแนวตั้ง.cps",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "label",
+      "path": "label:หนังจีนแนวตั้ง",
+      "value": null,
+      "text": "หนังจีนแนวตั้ง"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ดูละครออนไลน์.volume",
+      "value": 1000,
+      "text": "1,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ดูละครออนไลน์.kd",
+      "value": 72,
+      "text": "72"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ดูละครออนไลน์.tp",
+      "value": 614000,
+      "text": "614,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ดูละครออนไลน์.cps",
+      "value": 1.1,
+      "text": "1.1"
+    },
+    {
+      "kind": "label",
+      "path": "label:ดูทีวีออนไลน์ช่อง33",
+      "value": null,
+      "text": "ดูทีวีออนไลน์ช่อง33"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้น ai.volume",
+      "value": 600,
+      "text": "600"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้น ai.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้น ai.tp",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้น ai.cps",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครฟรี.volume",
+      "value": 200,
+      "text": "200"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครฟรี.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครฟรี.tp",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครฟรี.cps",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้นฟรี.volume",
+      "value": 40,
+      "text": "40"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้นฟรี.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้นฟรี.tp",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ละครสั้นฟรี.cps",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ซีรีส์สั้น.volume",
+      "value": 40,
+      "text": "40"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ซีรีส์สั้น.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ซีรีส์สั้น.tp",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.ซีรีส์สั้น.cps",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.แอพดูละคร.volume",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.แอพดูละคร.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.แอพดูละคร.tp",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t1.แอพดูละคร.cps",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "note.lakornsan.volume",
+      "value": 2300,
+      "text": "2,300"
+    },
+    {
+      "kind": "measured",
+      "path": "note.lakornsan.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "note.lakornsan.tp",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "note.lakornsan.cps",
+      "value": 0.5,
+      "text": "0.5"
+    },
+    {
+      "kind": "label",
+      "path": "label:2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label:1",
+      "value": null,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "note.chinese.volume",
+      "value": 8100,
+      "text": "8,100"
+    },
+    {
+      "kind": "measured",
+      "path": "note.chinese.tp",
+      "value": 200,
+      "text": "200"
+    },
+    {
+      "kind": "label",
+      "path": "label:AIO-19",
+      "value": null,
+      "text": "AIO-19"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.wetv.volume",
+      "value": 202000,
+      "text": "202,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.wetv.kd",
+      "value": 70,
+      "text": "70"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.wetv.gv",
+      "value": 579000,
+      "text": "579,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.viu.volume",
+      "value": 50000,
+      "text": "50,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.viu.kd",
+      "value": 62,
+      "text": "62"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.viu.gv",
+      "value": 443000,
+      "text": "443,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.dramabox.volume",
+      "value": 2700,
+      "text": "2,700"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.dramabox.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.dramabox.gv",
+      "value": 86000,
+      "text": "86,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.reelshort.volume",
+      "value": 1500,
+      "text": "1,500"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.reelshort.kd",
+      "value": 37,
+      "text": "37"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.reelshort.gv",
+      "value": 70000,
+      "text": "70,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.shortmax.volume",
+      "value": 600,
+      "text": "600"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.shortmax.kd",
+      "value": 4,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.shortmax.gv",
+      "value": 63000,
+      "text": "63,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.netshort.volume",
+      "value": 350,
+      "text": "350"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.netshort.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.netshort.gv",
+      "value": 42000,
+      "text": "42,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.lakorn.volume",
+      "value": 250,
+      "text": "250"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.lakorn.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.lakorn.gv",
+      "value": 3000,
+      "text": "3,000"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.goodshort.volume",
+      "value": 20,
+      "text": "20"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.goodshort.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "t2.goodshort.gv",
+      "value": 3600,
+      "text": "3,600"
+    },
+    {
+      "kind": "label",
+      "path": "label:2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.missing_count",
+      "value": 21,
+      "text": "21"
+    },
+    {
+      "kind": "label",
+      "path": "label:3",
+      "value": null,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.rows",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.organic",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.video",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.organic_echo",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.organic_platform",
+      "value": 5,
+      "text": "5"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.organic_sites",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.video_echo",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.sites_echo",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.flickreels_dr",
+      "value": 49,
+      "text": "49"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.flickreels_traffic",
+      "value": 3058,
+      "text": "3,058"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.goodshort_dr",
+      "value": 62,
+      "text": "62"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.goodshort_traffic",
+      "value": 6,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.san.tp_echo",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "wl.dr",
+      "value": 0.7,
+      "text": "0.7"
+    },
+    {
+      "kind": "measured",
+      "path": "wl.traffic",
+      "value": 11493,
+      "text": "11,493"
+    },
+    {
+      "kind": "measured",
+      "path": "wl.keywords",
+      "value": 41,
+      "text": "41"
+    },
+    {
+      "kind": "measured",
+      "path": "wl.brand_volume",
+      "value": 7800,
+      "text": "7,800"
+    },
+    {
+      "kind": "measured",
+      "path": "wl.brand_kd",
+      "value": 27,
+      "text": "27"
+    },
+    {
+      "kind": "measured",
+      "path": "wl.brand_tp",
+      "value": 12000,
+      "text": "12,000"
+    },
+    {
+      "kind": "measured",
+      "path": "wl.compare_category",
+      "value": 2300,
+      "text": "2,300"
+    },
+    {
+      "kind": "measured",
+      "path": "wl.ratio",
+      "value": 3.4,
+      "text": "3.4"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.vert.rows",
+      "value": 13,
+      "text": "13"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.vert.chinese",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.vert.kw_nangjeen",
+      "value": 4800,
+      "text": "4,800"
+    },
+    {
+      "kind": "measured",
+      "path": "serp.vert.kw_series",
+      "value": 2900,
+      "text": "2,900"
+    },
+    {
+      "kind": "label",
+      "path": "label:AC-5",
+      "value": null,
+      "text": "AC-5"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.cat_volume",
+      "value": 2300,
+      "text": "2,300"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.cat_cps",
+      "value": 0.5,
+      "text": "0.5"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.cat_clicks",
+      "value": 1150,
+      "text": "1,150"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.platform_rows",
+      "value": 5,
+      "text": "5"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.organic_rows",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.dramabox",
+      "value": 2700,
+      "text": "2,700"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.watchlakorn",
+      "value": 7800,
+      "text": "7,800"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.wl_dr",
+      "value": 0.7,
+      "text": "0.7"
+    },
+    {
+      "kind": "label",
+      "path": "label:2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label:1",
+      "value": null,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.cmp.plern",
+      "value": 1300,
+      "text": "1,300"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.cmp.yim",
+      "value": 9600,
+      "text": "9,600"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.cmp.dara",
+      "value": 17000,
+      "text": "17,000"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.cmp.dara_kd",
+      "value": 64,
+      "text": "64"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.cmp.muanjai",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "label",
+      "path": "label:2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.wetv",
+      "value": 202000,
+      "text": "202,000"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.viu",
+      "value": 50000,
+      "text": "50,000"
+    },
+    {
+      "kind": "label",
+      "path": "label:0",
+      "value": null,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.ai.ละคร ai.volume",
+      "value": 700,
+      "text": "700"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.ai.ละคร ai.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.ai.ละครสั้น ai.volume",
+      "value": 600,
+      "text": "600"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.ai.ละครสั้น ai.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.ai.ละครสั้นai.volume",
+      "value": 100,
+      "text": "100"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.ai.ละครสั้นai.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.ai.sum",
+      "value": 1400,
+      "text": "1,400"
+    },
+    {
+      "kind": "measured",
+      "path": "a5.ai.compare",
+      "value": 2300,
+      "text": "2,300"
+    },
+    {
+      "kind": "label",
+      "path": "label:0",
+      "value": null,
+      "text": "0"
+    },
+    {
+      "kind": "label",
+      "path": "label:3",
+      "value": null,
+      "text": "3"
+    },
+    {
+      "kind": "label",
+      "path": "label:6",
+      "value": null,
+      "text": "6"
+    },
+    {
+      "kind": "label",
+      "path": "label:AC-2",
+      "value": null,
+      "text": "AC-2"
+    },
+    {
+      "kind": "label",
+      "path": "label:1",
+      "value": null,
+      "text": "1"
+    },
+    {
+      "kind": "label",
+      "path": "label:2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.self_max",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "label",
+      "path": "label:3",
+      "value": null,
+      "text": "3"
+    },
+    {
+      "kind": "label",
+      "path": "label:4",
+      "value": null,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "name.muanjai.self_max",
+      "value": 250,
+      "text": "250"
+    },
+    {
+      "kind": "label",
+      "path": "label:5",
+      "value": null,
+      "text": "5"
+    },
+    {
+      "kind": "label",
+      "path": "label:6",
+      "value": null,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.self_max",
+      "value": 250,
+      "text": "250"
+    },
+    {
+      "kind": "label",
+      "path": "label:3",
+      "value": null,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "axes.kw",
+      "value": 4,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "axes.brand",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "axes.noai",
+      "value": 5,
+      "text": "5"
+    },
+    {
+      "kind": "measured",
+      "path": "axes.keepai",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "label",
+      "path": "label:1",
+      "value": null,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้น.volume",
+      "value": 2300,
+      "text": "2,300"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้น.difficulty",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.doo-san.hook.ละครสั้น.tp",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ดูละครสั้น.volume",
+      "value": 150,
+      "text": "150"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ดูละครสั้น.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้นฟรี.volume",
+      "value": 40,
+      "text": "40"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้นฟรี.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ดูสั้น.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ดูสั้น.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.dooshort.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.dooshort.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "name.doo-san.serp.serp-lakorn-san.rows",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "label",
+      "path": "label:youtube.com",
+      "value": null,
+      "text": "youtube.com"
+    },
+    {
+      "kind": "label",
+      "path": "label:facebook.com",
+      "value": null,
+      "text": "facebook.com"
+    },
+    {
+      "kind": "label",
+      "path": "label:flickreels.net",
+      "value": null,
+      "text": "flickreels.net"
+    },
+    {
+      "kind": "label",
+      "path": "label:goodshort.com",
+      "value": null,
+      "text": "goodshort.com"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.com.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.com.refdomains",
+      "value": 901,
+      "text": "901"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.com.ip",
+      "value": "172.67.171.67",
+      "text": "172.67.171.67"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.tv.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.tv.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.tv.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.tv.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.co.th.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.co.th.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.co.th.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.dooshort.co.th.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.doo-san.thai_len",
+      "value": 6,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "name.doo-san.latin_len",
+      "value": 8,
+      "text": "8"
+    },
+    {
+      "kind": "measured",
+      "path": "name.doo-san.domains_checked",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "name.doo-san.dom_operating",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.doo-san.dom_held",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "name.doo-san.dom_nosignal",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label:2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้น.volume",
+      "value": 2300,
+      "text": "2,300"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้น.difficulty",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.hook.ละครสั้น.tp",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้นไทย.volume",
+      "value": 60,
+      "text": "60"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้นไทย.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้นฟรี.volume",
+      "value": 40,
+      "text": "40"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้นฟรี.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ไทยชอร์ต.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ไทยชอร์ต.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.thaishort.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.thaishort.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.thai short drama.volume",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.thai short drama.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.serp.serp-lakorn-san.rows",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "label",
+      "path": "label:youtube.com",
+      "value": null,
+      "text": "youtube.com"
+    },
+    {
+      "kind": "label",
+      "path": "label:facebook.com",
+      "value": null,
+      "text": "facebook.com"
+    },
+    {
+      "kind": "label",
+      "path": "label:flickreels.net",
+      "value": null,
+      "text": "flickreels.net"
+    },
+    {
+      "kind": "label",
+      "path": "label:goodshort.com",
+      "value": null,
+      "text": "goodshort.com"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.com.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.com.refdomains",
+      "value": 935,
+      "text": "935"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.com.ip",
+      "value": "54.243.117.197",
+      "text": "54.243.117.197"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.tv.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.tv.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.tv.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.tv.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.co.th.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.co.th.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.co.th.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.thaishort.co.th.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.thai_len",
+      "value": 8,
+      "text": "8"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.latin_len",
+      "value": 9,
+      "text": "9"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.domains_checked",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.dom_operating",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.dom_held",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "name.thai-short.dom_nosignal",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label:3",
+      "value": null,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละคร.volume",
+      "value": 9000,
+      "text": "9,000"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละคร.difficulty",
+      "value": 61,
+      "text": "61"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.hook.ละคร.tp",
+      "value": 20000,
+      "text": "20,000"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้น.volume",
+      "value": 2300,
+      "text": "2,300"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้น.difficulty",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.hook.ละครสั้น.tp",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.มินิซีรีส์.volume",
+      "value": 30,
+      "text": "30"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.มินิซีรีส์.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.มินิละคร.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.มินิละคร.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.minilakorn.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.minilakorn.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.serp.serp-lakorn-en.rows",
+      "value": 17,
+      "text": "17"
+    },
+    {
+      "kind": "label",
+      "path": "label:watchlakorn.org",
+      "value": null,
+      "text": "watchlakorn.org"
+    },
+    {
+      "kind": "label",
+      "path": "label:youtube.com",
+      "value": null,
+      "text": "youtube.com"
+    },
+    {
+      "kind": "label",
+      "path": "label:wetv.vip",
+      "value": null,
+      "text": "wetv.vip"
+    },
+    {
+      "kind": "label",
+      "path": "label:rosewoodhotels.com",
+      "value": null,
+      "text": "rosewoodhotels.com"
+    },
+    {
+      "kind": "label",
+      "path": "label:one31.net",
+      "value": null,
+      "text": "one31.net"
+    },
+    {
+      "kind": "label",
+      "path": "label:ch3plus.com",
+      "value": null,
+      "text": "ch3plus.com"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.com.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.com.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.tv.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.tv.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.tv.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.tv.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.co.th.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.co.th.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.co.th.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.minilakorn.co.th.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.thai_len",
+      "value": 8,
+      "text": "8"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.latin_len",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.domains_checked",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.dom_operating",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.dom_held",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.mini-lakorn.dom_nosignal",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "label",
+      "path": "label:4",
+      "value": null,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ม่วนใจ.volume",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ม่วนใจ.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.muanjai.volume",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.muanjai.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ม่วน.volume",
+      "value": 250,
+      "text": "250"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ม่วน.difficulty",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.muan.volume",
+      "value": 20,
+      "text": "20"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.muan.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.com.dr",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.com.refdomains",
+      "value": 960,
+      "text": "960"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.com.ip",
+      "value": "3.14.223.155",
+      "text": "3.14.223.155"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.tv.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.tv.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.tv.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.tv.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.co.th.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.co.th.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.co.th.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.muanjai.co.th.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.muanjai.thai_len",
+      "value": 6,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "name.muanjai.latin_len",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "name.muanjai.domains_checked",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "name.muanjai.dom_operating",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.muanjai.dom_held",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "name.muanjai.dom_nosignal",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label:5",
+      "value": null,
+      "text": "5"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ปัดดู.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ปัดดู.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.patdoo.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.patdoo.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.com.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.com.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.tv.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.tv.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.tv.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.tv.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.co.th.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.co.th.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.co.th.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.patdoo.co.th.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.patdoo.thai_len",
+      "value": 5,
+      "text": "5"
+    },
+    {
+      "kind": "measured",
+      "path": "name.patdoo.latin_len",
+      "value": 6,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "name.patdoo.domains_checked",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "name.patdoo.dom_operating",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.patdoo.dom_held",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.patdoo.dom_nosignal",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "label",
+      "path": "label:6",
+      "value": null,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.lakorn.volume",
+      "value": 250,
+      "text": "250"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.lakorn.difficulty",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.hook.lakorn.tp",
+      "value": 4200,
+      "text": "4,200"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละคร ai.volume",
+      "value": 700,
+      "text": "700"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละคร ai.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้น ai.volume",
+      "value": 600,
+      "text": "600"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.ละครสั้น ai.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.lakorn.volume",
+      "value": 250,
+      "text": "250"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.lakorn.difficulty",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.lakorn.ai.volume",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "kw.lakorn.ai.difficulty",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.serp.serp-lakorn-en.rows",
+      "value": 17,
+      "text": "17"
+    },
+    {
+      "kind": "label",
+      "path": "label:watchlakorn.org",
+      "value": null,
+      "text": "watchlakorn.org"
+    },
+    {
+      "kind": "label",
+      "path": "label:youtube.com",
+      "value": null,
+      "text": "youtube.com"
+    },
+    {
+      "kind": "label",
+      "path": "label:wetv.vip",
+      "value": null,
+      "text": "wetv.vip"
+    },
+    {
+      "kind": "label",
+      "path": "label:rosewoodhotels.com",
+      "value": null,
+      "text": "rosewoodhotels.com"
+    },
+    {
+      "kind": "label",
+      "path": "label:one31.net",
+      "value": null,
+      "text": "one31.net"
+    },
+    {
+      "kind": "label",
+      "path": "label:ch3plus.com",
+      "value": null,
+      "text": "ch3plus.com"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.ai.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.ai.refdomains",
+      "value": 349,
+      "text": "349"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.ai.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.ai.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.tv.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.tv.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.tv.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.tv.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.co.th.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.co.th.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.co.th.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakorn.co.th.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.thai_len",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.latin_len",
+      "value": 9,
+      "text": "9"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.domains_checked",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.dom_operating",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.dom_held",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "name.lakorn-ai.dom_nosignal",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "cuts.count",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "label",
+      "path": "label:5",
+      "value": null,
+      "text": "5"
+    },
+    {
+      "kind": "label",
+      "path": "label:2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label:AC-3",
+      "value": null,
+      "text": "AC-3"
+    },
+    {
+      "kind": "label",
+      "path": "label:1",
+      "value": null,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.เพลิน.volume",
+      "value": 1300,
+      "text": "1,300"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.เพลิน.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.เพลิน.gv",
+      "value": 1400,
+      "text": "1,400"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.plern.volume",
+      "value": 200,
+      "text": "200"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.plern.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.plern.gv",
+      "value": 450,
+      "text": "450"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.plearn.volume",
+      "value": 300,
+      "text": "300"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.plearn.kd",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.plearn.gv",
+      "value": 700,
+      "text": "700"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.serp.serp-plern",
+      "value": 16,
+      "text": "16"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.com.dr",
+      "value": 0.1,
+      "text": "0.1"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.com.refdomains",
+      "value": 802,
+      "text": "802"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.com.ip",
+      "value": "64.187.239.229",
+      "text": "64.187.239.229"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.co.th.dr",
+      "value": 0.1,
+      "text": "0.1"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.co.th.refdomains",
+      "value": 32,
+      "text": "32"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.co.th.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.co.th.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.plern.co.th.ip",
+      "value": "43.249.35.149",
+      "text": "43.249.35.149"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ละคอน.volume",
+      "value": 40,
+      "text": "40"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ละคอน.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ละคอน.gv",
+      "value": 70,
+      "text": "70"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.lakhon.volume",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.lakhon.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.lakhon.gv",
+      "value": 100,
+      "text": "100"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.serp.serp-lakhon-th",
+      "value": 15,
+      "text": "15"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakhon.com.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakhon.com.refdomains",
+      "value": 53,
+      "text": "53"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakhon.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakhon.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakhon.co.th.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakhon.co.th.refdomains",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakhon.co.th.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.lakhon.co.th.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ใจดี.volume",
+      "value": 2800,
+      "text": "2,800"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ใจดี.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ใจดี.gv",
+      "value": 2800,
+      "text": "2,800"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.jaidee.volume",
+      "value": 150,
+      "text": "150"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.jaidee.kd",
+      "value": 44,
+      "text": "44"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.jaidee.gv",
+      "value": 1400,
+      "text": "1,400"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.co.th.dr",
+      "value": 18,
+      "text": "18"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.co.th.refdomains",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.co.th.org_keywords",
+      "value": 9,
+      "text": "9"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.co.th.org_traffic",
+      "value": 12,
+      "text": "12"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.co.th.ip",
+      "value": "31.43.161.6",
+      "text": "31.43.161.6"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.com.dr",
+      "value": 0.2,
+      "text": "0.2"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.com.refdomains",
+      "value": 844,
+      "text": "844"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.jaidee.com.ip",
+      "value": "3.33.243.145",
+      "text": "3.33.243.145"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.สั้นสั้น.volume",
+      "value": 30,
+      "text": "30"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.สั้นสั้น.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.สั้นสั้น.gv",
+      "value": 30,
+      "text": "30"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.sunsun.volume",
+      "value": 150,
+      "text": "150"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.sunsun.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.sunsun.gv",
+      "value": 12000,
+      "text": "12,000"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.sunsun.tv.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.sunsun.tv.refdomains",
+      "value": 636,
+      "text": "636"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.sunsun.tv.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.sunsun.tv.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.sunsun.tv.ip",
+      "value": "15.197.172.60",
+      "text": "15.197.172.60"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ดูดี.volume",
+      "value": 900,
+      "text": "900"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ดูดี.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ดูดี.gv",
+      "value": 900,
+      "text": "900"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.doodee.volume",
+      "value": 70,
+      "text": "70"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.doodee.kd",
+      "value": 23,
+      "text": "23"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.doodee.gv",
+      "value": 700,
+      "text": "700"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.doodee.com.dr",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.doodee.com.refdomains",
+      "value": 936,
+      "text": "936"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.doodee.com.org_keywords",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "domain.doodee.com.org_traffic",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ยิ้ม.volume",
+      "value": 9600,
+      "text": "9,600"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ยิ้ม.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ยิ้ม.gv",
+      "value": 9800,
+      "text": "9,800"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ฟิน.volume",
+      "value": 2700,
+      "text": "2,700"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ฟิน.kd",
+      "value": 59,
+      "text": "59"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ฟิน.gv",
+      "value": 2800,
+      "text": "2,800"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.fin.volume",
+      "value": 4200,
+      "text": "4,200"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.fin.kd",
+      "value": 12,
+      "text": "12"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.fin.gv",
+      "value": 256000,
+      "text": "256,000"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ดารา.volume",
+      "value": 17000,
+      "text": "17,000"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ดารา.kd",
+      "value": 64,
+      "text": "64"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ดารา.gv",
+      "value": 18000,
+      "text": "18,000"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.dara.volume",
+      "value": 500,
+      "text": "500"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.dara.kd",
+      "value": 4,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.dara.gv",
+      "value": 67000,
+      "text": "67,000"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ทันใจ.volume",
+      "value": 900,
+      "text": "900"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ทันใจ.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ทันใจ.gv",
+      "value": 900,
+      "text": "900"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.tanjai.volume",
+      "value": 100,
+      "text": "100"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.tanjai.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.tanjai.gv",
+      "value": 200,
+      "text": "200"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ลั้นลา.volume",
+      "value": 500,
+      "text": "500"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ลั้นลา.kd",
+      "value": 0,
+      "text": "0"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ลั้นลา.gv",
+      "value": 500,
+      "text": "500"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.lanla.volume",
+      "value": 10,
+      "text": "10"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.lanla.kd",
+      "value": null,
+      "text": "ไม่มีข้อมูล"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.lanla.gv",
+      "value": 600,
+      "text": "600"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ละครสั้นจีน.volume",
+      "value": 8100,
+      "text": "8,100"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ละครสั้นจีน.kd",
+      "value": 43,
+      "text": "43"
+    },
+    {
+      "kind": "measured",
+      "path": "cut.ละครสั้นจีน.gv",
+      "value": 8200,
+      "text": "8,200"
+    },
+    {
+      "kind": "label",
+      "path": "label:AC-6",
+      "value": null,
+      "text": "AC-6"
+    },
+    {
+      "kind": "label",
+      "path": "label:2,301",
+      "value": null,
+      "text": "2,301"
+    },
+    {
+      "kind": "measured",
+      "path": "census.total",
+      "value": 2301,
+      "text": "2,301"
+    },
+    {
+      "kind": "label",
+      "path": "label:2,192",
+      "value": null,
+      "text": "2,192"
+    },
+    {
+      "kind": "measured",
+      "path": "census.html_all",
+      "value": 2192,
+      "text": "2,192"
+    },
+    {
+      "kind": "label",
+      "path": "label:568",
+      "value": null,
+      "text": "568"
+    },
+    {
+      "kind": "measured",
+      "path": "census.html_all_files",
+      "value": 568,
+      "text": "568"
+    },
+    {
+      "kind": "label",
+      "path": "label:~60",
+      "value": null,
+      "text": "~60"
+    },
+    {
+      "kind": "measured",
+      "path": "census.build",
+      "value": 65,
+      "text": "65"
+    },
+    {
+      "kind": "label",
+      "path": "label:150",
+      "value": null,
+      "text": "150"
+    },
+    {
+      "kind": "measured",
+      "path": "census.design",
+      "value": 150,
+      "text": "150"
+    },
+    {
+      "kind": "label",
+      "path": "label:13",
+      "value": null,
+      "text": "13"
+    },
+    {
+      "kind": "measured",
+      "path": "census.share_wordmark",
+      "value": 13,
+      "text": "13"
+    },
+    {
+      "kind": "measured",
+      "path": "census.share_total",
+      "value": 13,
+      "text": "13"
+    },
+    {
+      "kind": "label",
+      "path": "label:2",
+      "value": null,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label:2,192",
+      "value": null,
+      "text": "2,192"
+    },
+    {
+      "kind": "label",
+      "path": "label:568",
+      "value": null,
+      "text": "568"
+    },
+    {
+      "kind": "measured",
+      "path": "census.gen_html",
+      "value": 2063,
+      "text": "2,063"
+    },
+    {
+      "kind": "measured",
+      "path": "census.gen_html_files",
+      "value": 504,
+      "text": "504"
+    },
+    {
+      "kind": "measured",
+      "path": "census.design_html",
+      "value": 129,
+      "text": "129"
+    },
+    {
+      "kind": "measured",
+      "path": "census.design_html_files",
+      "value": 64,
+      "text": "64"
+    },
+    {
+      "kind": "measured",
+      "path": "census.design_all",
+      "value": 150,
+      "text": "150"
+    },
+    {
+      "kind": "measured",
+      "path": "census.design_all_files",
+      "value": 73,
+      "text": "73"
+    },
+    {
+      "kind": "measured",
+      "path": "census.build2",
+      "value": 65,
+      "text": "65"
+    },
+    {
+      "kind": "measured",
+      "path": "census.build_files",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "census.docs",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "census.remainder",
+      "value": 20,
+      "text": "20"
+    },
+    {
+      "kind": "measured",
+      "path": "census.remainder_files",
+      "value": 14,
+      "text": "14"
+    },
+    {
+      "kind": "measured",
+      "path": "census.any_case",
+      "value": 10234,
+      "text": "10,234"
+    },
+    {
+      "kind": "measured",
+      "path": "census.total_echo",
+      "value": 2301,
+      "text": "2,301"
+    },
+    {
+      "kind": "measured",
+      "path": "census.other_casing",
+      "value": 7933,
+      "text": "7,933"
+    },
+    {
+      "kind": "measured",
+      "path": "census.origin_literal",
+      "value": 7664,
+      "text": "7,664"
+    },
+    {
+      "kind": "measured",
+      "path": "census.repo_path_literal",
+      "value": 18,
+      "text": "18"
+    },
+    {
+      "kind": "measured",
+      "path": "src.site_name_line",
+      "value": 34,
+      "text": "34"
+    },
+    {
+      "kind": "measured",
+      "path": "src.site_name_refs",
+      "value": 5,
+      "text": "5"
+    },
+    {
+      "kind": "measured",
+      "path": "src.site_name_imports",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "src.site_name_uses",
+      "value": 4,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "src.use.build/pages-content.mjs.191",
+      "value": 191,
+      "text": "191"
+    },
+    {
+      "kind": "measured",
+      "path": "src.use.build/seo.mjs.128",
+      "value": 128,
+      "text": "128"
+    },
+    {
+      "kind": "measured",
+      "path": "src.use.build/seo.mjs.156",
+      "value": 156,
+      "text": "156"
+    },
+    {
+      "kind": "measured",
+      "path": "src.use.build/seo.mjs.259",
+      "value": 259,
+      "text": "259"
+    },
+    {
+      "kind": "measured",
+      "path": "src.build_total",
+      "value": 65,
+      "text": "65"
+    },
+    {
+      "kind": "measured",
+      "path": "src.build_files",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "src.ceo_lines_ok",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "src.ceo_lines_total",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "src.logo_line",
+      "value": 212,
+      "text": "212"
+    },
+    {
+      "kind": "measured",
+      "path": "src.footer_line",
+      "value": 239,
+      "text": "239"
+    },
+    {
+      "kind": "label",
+      "path": "label:© LakornAI · lakornai.tv",
+      "value": null,
+      "text": "© LakornAI · lakornai.tv"
+    },
+    {
+      "kind": "measured",
+      "path": "src.origin_line",
+      "value": 14,
+      "text": "14"
+    },
+    {
+      "kind": "label",
+      "path": "label:https://lakornai.tv",
+      "value": null,
+      "text": "https://lakornai.tv"
+    },
+    {
+      "kind": "measured",
+      "path": "share.jpg",
+      "value": 13,
+      "text": "13"
+    },
+    {
+      "kind": "measured",
+      "path": "share.src",
+      "value": 14,
+      "text": "14"
+    },
+    {
+      "kind": "measured",
+      "path": "share.cards",
+      "value": 13,
+      "text": "13"
+    },
+    {
+      "kind": "measured",
+      "path": "share.sheet",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "share.with_wordmark",
+      "value": 13,
+      "text": "13"
+    },
+    {
+      "kind": "measured",
+      "path": "share.cards_echo",
+      "value": 13,
+      "text": "13"
+    },
+    {
+      "kind": "measured",
+      "path": "share.wordmark_line.0",
+      "value": 213,
+      "text": "213"
+    },
+    {
+      "kind": "measured",
+      "path": "share.wordmark_line.1",
+      "value": 243,
+      "text": "243"
+    },
+    {
+      "kind": "measured",
+      "path": "share.title_line",
+      "value": 235,
+      "text": "235"
+    },
+    {
+      "kind": "measured",
+      "path": "q.site_name_line",
+      "value": 34,
+      "text": "34"
+    },
+    {
+      "kind": "measured",
+      "path": "q.options",
+      "value": 6,
+      "text": "6"
+    },
+    {
+      "kind": "label",
+      "path": "label:https://lakornai.tv",
+      "value": null,
+      "text": "https://lakornai.tv"
+    },
+    {
+      "kind": "measured",
+      "path": "q.origin_line",
+      "value": 14,
+      "text": "14"
+    },
+    {
+      "kind": "measured",
+      "path": "q.repo_path",
+      "value": 18,
+      "text": "18"
+    },
+    {
+      "kind": "measured",
+      "path": "q.options_echo",
+      "value": 6,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "q.keepai_options",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "label",
+      "path": "label:AIO-19",
+      "value": null,
+      "text": "AIO-19"
+    },
+    {
+      "kind": "label",
+      "path": "label:0",
+      "value": null,
+      "text": "0"
+    },
+    {
+      "kind": "label",
+      "path": "label:AIO-81",
+      "value": null,
+      "text": "AIO-81"
+    }
+  ]
+}

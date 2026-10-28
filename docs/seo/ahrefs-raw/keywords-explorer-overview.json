@@ -1,0 +1,175 @@
+{
+  "_note": "คำตอบดิบจาก Ahrefs MCP tool `keywords-explorer-overview` ถอดมาตรง ๆ จากรันวันที่ระบุใน captured_at — ไม่แก้ตัวเลข ไม่เติมแถว · แถวที่ Ahrefs ไม่คืนมา = ไม่มีข้อมูล ห้ามเดาแทน (ดู missing_keywords)",
+  "captured_at": "2026-10-28",
+  "captured_by": "SEO (agent cdf0bb13) · AIO-81",
+  "transport": "claude.ai Ahrefs MCP connector (ไม่มี AHREFS_API_TOKEN ในเครื่องนี้ — api.ahrefs.com ตอบ 403 ถ้าเรียกตรง)",
+  "calls": [
+    {
+      "id": "category",
+      "tool": "keywords-explorer-overview",
+      "params": {
+        "country": "th",
+        "keywords": "ละครสั้นจีน,ดูละครย้อนหลัง,ละครสั้น,ละครแนวตั้ง,ดูละครออนไลน์,ละครสั้น ai,ละครฟรี,ละครสั้นฟรี,ซีรีส์สั้น,แอพดูละคร",
+        "select": "keyword,volume,difficulty,cps,cpc,traffic_potential,parent_topic,parent_volume,global_volume,intents,serp_last_update"
+      },
+      "api_usage": { "rows": 10, "units-cost-row": 65, "units-cost-total-actual": 650 },
+      "requested_keywords": ["ละครสั้นจีน", "ดูละครย้อนหลัง", "ละครสั้น", "ละครแนวตั้ง", "ดูละครออนไลน์", "ละครสั้น ai", "ละครฟรี", "ละครสั้นฟรี", "ซีรีส์สั้น", "แอพดูละคร"],
+      "response": {
+        "keywords": [
+          { "keyword": "ละครสั้นจีน", "volume": 8100, "difficulty": 43, "cps": null, "cpc": 6, "traffic_potential": 200, "parent_topic": "ซีรี่ย์จีนสั้น", "parent_volume": 1700, "global_volume": 8200, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false }, "serp_last_update": "2026-10-27T18:57:22Z" },
+          { "keyword": "ดูละครออนไลน์", "volume": 1000, "difficulty": 72, "cps": 1.1, "cpc": 2, "traffic_potential": 614000, "parent_topic": "ดูทีวีออนไลน์ช่อง33", "parent_volume": 144000, "global_volume": 1200, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": true, "branded": false, "local": false }, "serp_last_update": "2026-10-24T11:21:52Z" },
+          { "keyword": "ละครแนวตั้ง", "volume": 1300, "difficulty": 0, "cps": null, "cpc": 10, "traffic_potential": null, "parent_topic": "หนังจีนแนวตั้ง", "parent_volume": 1900, "global_volume": 1300, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false }, "serp_last_update": "2026-07-31T15:29:56Z" },
+          { "keyword": "ละครสั้นฟรี", "volume": 40, "difficulty": null, "cps": null, "cpc": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 40, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false }, "serp_last_update": null },
+          { "keyword": "ละครฟรี", "volume": 200, "difficulty": null, "cps": null, "cpc": 7, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 250, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false }, "serp_last_update": null },
+          { "keyword": "ดูละครย้อนหลัง", "volume": 3700, "difficulty": 66, "cps": 0.97, "cpc": 3, "traffic_potential": 20000, "parent_topic": "ละครช่องวัน", "parent_volume": 9500, "global_volume": 6300, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false }, "serp_last_update": "2026-10-25T15:22:53Z" },
+          { "keyword": "ละครสั้น", "volume": 2300, "difficulty": 0, "cps": 0.5, "cpc": 3, "traffic_potential": 0, "parent_topic": "หนังเรื่องสั้น", "parent_volume": 20, "global_volume": 2400, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false }, "serp_last_update": "2026-10-23T21:49:31Z" },
+          { "keyword": "ซีรีส์สั้น", "volume": 40, "difficulty": null, "cps": null, "cpc": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 40, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false }, "serp_last_update": null },
+          { "keyword": "แอพดูละคร", "volume": 0, "difficulty": null, "cps": null, "cpc": 7, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 0, "intents": {}, "serp_last_update": null },
+          { "keyword": "ละครสั้น ai", "volume": 600, "difficulty": null, "cps": null, "cpc": 10, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 600, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false }, "serp_last_update": null }
+        ]
+      }
+    },
+    {
+      "id": "brands",
+      "tool": "keywords-explorer-overview",
+      "params": {
+        "country": "th",
+        "keywords": "wetv,viu,dramabox,reelshort,shortmax,netshort,lakorn,goodshort,lakornai,lakorn ai",
+        "select": "keyword,volume,difficulty,cps,traffic_potential,parent_topic,parent_volume,global_volume,intents,serp_last_update"
+      },
+      "api_usage": { "rows": 8, "units-cost-row": 64, "units-cost-total-actual": 512 },
+      "requested_keywords": ["wetv", "viu", "dramabox", "reelshort", "shortmax", "netshort", "lakorn", "goodshort", "lakornai", "lakorn ai"],
+      "response": {
+        "keywords": [
+          { "keyword": "netshort", "volume": 350, "difficulty": null, "cps": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 42000, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": false, "branded": true, "local": false }, "serp_last_update": null },
+          { "keyword": "lakorn", "volume": 250, "difficulty": 0, "cps": 0.83, "traffic_potential": 4200, "parent_topic": "วอทละคร", "parent_volume": 800, "global_volume": 3000, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": false, "branded": false, "local": false }, "serp_last_update": "2026-10-01T13:08:24Z" },
+          { "keyword": "goodshort", "volume": 20, "difficulty": null, "cps": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 3600, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": true, "branded": true, "local": false }, "serp_last_update": null },
+          { "keyword": "reelshort", "volume": 1500, "difficulty": 37, "cps": null, "traffic_potential": 700, "parent_topic": "reelshort", "parent_volume": 1300, "global_volume": 70000, "intents": { "informational": true, "navigational": true, "commercial": false, "transactional": false, "branded": true, "local": false }, "serp_last_update": "2026-10-20T02:54:41Z" },
+          { "keyword": "wetv", "volume": 202000, "difficulty": 70, "cps": 0.51, "traffic_potential": 9200, "parent_topic": "วีทีวี", "parent_volume": 4500, "global_volume": 579000, "intents": { "informational": true, "navigational": true, "commercial": false, "transactional": true, "branded": true, "local": false }, "serp_last_update": "2026-10-21T20:59:49Z" },
+          { "keyword": "dramabox", "volume": 2700, "difficulty": 0, "cps": null, "traffic_potential": 4000, "parent_topic": "dramabox", "parent_volume": 4300, "global_volume": 86000, "intents": { "informational": true, "navigational": true, "commercial": false, "transactional": true, "branded": true, "local": false }, "serp_last_update": "2026-10-21T03:54:08Z" },
+          { "keyword": "shortmax", "volume": 600, "difficulty": 4, "cps": null, "traffic_potential": 0, "parent_topic": "short tv", "parent_volume": 50, "global_volume": 63000, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": true, "branded": true, "local": false }, "serp_last_update": "2026-10-25T14:34:56Z" },
+          { "keyword": "viu", "volume": 50000, "difficulty": 62, "cps": 1.03, "traffic_potential": 29000, "parent_topic": "viu", "parent_volume": 50000, "global_volume": 443000, "intents": { "informational": true, "navigational": true, "commercial": false, "transactional": false, "branded": true, "local": false }, "serp_last_update": "2026-10-24T17:59:19Z" }
+        ]
+      }
+    },
+    {
+      "id": "candidates-1",
+      "tool": "keywords-explorer-overview",
+      "params": {
+        "country": "th",
+        "keywords": "ชอร์ตละคร,shortlakorn,สั้นสั้น,sunsun,เพลิน,plern,plearn,ยิ้ม,ม่วน,muan,ลครา,lakora,นิด,ดูดี,doodee,จบในตอน,ละคร ai,ai lakorn,lakorn tv,lakorntv,ดูสั้น,dooshort,ทันใจ,tanjai",
+        "select": "keyword,volume,difficulty,traffic_potential,parent_topic,global_volume,intents"
+      },
+      "api_usage": { "rows": 17, "units-cost-row": 52, "units-cost-total-actual": 884 },
+      "requested_keywords": ["ชอร์ตละคร", "shortlakorn", "สั้นสั้น", "sunsun", "เพลิน", "plern", "plearn", "ยิ้ม", "ม่วน", "muan", "ลครา", "lakora", "นิด", "ดูดี", "doodee", "จบในตอน", "ละคร ai", "ai lakorn", "lakorn tv", "lakorntv", "ดูสั้น", "dooshort", "ทันใจ", "tanjai"],
+      "response": {
+        "keywords": [
+          { "keyword": "plearn", "volume": 300, "difficulty": 3, "traffic_potential": 60, "parent_topic": "plearn", "global_volume": 700, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": false, "branded": true, "local": false } },
+          { "keyword": "doodee", "volume": 70, "difficulty": 23, "traffic_potential": 20, "parent_topic": "doodee", "global_volume": 700, "intents": { "informational": true, "navigational": true, "commercial": true, "transactional": false, "branded": true, "local": false } },
+          { "keyword": "lakorn tv", "volume": 0, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 10, "intents": {} },
+          { "keyword": "ทันใจ", "volume": 900, "difficulty": 0, "traffic_potential": 150, "parent_topic": "ทันใจ", "global_volume": 900, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": true, "branded": false, "local": false } },
+          { "keyword": "sunsun", "volume": 150, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 12000, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": true, "branded": true, "local": false } },
+          { "keyword": "plern", "volume": 200, "difficulty": 0, "traffic_potential": 30, "parent_topic": "plern", "global_volume": 450, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": true, "branded": true, "local": false } },
+          { "keyword": "นิด", "volume": 200, "difficulty": 0, "traffic_potential": 10, "parent_topic": "นิดๆ", "global_volume": 200, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": true, "branded": false, "local": false } },
+          { "keyword": "ยิ้ม", "volume": 9600, "difficulty": 0, "traffic_potential": 500, "parent_topic": "ยิ้ม", "global_volume": 9800, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ละคร ai", "volume": 700, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 700, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ดูดี", "volume": 900, "difficulty": 0, "traffic_potential": 60, "parent_topic": "ที่สุดเลยเว้ยแก", "global_volume": 900, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": true, "local": false } },
+          { "keyword": "จบในตอน", "volume": 0, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 0, "intents": {} },
+          { "keyword": "muan", "volume": 20, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 1100, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": true, "branded": true, "local": true } },
+          { "keyword": "ม่วน", "volume": 250, "difficulty": 0, "traffic_potential": 0, "parent_topic": "รายชื่อเพลง ลูกทุ่ง มัน ๆ รถแห่", "global_volume": 250, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "tanjai", "volume": 100, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 200, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": true, "branded": true, "local": true } },
+          { "keyword": "เพลิน", "volume": 1300, "difficulty": 0, "traffic_potential": 2600, "parent_topic": "ร้านอาหารเพลิน", "global_volume": 1400, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": false, "branded": true, "local": true } },
+          { "keyword": "lakora", "volume": 0, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 60, "intents": {} },
+          { "keyword": "สั้นสั้น", "volume": 30, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 30, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } }
+        ]
+      }
+    },
+    {
+      "id": "candidates-2",
+      "tool": "keywords-explorer-overview",
+      "params": {
+        "country": "th",
+        "keywords": "ใจดี,jaidee,ม่วนใจ,muanjai,ละคอน,lakhon,lakorn.ai,ละคร,ดูละครสั้น,เว็บดูละครสั้น,แอพดูละครสั้น,ละครสั้นไทย,ละครสั้น ดูฟรี,ซีรี่ย์สั้น,หนังสั้น",
+        "select": "keyword,volume,difficulty,traffic_potential,parent_topic,parent_volume,global_volume,cps,intents"
+      },
+      "api_usage": { "rows": 13, "units-cost-row": 63, "units-cost-total-actual": 819 },
+      "requested_keywords": ["ใจดี", "jaidee", "ม่วนใจ", "muanjai", "ละคอน", "lakhon", "lakorn.ai", "ละคร", "ดูละครสั้น", "เว็บดูละครสั้น", "แอพดูละครสั้น", "ละครสั้นไทย", "ละครสั้น ดูฟรี", "ซีรี่ย์สั้น", "หนังสั้น"],
+      "response": {
+        "keywords": [
+          { "keyword": "ละครสั้นไทย", "volume": 60, "difficulty": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 60, "cps": null, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ละคอน", "volume": 40, "difficulty": 0, "traffic_potential": 0, "parent_topic": "ดูละ", "parent_volume": 40, "global_volume": 70, "cps": 0.68, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ดูละครสั้น", "volume": 150, "difficulty": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 150, "cps": null, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ม่วนใจ", "volume": 10, "difficulty": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 10, "cps": null, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ซีรี่ย์สั้น", "volume": 150, "difficulty": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 150, "cps": null, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "jaidee", "volume": 150, "difficulty": 44, "traffic_potential": 60, "parent_topic": "jaidee", "parent_volume": 150, "global_volume": 1400, "cps": 0.36, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": false, "branded": true, "local": false } },
+          { "keyword": "muanjai", "volume": 10, "difficulty": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 30, "cps": null, "intents": {} },
+          { "keyword": "ใจดี", "volume": 2800, "difficulty": 0, "traffic_potential": 0, "parent_topic": "ใจดี", "parent_volume": 2800, "global_volume": 2800, "cps": 0.19, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": false, "branded": false, "local": true } },
+          { "keyword": "ละคร", "volume": 9000, "difficulty": 61, "traffic_potential": 20000, "parent_topic": "ละครช่องวัน", "parent_volume": 9500, "global_volume": 11000, "cps": 0.6899999999999999, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "หนังสั้น", "volume": 2400, "difficulty": 0, "traffic_potential": 50, "parent_topic": "หนังสั้นสะท้อนสังคม", "parent_volume": 70, "global_volume": 2500, "cps": 0.58, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "เว็บดูละครสั้น", "volume": 10, "difficulty": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 10, "cps": null, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "lakhon", "volume": 0, "difficulty": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 100, "cps": null, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ละครสั้น ดูฟรี", "volume": 0, "difficulty": null, "traffic_potential": null, "parent_topic": null, "parent_volume": null, "global_volume": 0, "cps": null, "intents": {} }
+        ]
+      }
+    },
+    {
+      "id": "candidates-3",
+      "tool": "keywords-explorer-overview",
+      "params": {
+        "country": "th",
+        "keywords": "ไทยชอร์ต,thaishort,ลาโครา,สั้นไทย,thai short drama,ดูฟรี,ละครสั้นai,เว็บละครสั้น",
+        "select": "keyword,volume,difficulty,traffic_potential,parent_topic,global_volume,intents"
+      },
+      "api_usage": { "rows": 4, "units-cost-row": 52, "units-cost-total-actual": 208 },
+      "requested_keywords": ["ไทยชอร์ต", "thaishort", "ลาโครา", "สั้นไทย", "thai short drama", "ดูฟรี", "ละครสั้นai", "เว็บละครสั้น"],
+      "response": {
+        "keywords": [
+          { "keyword": "ดูฟรี", "volume": 1900, "difficulty": 53, "traffic_potential": 1060000, "parent_topic": "ดูหนัง", "global_volume": 2100, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "thai short drama", "volume": 0, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 10, "intents": {} },
+          { "keyword": "เว็บละครสั้น", "volume": 10, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 10, "intents": {} },
+          { "keyword": "ละครสั้นai", "volume": 100, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 100, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } }
+        ]
+      }
+    },
+    {
+      "id": "candidates-4",
+      "tool": "keywords-explorer-overview",
+      "params": {
+        "country": "th",
+        "keywords": "มินิละคร,minilakorn,มินิซีรีส์,ฟิน,fin,ลั้นลา,lanla,watchlakorn,ละครสั้นแนวตั้ง",
+        "select": "keyword,volume,difficulty,traffic_potential,parent_topic,global_volume,intents"
+      },
+      "api_usage": { "rows": 7, "units-cost-row": 52, "units-cost-total-actual": 364 },
+      "requested_keywords": ["มินิละคร", "minilakorn", "มินิซีรีส์", "ฟิน", "fin", "ลั้นลา", "lanla", "watchlakorn", "ละครสั้นแนวตั้ง"],
+      "response": {
+        "keywords": [
+          { "keyword": "fin", "volume": 4200, "difficulty": 12, "traffic_potential": 9000, "parent_topic": "finn", "global_volume": 256000, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": false, "branded": true, "local": false } },
+          { "keyword": "มินิซีรีส์", "volume": 30, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 30, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ฟิน", "volume": 2700, "difficulty": 59, "traffic_potential": 8900, "parent_topic": "finn", "global_volume": 2800, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "lanla", "volume": 10, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 600, "intents": { "informational": true, "navigational": false, "commercial": true, "transactional": true, "branded": true, "local": false } },
+          { "keyword": "watchlakorn", "volume": 7800, "difficulty": 27, "traffic_potential": 12000, "parent_topic": "watchlakorn", "global_volume": 9700, "intents": { "informational": true, "navigational": true, "commercial": false, "transactional": false, "branded": true, "local": false } },
+          { "keyword": "ละครสั้นแนวตั้ง", "volume": 100, "difficulty": null, "traffic_potential": null, "parent_topic": null, "global_volume": 100, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "ลั้นลา", "volume": 500, "difficulty": 0, "traffic_potential": 0, "parent_topic": "ชลาสินธุ์", "global_volume": 500, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } }
+        ]
+      }
+    },
+    {
+      "id": "candidates-5",
+      "tool": "keywords-explorer-overview",
+      "params": {
+        "country": "th",
+        "keywords": "ดารา,dara,ปัดดู,patdoo,ดูม่วน,doomuan,มะลิละคร",
+        "select": "keyword,volume,difficulty,traffic_potential,parent_topic,global_volume,intents"
+      },
+      "api_usage": { "rows": 3, "units-cost-row": 52, "units-cost-total-actual": 156 },
+      "requested_keywords": ["ดารา", "dara", "ปัดดู", "patdoo", "ดูม่วน", "doomuan", "มะลิละคร"],
+      "response": {
+        "keywords": [
+          { "keyword": "ดารา", "volume": 17000, "difficulty": 64, "traffic_potential": 19000, "parent_topic": "ดารา", "global_volume": 18000, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } },
+          { "keyword": "doomuan", "volume": 40, "difficulty": 1, "traffic_potential": null, "parent_topic": null, "global_volume": 40, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": true, "local": false } },
+          { "keyword": "dara", "volume": 500, "difficulty": 4, "traffic_potential": 250, "parent_topic": "dara", "global_volume": 67000, "intents": { "informational": true, "navigational": false, "commercial": false, "transactional": false, "branded": false, "local": false } }
+        ]
+      }
+    }
+  ]
+}

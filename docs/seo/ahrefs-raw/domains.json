@@ -1,0 +1,106 @@
+{
+  "_note": "คำตอบดิบจาก Ahrefs MCP tools `batch-analysis` (รวมหลายโดเมนต่อคำขอ) + `site-explorer-domain-rating` + `site-explorer-backlinks-stats` · เครื่องมือชุดนี้บอกได้แค่ว่าโดเมนมีร่องรอยเว็บ/ลิงก์/ทราฟฟิกหรือไม่ — บอกไม่ได้ว่า 'จดได้' ห้ามแปลผลเป็นคำว่าโดเมนว่าง",
+  "captured_at": "2026-10-28",
+  "captured_by": "SEO (agent cdf0bb13) · AIO-81",
+  "calls": [
+    {
+      "id": "batch-1",
+      "tool": "batch-analysis",
+      "params": {
+        "country": "th",
+        "select": ["url", "domain_rating", "url_rating", "backlinks", "refdomains", "org_traffic", "org_keywords", "ip", "ahrefs_rank"],
+        "targets_mode": "subdomains",
+        "targets_protocol": "both"
+      },
+      "api_usage": { "rows": 22, "units-cost-row": 22, "units-cost-total-actual": 484 },
+      "response": {
+        "targets": [
+          { "url": "dooshort.com/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 1492, "refdomains": 901, "org_traffic": 0, "org_keywords": 0, "ip": "172.67.171.67", "ahrefs_rank": 0 },
+          { "url": "dooshort.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "muanjai.com/", "domain_rating": 7.0, "url_rating": 4.8, "backlinks": 1114, "refdomains": 960, "org_traffic": 0, "org_keywords": 0, "ip": "3.14.223.155", "ahrefs_rank": 25000330 },
+          { "url": "muanjai.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "lakhon.com/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 64, "refdomains": 53, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "lakhon.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "lakorn.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 268867938 },
+          { "url": "lakorn.ai/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 377, "refdomains": 349, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "lakornai.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "lakornai.com/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 912, "refdomains": 838, "org_traffic": 0, "org_keywords": 0, "ip": "91.195.240.94", "ahrefs_rank": 0 },
+          { "url": "plern.com/", "domain_rating": 0.1, "url_rating": 0.0, "backlinks": 1469, "refdomains": 802, "org_traffic": 0, "org_keywords": 0, "ip": "64.187.239.229", "ahrefs_rank": 85217345 },
+          { "url": "plern.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "thaishort.com/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 1022, "refdomains": 935, "org_traffic": 0, "org_keywords": 0, "ip": "54.243.117.197", "ahrefs_rank": 165109405 },
+          { "url": "thaishort.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "jaidee.com/", "domain_rating": 0.2, "url_rating": 0.0, "backlinks": 942, "refdomains": 844, "org_traffic": 0, "org_keywords": 0, "ip": "3.33.243.145", "ahrefs_rank": 82840864 },
+          { "url": "lakora.com/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 716, "refdomains": 630, "org_traffic": 0, "org_keywords": 0, "ip": "35.182.125.245", "ahrefs_rank": 0 },
+          { "url": "dramabox.com/", "domain_rating": 58.0, "url_rating": 5.0, "backlinks": 8921929, "refdomains": 3525, "org_traffic": 3062, "org_keywords": 157, "ip": "54.254.1.28", "ahrefs_rank": 330611 },
+          { "url": "reelshort.com/", "domain_rating": 72.0, "url_rating": 4.5, "backlinks": 575336, "refdomains": 6239, "org_traffic": 2471, "org_keywords": 78, "ip": "47.251.7.125", "ahrefs_rank": 79580 },
+          { "url": "goodshort.com/", "domain_rating": 62.0, "url_rating": 4.7, "backlinks": 661950, "refdomains": 4356, "org_traffic": 2577, "org_keywords": 257, "ip": "13.251.144.82", "ahrefs_rank": 235461 },
+          { "url": "flickreels.net/", "domain_rating": 49.0, "url_rating": 4.6, "backlinks": 76233, "refdomains": 3339, "org_traffic": 5724, "org_keywords": 255, "ip": "104.18.2.128", "ahrefs_rank": 798120 },
+          { "url": "shortmax.com/", "domain_rating": 15.0, "url_rating": 4.4, "backlinks": 1242, "refdomains": 958, "org_traffic": 0, "org_keywords": 0, "ip": "3.33.251.168", "ahrefs_rank": 12551883 },
+          { "url": "netshort.com/", "domain_rating": 61.0, "url_rating": 20.0, "backlinks": 461049, "refdomains": 4678, "org_traffic": 8929, "org_keywords": 361, "ip": "104.18.20.248", "ahrefs_rank": 271852 }
+        ]
+      }
+    },
+    {
+      "id": "batch-2",
+      "tool": "batch-analysis",
+      "params": {
+        "country": "th",
+        "select": ["url", "domain_rating", "url_rating", "backlinks", "refdomains", "org_traffic", "org_keywords", "ip", "ahrefs_rank"],
+        "targets_mode": "subdomains",
+        "targets_protocol": "both"
+      },
+      "api_usage": { "rows": 16, "units-cost-row": 22, "units-cost-total-actual": 352 },
+      "response": {
+        "targets": [
+          { "url": "minilakorn.com/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "minilakorn.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "patdoo.com/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "patdoo.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "dooshort.co.th/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "thaishort.co.th/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "minilakorn.co.th/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "muanjai.co.th/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "patdoo.co.th/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "lakorn.co.th/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "watchlakorn.org/", "domain_rating": 0.7, "url_rating": 0.0, "backlinks": 96717, "refdomains": 2499, "org_traffic": 11493, "org_keywords": 41, "ip": "104.21.22.212", "ahrefs_rank": 65552965 },
+          { "url": "lakhon.co.th/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 0, "refdomains": 0, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 0 },
+          { "url": "plern.co.th/", "domain_rating": 0.1, "url_rating": 0.0, "backlinks": 35, "refdomains": 32, "org_traffic": 0, "org_keywords": 0, "ip": "43.249.35.149", "ahrefs_rank": 86549217 },
+          { "url": "jaidee.co.th/", "domain_rating": 18.0, "url_rating": 0.0, "backlinks": 8, "refdomains": 2, "org_traffic": 12, "org_keywords": 9, "ip": "31.43.161.6", "ahrefs_rank": 10815221 },
+          { "url": "sunsun.tv/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 712, "refdomains": 636, "org_traffic": 0, "org_keywords": 0, "ip": "15.197.172.60", "ahrefs_rank": 0 },
+          { "url": "doodee.com/", "domain_rating": 0.0, "url_rating": 0.0, "backlinks": 1039, "refdomains": 936, "org_traffic": 0, "org_keywords": 0, "ip": null, "ahrefs_rank": 133862222 }
+        ]
+      }
+    },
+    {
+      "id": "cross-check-domain-rating",
+      "tool": "site-explorer-domain-rating",
+      "params": { "target": "dooshort.com", "date": "2026-10-28" },
+      "api_usage": { "rows": 1, "units-cost-row": 2, "units-cost-total-actual": 50 },
+      "response": { "domain_rating": { "domain_rating": 0.0, "ahrefs_rank": null } }
+    },
+    {
+      "id": "cross-check-backlinks-stats",
+      "tool": "site-explorer-backlinks-stats",
+      "params": { "target": "dooshort.com", "date": "2026-10-28", "mode": "subdomains" },
+      "api_usage": { "rows": 1, "units-cost-row": 12, "units-cost-total-actual": 50 },
+      "response": { "metrics": { "live": 1398, "all_time": 1781, "live_refdomains": 881, "all_time_refdomains": 1068 } }
+    },
+    {
+      "id": "subscription",
+      "tool": "subscription-info-limits-and-usage",
+      "params": {},
+      "api_usage": { "rows": 1, "units-cost-row": 0, "units-cost-total-actual": 0 },
+      "response": {
+        "limits_and_usage": {
+          "subscription": "Lite 2022, billed monthly",
+          "usage_reset_date": "2026-11-15T00:00:00Z",
+          "units_limit_workspace": 200000,
+          "units_usage_workspace": 8988,
+          "units_limit_api_key": null,
+          "units_usage_api_key": 2040,
+          "api_key_expiration_date": "2036-03-15T12:36:26Z"
+        }
+      }
+    }
+  ]
+}

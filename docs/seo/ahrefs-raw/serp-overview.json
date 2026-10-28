@@ -1,0 +1,163 @@
+{
+  "_note": "คำตอบดิบจาก Ahrefs MCP tool `serp-overview` · positions: [] = Ahrefs ไม่มีข้อมูล SERP ของคำนั้น (ไม่ใช่ 'ไม่มีคู่แข่ง' แต่ 'ไม่มีข้อมูล') · URL ยาวที่เป็น percent-encoded เก็บไว้ตามที่ได้มา ไม่ย่อ",
+  "captured_at": "2026-10-28",
+  "captured_by": "SEO (agent cdf0bb13) · AIO-81",
+  "calls": [
+    {
+      "id": "serp-lakorn-san",
+      "tool": "serp-overview",
+      "params": { "keyword": "ละครสั้น", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,keywords,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 10, "units-cost-row": 27, "units-cost-total-actual": 270 },
+      "response": {
+        "positions": [
+          { "position": 1, "type": ["video"], "url": "https://www.youtube.com/watch?v=SitO8en3osY", "title": "เมื่อสะใภ้แสนดี กลายเป็นแม่ผัวตัวแสบ (หนังสั้น) (ละครสั้น) | BSC Films", "domain_rating": null, "traffic": null, "keywords": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 1, "type": ["video"], "url": "https://www.facebook.com/bangrak.channel/videos/%E0%B8%8B%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%81%E0%B8%B4%E0%B8%99%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B8%AB%E0%B8%A1%E0%B8%94-ep6-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%98%E0%B8%A3%E0%B8%A3%E0%B8%A1-%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%87%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B8%AA%E0%B8%B0%E0%B8%97%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AA%E0%B8%B1%E0%B8%87%E0%B8%84%E0%B8%A1-%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%87%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99-%E0%B8%9A%E0%B8%B2%E0%B8%87%E0%B8%A3%E0%B8%B1%E0%B8%81%E0%B8%8A%E0%B8%B2%E0%B9%81%E0%B8%99%E0%B8%A5/1081308544902247/", "title": "ซื่อกินไม่หมด ep.6 - #ละครคุณธรรม - #หนังสั้นสะท้อนสังคม", "domain_rating": null, "traffic": null, "keywords": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 1, "type": ["video"], "url": "https://www.facebook.com/bangrak.channel/videos/%E0%B8%8B%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%81%E0%B8%B4%E0%B8%99%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B8%AB%E0%B8%A1%E0%B8%94-ep7-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%84%E0%B8%B8%E0%B8%93%E0%B8%98%E0%B8%A3%E0%B8%A3%E0%B8%A1-%E0%B8%AB%E0%B8%99%E0%B8%B1%E0%B8%87%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B8%AA%E0%B8%B0%E0%B8%97%E0%B9%89%E0%B8%AD%E0%B8%99%E0%B8%AA%E0%B8%B1%E0%B8%87%E0%B8%84%E0%B8%A1-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99-%E0%B8%9A%E0%B8%B2%E0%B8%87%E0%B8%A3%E0%B8%B1%E0%B8%81%E0%B8%8A%E0%B8%B2%E0%B9%81%E0%B8%99%E0%B8%A5/1863737135001653/", "title": "ซื่อกินไม่หมด ep.7 - #ละครคุณธรรม - #หนังสั้นสะท้อนสังคม", "domain_rating": null, "traffic": null, "keywords": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["organic"], "url": "https://www.youtube.com/@Todayshortsdrama", "title": "Today ละครสั้น", "domain_rating": 99.0, "traffic": 183, "keywords": 6, "top_keyword": "ละครสั้น", "top_keyword_volume": 2300 },
+          { "position": 3, "type": ["organic"], "url": "https://www.flickreels.net/th/classify", "title": "ละครสั้นทั้งหมด - FlickReels", "domain_rating": 49.0, "traffic": 3058, "keywords": 49, "top_keyword": "หนังสั้นจีน", "top_keyword_volume": 16000 },
+          { "position": 4, "type": ["organic"], "url": "https://www.youtube.com/@bscfilms1119", "title": "หนังสั้น BSC Films", "domain_rating": 99.0, "traffic": 10, "keywords": 5, "top_keyword": "ละครสั้น", "top_keyword_volume": 2300 },
+          { "position": 5, "type": ["organic", "video_th"], "url": "https://www.youtube.com/watch?v=v6XqbKNLgGM", "title": "คนเก่งจริง ไม่กลัวใครเก่งกว่า ตอนจบ (หนังสั้น) (ละครสั้น) | BSC Films", "domain_rating": 99.0, "traffic": 1, "keywords": 3, "top_keyword": "ละครสั้น", "top_keyword_volume": 2300 },
+          { "position": 6, "type": ["organic"], "url": "https://www.goodshort.com/dramas/%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99", "title": "รับชมละครสั้นและวิดีโอสั้นออนไลน์ที่", "domain_rating": 62.0, "traffic": 6, "keywords": 2, "top_keyword": "ดูหนังสั้น", "top_keyword_volume": 250 },
+          { "position": 7, "type": ["organic", "video_th"], "url": "https://www.youtube.com/watch?v=KZnOpdfYEto", "title": "ความซื่อสัตย์วัดกันตอนสบาย (หนังสั้น) (ละครสั้น) | BSC Films", "domain_rating": 99.0, "traffic": 0, "keywords": 1, "top_keyword": "ละครสั้น", "top_keyword_volume": 2300 },
+          { "position": 8, "type": ["organic"], "url": "https://www.youtube.com/playlist?list=PLyxjdO_gh0nIJpuQYJf0mpOEAMSrzfj1K", "title": "🌟รวมละครสั้นจีน พากย์ไทยเต็มเรื่องทั้งหมด‼️", "domain_rating": 99.0, "traffic": 1784, "keywords": 16, "top_keyword": "หนังสั้นจีนพากย์ไทย", "top_keyword_volume": 7500 }
+        ]
+      }
+    },
+    {
+      "id": "serp-lakorn-naewtang",
+      "tool": "serp-overview",
+      "params": { "keyword": "ละครแนวตั้ง", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 13, "units-cost-row": 26, "units-cost-total-actual": 338 },
+      "response": {
+        "positions": [
+          { "position": 1, "type": ["organic"], "url": "https://www.youtube.com/playlist?list=PLdlK-IVFgTJ6Jpfo9b9TFDl3dTqiklgF4", "title": "🔥ละครแนวตั้งจีน หนังจีนพากย์ไทย เรื่องใหม่ล่าสุดก่อนใคร❗💥", "domain_rating": 99.0, "traffic": 488, "top_keyword": "ซีรี่ย์จีนแนวตั้งพากย์ไทย", "top_keyword_volume": 1400 },
+          { "position": 2, "type": ["ai_overview"], "url": null, "title": null, "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.youtube.com/watch?v=6XXns8gDXSA", "title": "24:15", "domain_rating": 99.0, "traffic": 9, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.youtube.com/watch?v=N4WuMI6RbFc", "title": "13:37", "domain_rating": 99.0, "traffic": 17, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.youtube.com/watch?v=Dt5QhhQ6jjg", "title": "8:01", "domain_rating": 99.0, "traffic": 161, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.facebook.com/isatamp/videos/%E0%B8%9E%E0%B8%B2%E0%B8%81%E0%B8%A2%E0%B9%8C%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B8%A1%E0%B8%B2%E0%B9%81%E0%B8%A5%E0%B9%89%E0%B8%A7%E0%B8%84%E0%B9%88%E0%B8%B0%EF%B8%8F-%E0%B9%81%E0%B8%8B%E0%B9%88%E0%B8%9A%E0%B8%99%E0%B8%B1%E0%B8%A7%E0%B8%A3%E0%B9%8C-%E0%B8%A5%E0%B8%B0%E0%B8%A1%E0%B8%B8%E0%B8%99%E0%B8%A1%E0%B8%B2%E0%B8%81-%E0%B8%95%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%94%E0%B8%B9-%E0%B9%80%E0%B8%A3%E0%B8%B7%E0%B9%88%E0%B8%AD%E0%B8%87-%E0%B8%9B%E0%B8%8F%E0%B8%B4%E0%B8%9A%E0%B8%B1%E0%B8%95%E0%B8%B4%E0%B8%81%E0%B8%B2%E0%B8%A3%E0%B9%80%E0%B8%99%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B9%80%E0%B8%9B%E0%B9%87%E0%B8%99%E0%B8%84%E0%B8%99%E0%B8%A3%E0%B8%B1%E0%B8%8160-%E0%B8%95/1722086129113121/", "title": "1:26", "domain_rating": 100.0, "traffic": 51, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["ai_overview_sitelink", "image_th"], "url": "https://salehere.co.th/articles/best-vertical-chinese-dramas", "title": "มัดรวม 20 ซีรี่ส์จีนแนวตั้ง ดูเพลินทุกตอน สนุกจนหยุดดูไม่ได้! | Sale Here", "domain_rating": 50.0, "traffic": 539, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["organic"], "url": "https://www.bilibili.tv/th/space/1967559152", "title": "ช่องของ มินิซีรีส์จีนแนวตั้ง", "domain_rating": 76.0, "traffic": 1547, "top_keyword": "bilibili ซี รี ย์ จีน พากย์ไทยเต็มเรื่อง", "top_keyword_volume": 10000 },
+          { "position": 4, "type": ["organic", "video_th"], "url": "https://www.facebook.com/ThaiPBS/videos/%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%AA%E0%B8%B1%E0%B9%89%E0%B8%99%E0%B9%81%E0%B8%99%E0%B8%A7%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87-%E0%B8%A1%E0%B8%B2%E0%B9%81%E0%B8%A3%E0%B8%87%E0%B9%83%E0%B8%99%E0%B8%88%E0%B8%B5%E0%B8%99%E0%B9%81%E0%B8%9C%E0%B9%88%E0%B8%99%E0%B8%94%E0%B8%B4%E0%B8%99%E0%B9%83%E0%B8%AB%E0%B8%8D%E0%B9%88-%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B8%9A%E0%B8%B1%E0%B8%99%E0%B9%80%E0%B8%97%E0%B8%B4%E0%B8%87/791585300636845/", "title": "ละครสั้นแนวตั้ง มาแรงในจีนแผ่นดินใหญ่ . คอนเทนต์หนึ่งที่มักขึ้นฟีดบน ...", "domain_rating": 100.0, "traffic": 24, "top_keyword": "หนังแนวตั้ง", "top_keyword_volume": 1100 },
+          { "position": 5, "type": ["organic"], "url": "https://www.facebook.com/groups/829998527541559/posts/1878572679350800/", "title": "ซีรีส์แนวตั้ง มันคืออะไรเหรอครับ ช่วยอธิบายหน่อย ไม่รู้จักกับเขาเลย", "domain_rating": 100.0, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 6, "type": ["organic"], "url": "https://salehere.co.th/articles/best-vertical-chinese-dramas", "title": "มัดรวม 20 ซีรี่ส์จีนแนวตั้ง ดูเพลินทุกตอน สนุกจนหยุดดูไม่ได้!", "domain_rating": 50.0, "traffic": 369, "top_keyword": "หนังจีนแนวตั้ง", "top_keyword_volume": 4800 },
+          { "position": 7, "type": ["organic"], "url": "https://www.youtube.com/playlist?list=PL7LI2C4GPyPh1La6cgnu3KzL776DLFKNK", "title": "Shop ละคร & โรงหนังจีน CCAP | การแก้แค้นของภรรยาเศรษฐี ซีรี ...", "domain_rating": 99.0, "traffic": 91, "top_keyword": "หนังแนวตั้ง", "top_keyword_volume": 1100 },
+          { "position": 8, "type": ["organic"], "url": "https://www.tiktok.com/tag/%E0%B8%A1%E0%B8%B4%E0%B8%99%E0%B8%B4%E0%B8%8B%E0%B8%B5%E0%B8%A3%E0%B8%B5%E0%B9%88%E0%B8%A2%E0%B9%8C%E0%B8%88%E0%B8%B5%E0%B8%99%E0%B9%81%E0%B8%99%E0%B8%A7%E0%B8%95%E0%B8%B1%E0%B9%89%E0%B8%87", "title": "มินิซีรี่ย์จีนแนวตั้ง", "domain_rating": 97.0, "traffic": 376, "top_keyword": "ซีรีย์แนวตั้ง", "top_keyword_volume": 2900 }
+        ]
+      }
+    },
+    {
+      "id": "serp-plern",
+      "tool": "serp-overview",
+      "params": { "keyword": "เพลิน", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 16, "units-cost-row": 26, "units-cost-total-actual": 416 },
+      "response": {
+        "positions": [
+          { "position": 1, "type": ["local_pack"], "url": null, "title": "ร้านอาหารเพลิน", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 1, "type": ["local_pack"], "url": null, "title": "ร้านอาหารเพลิน", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 1, "type": ["local_pack"], "url": null, "title": "ร้านเพลินภูเก็ต", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["video"], "url": "https://www.youtube.com/watch?v=NoXHe9Pt26M", "title": "เพลิน - สุชาติ ชวางกูร (คอนเสิร์ท ความงามและความรัก)", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["video"], "url": "https://www.facebook.com/ploen.restaurant/videos/3-%E0%B9%80%E0%B8%AB%E0%B8%95%E0%B8%B8%E0%B8%9C%E0%B8%A5%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%95%E0%B9%89%E0%B8%AD%E0%B8%87%E0%B8%A1%E0%B8%B2%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9E%E0%B8%A5%E0%B8%B4%E0%B8%99%E0%B8%9A%E0%B8%AD%E0%B8%81%E0%B9%80%E0%B8%A5%E0%B8%A2%E0%B8%A7%E0%B9%88%E0%B8%B2%E0%B8%94%E0%B8%B9%E0%B8%84%E0%B8%A5%E0%B8%B4%E0%B8%9B%E0%B8%99%E0%B8%B5%E0%B9%89%E0%B8%88%E0%B8%9A-%E0%B8%A1%E0%B8%B5%E0%B8%99%E0%B8%B1%E0%B8%94%E0%B8%A1%E0%B8%B7%E0%B9%89%E0%B8%AD%E0%B8%96%E0%B8%B1%E0%B8%94%E0%B9%84%E0%B8%9B%E0%B9%81%E0%B8%99%E0%B9%88%E0%B8%99%E0%B8%AD%E0%B8%99%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B9%80%E0%B8%9E%E0%B8%A5%E0%B8%B4%E0%B8%99-plo/1437190891439121/", "title": "3 เหตุผลที่ต้องมาร้านเพลิน…บอกเลยว่าดูคลิปนี้จบ มีนัดมื้อถัดไป ...", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["video"], "url": "https://www.youtube.com/watch?v=iC14PXXMVKo", "title": "เพลิน - อุมาพร บัวพึ่ง (Official Audio)", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["question"], "url": null, "title": "เพลิน สะกด ยัง ไง", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["question"], "url": null, "title": "ร้านเพลินมีเมนูอะไรบ้าง?", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["question"], "url": null, "title": "\"เพลิน\" แปลว่าอะไร?", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["question"], "url": null, "title": "เพลินพุง ร้านใคร", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 4, "type": ["organic", "image_th"], "url": "https://www.facebook.com/ploen.restaurant/?locale=th_TH", "title": "Ploen Restaurant/ร้านอาหารเพลิน | Bangkok", "domain_rating": 100.0, "traffic": 2097, "top_keyword": "ร้านอาหารเพลิน", "top_keyword_volume": 1300 },
+          { "position": 5, "type": ["organic"], "url": "https://www.caretery.com/ploen/", "title": "ร้านอาหารเพลิน (เพลินซีฟู้ด วิภาวดีฯ) | Ploen/ ...", "domain_rating": 16.0, "traffic": 233, "top_keyword": "ร้านเพลิน วิภาวดี", "top_keyword_volume": 1100 },
+          { "position": 6, "type": ["organic"], "url": "https://www.wongnai.com/restaurants/5829MP-%E0%B8%A3%E0%B9%89%E0%B8%B2%E0%B8%99%E0%B8%AD%E0%B8%B2%E0%B8%AB%E0%B8%B2%E0%B8%A3%E0%B9%80%E0%B8%9E%E0%B8%A5%E0%B8%B4%E0%B8%99-ploen-restaurant", "title": "[รีวิว] ร้าน ร้านอาหารเพลิน (Ploen Restaurant) | เมนูแนะนำ ...", "domain_rating": 74.0, "traffic": 481, "top_keyword": "ร้านเพลิน วิภาวดี", "top_keyword_volume": 1100 },
+          { "position": 7, "type": ["organic"], "url": "https://page.line.me/zvp8242d", "title": "ร้านอาหารเพลิน | LINE Official Account", "domain_rating": 96.0, "traffic": 27, "top_keyword": "เพลิน วิภาวดี", "top_keyword_volume": 700 },
+          { "position": 8, "type": ["organic"], "url": "https://shellshuanshim.com/restaurant/detail/ploen", "title": "ร้านอาหารเพลิน", "domain_rating": 21.0, "traffic": 87, "top_keyword": "ร้านเพลิน", "top_keyword_volume": 1600 },
+          { "position": 9, "type": ["organic", "image_th"], "url": "https://www.centerwedding.com/bangkok/venues/433191/", "title": "ร้านอาหารเพลิน (Ploen), จังหวัดกรุงเทพมหานคร", "domain_rating": 35.0, "traffic": 13, "top_keyword": "ร้านอาหารเพลิน วิภาวดี", "top_keyword_volume": 250 }
+        ]
+      }
+    },
+    {
+      "id": "serp-lakorn-en",
+      "tool": "serp-overview",
+      "params": { "keyword": "lakorn", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 17, "units-cost-row": 26, "units-cost-total-actual": 442 },
+      "response": {
+        "positions": [
+          { "position": 1, "type": ["organic"], "url": "https://www.watchlakorn.org/", "title": "WatchLakorn.org: หน้าแรก", "domain_rating": 0.0, "traffic": 11259, "top_keyword": "watchlakorn", "top_keyword_volume": 7800 },
+          { "position": 2, "type": ["video"], "url": "https://www.youtube.com/watch?v=835WSH3q1mU", "title": "FIN | กูแค่อยากหาเหตุผล ทำไมเขาถึงไม่เลือกกู | สองหัวใจ EP.15", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["video"], "url": "https://www.youtube.com/watch?v=eRMed_VXn3I", "title": "Lakorn Nok: Suwannahong, The Episode of ...", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["video"], "url": "https://wetv.vip/th/short/k3278n39h2q", "title": "#lakorn #thai #dramaTop 10 Lakorn / T drama / Thailand ...", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["ai_overview"], "url": null, "title": null, "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.watchlakorn.org/", "title": "WatchLakorn.org: หน้าแรก", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.rosewoodhotels.com/en/bangkok/dining/lakorn", "title": "Bangkok Authentic Thai Restaurant | Lakorn at Rosewood", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.one31.net/shows/drama", "title": "📺 ละครช่องวัน 31 ดูละครย้อนหลัง oneD ดูฟรี มีตอนใหม่ทุกวัน", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["ai_overview_sitelink", "image_th"], "url": "https://ch3plus.com/drama", "title": "ละคร/ซีรีส์ - ช่อง3", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 3, "type": ["ai_overview_sitelink"], "url": "https://www.oned.net/content/drama", "title": "oneD ดูละครย้อนหลัง ฟรี ช่องวัน 31 และ GMM25", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 4, "type": ["organic"], "url": "https://www.youtube.com/@oneLakorn", "title": "one Lakorn", "domain_rating": 99.0, "traffic": 40, "top_keyword": "lakorn", "top_keyword_volume": 250 },
+          { "position": 5, "type": ["organic"], "url": "https://www.facebook.com/lakorn.bkk/", "title": "Lakorn | Bangkok", "domain_rating": 100.0, "traffic": 4, "top_keyword": "lakorn", "top_keyword_volume": 250 },
+          { "position": 6, "type": ["organic"], "url": "https://www.wongnai.com/restaurants/397269vB-lakorn", "title": "ร้าน Lakorn | รีวิวร้านอาหาร", "domain_rating": 74.0, "traffic": 2, "top_keyword": "lakorn", "top_keyword_volume": 250 },
+          { "position": 7, "type": ["organic"], "url": "https://en.wikipedia.org/wiki/Thai_television_soap_opera", "title": "Thai television soap opera", "domain_rating": 97.0, "traffic": 13, "top_keyword": "thai drama", "top_keyword_volume": 200 },
+          { "position": 8, "type": ["organic"], "url": "https://www.instagram.com/lakorn.bkk/", "title": "lakorn.bkk - Bangkok", "domain_rating": 100.0, "traffic": 0, "top_keyword": "lakorn", "top_keyword_volume": 250 },
+          { "position": 9, "type": ["organic"], "url": "https://www.themoviedb.org/keyword/204211-lakorn/tv?language=th-TH", "title": "\"lakorn\" TV Shows — The Movie Database ...", "domain_rating": 89.0, "traffic": 6, "top_keyword": "thai lakorn", "top_keyword_volume": 30 },
+          { "position": 10, "type": ["organic"], "url": "https://thailandfoundation.or.th/thai-series-101-your-ultimate-guide-to-lakorns-shows-and-dramas/", "title": "Thai Series 101: Your Ultimate Guide to Lakorns, Shows, ...", "domain_rating": 55.0, "traffic": 1, "top_keyword": "lakorn thai", "top_keyword_volume": 20 }
+        ]
+      }
+    },
+    {
+      "id": "serp-lakhon-th",
+      "tool": "serp-overview",
+      "params": { "keyword": "ละคอน", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 15, "units-cost-row": 26, "units-cost-total-actual": 390 },
+      "response": {
+        "positions": [
+          { "position": 1, "type": ["ai_overview"], "url": null, "title": null, "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 1, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.facebook.com/lakornvarasarn/photos/%E0%B8%AB%E0%B8%A5%E0%B8%B2%E0%B8%A2%E0%B8%84%E0%B8%99%E0%B8%AA%E0%B8%87%E0%B8%AA%E0%B8%B1%E0%B8%A2%E0%B8%A7%E0%B9%88%E0%B8%B2%E0%B8%97%E0%B8%B3%E0%B9%84%E0%B8%A1%E0%B9%80%E0%B8%A3%E0%B8%B2%E0%B8%9E%E0%B8%B4%E0%B8%A1%E0%B8%9E%E0%B9%8C%E0%B8%9C%E0%B8%B4%E0%B8%94%E0%B8%AB%E0%B8%A3%E0%B8%B7%E0%B8%AD%E0%B9%80%E0%B8%9B%E0%B8%A5%E0%B9%88%E0%B8%B2-%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B9%83%E0%B8%8A%E0%B9%89%E0%B8%84%E0%B8%B3%E0%B8%A7%E0%B9%88%E0%B8%B2-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%AD%E0%B8%99-%E0%B9%84%E0%B8%A1%E0%B9%88%E0%B9%83%E0%B8%8A%E0%B9%89%E0%B8%84%E0%B8%B3%E0%B8%A7%E0%B9%88%E0%B8%B2-%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3-%E0%B9%81%E0%B8%97%E0%B8%99-%E0%B8%A7%E0%B8%B1/569941823066545/", "title": "Lakorn - หลายคนสงสัยว่าทำไมเราพิมพ์ผิดหรือเปล่า ที่ใช้คำว่า “ละคอน” ไม่ใช้ ...", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 1, "type": ["ai_overview_sitelink", "image_th"], "url": "https://www.instagram.com/tapadkarnlakorn/", "title": "ถาปัดการละคอน Atlantis (@tapadkarnlakorn) - Instagram", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 2, "type": ["organic", "video_th"], "url": "https://www.youtube.com/watch?v=y3v3lo1_C58", "title": "ความรักครั้งนี้ จะลงเอยอย่างไร!? | ละคอนTENT", "domain_rating": 99.0, "traffic": 14, "top_keyword": "ละคอน", "top_keyword_volume": 40 },
+          { "position": 3, "type": ["organic"], "url": "https://pantip.com/topic/37828980", "title": "ละคร กับ ละคอน {สงสัยมากมาย}", "domain_rating": 77.0, "traffic": 1, "top_keyword": "ละคอน", "top_keyword_volume": 40 },
+          { "position": 4, "type": ["question"], "url": null, "title": "\"ละคอน\" แปลว่าอะไร?", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 4, "type": ["question"], "url": null, "title": "การละคอน มธ เรียนอะไร", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 4, "type": ["question"], "url": null, "title": "โรง ละ คอน คือ อะไร", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 4, "type": ["question"], "url": null, "title": "คำว่าละครเขียนยังไง", "domain_rating": null, "traffic": null, "top_keyword": null, "top_keyword_volume": null },
+          { "position": 5, "type": ["organic"], "url": "https://www.youtube.com/playlist?list=PLJx-XkJhYuVd7Mm6AJ3E7Qg5soTudbolM", "title": "ละคอนTENT เพลงรักรอยแค้น", "domain_rating": 99.0, "traffic": 0, "top_keyword": "ละคอน", "top_keyword_volume": 40 },
+          { "position": 6, "type": ["organic"], "url": "https://theatre.fineart.tu.ac.th/", "title": "การละคอน คณะศิลปกรรมศาสตร์ มหาวิทยาลัยธรรมศาสตร์: หน้าหลัก", "domain_rating": 76.0, "traffic": 7, "top_keyword": "การละคอน มธ", "top_keyword_volume": 20 },
+          { "position": 7, "type": ["organic"], "url": "http://legacy.orst.go.th/?knowledges=%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3%E0%B8%AB%E0%B8%A3%E0%B8%B7%E0%B8%AD%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%AD%E0%B8%99-%E0%B9%92-%E0%B8%AA%E0%B8%B4%E0%B8%87%E0%B8%AB%E0%B8%B2%E0%B8%84%E0%B8%A1", "title": "ละครหรือละคอน (๒ สิงหาคม ๒๕๕๔)", "domain_rating": 64.0, "traffic": 0, "top_keyword": "ละคอน", "top_keyword_volume": 40 },
+          { "position": 8, "type": ["organic"], "url": "https://www.youtube.com/playlist?list=PLJx-XkJhYuVd1FzPoEggGDjlCI0O-fSL_", "title": "ละคอนTENT", "domain_rating": 99.0, "traffic": 0, "top_keyword": "ละคอน", "top_keyword_volume": 40 },
+          { "position": 9, "type": ["organic"], "url": "https://www.facebook.com/tapadkarnlakorn/?locale=th_TH", "title": "ถาปัดการละคอน (@tapadkarnlakorn)", "domain_rating": 100.0, "traffic": 0, "top_keyword": "ละคอน", "top_keyword_volume": 40 },
+          { "position": 10, "type": ["organic"], "url": "https://www.wordyguru.com/a/%E0%B8%84%E0%B8%B3%E0%B9%84%E0%B8%97%E0%B8%A2%E0%B8%97%E0%B8%B5%E0%B9%88%E0%B8%A1%E0%B8%B1%E0%B8%81%E0%B9%80%E0%B8%82%E0%B8%B5%E0%B8%A2%E0%B8%99%E0%B8%9C%E0%B8%B4%E0%B8%94/q/%E0%B8%A5%E0%B8%B0%E0%B8%84%E0%B8%A3", "title": "ละคร หรือ ละคอน เขียนยังไงถูก พร้อมความหมายและวิธีจำ", "domain_rating": 43.0, "traffic": 0, "top_keyword": "ละคอน", "top_keyword_volume": 40 }
+        ]
+      }
+    },
+    {
+      "id": "serp-muanjai",
+      "tool": "serp-overview",
+      "params": { "keyword": "ม่วนใจ", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 0, "units-cost-row": 26, "units-cost-total-actual": 50 },
+      "response": { "positions": [] }
+    },
+    {
+      "id": "serp-doosan",
+      "tool": "serp-overview",
+      "params": { "keyword": "ดูสั้น", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 0, "units-cost-row": 26, "units-cost-total-actual": 50 },
+      "response": { "positions": [] }
+    },
+    {
+      "id": "serp-thaishort",
+      "tool": "serp-overview",
+      "params": { "keyword": "ไทยชอร์ต", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 0, "units-cost-row": 26, "units-cost-total-actual": 50 },
+      "response": { "positions": [] }
+    },
+    {
+      "id": "serp-minilakorn",
+      "tool": "serp-overview",
+      "params": { "keyword": "มินิละคร", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 0, "units-cost-row": 26, "units-cost-total-actual": 50 },
+      "response": { "positions": [] }
+    },
+    {
+      "id": "serp-patdoo",
+      "tool": "serp-overview",
+      "params": { "keyword": "ปัดดู", "country": "th", "top_positions": 10, "select": "position,type,url,title,domain_rating,traffic,top_keyword,top_keyword_volume" },
+      "api_usage": { "rows": 0, "units-cost-row": 26, "units-cost-total-actual": 50 },
+      "response": { "positions": [] }
+    }
+  ]
+}
