@@ -2635,6 +2635,24 @@
       "any_case": 10234,
       "origin_literal": 7664,
       "repo_path_literal": 18,
+      "non_html": 109,
+      "build_mjs": 64,
+      "design_mjs": 18,
+      "design_non_html": 21,
+      "assets_dir": 7,
+      "admin_dir": 2,
+      "admin_dir_all": 4,
+      "tools_dir": 5,
+      "ci_dir": 1,
+      "loose": 5,
+      "loose_files": [
+        ".github/workflows/content-ci.yml",
+        "README-POSTERS.txt",
+        "README.md",
+        "redirects.map",
+        "robots.txt"
+      ],
+      "generated_html_ceo_pathspec": 2063,
       "remainder": 20,
       "other_casing": 7933,
       "remainder_files": [
@@ -6494,12 +6512,6 @@
     },
     {
       "kind": "label",
-      "path": "label:2",
-      "value": null,
-      "text": "2"
-    },
-    {
-      "kind": "label",
       "path": "label:2,192",
       "value": null,
       "text": "2,192"
@@ -6509,6 +6521,18 @@
       "path": "label:568",
       "value": null,
       "text": "568"
+    },
+    {
+      "kind": "measured",
+      "path": "census.gen_html_ceo",
+      "value": 2063,
+      "text": "2,063"
+    },
+    {
+      "kind": "measured",
+      "path": "census.gen_html_mine",
+      "value": 2063,
+      "text": "2,063"
     },
     {
       "kind": "measured",
@@ -6575,6 +6599,216 @@
       "path": "census.remainder_files",
       "value": 14,
       "text": "14"
+    },
+    {
+      "kind": "measured",
+      "path": "census.non_html_head",
+      "value": 109,
+      "text": "109"
+    },
+    {
+      "kind": "measured",
+      "path": "ceo.sub_sum",
+      "value": 105,
+      "text": "105"
+    },
+    {
+      "kind": "measured",
+      "path": "ceo.sub_delta",
+      "value": 4,
+      "text": "4"
+    },
+    {
+      "kind": "label",
+      "path": "label:64",
+      "value": null,
+      "text": "64"
+    },
+    {
+      "kind": "measured",
+      "path": "census.build_mjs",
+      "value": 64,
+      "text": "64"
+    },
+    {
+      "kind": "measured",
+      "path": "census.build_all",
+      "value": 65,
+      "text": "65"
+    },
+    {
+      "kind": "measured",
+      "path": "census.build_extra",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "label",
+      "path": "label:21",
+      "value": null,
+      "text": "21"
+    },
+    {
+      "kind": "measured",
+      "path": "census.design_non_html",
+      "value": 21,
+      "text": "21"
+    },
+    {
+      "kind": "measured",
+      "path": "census.design_mjs",
+      "value": 18,
+      "text": "18"
+    },
+    {
+      "kind": "measured",
+      "path": "census.design_css_md",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "label",
+      "path": "label:7",
+      "value": null,
+      "text": "7"
+    },
+    {
+      "kind": "measured",
+      "path": "census.assets",
+      "value": 7,
+      "text": "7"
+    },
+    {
+      "kind": "label",
+      "path": "label:4",
+      "value": null,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "census.admin",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "census.admin_all",
+      "value": 4,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "census.admin_html",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "census.admin_echo",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "label",
+      "path": "label:5",
+      "value": null,
+      "text": "5"
+    },
+    {
+      "kind": "measured",
+      "path": "census.tools",
+      "value": 5,
+      "text": "5"
+    },
+    {
+      "kind": "label",
+      "path": "label:1",
+      "value": null,
+      "text": "1"
+    },
+    {
+      "kind": "measured",
+      "path": "census.ci",
+      "value": 1,
+      "text": "1"
+    },
+    {
+      "kind": "label",
+      "path": "label:3",
+      "value": null,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "census.docs2",
+      "value": 3,
+      "text": "3"
+    },
+    {
+      "kind": "measured",
+      "path": "census.loose",
+      "value": 5,
+      "text": "5"
+    },
+    {
+      "kind": "label",
+      "path": "label:109",
+      "value": null,
+      "text": "109"
+    },
+    {
+      "kind": "measured",
+      "path": "census.non_html",
+      "value": 109,
+      "text": "109"
+    },
+    {
+      "kind": "measured",
+      "path": "census.non_html_echo",
+      "value": 109,
+      "text": "109"
+    },
+    {
+      "kind": "measured",
+      "path": "census.admin_delta",
+      "value": 2,
+      "text": "2"
+    },
+    {
+      "kind": "measured",
+      "path": "census.unlisted",
+      "value": 6,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "census.loose_files_n",
+      "value": 5,
+      "text": "5"
+    },
+    {
+      "kind": "measured",
+      "path": "ceo.delta_admin",
+      "value": -2,
+      "text": "-2"
+    },
+    {
+      "kind": "measured",
+      "path": "ceo.delta_unlisted",
+      "value": 6,
+      "text": "6"
+    },
+    {
+      "kind": "measured",
+      "path": "ceo.delta_net",
+      "value": 4,
+      "text": "4"
+    },
+    {
+      "kind": "measured",
+      "path": "census.total_echo2",
+      "value": 2301,
+      "text": "2,301"
     },
     {
       "kind": "measured",

@@ -73,6 +73,16 @@ const recount = {
   any_case: occI('lakornai', '.'),
   origin_literal: occI('lakornai\\.tv', '.'),
   repo_path_literal: occI('github\\.io/lakornai', '.'),
+  non_html: occ('.', ':!*.html'),
+  build_mjs: occ('build/*.mjs'),
+  design_mjs: occ('design/**/*.mjs'),
+  assets_dir: occ('assets/*', ':!*.html'),
+  admin_dir: occ('admin/*', ':!*.html'),
+  admin_dir_all: occ('admin/*'),
+  tools_dir: occ('tools/*', ':!*.html'),
+  ci_dir: occ('ci/*', ':!*.html'),
+  loose: occ('.', ':!*.html', ':!build/*', ':!design/*', ':!docs/*', ':!assets/*', ':!admin/*', ':!tools/*', ':!ci/*'),
+  generated_html_ceo_pathspec: occ('*.html', ':!design/**'),
 };
 for (const [k, v] of Object.entries(recount)) {
   if (c[k] === v) ok('D2 ' + k + ' = ' + v + ' นับใหม่ได้เท่าเดิม');
@@ -84,6 +94,21 @@ if (sum === c.total) ok('D2 ถังย่อยรวมกันได้ ' +
 else fail('D2 ถังย่อยรวมกันได้ ' + sum + ' แต่ถังรวมคือ ' + c.total + ' — การแบ่งกองไม่ครบหรือซ้อนกัน');
 if (c.html_all === c.generated_html + c.design_html) ok('D2 html ทั้งหมด = html ที่ build สร้าง + html ของม็อกอัพ');
 else fail('D2 html ทั้งหมด (' + c.html_all + ') ≠ build (' + c.generated_html + ') + design (' + c.design_html + ')');
+/* กองย่อยฝั่งไฟล์ต้นทางต้องรวมได้เท่ายอด non_html — ตารางที่ส่งให้ CEO ไล่งานใช้ตัวนี้ */
+const nonHtmlParts = c.build_dir + c.design_non_html + c.docs_dir + c.assets_dir + c.admin_dir + c.tools_dir + c.ci_dir + c.loose;
+if (nonHtmlParts === c.non_html) ok('D2 กองย่อยไฟล์ต้นทางรวมได้ ' + nonHtmlParts + ' เท่ากับยอด non_html');
+else fail('D2 กองย่อยไฟล์ต้นทางรวมได้ ' + nonHtmlParts + ' แต่ยอด non_html คือ ' + c.non_html + ' — ตารางที่ส่งให้ CEO ไล่งานมีรูรั่ว');
+if (c.generated_html_ceo_pathspec === c.generated_html) ok('D2 pathspec สองแบบ (:!design/* กับ :!design/**) ได้เลขเดียวกัน');
+else fail('D2 pathspec สองแบบได้เลขไม่เท่ากัน: ' + c.generated_html + ' กับ ' + c.generated_html_ceo_pathspec);
+/* เลขคณิตที่รายงานตีพิมพ์ต้องบวกกันได้จริง — ส่วนประกอบของผลต่างต้องเท่าผลต่าง
+   ไม่งั้นรายงานอธิบายผลต่างด้วยเหตุที่อธิบายไม่ครบ แล้วไม่มีใครเห็น */
+const numAt = path => out.report_numbers.find(x => x.path === path)?.value ?? null;
+const [dAdmin, dUnlisted, dNet, dSub] = ['ceo.delta_admin', 'ceo.delta_unlisted', 'ceo.delta_net', 'ceo.sub_delta'].map(numAt);
+if (dAdmin !== null && dAdmin + dUnlisted === dNet && dNet === dSub) ok('D2 ส่วนประกอบของผลต่าง (' + dAdmin + ' + ' + dUnlisted + ') เท่าผลต่างที่ตีพิมพ์ ' + dNet);
+else fail('D2 ส่วนประกอบของผลต่างบวกไม่ลงตัว: ' + dAdmin + ' + ' + dUnlisted + ' ≠ ' + dNet + ' หรือไม่เท่า sub_delta ' + dSub);
+
+/* ยอดนับต้องไม่ขยับเพราะตัวรายงานเอง: รัน 2 รอบติดกันต้องได้ไฟล์เดียวกัน (ด่าน D1 คุมอยู่)
+   จึงไม่มีช่อง self_reference ให้ตรวจอีก — เลขที่ไม่มีจุดนิ่งถูกถอนออกจากรายงานแล้ว */
 
 /* เลขบรรทัดที่รายงานอ้าง ต้องมีสตริงนั้นอยู่จริงบนบรรทัดนั้น ณ ตอนตรวจ */
 const lineHas = (file, line, needle) => {

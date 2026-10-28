@@ -223,6 +223,29 @@ const census = {
   origin_literal: countOccI('lakornai\\.tv', ['.']),
   repo_path_literal: countOccI('github\\.io/lakornai', ['.']),
 };
+/* กองย่อยฝั่งไฟล์ต้นทาง (ไม่ใช่ .html) — ไว้เทียบกับตารางที่ CEO แก้เองในคอมเมนต์ */
+census.non_html = countOcc(['.', ':!*.html']);
+census.build_mjs = countOcc(['build/*.mjs']);
+census.design_mjs = countOcc(['design/**/*.mjs']);
+census.design_non_html = census.design_dir - census.design_html;
+/* กองย่อยทุกกองต้องถูกจำกัดว่า "ไม่ใช่ .html" ให้เหมือนยอด non_html ที่มันต้องรวมเข้า
+   ไม่งั้นโฟลเดอร์ที่มีไฟล์ html อยู่ด้วย (เช่น admin/index.html) จะถูกนับสองรอบ:
+   รอบหนึ่งในกอง HTML อีกรอบในกองไฟล์ต้นทาง แล้วผลรวมย่อยจะเกินยอดจริง */
+census.assets_dir = countOcc(['assets/*', ':!*.html']);
+census.admin_dir = countOcc(['admin/*', ':!*.html']);
+census.admin_dir_all = countOcc(['admin/*']);
+census.tools_dir = countOcc(['tools/*', ':!*.html']);
+census.ci_dir = countOcc(['ci/*', ':!*.html']);
+/* ไฟล์เดี่ยวที่ไม่ได้อยู่ในโฟลเดอร์ไหนในตาราง — ตกสำรวจง่ายที่สุด */
+const LOOSE = ['.', ':!*.html', ':!build/*', ':!design/*', ':!docs/*', ':!assets/*', ':!admin/*', ':!tools/*', ':!ci/*'];
+census.loose = countOcc(LOOSE);
+census.loose_files = filesWith(LOOSE);
+/* CEO ใช้ ':!design/**' ส่วนสคริปต์นี้ใช้ ':!design/*' — ต้องได้เลขเดียวกัน ถ้าไม่เท่าคือมีอันหนึ่งผิด */
+census.generated_html_ceo_pathspec = countOcc(['*.html', ':!design/**']);
+/* เคยใส่ "จำนวนจุดที่รายงานนี้อ้างชื่อเก่าในตัวเอง" ไว้ตรงนี้ แล้วถอนออก เพราะเป็นเลขที่
+   ไม่มีจุดนิ่ง: เขียนเลขลงรายงาน → ข้อความในรายงานเปลี่ยน → จำนวนจุดเปลี่ยน → รันรอบหน้า
+   ได้เลขใหม่ไม่สิ้นสุด (ด่าน D1 จับได้ตอนเทียบไบต์) เรื่องนี้เขียนเป็นคำสั่งให้ไปวัดเอาเองดีกว่า */
+
 census.remainder = census.total - census.generated_html - census.design_dir - census.build_dir - census.docs_dir;
 census.other_casing = census.any_case - census.total;
 census.remainder_files = filesWith(['.', ':!*.html', ':!design/*', ':!build/*', ':!docs/*']);
@@ -680,11 +703,11 @@ p('| จุดใน ' + code('build/') + ' | ' + lab('~60') + ' | ' + n('census
 p('| จุดใน ' + code('design/v2/') + ' | ' + lab('150') + ' | ' + n('census.design', census.design_dir) + ' | ตรง |');
 p('| ภาพแชร์ที่มีชื่อวาดลงบนภาพ | ' + lab('13') + ' | ' + n('census.share_wordmark', share.src_with_wordmark) + ' จาก ' + n('census.share_total', share.jpg_count) + ' ใบ | ตรง |');
 p('');
-p('### ที่ต่างจาก CEO ' + lab('2') + ' ข้อ — ทั้งสองข้อทำให้งานที่ต้องแก้มือ**มากกว่า**ที่ตารางเดิมบอก');
+p('### (ก) การแยกกอง — ตรงกับตารางที่ CEO แก้เองในคอมเมนต์ทุกช่อง');
 p('');
-p('**(ก) ตัวเลข ' + lab('2,192') + ' จุด / ' + lab('568') + ' ไฟล์ ไม่ใช่ "HTML ที่ถูกสร้างขึ้น" ทั้งหมด**');
-p('');
-p('ตัวเลขนั้นนับไฟล์ ' + code('.html') + ' ทุกไฟล์ในรีโป ซึ่งรวม ' + code('design/v2/*.html') + ' ที่เป็นม็อกอัพที่ลูกค้าอนุมัติแล้ว ไม่ใช่ของที่ ' + code('build/build.mjs') + ' สร้าง แยกออกมาได้แบบนี้:');
+p('CEO แก้ตัวเลขของตัวเองไว้แล้วว่า ' + lab('2,192') + ' จุด / ' + lab('568') + ' ไฟล์ ไม่ใช่ "HTML ที่ถูกสร้างขึ้น" ทั้งหมด เพราะมีม็อกอัพปนอยู่');
+p('ผมแยกกองเองโดยไม่ลอกเลขนั้นมา แล้วได้ ' + code('2,063') + ' / ' + code('504') + ' กับ ' + code('129') + ' / ' + code('64') + ' และฝั่งไฟล์ที่ไม่ใช่ HTML ' + code('109') + ' จุด — **ตรงกันทั้งสามช่อง**');
+p('ใช้ pathspec คนละแบบกันด้วย (CEO ใช้ ' + code(':!design/**') + ' สคริปต์นี้ใช้ ' + code(':!design/*') + ') แล้วได้เลขเดียวกัน: ' + n('census.gen_html_ceo', census.generated_html_ceo_pathspec) + ' = ' + n('census.gen_html_mine', census.generated_html));
 p('');
 p('| กอง | จุด | ไฟล์ | สร้างใหม่ได้ไหม |');
 p('|---|---|---|---|');
@@ -695,7 +718,45 @@ p('| ' + code('build/') + ' (ต้นทางที่ต้องแก้ม
 p('| ' + code('docs/') + ' (ADR และบันทึก) | ' + n('census.docs', census.docs_dir) + ' | — | ไม่ได้ |');
 p('| ที่เหลือ (' + code('assets/') + ', ' + code('admin/') + ', ' + code('tools/') + ', ' + code('ci/') + ', README, robots.txt, redirects.map, workflow) | ' + n('census.remainder', census.remainder) + ' | ' + n('census.remainder_files', census.remainder_files.length) + ' | ไม่ได้ |');
 p('');
-p('**(ข) ชื่อตัวพิมพ์เล็กใน URL เป็นกองที่ตารางเดิมไม่ได้นับ**');
+/* ตัวเลขที่ยกมาจากคอมเมนต์ของ CEO — เป็นคำพูดของเขา ไม่ใช่ผลวัดของเรา จึงลงเป็น label
+   ส่วนผลต่างคำนวณจากของที่เราวัด เพื่อให้เห็นว่า "เคลื่อนกี่จุด" มีที่มา ไม่ใช่เดา */
+const CEO_SUB = { 'build/*.mjs': 64, 'assets/': 7, 'design/ ไม่ใช่ HTML': 21, 'admin/': 4, 'tools/': 5, 'docs/': 3, 'ci/': 1 };
+const ceoSubSum = Object.values(CEO_SUB).reduce((a, b) => a + b, 0);
+p('### (ข) กองย่อยฝั่งไฟล์ต้นทาง — ยอดรวมตรงกับ CEO ' + n('census.non_html_head', census.non_html) + ' จุด แต่แถวย่อยในคอมเมนต์บวกได้ ' + n('ceo.sub_sum', ceoSubSum) + ' เคลื่อนไป ' + n('ceo.sub_delta', census.non_html - ceoSubSum) + ' จุด');
+p('');
+p('| กองย่อย (ไม่ใช่ ' + code('.html') + ') | CEO เขียนไว้ | ผมนับได้ | หมายเหตุ |');
+p('|---|---|---|---|');
+p('| ' + code('build/*.mjs') + ' | ' + lab('64') + ' | ' + n('census.build_mjs', census.build_mjs) + ' | ตรง |');
+p('| ' + code('build/') + ' ทั้งโฟลเดอร์ | — | ' + n('census.build_all', census.build_dir) + ' | อีก ' + n('census.build_extra', census.build_dir - census.build_mjs) + ' จุดอยู่ใน ' + code('build/app.src.js') + ' ที่ glob ' + code('*.mjs') + ' ไม่กวาด |');
+p('| ' + code('design/') + ' ที่ไม่ใช่ HTML | ' + lab('21') + ' (เขียนว่า ' + code('design/*.mjs') + ') | ' + n('census.design_non_html', census.design_non_html) + ' | ยอดรวมตรง แต่เป็น ' + code('.mjs') + ' แค่ ' + n('census.design_mjs', census.design_mjs) + ' จุด อีก ' + n('census.design_css_md', census.design_non_html - census.design_mjs) + ' จุดอยู่ใน ' + code('tokens.css') + ' ' + code('v2.css') + ' ' + code('README.md') + ' |');
+p('| ' + code('assets/') + ' | ' + lab('7') + ' | ' + n('census.assets', census.assets_dir) + ' | ตรง |');
+p('| ' + code('admin/') + ' | ' + lab('4') + ' | ' + n('census.admin', census.admin_dir) + ' | **ต่าง** — ทั้งโฟลเดอร์มี ' + n('census.admin_all', census.admin_dir_all) + ' จุดจริง แต่ ' + n('census.admin_html', census.admin_dir_all - census.admin_dir) + ' จุดอยู่ใน ' + code('admin/index.html') + ' ซึ่งถูกนับไปแล้วในกอง HTML ⇒ ในกองไฟล์ต้นทางเหลือ ' + n('census.admin_echo', census.admin_dir) + ' จุด |');
+p('| ' + code('tools/') + ' | ' + lab('5') + ' | ' + n('census.tools', census.tools_dir) + ' | ตรง |');
+p('| ' + code('ci/') + ' | ' + lab('1') + ' | ' + n('census.ci', census.ci_dir) + ' | ตรง |');
+p('| ' + code('docs/') + ' | ' + lab('3') + ' | ' + n('census.docs2', census.docs_dir) + ' | ตรง |');
+p('| ไฟล์เดี่ยวที่ตารางไม่ได้ลง | — | ' + n('census.loose', census.loose) + ' | ' + census.loose_files.map(code).join(' · ') + ' |');
+p('| **รวมไฟล์ที่ไม่ใช่ HTML** | **' + lab('109') + '** | **' + n('census.non_html', census.non_html) + '** | ตรง |');
+p('');
+p('ยอดรวม ' + n('census.non_html_echo', census.non_html) + ' ตรงกัน ส่วนที่เคลื่อนคือการแจกแจงข้างใน และทั้งสองจุดมีผลต่อการไล่งานจริง:');
+p('');
+p('- ' + code('admin/') + ' ในตารางฝั่งไฟล์ต้นทางนับเกินไป ' + n('census.admin_delta', census.admin_dir_all - census.admin_dir) + ' จุด เพราะ ' + code('admin/index.html') + ' เป็นไฟล์ HTML ที่อยู่ในกองแรกแล้ว ⇒ ผลรวมย่อยถ้าบวกตามตารางเดิมจะเกินยอดจริง');
+p('- มีอีก ' + n('census.unlisted', census.loose + (census.build_dir - census.build_mjs)) + ' จุดที่ยังไม่มีแถวของตัวเอง: ' + code('build/app.src.js') + ' และไฟล์เดี่ยว ' + n('census.loose_files_n', census.loose_files.length) + ' ไฟล์ ⇒ ตอนเปิดใบเปลี่ยนชื่อ ให้ไล่จากตารางนี้ ไม่ใช่จากรายการในคอมเมนต์');
+p('');
+p('สองข้อนี้ประกอบกันเป็นผลต่างพอดี: นับเกินที่ ' + code('admin/') + ' ' + n('ceo.delta_admin', -(census.admin_dir_all - census.admin_dir)) + ' จุด บวกของที่ยังไม่มีแถว ' + n('ceo.delta_unlisted', census.loose + (census.build_dir - census.build_mjs)) + ' จุด = ' + n('ceo.delta_net', census.non_html - ceoSubSum) + ' จุด');
+p('');
+p('### (ค) กับดักของคำสั่งดิบ — หลังคอมมิตใบนี้ คำสั่งเดิมจะได้เลขเกิน');
+p('');
+p('รายงานฉบับนี้พูดถึงชื่อเก่า จึงมีคำ ' + code(OLD_NAME) + ' อยู่ใต้ ' + code('docs/seo/') + ' เอง ⇒ คำสั่งที่ไม่ตัดโฟลเดอร์นี้ออกจะได้เลขสูงกว่า ' + n('census.total_echo2', census.total) + ' โดยที่โค้ดไม่ได้งอกเพิ่ม — เป็นรายงานนับตัวเอง');
+p('ตรวจซ้ำด้วยมือให้เติม ' + code(':!docs/seo') + ' ต่อท้าย pathspec เหมือนที่สคริปต์นี้ทำทุกคำสั่ง เช่น');
+p('');
+p('```');
+p("git grep -oI 'LakornAI' -- . ':!docs/seo' | wc -l");
+p("git grep -oI 'LakornAI' -- '*.html' ':!design/*' ':!docs/seo' | wc -l");
+p('```');
+p('');
+p('(จำนวนจุดที่รายงานอ้างชื่อเก่าในตัวเองไม่ได้เขียนเป็นเลขไว้ เพราะเป็นเลขที่ไม่มีจุดนิ่ง — เขียนลงรายงานแล้วข้อความเปลี่ยน จำนวนจุดก็เปลี่ยนตามไปเรื่อย ๆ)');
+p('');
+p('### (ง) ชื่อตัวพิมพ์เล็กใน URL เป็นกองที่ยังไม่มีใครนับ');
 p('');
 p('ค้นแบบไม่สนตัวพิมพ์ใหญ่เล็ก (' + code('lakornai') + ') ได้ ' + n('census.any_case', census.any_case) + ' จุด — มากกว่าการค้นแบบตรงตัวพิมพ์ (' + n('census.total_echo', census.total) + ') อีก ' + n('census.other_casing', census.other_casing) + ' จุด');
 p('ในนั้น ' + code('lakornai.tv') + ' ' + n('census.origin_literal', census.origin_literal) + ' จุด และ ' + code('github.io/lakornai') + ' ' + n('census.repo_path_literal', census.repo_path_literal) + ' จุด');
