@@ -17,7 +17,7 @@ import { fileURLToPath } from 'node:url';
 import { SERIES, U } from '../build/content.mjs';
 import {
   ADR_REL, DUAL, parseShapeTables, shapeMapProblems, callsiteProblems, slotProblems,
-  countCallsIn, selectorsIn, stripCommentsAndStrings,
+  countCallsIn, selectorsIn, selectorTokens, stripCommentsAndStrings, unclaimedCallsites,
 } from '../tools/adr-shape-table.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -368,4 +368,126 @@ test('P3 · นิพจน์แทรกซ้อนหลายชั้น�
   const src = 'const h = `a${ `b${ coverImg(s) }c` }d`;\n';
   assert.match(stripCommentsAndStrings(src), /coverImg\s*\(/);
   assert.equal(countCallsIn(src, 'coverImg'), 1);
+});
+
+/* ================= 7. คำตัดสินรีวิวรอบที่ห้า (AIO-79 · AIO-80) =================
+   ทุกข้อในส่วนนี้คือมิวเทชันที่ **ทั้งสองฝั่งรีวิววัดแล้วว่าด่านเขียวทั้งที่ควรแดง** ในคอมมิต
+   `97908c0`/`d35f682` ⇒ แต่ละข้อถือมิวเทชันของตัวเองไว้ถาวร และต้องแดง **ด้วยข้อใหม่**
+   ที่ชี้ของที่มันแก้จริง (ไม่ใช่ `length >= 1`) */
+
+/* ---------- R2 · ก8 · โทเคนไนเซอร์ของ JS ---------- */
+test('R2 · regex ที่อยู่หลังคีย์เวิร์ด/หลัง `)` ของ if ต้องไม่กลืนจุดเรียกที่อยู่ถัดไป', () => {
+  assert.equal(countCallsIn('function valid(){ return /["\']/; }\ncoverImg(s);\n', 'coverImg'), 1);
+  assert.equal(countCallsIn('if (true) /["\']/.test("x"); coverImg(s);\n', 'coverImg'), 1);
+  assert.equal(countCallsIn('for (;;) /["\']/.test("x"); coverImg(s);\n', 'coverImg'), 1);
+  assert.equal(countCallsIn('const r = /["\']/; coverImg(s);\n', 'coverImg'), 1);
+  /* และ "การหาร" ยังต้องเป็นการหาร ไม่ใช่ regex (ไม่ใช่แลกทิศหนึ่งกับอีกทิศ) */
+  assert.equal(countCallsIn('const a = w / h; const b = x /y/ z; coverImg(s);\n', 'coverImg'), 1);
+});
+
+test('R2 · เติมจุดเรียกจริงต่อท้ายไฟล์ที่มี regex หลังคีย์เวิร์ด ⇒ ด่านจริงต้องแดง', () => {
+  const EXTRA = '\nfunction valid(x){ return /["\']/.test(x); }\nexport const z = coverImg(L, s);\n';
+  const stub = rel => (rel === 'build/seo.mjs' ? read(rel) + EXTRA : read(rel));
+  const stubCount = (rel, name) => countCallsIn(stub(rel), name);
+  const delta = added(callsites(ADR, stubCount, stub, SCAN), BASE_CALLSITE);
+  assert.ok(delta.some(x => x.includes('build/seo.mjs') && x.includes('coverImg')), delta.join(' · '));
+});
+
+test('ก8 · `function  ชื่อ(` (ช่องว่างสองตัว) และ method shorthand ไม่ใช่จุดเรียก', () => {
+  assert.equal(countCallsIn('function  coverImg(a) {}\nx = coverImg(1);\n', 'coverImg'), 1);
+  assert.equal(countCallsIn('const o = { coverImg(s) { return 1; } };\n', 'coverImg'), 0);
+});
+
+/* ---------- ก6 · คู่ (ไฟล์, ชื่อท่อ) ไม่ใช่ "ยกเว้นทั้งไฟล์" ---------- */
+test('ก6 · เติม `coverImg(` ลง build/app.src.js ⇒ แดง (ของเดิมเขียวเพราะยกเว้นทั้งไฟล์)', () => {
+  const FAKE = 'build/app.src.js';
+  const stub = rel => (rel === FAKE ? read(rel) + '\nvar zz = coverImg(s, "poster");\n' : read(rel));
+  const stubCount = (rel, name) => countCallsIn(stub(rel), name);
+  const delta = added(callsites(ADR, stubCount, stub, SCAN), BASE_CALLSITE);
+  assert.ok(delta.some(x => x.includes(FAKE) && x.includes('coverImg')), delta.join(' · '));
+});
+
+test('ก6 · เติม `coverAttrs(` ลงไฟล์ฝั่ง build ที่มีเลขของ coverImg อยู่แล้ว ⇒ แดง', () => {
+  const FAKE = 'build/ui.mjs';
+  const stub = rel => (rel === FAKE ? read(rel) + '\nexport const zz = coverAttrs(s, "poster");\n' : read(rel));
+  const stubCount = (rel, name) => countCallsIn(stub(rel), name);
+  const delta = added(callsites(ADR, stubCount, stub, SCAN), BASE_CALLSITE);
+  assert.ok(delta.some(x => x.includes(FAKE) && x.includes('coverAttrs')), delta.join(' · '));
+});
+
+/* ---------- ก4 · R4 · ผูกแถวกับสัญลักษณ์ ไม่ใช่กับคลาสในไฟล์ ---------- */
+test('ก4 · ย้ายแถวไปอ้างสัญลักษณ์ที่แถวอื่นอ้างอยู่แล้ว ⇒ แดง (สองที่วางชี้จุดเรียกเดียวกัน)', () => {
+  const mutated = parseShapeTables(mdWith('ใน `contCardHtml()` (ส่วน 6 ของ `build/app.src.js`',
+    'ใน `contRowHtml()` (ส่วน 6 ของ `build/app.src.js`'));
+  const delta = added(callsites(mutated), BASE_CALLSITE);
+  assert.ok(delta.some(x => x.includes('contRowHtml')), delta.join(' · '));
+});
+
+test('ก4 · ย้ายไฟล์ของแถวที่อ้างสัญลักษณ์ ⇒ แดงพร้อมชื่อสัญลักษณ์ (ไม่ใช่แดงด้วยเหตุผลอื่น)', () => {
+  const mutated = parseShapeTables(mdWith(
+    '| ปกในการ์ดทุกแบบ `.card .poster` (กล่องที่ `poster()` สร้าง) | `poster` | `build/ui.mjs:99`',
+    '| ปกในการ์ดทุกแบบ `.card .poster` (กล่องที่ `poster()` สร้าง) | `poster` | `build/pages-watch.mjs:99`'));
+  const delta = added(callsites(mutated), BASE_CALLSITE);
+  assert.ok(delta.some(x => x.includes('poster()') && x.includes('pages-watch')), delta.join(' · '));
+});
+
+test('ก4 · ช่องที่ยังเหลือถูกรายงานเป็นรายชื่อ ไม่ใช่ความเงียบ (แถวที่สัญญาไม่ได้ตั้งชื่อสัญลักษณ์)', () => {
+  const gaps = unclaimedCallsites(ADR, read, SCAN);
+  assert.ok(gaps.length >= 1, 'ถ้าไม่เหลือช่องแล้ว ให้เปลี่ยนข้อนี้เป็นการบังคับสองทิศ ไม่ใช่ลบข้อ');
+  for (const g of gaps) {
+    assert.match(g, /^build\/[\w.-]+\.(mjs|js): จุดเรียก cover\w+\(\) ในขอบเขต .+$/,
+      `รายการช่องว่างต้องบอกทั้งไฟล์และขอบเขต ⇒ คำขอต่อ CTO มีชื่อที่แน่นอน · ได้: ${g}`);
+  }
+  /* และแถวที่ **อ้างสัญลักษณ์แล้ว** ต้องไม่อยู่ในรายการช่องว่าง (ไม่ใช่รายงานทุกอย่างเป็นช่อง) */
+  assert.ok(!gaps.some(g => g.includes('contCardHtml') || g.includes('buildFeed')), gaps.join(' · '));
+});
+
+/* ---------- R5 · ก5 · ตัวแยกโทเคนของ selector ---------- */
+test('R5 · โทเคนรูป `tag.class` ต้องเข้ากองใดกองหนึ่ง ไม่หายเงียบเมื่ออยู่ร่วมกับ selector อื่น', () => {
+  assert.deepEqual(selectorsIn('`.flatlist .th2` 34px · `span.clip`'), ['.flatlist .th2', 'span.clip']);
+  const mutated = parseShapeTables(mdWith('| ดัชนีทุกเรื่อง `.flatlist .th2` 34px |',
+    '| ดัชนีทุกเรื่อง `.flatlist .th2` 34px · `div.newslot` |'));
+  const delta = added(shapeMapProblems(mutated, SHAPE_MAP), BASE_SHAPE);
+  assert.ok(delta.some(x => x.includes('div.newslot')), delta.join(' · '));
+});
+
+test('R5 · ช่องว่างข้างใน `[...]`/`(...)` ไม่ใช่ตัวแบ่งโทเคน ⇒ CSS ที่ถูกต้องต้องไม่กลายเป็น "แกะไม่ออก"', () => {
+  assert.deepEqual(selectorsIn('`.x[data-name="a b"]`'), ['.x[data-name="a b"]']);
+  assert.deepEqual(selectorsIn('`.a:not(.b .c)`'), ['.a:not(.b .c)']);
+  /* และคอมบิเนเตอร์ที่ไม่มี compound คั่น = แกะไม่ออกจริง ไม่ใช่ "อ่านได้" */
+  assert.deepEqual(selectorTokens('`.x > > .y`').unreadable, ['.x > > .y']);
+  assert.deepEqual(selectorTokens('`.x > > .y`').selectors, []);
+});
+
+/* ---------- R3 · coverSlot: นับและอ่านทรงจากชุดโทเคนเดียวกัน ---------- */
+test('R3 · เปลี่ยนจุดเรียกจริงเป็นตัวแปรแล้วเติมสตริงเลียนแบบ ⇒ สตริงสวมรอยไม่ได้', () => {
+  const stub = rel => (rel === 'build/pages-content.mjs'
+    ? read(rel).replace("coverSlot(s, 'poster')", 'coverSlot(s, dynamicShape)')
+      + '\nconst msg = "coverSlot(s, \'poster\')";\n'
+    : read(rel));
+  const problems = slotProblems(ADR, stub, SCAN);
+  assert.ok(problems.some(x => x.includes('pages-content') && x.includes('ค่าคงที่')), problems.join(' · '));
+  assert.ok(problems.some(x => x.includes('pages-content') && x.includes("'poster'")), problems.join(' · '));
+});
+
+test('R3 · เติม **เฉพาะสตริง** ที่เลียนแบบจุดเรียก ⇒ ต้องไม่แดง (แดงผิดเรื่องก็ไม่เอา)', () => {
+  const stub = rel => (rel === 'build/pages-content.mjs'
+    ? read(rel) + '\nconst msg = "coverSlot(s, \'poster\')";\n' : read(rel));
+  assert.deepEqual(slotProblems(ADR, stub, SCAN), slotProblems(ADR, read, SCAN));
+});
+
+test('R3 · `coverSlot?.(` เป็นจุดเรียกจริง ⇒ ต้องถูกนับ', () => {
+  const stub = rel => (rel === 'build/pages-content.mjs'
+    ? read(rel) + "\nconst z = coverSlot?.(s, 'wide');\n" : read(rel));
+  const problems = slotProblems(ADR, stub, SCAN);
+  assert.ok(problems.some(x => x.includes('pages-content') && x.includes('wide')), problems.join(' · '));
+});
+
+test('R3 · จุดเรียกในไฟล์เจ้าของท่อที่อยู่ **นอก** ฟังก์ชันของท่อ ⇒ แดง (ไม่ยกเว้นทั้งไฟล์อีก)', () => {
+  const stub = rel => (rel === 'build/ui.mjs'
+    ? read(rel) + "\nexport const rogue = s => coverSlot(s, 'wide');\n" : read(rel));
+  const problems = slotProblems(ADR, stub, SCAN);
+  assert.ok(problems.some(x => x.includes('build/ui.mjs') && x.includes('wide')), problems.join(' · '));
+  /* แต่จุดเรียกที่อยู่ข้างใน `coverImg()` ของไฟล์เดียวกันยังถูกยกเว้น (มันคือท่อ) */
+  assert.deepEqual(slotProblems(ADR, read, SCAN), []);
 });

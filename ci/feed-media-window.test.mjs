@@ -12,7 +12,8 @@
    อิลิเมนต์จริง · หน้าฟีดของเราเป็นหน้าที่ JS ทำงาน ⇒ เฉลยที่ถูกคือ "เนื้อเป็นข้อความ" */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseHtml, findDirectChain, findByClasses, parseAttrs } from '../build/html-tree.mjs';
+import { parseHtml, findDirectChain, findByClasses, parseAttrs, decodeRefs } from '../build/html-tree.mjs';
+import { CHROME_CASES, CHAIN } from './html-tree-cases.mjs';
 
 /* ตัวตัดสินตัวเดียวกับที่ build/build.mjs ส่วน 4.8ข เรียก — import ของจริง ไม่ใช่สำเนา */
 const V19 = html => !!findDirectChain(parseHtml(html), [['player', 'full'], ['mwin'], ['clip']]);
@@ -69,6 +70,29 @@ test('V19 ปฏิเสธโครงที่ไม่ได้อยู่�
   for (const [name, html] of REJECT) assert.equal(V19(html), false, `ต้องปฏิเสธ: ${name}`);
 });
 
+/* ---------- ข2 · เฉลยที่วัดจาก Chrome จริง ----------
+   รีวิวรอบที่ห้าวัดเคสใหม่แล้วพบว่าตัวแกะตอบผิด 5 รูป และ **หนึ่งรูปตอบผิดบนไฟล์ที่ส่งมอบ
+   วันนี้แล้ว** (`<svg><path …/>` ของ feed/index.html) ⇒ เฉลยทั้งชุดถูกย้ายไปอยู่ที่
+   ci/html-tree-cases.mjs ซึ่งบันทึกเลขที่ **Chrome** ตอบ และ ci/html-tree-oracle.mjs
+   ยิงซ้ำเข้า Chrome จริงเพื่อกันเลขนั้นเน่า (ที่นี่ไม่ต้องมีเบราว์เซอร์ ⇒ รันทุกครั้ง) */
+test(`ตัวแกะตอบตรงกับ Chrome ทุกเคสที่วัดไว้ (${CHROME_CASES.length} เคส)`, () => {
+  for (const c of CHROME_CASES) {
+    const got = findDirectChain(parseHtml(c.html), CHAIN) ? 1 : 0;
+    assert.equal(got, c.chain, `ต้องตอบ ${c.chain} เท่าที่ Chrome ตอบ: ${c.name}`);
+  }
+});
+
+test('โครงที่อยู่นอกขอบเขตของตัวแกะ ถูกบันทึกเป็น caveat ไม่ใช่ตอบเงียบ ๆ', () => {
+  for (const c of CHROME_CASES) {
+    assert.equal(parseHtml(c.html).caveats.length > 0, c.caveat,
+      `caveat ของเคสนี้ต้องเป็น ${c.caveat}: ${c.name}`);
+  }
+  /* caveat ต้องมีข้อความที่อ่านรู้เรื่อง ไม่ใช่ธงเปล่า — คนที่เจอข้อแดงของ V19 ต้องรู้ว่า
+     "ตัดสินไม่ได้เพราะอะไร" ไม่ใช่แค่ "ตัดสินไม่ได้" */
+  const sample = parseHtml('<div class="player full"><table class="mwin"><div class="clip"></div></table></div>');
+  assert.match(sample.caveats.join(' '), /foster parenting/);
+});
+
 /* ---------- ค · ตัวอ่านแอตทริบิวต์ (ข้อความของกฎอ่าน `data-orientation` จากกล่องจริง) ---------- */
 test('ตัวอ่านแอตทริบิวต์รับทั้งสามรูปของ HTML และไม่ข้ามขอบเขตค่า', () => {
   assert.equal(parseAttrs(' class="a b" data-orientation="horizontal"').get('data-orientation'), 'horizontal');
@@ -101,4 +125,18 @@ test('feed/index.html ที่ส่งออกวันนี้: กล่�
   assert.ok(box, 'feed/index.html ต้องมีกล่อง .player.full (§13.7 D7)');
   assert.match(box.attrs.get('data-orientation') || '', /^(vertical|horizontal)$/,
     'กล่องสื่อของฟีดต้องประกาศ data-orientation จากข้อมูล (§13.7 D7 ข้อ 1)');
+  /* ของที่กันไม่ให้ "ตัวแกะอยู่ในขอบเขต" เป็นคำสัญญาในคอมเมนต์: HTML ที่ renderer ส่งมอบ
+     ต้องอยู่ในไวยากรณ์ที่โมเดลนี้รองรับจริง ⇒ ถ้าวันหน้ามีใครพ่น `<table>` คร่อมกล่องสื่อ
+     หรือปล่อยแท็กจัดรูปค้าง ด่านนี้แดง **ก่อน** ที่ข้อมูลแนวนอนจะมาถึง (ไม่ต้องรอ V19
+     ซึ่งวันนี้ไม่ทำงานเลยเพราะคลังเป็นแนวตั้ง 12/12) · วัดแล้ววันนี้: 632 ไฟล์ caveats = 0 */
+  assert.deepEqual(doc.caveats, [],
+    'feed/index.html ต้องอยู่ในไวยากรณ์ที่ build/html-tree.mjs โมเดล (caveats ต้องว่าง)');
+});
+
+test('ตัวถอด character reference ของค่าแอตทริบิวต์: ตัวเลข ถอด · ชื่อที่ไม่รู้จัก คงไว้ตามตัว', () => {
+  assert.equal(decodeRefs('mw&#105;n'), 'mwin');
+  assert.equal(decodeRefs('mw&#x69;n'), 'mwin');
+  assert.equal(decodeRefs('a&amp;b'), 'a&b');
+  assert.equal(decodeRefs('cl&iuml;p'), 'cl&iuml;p');      /* ไม่รู้จัก ⇒ คงไว้ + เป็น caveat */
+  assert.equal(parseAttrs(' class="mw&#105;n"').get('class'), 'mwin');
 });
