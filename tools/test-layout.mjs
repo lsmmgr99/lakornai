@@ -542,6 +542,32 @@ const SHAPE_MAP = [
      ทั้งคู่ถูก assets/app.js สร้างจาก localStorage ⇒ ถ้าวัดแค่ผิวเดียว อีกผิวไม่มีด่านเลย */
   { key: 'รายการในคลัง (มือถือ)', sel: '.lib-list .controw .th', at: U.library, shape: 'poster', mode: 'shape' },
   { key: 'การ์ดในคลัง (เดสก์ท็อป)', sel: '.lib-grid .libcard .poster', at: U.library, shape: 'poster', mode: 'shape' },
+  /* สามรายการข้างล่างเปิดผิวของ **สองแถวฝั่งเบราว์เซอร์** ที่ §13.5 ประกาศไว้แล้ว แต่แผนที่
+     ไม่เคยไปยืนบนผิวจริงของมันเลย (AIO-78) · ข้อ (ก) ของกฎการแกะ §13.5 ("ทุก selector
+     ในตารางต้องมีใน SHAPE_MAP อย่างน้อยหนึ่งรายการ") พอใจได้ด้วยรายการฝั่ง build ที่ selector
+     ซ้ำกันอยู่แล้ว — `.card .poster @ /` และ `.ep-row .th @ /new/` ⇒ **ด่านเทียบตารางเขียว
+     โดยที่จุดเรียกสองจุดในท่อเบราว์เซอร์ไม่ถูกวัด** เพราะไม่มีรายการใดเปิด `/library/` ในสภาพ
+     ที่มีข้อมูลในเครื่อง · รูเดียวกับ AIO-63 ข้อ 4ก และมิวเทชัน M13 แค่คนละผิว
+       `.card .poster`  → posterCardHtml() ที่แท็บ "ติดตาม" และ "ดูจบแล้ว" · สองแท็บวาดจาก
+                          คีย์คนละตัว (`lakorn.follows` · `lakorn.done`) ⇒ แยกสองรายการ
+                          ไม่ใช่รายการเดียวที่หวังว่าจะครอบทั้งคู่
+                          **หมายเหตุความครอบ**: รายการ `.card .poster @ /` วัดการ์ดที่ฝั่ง
+                          build วาด (`coverImg()`) ⇒ ก่อนใบนี้ `posterCardHtml()` ไม่มีผิวใด
+                          ถูกวัดเลยทั้งแผนที่ · วัดแล้วด้วยมิวเทชัน: เปลี่ยนทรงใน
+                          posterCardHtml() แล้วด่านเขียวทั้งแผง
+       `.ep-row .th`    → บล็อกแท็บ "ประวัติ" ของ renderLibrary() ซึ่งเป็น **บล็อกโค้ดคนละตัว**
+                          กับ `.ep-row .th` ฝั่ง build ของ /new/ · /popular/ · /schedule/
+     แท็บเลือกด้วยคิวรี `?tab=` ตาม currentTab() ของ build/app.src.js (ไม่ใช่ hash) และชื่อแท็บ
+     เป็นชุดเดียวกับที่ build/build.mjs ใช้ทำ redirect ของหน้าเก่า ⇒ ไม่ได้เดารูป URL เอง
+     ⚠️ เพดานที่รู้ตัวของสามรายการนี้ (AIO-78 — บันทึกไว้ ไม่ใช่ลืม): ทรง 'poster' กับ 'wide'
+        ให้ **ไฟล์เดียวกัน** ในสถานะ ก เพราะคลังตามสภาพไม่มี `coverWide` เลย ⇒ มิวเทชันทรง
+        ที่ renderer มองเห็นได้เฉพาะในสถานะ ข ซึ่งวันนี้ถูกเลื่อนด้วยกฎ V19 · ข้อนี้จริงกับ
+        **ทุก** รายการในแผนที่ ไม่ใช่เฉพาะสามรายการนี้ · ที่สามรายการนี้บังคับได้ในสถานะ ก คือ
+        เรขาคณิตของกล่อง (S1) · "การ์ดใบนี้คือเรื่องอะไร" (S2 ฝั่ง identity) · ขนาดที่ประกาศ
+        เทียบไฟล์จริง (S3/S4) · และข้อ "มีตัวตนให้วัด" ที่จับการที่ผิวนั้นหายไปจากหน้า */
+  { key: 'ปกในการ์ดที่คลังวาด (แท็บติดตาม)', sel: '.card .poster', at: U.library + '?tab=following', shape: 'poster', mode: 'shape' },
+  { key: 'ปกในการ์ดที่คลังวาด (แท็บดูจบแล้ว)', sel: '.card .poster', at: U.library + '?tab=done', shape: 'poster', mode: 'shape' },
+  { key: 'ประวัติการดูในคลัง', sel: '.ep-row .th', at: U.library + '?tab=history', shape: 'poster', mode: 'shape' },
   { key: 'รายการแจ้งเตือน', sel: '.notif .th', at: U.notifications, shape: 'poster', mode: 'shape' },
   { key: 'การ์ดตอนถัดไป', sel: '.nextup .thumb', at: U.watch(SHORT_SERIES.slug, 1), shape: 'poster', mode: 'shape', drive: 'finish' },
   { key: 'การ์ดจบเรื่อง', sel: '.endcard .ec-next .thumb', at: U.watch(SHORT_SERIES.slug, SHORT_SERIES.eps), shape: 'poster', mode: 'shape', drive: 'finish' },
@@ -562,7 +588,14 @@ const SEED_CONT = Object.fromEntries(SEED_ENTRIES);
    (เขียนครั้งเดียวแล้วหวังว่าค่าจะอยู่ยาวคือทางที่พังเงียบ ถ้าวันหน้ามีหน้าไหนล้างคลัง)
    ด่านไม่เชื่อว่าซีดติด: ส่วน 2 และ 3 บังคับให้นับการ์ด .cont ได้เท่าจำนวนที่ซีดจริง */
 const SEED_SCRIPT = `try{localStorage.setItem('lakorn.cont',${JSON.stringify(JSON.stringify(SEED_CONT))})}catch(e){}`;
-const UNSEED_SCRIPT = `try{localStorage.removeItem('lakorn.cont')}catch(e){}`;
+/* สภาพ "ผู้ใช้ใหม่" ต้องล้าง **ทั้งเนมสเปซ** ไม่ใช่เฉพาะ `lakorn.cont` — localStorage อยู่ข้าม
+   การนำทาง ⇒ ของเดิมที่ลบคีย์เดียวทำให้คีย์ที่รอบ 'shape' เขียนไว้ (`follows` `set` และตั้งแต่
+   AIO-78 คือ `done` `history` ด้วย) **ค้างอยู่ในรอบ 'new' ถัดไป** แล้วป้าย MODE_LABEL ที่พิมพ์ว่า
+   "localStorage ว่าง" ก็ไม่จริง · กฎการล้างยกมาจาก `wipe()` ของ build/app.src.js เอง (กวาดคีย์
+   ที่ขึ้นต้นด้วย NS) ไม่ใช่รายชื่อคีย์ที่ต้องมาเติมทุกครั้งที่สัญญาข้อมูลโตขึ้น */
+const UNSEED_SCRIPT = `try{Object.keys(localStorage)
+  .filter(function(k){return k.indexOf('lakorn.')===0})
+  .forEach(function(k){localStorage.removeItem(k)})}catch(e){}`;
 /* สภาพที่ 3 สำหรับส่วน 6: ที่วางบางช่องต้องมีของอย่างอื่นในเครื่องด้วย ไม่ใช่แค่ `lakorn.cont`
      follows → `.notif .th` (หน้าแจ้งเตือนวาดจากรายการติดตาม)
      set.autoplay:false → การ์ด "ตอนถัดไป" ต้องไม่นับถอยหลังแล้วพาหน้าเปลี่ยนไปกลางการวัด
@@ -581,9 +614,33 @@ const SHAPE_CONT = Object.fromEntries(SHAPE_SEED_SLUGS.map((slug, i) => {
   return [slug, { ep, sec: Math.round(dur / 2), dur, ts: 1761000000000 - i * 60000 }];
 }));
 const SHAPE_SET = { autoplay: false, sound: false, subs: true, notify: true };
+/* แท็บ "ดูจบแล้ว" และ "ประวัติ" ของคลังวาดจากคีย์คนละตัว ไม่ใช่ `lakorn.cont`/`lakorn.follows`
+   ⇒ ไม่ซีดสองคีย์นี้ = ที่วางของสองแท็บนั้นไม่มีตัวตนให้วัดโดยโครงสร้าง (AIO-78)
+   รูปข้อมูลคือสัญญาที่หัวไฟล์ build/app.src.js ประกาศไว้:
+     lakorn.done     { slug: ts }
+     lakorn.history  [ {slug,ep,ts} ]   ใหม่สุดอยู่หน้าสุด
+
+   ⚠️ **`lakorn.done` ต้องไม่ทับเรื่องใน SHAPE_SEED_SLUGS** — `Progress.list()` ตัดเรื่องที่
+      done แล้วออกจากรายการค้าง (`if (dn[slug]) continue;`) ⇒ ซีดทับกันแล้วแท็บ "ดูค้าง" ว่าง
+      และสามที่วางที่พึ่งรายการค้าง (`.cont .thumb` · `.lib-list .controw .th` ·
+      `.lib-grid .libcard .poster`) จะตกข้อ "มีตัวตนให้วัด" พร้อมกัน ⇒ เลือกจากคลังด้วย
+      **เงื่อนไข** ("ไม่อยู่ในชุดที่ซีดเป็นเรื่องค้าง") ไม่ใช่เขียนชื่อเรื่องมือ · เพิ่มเรื่องที่ 13
+      แล้วยังถูกเอง และถ้าวันหน้าคลังเล็กลงจนเลือกไม่ได้ ข้อ "มีตัวตนให้วัด" ของแท็บนั้นจะแดง
+      ไม่ใช่เงียบ */
+const SHAPE_DONE_SLUGS = SERIES.filter(s => !SHAPE_SEED_SLUGS.includes(s.slug)).slice(0, 2).map(s => s.slug);
+const SHAPE_DONE = Object.fromEntries(SHAPE_DONE_SLUGS.map((slug, i) => [slug, 1761000000000 - i * 60000]));
+/* ประวัติใช้ชุดเดียวกับเรื่องค้าง/ติดตามได้ — ไม่มีตัวกรองใดในแอปที่ตัดกันเอง (`arr('history')`
+   ถูกอ่านตรง ๆ แล้วแมปผ่าน BY) · `ep` ผ่าน epNum() ของแอปอีกชั้น จึงส่งตอนที่ 2 แบบเดียวกับ
+   SHAPE_CONT เพื่อให้ชื่อตอนที่ขึ้นเป็นตอนจริง ไม่ใช่ตอนที่ไม่มีในเรื่อง */
+const SHAPE_HISTORY = SHAPE_SEED_SLUGS.map((slug, i) => {
+  const s = SERIES.find(x => x.slug === slug);
+  return { slug, ep: Math.min(2, s.eps), ts: 1761000000000 - i * 60000 };
+});
 const SHAPE_SCRIPT = `try{
   localStorage.setItem('lakorn.cont',${JSON.stringify(JSON.stringify(SHAPE_CONT))});
   localStorage.setItem('lakorn.follows',${JSON.stringify(JSON.stringify(SHAPE_SEED_SLUGS))});
+  localStorage.setItem('lakorn.done',${JSON.stringify(JSON.stringify(SHAPE_DONE))});
+  localStorage.setItem('lakorn.history',${JSON.stringify(JSON.stringify(SHAPE_HISTORY))});
   localStorage.setItem('lakorn.set',${JSON.stringify(JSON.stringify(SHAPE_SET))});
 }catch(e){}`;
 
@@ -918,7 +975,8 @@ async function setStorageMode(mode) {
 const MODE_LABEL = {
   new: 'ผู้ใช้ใหม่ (localStorage ว่าง)',
   seeded: `ผู้ใช้ที่กลับมา (ซีด lakorn.cont ${SEED_ENTRIES.length} เรื่อง)`,
-  shape: `ผู้ใช้ที่กลับมา ${SHAPE_SEED_SLUGS.length} เรื่อง (รวมเรื่องท้ายคลัง = เรื่องแนวนอนในสถานะ ข) + ติดตามชุดเดียวกัน + ปิดเล่นอัตโนมัติ`,
+  shape: `ผู้ใช้ที่กลับมา ${SHAPE_SEED_SLUGS.length} เรื่อง (รวมเรื่องท้ายคลัง = เรื่องแนวนอนในสถานะ ข) + ติดตามชุดเดียวกัน`
+    + ` + ดูจบแล้ว ${SHAPE_DONE_SLUGS.length} เรื่อง (${SHAPE_DONE_SLUGS.join(' ')}) + ประวัติ ${SHAPE_HISTORY.length} รายการ + ปิดเล่นอัตโนมัติ`,
 };
 
 /* ---------- 4. ตัวตรวจเรขาคณิตฮีโร่ ----------
