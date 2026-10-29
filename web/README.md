@@ -72,7 +72,7 @@ git pull && npm ci && npx prisma db push && npm run build && pm2 reload ailakorn
 - `<title>`/description เฉพาะหน้า · canonical · Open Graph (video.tv_show / video.episode) · Twitter card · `lang="th"` · `og:locale th_TH`
 - JSON-LD: WebSite+SearchAction · TVSeries/TVSeason/TVEpisode · CollectionPage/ItemList · BreadcrumbList · FAQPage · AboutPage/ContactPage · ไม่มี VideoObject/คะแนน/ยอดวิวที่ไม่มีข้อมูลจริง
 - sitemap.xml (lastmod จากเวลาแก้จริง) · robots.txt สลับได้จากหลังบ้าน · หน้าส่วนตัวและตอน ≥2 เป็น noindex (จนกว่าจะมีชื่อตอน/คำบรรยายเฉพาะตัว)
-- รูปผ่าน next/image (srcset · width/height กัน CLS · lazy · ภาพฮีโร่ preload) แต่ **ไม่ย่อสด**: ทุกปกมีไฟล์ย่อย WebP ทุกขนาด (`src/lib/covers.ts`) สร้างตอนอัปโหลด/seed และเสิร์ฟเป็นไฟล์นิ่งจาก nginx — Cloudflare แคชที่ edge ได้ (เครื่อง 1 CPU ย่อ/แปลง AVIF สดใช้ 1–2 วิ/รูป) · ถ้าคัดลอกไฟล์ปกเข้า `data/uploads/` เอง ให้รัน `npm run images:variants` · ฟอนต์ไทย subset ในเครื่อง · ไม่มีสคริปต์บุคคลที่สาม
+- รูปผ่าน next/image (srcset · width/height กัน CLS · lazy · ภาพฮีโร่ preload) แต่ **ไม่ย่อสด**: ทุกปกมีไฟล์ย่อย AVIF + WebP ทุกขนาด (`src/lib/covers.ts` · `<picture>` เลือก AVIF ก่อน) สร้างตอนอัปโหลด/seed และเสิร์ฟเป็นไฟล์นิ่งจาก nginx — Cloudflare แคชที่ edge ได้ (เครื่อง 1 CPU ย่อ/แปลง AVIF สดใช้ 1–2 วิ/รูป) · ถ้าคัดลอกไฟล์ปกเข้า `data/uploads/` เอง ให้รัน `npm run images:variants` · ฟอนต์ไทย subset ในเครื่อง · ไม่มีสคริปต์บุคคลที่สาม
 - ด่านอัตโนมัติ `tests/site-check.mts` ตรวจทุกหน้าตามกฎข้างบนทุกครั้งที่ต้องการ
 
 ## โครงสร้างโค้ด
