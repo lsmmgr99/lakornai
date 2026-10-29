@@ -45,6 +45,11 @@ git pull && npm ci && npx prisma db push && npm run build && pm2 reload ailakorn
 
 หรือ Docker: `docker build -t ailakorn . && docker run -d --name ailakorn -p 3000:3000 -v ailakorn-data:/app/data --env-file .env ailakorn`
 
+**โปรดักชันปัจจุบัน (29 ต.ค. 2026):** VPS `ailakorn-prod` (143.198.220.253, Ubuntu 24.04, swap 2 GB) · โค้ดที่ `/opt/ailakorn/web` · pm2 `ailakorn` พอร์ต 3000 · nginx 80/443
+· โดเมนผ่าน Cloudflare (SSL mode Full) — origin ใช้ใบรับรอง self-signed ที่ `/etc/nginx/ssl/` (certbot ใช้ไม่ได้เพราะ challenge วิ่งผ่าน Cloudflare; ถ้าต้องการใบจริงที่ origin ให้ใช้ Cloudflare Origin Certificate แทน)
+· backup อัตโนมัติ 03:20 ทุกวัน → `/opt/ailakorn-backups/` เก็บ 14 ชุด (`/usr/local/bin/ailakorn-backup`)
+· อัปเดตโค้ด: `cd /opt/ailakorn && git pull && cd web && npm ci && npx prisma db push && NODE_OPTIONS=--max-old-space-size=1536 npm run build && pm2 reload ailakorn`
+
 **Backup** = ไฟล์ `data/ailakorn.db` + โฟลเดอร์ `data/uploads/` (คัดลอกสองอย่างนี้ไปที่อื่นเป็นประจำ เช่น cron + rclone)
 
 ## หลังบ้านทำอะไรได้
