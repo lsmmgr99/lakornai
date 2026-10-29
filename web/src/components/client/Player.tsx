@@ -15,6 +15,7 @@ import { FollowButton, ShareButton } from "./Buttons";
 import { PosterCardLite } from "./HomeBits";
 import { toast } from "./toast";
 import { useCatalogLite, coverSlotLite, type SeriesLiteFull } from "./CatalogContext";
+import { variantUrl } from "@/lib/covers";
 
 export interface PlayerProps {
   slug: string;
@@ -309,7 +310,7 @@ export function Player(p: PlayerProps) {
           <>
             <div className="nh">
               {nextUp.auto && <span className="ring" id="nuRing" style={{ "--p": `${((COUNTDOWN - nextUp.left) / COUNTDOWN) * 100}%` } as CSSProperties} aria-hidden="true"><b className="num" id="nuLeft">{nextUp.left}</b></span>}
-              <span className="thumb"><img src={nextThumb.url} width={nextThumb.w} height={nextThumb.h} alt="" loading="lazy" decoding="async" /></span>
+              <span className="thumb"><img src={variantUrl(nextThumb.url, 260)} width={nextThumb.w} height={nextThumb.h} alt="" loading="lazy" decoding="async" /></span>
               <span className="nt"><b className="num">ตอนถัดไป · EP.{ep + 1}</b><span>{nx.title} · {nx.mmss} นาที</span></span>
             </div>
             <div className="na">
@@ -330,7 +331,7 @@ export function Player(p: PlayerProps) {
                 <p>{s.title} — เรื่องนี้ย้ายไปอยู่ในแท็บ “ดูจบแล้ว” ของคลังคุณแล้ว</p>
               </div>
               <Link className="ec-next" href={U.watch(endCard.nextS.slug, 1)}>
-                <span className="thumb"><img src={nt.url} width={nt.w} height={nt.h} alt="" loading="lazy" decoding="async" /></span>
+                <span className="thumb"><img src={variantUrl(nt.url, 260)} width={nt.w} height={nt.h} alt="" loading="lazy" decoding="async" /></span>
                 <span className="et"><span>ดูเรื่องถัดไป</span><b>{endCard.nextS.title}</b></span>
                 <Icon name="playf" />
               </Link>

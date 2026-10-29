@@ -6,6 +6,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import sharp from "sharp";
 import { UPLOAD_DIR } from "@/app/media/[...path]/route";
+import { generateCoverVariants, removeCoverVariants } from "@/lib/cover-variants";
 
 export type CoverKind = "poster" | "wide";
 const SPEC = {
@@ -40,6 +41,7 @@ export async function processCover(bytes: Buffer, slug: string, kind: CoverKind)
   const abs = path.join(UPLOAD_DIR, rel);
   fs.mkdirSync(path.dirname(abs), { recursive: true });
   fs.writeFileSync(abs, out);
+  await generateCoverVariants(abs, kind, { force: true });   // ไฟล์ย่อยทุกขนาด (covers.ts) — หน้าเว็บใช้ไฟล์เหล่านี้ ไม่ย่อสด
   return { path: rel, w: spec.w, h: spec.h, bytes: out.length };
 }
 
@@ -47,4 +49,5 @@ export function removeCoverFile(rel: string | null | undefined) {
   if (!rel || !/^(covers|covers-wide)\/[a-z0-9][a-z0-9-]*(?:-[0-9a-f]{6,12})?\.(webp|png|jpg|jpeg|avif)$/.test(rel)) return;
   const abs = path.join(UPLOAD_DIR, rel);
   try { if (fs.existsSync(abs)) fs.unlinkSync(abs); } catch { /* ไม่สำคัญ */ }
+  removeCoverVariants(abs);
 }

@@ -6,12 +6,13 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   output: "standalone",
   poweredByHeader: false,
+  /* ปกใช้ไฟล์ย่อยที่สร้างไว้ล่วงหน้า (src/lib/covers.ts) แทน /_next/image — เครื่อง 1 CPU ย่อสดช้า 1–2 วิ/รูป และ Cloudflare ไม่แคช URL ที่ไม่มีนามสกุล
+     ขนาดต้องตรงกับ POSTER_WIDTHS/WIDE_WIDTHS (loader จะปัดขึ้นให้ไฟล์ที่มีอยู่) */
   images: {
-    formats: ["image/avif", "image/webp"],
-    deviceSizes: [360, 414, 640, 750, 828, 1080, 1280, 1440, 1920],
-    imageSizes: [34, 76, 96, 128, 160, 200, 260, 320],
-    qualities: [75],
-    minimumCacheTTL: 60 * 60 * 24 * 30,
+    loader: "custom",
+    loaderFile: "./src/lib/image-loader.ts",
+    deviceSizes: [414, 640, 828, 1024, 1440, 1920, 2640],
+    imageSizes: [96, 160, 260],
   },
   async headers() {
     return [

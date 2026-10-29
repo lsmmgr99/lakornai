@@ -7,6 +7,7 @@ import crypto from "node:crypto";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import sharp from "sharp";
+import { generateCoverVariants } from "../src/lib/cover-variants";
 
 const prisma = new PrismaClient();
 const ROOT = path.resolve(__dirname, "..");
@@ -35,6 +36,7 @@ async function importCover(rel: string | undefined, slug: string, kind: "covers"
   const dest = path.join(dir, name);
   if (!fs.existsSync(dest)) fs.copyFileSync(src, dest);
   const meta = await sharp(dest).metadata();
+  await generateCoverVariants(dest, kind === "covers" ? "poster" : "wide");
   return { path: `${kind}/${name}`, w: meta.width || 0, h: meta.height || 0 };
 }
 

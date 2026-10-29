@@ -18,8 +18,10 @@
 .adm .between{justify-content:space-between}
 .adm .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
 .adm .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media (max-width:1000px){.adm{grid-template-columns:1fr}.adm-side{position:static;height:auto}.adm .grid2,.adm .grid3{grid-template-columns:1fr}}
-.adm .card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);padding:18px 20px}
+@media (max-width:1000px){.adm{grid-template-columns:1fr}.adm-side{position:static;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line-2)}.adm-side .brand{padding-bottom:8px}.adm-side nav{display:flex;flex-wrap:wrap;gap:2px}.adm-side nav a{padding:7px 10px;font-size:14px}.adm-side .who{margin-top:8px;padding-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.adm-side .who b{display:inline}.adm-main{padding:18px 16px 50px}.adm .grid2,.adm .grid3{grid-template-columns:1fr}}
+.adm .card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);padding:18px 20px;transform:none;transition:none}
+.adm .card:hover,.adm .card.is-hover{transform:none;box-shadow:none}
+.adm .table-wrap{overflow-x:auto;padding:6px 12px 10px}
 .adm .stat{display:flex;flex-direction:column;gap:4px}
 .adm .stat b{font-family:var(--display);font-size:30px;font-weight:600;color:var(--accent)}
 .adm .stat span{color:var(--muted);font-size:13px}
@@ -36,13 +38,14 @@
 .adm legend{color:var(--muted);font-size:13px;padding:0 6px}
 .adm .counter{font-size:12px;color:var(--muted);text-align:right;margin-top:3px}
 .adm .counter.bad{color:var(--danger)}
-.adm .btn{display:inline-flex;align-items:center;gap:6px;font:inherit;cursor:pointer;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--border-i);background:var(--surface-2);color:var(--fg);text-decoration:none;font-weight:500}
+.adm .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:14px;line-height:1.3;min-height:0;white-space:nowrap;cursor:pointer;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--border-i);background:var(--surface-2);color:var(--fg);text-decoration:none;font-weight:500}
 .adm .btn:hover{border-color:var(--accent);color:var(--fg)}
 .adm .btn:disabled{opacity:.5;cursor:not-allowed}
 .adm .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .adm .btn.primary:hover{background:var(--accent-hi)}
 .adm .btn.danger{color:var(--danger);border-color:var(--danger)}
-.adm .btn.sm{padding:5px 10px;font-size:13px}
+.adm .btn.sm{padding:5px 10px;font-size:13px;border-radius:7px}
+.adm .btn:active{transform:none}
 .adm .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--muted)}
 .adm .pill.on{color:var(--free);border-color:var(--free-line);background:var(--free-soft)}
 .adm .pill.off{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
@@ -52,8 +55,16 @@
 .adm th{font-size:13px;color:var(--muted);font-weight:500}
 .adm td.num{font-variant-numeric:tabular-nums;color:var(--fg-2)}
 .adm td input{padding:6px 8px}
-.adm .thumb{width:44px;aspect-ratio:2/3;border-radius:5px;overflow:hidden;background:var(--surface-3);flex:none}
+.adm .thumb{display:block;width:44px;height:66px;aspect-ratio:2/3;border-radius:5px;overflow:hidden;background:var(--surface-3);flex:none}
 .adm .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.adm td img{max-width:100%}
+.adm table.list th,.adm table.list td{white-space:nowrap}
+.adm table.list td:first-child{width:52px;padding-right:0}
+.adm table.list td:nth-child(2) a{color:var(--fg);text-decoration:none}
+.adm table.list td:nth-child(2) a:hover{color:var(--accent)}
+.adm table.list th:last-child,.adm table.list td:last-child{text-align:right;white-space:nowrap}
+.adm .list-actions .actions{display:inline-flex;gap:6px;align-items:center;justify-content:flex-end;flex-wrap:nowrap}
+.adm .list-actions .msg{white-space:normal;text-align:left;max-width:260px;font-size:12px;padding:6px 8px}
 .adm .msg{margin:14px 0 0;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--surface)}
 .adm .msg.ok{border-color:var(--free-line);background:var(--free-soft);color:var(--free)}
 .adm .msg.bad{border-color:var(--danger);background:var(--danger-soft);color:var(--fg)}

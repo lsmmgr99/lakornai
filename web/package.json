@@ -13,7 +13,8 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "test": "node --test --import tsx tests/*.test.mts",
-    "e2e:admin": "tsx tests/admin-e2e.mts"
+    "e2e:admin": "tsx tests/admin-e2e.mts",
+    "images:variants": "tsx scripts/cover-variants.ts"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

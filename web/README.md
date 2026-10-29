@@ -48,7 +48,8 @@ git pull && npm ci && npx prisma db push && npm run build && pm2 reload ailakorn
 **โปรดักชันปัจจุบัน (29 ต.ค. 2026):** VPS `ailakorn-prod` (143.198.220.253, Ubuntu 24.04, swap 2 GB) · โค้ดที่ `/opt/ailakorn/web` · pm2 `ailakorn` พอร์ต 3000 · nginx 80/443
 · โดเมนผ่าน Cloudflare (SSL mode Full) — origin ใช้ใบรับรอง self-signed ที่ `/etc/nginx/ssl/` (certbot ใช้ไม่ได้เพราะ challenge วิ่งผ่าน Cloudflare; ถ้าต้องการใบจริงที่ origin ให้ใช้ Cloudflare Origin Certificate แทน)
 · backup อัตโนมัติ 03:20 ทุกวัน → `/opt/ailakorn-backups/` เก็บ 14 ชุด (`/usr/local/bin/ailakorn-backup`)
-· อัปเดตโค้ด: `cd /opt/ailakorn && git pull && cd web && npm ci && npx prisma db push && NODE_OPTIONS=--max-old-space-size=1536 npm run build && pm2 reload ailakorn`
+· nginx เสิร์ฟ `/media/` ตรงจาก `data/uploads/` (ดู `deploy/nginx.conf`) · log มีเวลาตอบใน `/var/log/nginx/ailakorn.access.log`
+· อัปเดตโค้ด: `cd /opt/ailakorn && git pull && cd web && npm ci && npx prisma db push && npm run images:variants && NODE_OPTIONS=--max-old-space-size=1536 npm run build && pm2 reload ailakorn`
 
 **Backup** = ไฟล์ `data/ailakorn.db` + โฟลเดอร์ `data/uploads/` (คัดลอกสองอย่างนี้ไปที่อื่นเป็นประจำ เช่น cron + rclone)
 
@@ -71,7 +72,7 @@ git pull && npm ci && npx prisma db push && npm run build && pm2 reload ailakorn
 - `<title>`/description เฉพาะหน้า · canonical · Open Graph (video.tv_show / video.episode) · Twitter card · `lang="th"` · `og:locale th_TH`
 - JSON-LD: WebSite+SearchAction · TVSeries/TVSeason/TVEpisode · CollectionPage/ItemList · BreadcrumbList · FAQPage · AboutPage/ContactPage · ไม่มี VideoObject/คะแนน/ยอดวิวที่ไม่มีข้อมูลจริง
 - sitemap.xml (lastmod จากเวลาแก้จริง) · robots.txt สลับได้จากหลังบ้าน · หน้าส่วนตัวและตอน ≥2 เป็น noindex (จนกว่าจะมีชื่อตอน/คำบรรยายเฉพาะตัว)
-- รูปผ่าน next/image (srcset · AVIF/WebP · width/height กัน CLS · lazy · ภาพฮีโร่ preload) · ฟอนต์ไทย subset ในเครื่อง · ไม่มีสคริปต์บุคคลที่สาม
+- รูปผ่าน next/image (srcset · width/height กัน CLS · lazy · ภาพฮีโร่ preload) แต่ **ไม่ย่อสด**: ทุกปกมีไฟล์ย่อย WebP ทุกขนาด (`src/lib/covers.ts`) สร้างตอนอัปโหลด/seed และเสิร์ฟเป็นไฟล์นิ่งจาก nginx — Cloudflare แคชที่ edge ได้ (เครื่อง 1 CPU ย่อ/แปลง AVIF สดใช้ 1–2 วิ/รูป) · ถ้าคัดลอกไฟล์ปกเข้า `data/uploads/` เอง ให้รัน `npm run images:variants` · ฟอนต์ไทย subset ในเครื่อง · ไม่มีสคริปต์บุคคลที่สาม
 - ด่านอัตโนมัติ `tests/site-check.mts` ตรวจทุกหน้าตามกฎข้างบนทุกครั้งที่ต้องการ
 
 ## โครงสร้างโค้ด

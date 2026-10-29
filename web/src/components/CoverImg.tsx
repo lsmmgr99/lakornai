@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { coverSlot, type Series, type Shape } from "@/lib/content";
+import { variantSrcSet } from "@/lib/covers";
 
 /* ปกทุกใบในเว็บไหลผ่านตัวนี้ (ADR-001 §13.5): ที่วางบอก "ทรง" ไม่ใช่ชื่อไฟล์
    ใช้ next/image ⇒ ได้ srcset/avif/webp และ width/height จริงของไฟล์ (กัน CLS) · lazy เป็นค่าตั้งต้น
@@ -37,7 +38,7 @@ export function CoverImg({ s, shape = "poster", lazy = true, cls = "", alt = nul
   if (!wide.wide) return img;
   return (
     <picture>
-      <source media={wideMedia} srcSet={wide.url} width={wide.w} height={wide.h} />
+      <source media={wideMedia} srcSet={variantSrcSet(wide.url) || wide.url} sizes={sizes} width={wide.w} height={wide.h} />
       {img}
     </picture>
   );
