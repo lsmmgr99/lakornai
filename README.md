@@ -7,14 +7,15 @@
 
 ---
 
-## หลังบ้าน (แผงจัดการเนื้อหา)
+## เว็บรุ่นใหม่ (Next.js) — เว็บ + CMS + หลังบ้านในแอปเดียว (ADR-002 · 29 ต.ค. 2026)
 
 ```bash
-node admin/broker.mjs         # เปิด http://127.0.0.1:4190/admin/ — ล็อกอิน GitHub · บันทึกร่าง · เผยแพร่ขึ้นเว็บ
+cd web && npm ci && npx prisma generate && npx prisma db push && npm run db:seed && npm run dev
+# เว็บ http://localhost:3000 · หลังบ้าน http://localhost:3000/admin/  (คู่มือ/deploy: web/README.md)
 ```
 
-แก้เรื่อง/ตอน/ปกในแผง → **เผยแพร่** → CI ตรวจ V1–V13 → build → ส่งขึ้น GitHub Pages เอง (ราว 2–4 นาที)
-ไม่มีฐานข้อมูล: แหล่งความจริงคือ `content.json` ใน git (ADR-001 §4/§14) · วิธีตั้งค่า GitHub App ครั้งแรกอยู่ที่ `admin/README.md`
+ข้อมูลอยู่ใน SQLite (`web/data/`) แก้ในหลังบ้านแล้วหน้าเว็บอัปเดตทันที · URL ทุกเส้นเหมือนรุ่น static · ด่าน SEO: `web/tests/site-check.mts`
+ส่วนด้านล่างนี้คือ **เว็บรุ่น static เดิม** (generator + GitHub Pages) ซึ่งยังเก็บไว้เป็นชุดอ้างอิง/สำรองจนกว่ารุ่น Next จะขึ้นโดเมนจริง
 
 ## คำสั่งที่ใช้บ่อย
 

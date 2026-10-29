@@ -1,0 +1,75 @@
+/* หลังบ้าน — สไตล์แยกจากเว็บผู้ชม (ใช้โทเคนสีชุดเดียวกัน) · ทุกกฎอยู่ใต้ .adm */
+.adm{min-height:100vh;display:grid;grid-template-columns:240px 1fr;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5}
+.adm *{box-sizing:border-box}
+.adm a{color:var(--accent)}
+.adm-side{background:var(--nav);border-right:1px solid var(--line-2);padding:18px 14px;display:flex;flex-direction:column;gap:6px;position:sticky;top:0;height:100vh}
+.adm-side .brand{font-family:var(--display);font-weight:600;font-size:20px;padding:4px 10px 14px;display:flex;flex-direction:column}
+.adm-side .brand small{font-size:12px;color:var(--muted);font-family:var(--body);font-weight:400}
+.adm-side nav a{display:block;padding:9px 12px;border-radius:var(--r-sm);color:var(--fg-2);text-decoration:none}
+.adm-side nav a:hover{background:var(--surface-2);color:var(--fg)}
+.adm-side nav a[aria-current=page]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.adm-side .who{margin-top:auto;font-size:13px;color:var(--muted);padding:8px 12px;border-top:1px solid var(--line);line-height:1.5}
+.adm-side .who b{display:block;color:var(--fg-2)}
+.adm-main{padding:26px 32px 60px;min-width:0}
+.adm h1{font-family:var(--display);font-weight:600;font-size:26px;margin:0 0 6px}
+.adm h2{font-family:var(--display);font-weight:600;font-size:18px;margin:26px 0 10px;color:var(--accent)}
+.adm .sub{color:var(--muted);margin:0 0 20px}
+.adm .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.adm .between{justify-content:space-between}
+.adm .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+.adm .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:1000px){.adm{grid-template-columns:1fr}.adm-side{position:static;height:auto}.adm .grid2,.adm .grid3{grid-template-columns:1fr}}
+.adm .card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);padding:18px 20px}
+.adm .stat{display:flex;flex-direction:column;gap:4px}
+.adm .stat b{font-family:var(--display);font-size:30px;font-weight:600;color:var(--accent)}
+.adm .stat span{color:var(--muted);font-size:13px}
+.adm label{display:block;margin:14px 0 0}
+.adm label>span{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+.adm label.inline{display:inline-flex;align-items:center;gap:7px;margin:6px 16px 6px 0}
+.adm label.inline input{width:auto}
+.adm input,.adm textarea,.adm select{font:inherit;color:inherit;background:var(--surface-2);border:1px solid var(--border-i);border-radius:8px;padding:9px 11px;width:100%}
+.adm input:focus,.adm textarea:focus,.adm select:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.adm input[type=color]{width:54px;height:38px;padding:2px}
+.adm input[type=checkbox],.adm input[type=radio]{width:18px;height:18px;accent-color:var(--accent)}
+.adm textarea{min-height:130px;resize:vertical}
+.adm fieldset{border:1px solid var(--line-2);border-radius:var(--r-sm);padding:8px 14px 10px;margin:14px 0 0}
+.adm legend{color:var(--muted);font-size:13px;padding:0 6px}
+.adm .counter{font-size:12px;color:var(--muted);text-align:right;margin-top:3px}
+.adm .counter.bad{color:var(--danger)}
+.adm .btn{display:inline-flex;align-items:center;gap:6px;font:inherit;cursor:pointer;padding:9px 16px;border-radius:var(--r-sm);border:1px solid var(--border-i);background:var(--surface-2);color:var(--fg);text-decoration:none;font-weight:500}
+.adm .btn:hover{border-color:var(--accent);color:var(--fg)}
+.adm .btn:disabled{opacity:.5;cursor:not-allowed}
+.adm .btn.primary{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.adm .btn.primary:hover{background:var(--accent-hi)}
+.adm .btn.danger{color:var(--danger);border-color:var(--danger)}
+.adm .btn.sm{padding:5px 10px;font-size:13px}
+.adm .pill{display:inline-block;font-size:12px;padding:2px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--muted)}
+.adm .pill.on{color:var(--free);border-color:var(--free-line);background:var(--free-soft)}
+.adm .pill.off{color:var(--accent);border-color:var(--accent-line);background:var(--accent-soft)}
+.adm .pill.warn{color:var(--danger);border-color:var(--danger);background:var(--danger-soft)}
+.adm table{width:100%;border-collapse:collapse;margin-top:10px}
+.adm th,.adm td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.adm th{font-size:13px;color:var(--muted);font-weight:500}
+.adm td.num{font-variant-numeric:tabular-nums;color:var(--fg-2)}
+.adm td input{padding:6px 8px}
+.adm .thumb{width:44px;aspect-ratio:2/3;border-radius:5px;overflow:hidden;background:var(--surface-3);flex:none}
+.adm .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.adm .msg{margin:14px 0 0;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--line-2);background:var(--surface)}
+.adm .msg.ok{border-color:var(--free-line);background:var(--free-soft);color:var(--free)}
+.adm .msg.bad{border-color:var(--danger);background:var(--danger-soft);color:var(--fg)}
+.adm .msg ul{margin:6px 0 0;padding-left:20px}
+.adm .cover-box{background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:12px}
+.adm .cover-box .frame{background:#0b0a0f;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center;margin:8px 0;color:var(--muted);font-size:13px}
+.adm .cover-box .frame.poster{aspect-ratio:2/3;max-width:200px}
+.adm .cover-box .frame.wide{aspect-ratio:2640/1200}
+.adm .cover-box .frame img{width:100%;height:100%;object-fit:cover;display:block}
+.adm .cover-box small{color:var(--muted);display:block;word-break:break-all}
+.adm .ep-tools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.adm tr.bad td{background:var(--danger-soft)}
+.adm .sticky-actions{position:sticky;bottom:0;background:var(--bg);padding:14px 0;border-top:1px solid var(--line-2);margin-top:26px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.adm .login{max-width:420px;margin:12vh auto 0;padding:0 20px}
+.adm .login .brand{font-family:var(--display);font-size:28px;font-weight:600;margin-bottom:4px}
+.adm .muted{color:var(--muted);font-size:13px}
+.adm .list-actions form{display:inline}
+.adm .danger-zone{margin-top:40px;padding-top:16px;border-top:1px dashed var(--line-2)}
+.adm code{background:var(--surface-2);padding:1px 6px;border-radius:4px;font-size:13px}

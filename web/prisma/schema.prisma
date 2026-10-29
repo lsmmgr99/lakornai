@@ -1,0 +1,116 @@
+// AiLakorn — ฐานข้อมูลของเว็บ + หลังบ้าน (ADR-002)
+// SQLite ไฟล์เดียว (data/ailakorn.db) · เปลี่ยนเป็น PostgreSQL ได้โดยแก้ provider + DATABASE_URL แล้ว migrate ใหม่
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// ตั้งค่าเว็บ (แถวเดียว id=1) — แก้ได้จากหลังบ้าน ไม่ต้อง deploy ใหม่
+model Setting {
+  id          Int      @id @default(1)
+  siteName    String   @default("AiLakorn")
+  siteOrigin  String   @default("https://ailakorn.com")
+  /// true = robots.txt เปิดให้เก็บดัชนี + ชี้ sitemap · false = Disallow ทั้งเว็บ (รอบทดสอบ)
+  indexing    Boolean  @default(false)
+  /// "none" = ยังไม่มีระบบวัดยอดวิว ⇒ ห้ามแสดง/อ้างยอดวิวทุกที่ (ADR-001 §7, V12/V13)
+  viewsSource String   @default("none")
+  /// ข้อความจุดยืน "ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก"
+  freeLine    String   @default("ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก")
+  updatedAt   DateTime @updatedAt
+}
+
+model Genre {
+  id    Int     @id @default(autoincrement())
+  slug  String  @unique
+  label String
+  /// ข้อความนำของหน้าแนว (SEO) — ถ้าว่าง หน้าแนวใช้ข้อความจากโค้ด
+  intro String?
+  /// title/description ของหน้าแนว (SEO) — ว่าง = สร้างอัตโนมัติ
+  seoTitle String?
+  seoDesc  String?
+  sort  Int     @default(0)
+}
+
+model Trope {
+  id    Int    @id @default(autoincrement())
+  slug  String @unique
+  label String
+  sort  Int    @default(0)
+}
+
+model Series {
+  id          Int       @id @default(autoincrement())
+  slug        String    @unique
+  title       String
+  hook        String
+  synopsis    String
+  /// "ongoing" | "ended"
+  status      String    @default("ongoing")
+  /// daily|mon|…|sun เมื่อ ongoing · null เมื่อ ended
+  releaseDay  String?
+  /// "vertical" | "horizontal" — บังคับ ห้ามเดา (ADR-001 §13.2)
+  orientation String
+  /// JSON array ของ slug แนว — ตัวแรกคือแนวหลัก
+  genres      String    @default("[]")
+  /// JSON array ของ slug แท็ก
+  tropes      String    @default("[]")
+  /// JSON array ของชื่อตัวละคร
+  cast        String    @default("[]")
+  themeC1     String?
+  themeC2     String?
+  /// พาธปก 2:3 ใน UPLOAD_DIR เช่น covers/durian-revenge.webp (เสิร์ฟที่ /media/covers/…)
+  cover       String?
+  coverW      Int?
+  coverH      Int?
+  /// ภาพกว้าง 2640×1200 (ไม่บังคับสำหรับแนวตั้ง · บังคับสำหรับแนวนอน)
+  coverWide   String?
+  coverWideW  Int?
+  coverWideH  Int?
+  views       Int?
+  /// false = ซ่อนจากหน้าบ้านทั้งหมด (ร่าง)
+  published   Boolean   @default(false)
+  sort        Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  episodes    Episode[]
+}
+
+model Episode {
+  id          Int     @id @default(autoincrement())
+  seriesId    Int
+  n           Int
+  title       String
+  durationSec Int
+  /// URL ไฟล์วิดีโอ (mp4/hls) — ว่าง = ยังไม่มีคลิป เพลเยอร์เดินเวลาจำลอง
+  videoUrl    String?
+  series      Series  @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+
+  @@unique([seriesId, n])
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  name         String
+  passwordHash String
+  /// "admin" (จัดการผู้ใช้/ตั้งค่า) | "editor" (แก้เนื้อหา)
+  role         String    @default("editor")
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  lastLoginAt  DateTime?
+}
+
+/// ร่องรอยการแก้ — ใครทำอะไรเมื่อไร
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  userName  String?
+  action    String
+  target    String
+  detail    String?
+  createdAt DateTime @default(now())
+}

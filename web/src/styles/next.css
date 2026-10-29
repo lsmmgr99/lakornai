@@ -1,0 +1,8 @@
+/* ส่วนเพิ่มของรุ่น Next.js — ไม่ทับโทเคน/สีของ Visual
+   next/image ใส่ style width/height แบบ auto มาเอง ⇒ ให้ CSS ของปกชนะ (ปกใช้ object-fit ในกรอบ 2:3) */
+.poster img,.th img,.th2 img,.hero .bg img,.player > img,.cont .thumb img,.gtile img,.reelstrip img,.nextup .thumb img,.ec-next .thumb img,.lib-list .controw .th img,.notif .th img{
+  width:100%;height:100%;object-fit:cover}
+.crumbs > span{display:contents}
+/* ปุ่มติดตามแบบมีข้อความ (หน้าเรื่อง) */
+.btn em{font-style:normal}
+/* หน้า admin ไม่ใช้สไตล์ของเว็บผู้ชม (มีของตัวเอง) */
