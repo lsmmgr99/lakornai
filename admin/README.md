@@ -1,123 +1,127 @@
-# แผงจัดการเนื้อหา — สถานะระหว่างพัฒนา
+# แผงจัดการเนื้อหา AiLakorn (หลังบ้าน)
 
-ทำแล้ว: seed ตาม ADR-001, ตัวตรวจข้อมูล, แผงร่างแก้เรื่อง/ตารางตอนหลายรายการ,
-ตรวจชื่อซ้ำทั้งคลัง, ส่งออก JSON, ทดสอบ static rebuild แบบไม่แตะไฟล์หน้าบ้านร่วม
+แผงนี้คือ "หลังบ้าน" ของเว็บตามสถาปัตยกรรม **Git-as-CMS** (ADR-001 §4): ไม่มีฐานข้อมูลและไม่มีเซิร์ฟเวอร์เปิดค้าง
+แหล่งความจริงคือไฟล์ `content.json` ในรีโป GitHub · แก้ในแผง → commit → CI ตรวจ → build → ส่งขึ้นเว็บเอง
+ประวัติการแก้ ใครแก้อะไรเมื่อไร และการย้อนกลับ ได้จาก git โดยไม่ต้องสร้างอะไรเพิ่ม
 
-มี implementation OAuth/commit ผ่าน broker พร้อม mock tests; ยังไม่พร้อมใช้งานจริงจนผ่าน live validation, รีวิว และ CI อัตโนมัติ
-ADR-001 §12 เลือก broker ในเครื่องสำหรับ OAuth และเลื่อนระบบวัดวิวออกจากงานนี้
-เส้นส่งออกใช้ได้ถาวรโดยไม่ต้องเข้าสู่ระบบ ส่วน broker ต้องรอ GitHub App ของบริษัทเพื่อทดลองจริง
-โหมดร่างนี้ไม่มีสิทธิ์เขียนรีโป และไม่ใช่การเข้าสู่ระบบแอดมินฉบับส่งมอบ
-
-ใช้ Node.js 24 ไม่ต้องติดตั้ง dependency:
-
-```sh
-node admin/serve.mjs
-# เปิด http://127.0.0.1:4190/admin/
-node --test admin/*.test.mjs
-node admin/browser-test.mjs # ต้องมี Chromium ตามพาธในไฟล์
-node admin/check.mjs
-node admin/reproduce.mjs
+```
+เบราว์เซอร์ (admin/)  ⇄  broker บนเครื่องเดียวกัน (node admin/broker.mjs)  ⇄  GitHub API
+                              │ token อยู่ในหน่วยความจำของ broker เท่านั้น
+   บันทึกร่าง  → branch admin-drafts/content   (ยังไม่ขึ้นเว็บ · เก็บงานค้าง)
+   เผยแพร่     → branch main                   → CI (V1–V13 + build) → force-push `preview` → GitHub Pages
 ```
 
-ในแผง เลือกเรื่อง แก้ชื่อตอนหลายแถว กดตรวจชื่อซ้ำอีกครั้ง แล้วส่งออก content.json
-ปุ่มส่งออกตรวจฟิลด์และการมีไฟล์ปก ไฟล์ดาวน์โหลดเป็นร่าง ยังไม่ได้ commit
-สามารถเปิดร่างกลับมาแก้ต่อได้ ห้ามเปลี่ยน slug ของเรื่องเดิม
-แผงยังไม่มี autosave: ส่งออกก่อนปิดหน้าเพื่อเก็บการแก้ไข
-
-`reproduce.mjs` สร้างสำเนาชั่วคราว แก้ชื่อตอนแรก แล้วตรวจข้อมูล/build/ตรวจ HTML
-พิมพ์พาธ output ให้เปิดดูได้ ไม่เขียนทับ HTML ใน workspace และไม่ deploy
-CI ในอนาคตต้องรัน check ก่อน build และ `check.mjs . --html` หลัง build
-V8/V9 ใช้ allowlist ทุกระดับเพื่อปฏิเสธฟิลด์นอกสัญญาทั้งหมด
-
-สร้าง seed ใหม่โดยระบุไฟล์ปลายทางที่ยังไม่มี:
+## ใช้งานประจำวัน
 
 ```sh
-node admin/seed.mjs assets/data.js /tmp/lakorn-seed.json
+node admin/broker.mjs          # เปิด http://127.0.0.1:4190/admin/
 ```
 
-seed อ่านเฉพาะฟิลด์สัญญา ใช้เรื่องย่อ/แท็กที่มีใน assets/data.js ล่าสุด
-จำนวนเริ่มต้น 12 เรื่อง / 418 ตอน / 6 แนว / 13 แท็ก ทิ้งช่อง tuple ที่สาม
-ทิ้งยอดวิวตัวอย่างทั้งหมดเป็น null และ viewsSource=none
-เรื่องย่อที่นำมาใช้ผ่านข้อกำหนดเชิงรูปแบบแล้ว แต่ยังต้องให้ผู้ดูแลตรวจเนื้อหา
+1. กด **เข้าสู่ระบบ GitHub** → แผงแสดงรหัส 8 ตัว → เปิด github.com/login/device กรอกรหัส → กลับมาแผงจะต่อให้เอง
+2. แผงถามว่าจะโหลด **ร่างที่ค้างอยู่** (ถ้ามี) หรือ **ข้อมูลที่เผยแพร่อยู่** — เลือกอย่างใดอย่างหนึ่ง
+3. แก้เรื่อง/ตอน/ปก — รายการ "สิ่งที่ต้องแก้" ด้านล่างอัปเดตทันที กดชื่อเรื่องในรายการเพื่อกระโดดไปแก้
+4. **บันทึกร่าง** = เก็บไว้บน GitHub (branch ร่าง) ยังไม่กระทบเว็บ · ปิดเครื่องแล้วมาเปิดต่อวันหลังได้
+5. **เผยแพร่ขึ้นเว็บ** = commit เข้า `main` → แผงแสดงสถานะ "รอ CI… / กำลัง build… / ขึ้นเว็บแล้ว ✓" (ราว 2–4 นาที)
 
-ประตูส่งมอบยังอยู่: Reviewer-Claude และ Reviewer-Codex ให้ความเห็นแยกกัน,
-QA ตรวจพฤติกรรม, Security เซ็นรับ auth/upload และ CTO ตัดสินก่อน merge
-ไม่มีการ deploy หรือจัดซื้อจากชุดคำสั่งนี้
+ปุ่มทั้งสองเปิดให้กดเฉพาะเมื่อ (ก) เข้าสู่ระบบแล้ว (ข) บัญชีนั้นมีสิทธิ์ push รีโปจริง และ (ค) ข้อมูลผ่านการตรวจครบ — ตัวตรวจคือ `admin/validate.mjs` ตัวเดียวกับที่ CI ใช้ จึงไม่มีกรณี "แผงให้ผ่านแต่ CI ล้ม" จากข้อมูล
 
-## ปกและเส้นส่งออกถาวร
+ไม่มี GitHub App หรือไม่ได้ล็อกอิน ยังใช้ **ส่งออก content.json / ส่งออกพร้อมปก (.tar)** แล้วให้คนที่มีสิทธิ์ commit เข้า `main` เองได้เสมอ (ADR-001 §12.1 ฉ) — ปลายทางเดียวกัน จึงขึ้นเว็บเองเหมือนกัน
 
-เลือกปกในเรื่องที่ต้องการ: รับ PNG/JPEG/WebP ไม่เกิน 1,000,000 ไบต์
-ตรวจ magic bytes และให้เบราว์เซอร์ถอดรหัสภาพก่อนรับ ไม่ใช้ชื่อไฟล์ต้นฉบับ
-ชื่อปลายทางมาจาก slug ของเรื่อง ปกอยู่ในหน่วยความจำจนปิดหน้า
-เมื่อมีปกใหม่ ต้องใช้ “ส่งออกชุดข้อมูลพร้อมปก” เพื่อได้ `lakorn-content.tar`
-ซึ่งมี `content.json` และเฉพาะปกใหม่ที่ร่างอ้างถึง ไม่มีคำสั่งเขียนรีโปในแผง
-การเปิด JSON ใหม่จะล้างปกในหน่วยความจำหลังยืนยัน ต้องเลือกปกใหม่อีกครั้ง
+## สิ่งที่แก้ได้ในแผง (ครบตามสัญญาข้อมูล version 2)
 
-ผู้มีสิทธิ์เขียนรีโปแตกไฟล์ในโฟลเดอร์พัก ตรวจ diff แล้วคัดลอก JSON และปกไปรีโป
-รัน `node admin/check.mjs` และ `node admin/reproduce.mjs` ก่อน commit ทั้งคู่พร้อมกัน
-อย่าแตก archive ที่มาจากแหล่งอื่นทับรีโปโดยไม่ตรวจรายการไฟล์ก่อน
-เส้นทางนี้ไม่ต้องมี OAuth และคงอยู่แม้เพิ่ม broker แล้ว
-CI ยังต้องให้ DevOps เชื่อม commit → ตรวจ V1–V13 → build artifact ตาม ADR §9
+| ส่วน | ฟิลด์ | กฎที่แผงบังคับ |
+|---|---|---|
+| ข้อมูลเรื่อง | ชื่อเรื่อง · ประโยคโปรย · เรื่องย่อ | 1–80 · 1–90 ไม่ลงท้ายด้วยจุด · 80–600 และไม่ซ้ำประโยคโปรย (V7) |
+| ทิศของวิดีโอ | `orientation` แนวตั้ง/แนวนอน | **ต้องเลือก** ไม่มีค่าตั้งต้น (V14) · แนวนอนต้องมีภาพกว้าง (V16) |
+| จัดหมวด | แนว (≥1) · แท็ก · สถานะ/วันออกตอน · นักแสดง · สีธีม | V3 · V5 |
+| ปก 2:3 | อัปโหลด PNG/JPEG/WebP ≤ 1 MB | ตรวจ magic bytes ไม่เชื่อชื่อไฟล์ · ชื่อปลายทาง = `assets/covers/<slug>.<ext>` (V6) |
+| ภาพกว้าง | อัปโหลด ≤ 300 KB | ต้อง **2640×1200 เป๊ะ** วัดทั้งในเบราว์เซอร์และใน broker · `assets/covers-wide/<slug>.<ext>` (V15) |
+| ตอน | ชื่อตอน · ความยาว (พิมพ์ `น:วว`) · เพิ่ม/ลบ/เลื่อนลำดับ | 0:30–10:00 · เลขตอนเรียงใหม่อัตโนมัติ (V4) · เตือนชื่อตอนซ้ำทั้งคลัง |
+| เรื่องใหม่ / ลบเรื่อง | รหัสเรื่อง (เปลี่ยนไม่ได้) + ชื่อ + ทิศ | ลบแล้วหน้าเรื่อง/หน้าตอนบนเว็บหายเมื่อเผยแพร่ |
 
-## Broker ในเครื่อง (AIO-31 — รอ live validation และ review)
+ยอดวิวยังปิดอยู่ (`meta.viewsSource = none`) ตาม ADR-001 §7 — แผงไม่มีช่องให้กรอก
 
-ใช้ GitHub App ของบริษัท เปิด Device flow และติดตั้งแบบ Selected repositories เฉพาะรีโปนี้
-ให้ Contents: read/write (Metadata: read เป็นสิทธิ์พื้นฐานของ GitHub) ไม่ใช้ OAuth App/PAT
-เจ้าของต้องยืนยัน App permissions และ branch publish ทั้งหมดก่อนทดสอบจริง
-สร้าง branch ร่างที่มี content.json และปกไว้แล้ว โดยชื่อขึ้นต้น `admin-drafts/`
-ตัว broker ไม่สร้าง branch ไม่ merge ไม่ deploy และไม่รับ path/branch จากหน้าเว็บ
+---
+
+## ขั้นที่ 1 (ทำครั้งเดียว): สร้าง GitHub App สำหรับล็อกอิน — เจ้าของรีโปทำ 5 นาที
+
+การล็อกอินใช้ **device flow ของ GitHub App** (ADR-001 §12.1 ลำดับ 1): ไม่มี secret อยู่บนเครื่องใคร มีแค่ `client_id` ซึ่งเป็นค่าสาธารณะ
+สิทธิ์ของ token จำกัดแค่รีโปนี้ และผูกกับตัวตนของคนที่ล็อกอิน (commit author = คนนั้น)
+
+1. เปิด **https://github.com/settings/apps/new** (บัญชี `lsmmgr99` ซึ่งเป็นเจ้าของรีโป)
+2. กรอก
+   - GitHub App name: `AiLakorn Admin` (ชื่ออะไรก็ได้ที่ยังว่าง)
+   - Homepage URL: `https://github.com/lsmmgr99/lakornai`
+   - **ติ๊ก "Enable Device Flow"** (อยู่ใต้หัวข้อ Identifying and authorizing users)
+   - Webhook: **เอาติ๊ก Active ออก** (ไม่ใช้)
+   - Repository permissions → **Contents: Read and write** (อย่างอื่นปล่อย No access · Metadata เป็น Read-only อัตโนมัติ)
+   - Where can this GitHub App be installed? → **Only on this account**
+3. กด **Create GitHub App** → หน้าถัดไปจะเห็น **Client ID** (รูปแบบ `Iv1.xxxxxxxxxxxxxxxx` หรือ `Iv23li…`) — คัดลอกไว้
+   *ไม่ต้องกด Generate client secret และไม่ต้องสร้าง private key* — device flow ไม่ใช้
+4. เมนูซ้าย **Install App** → เลือกบัญชี `lsmmgr99` → **Only select repositories** → เลือก `lakornai` → Install
+5. วาง Client ID ลง `admin/config.json`:
+   ```json
+   "clientId": "Iv1.xxxxxxxxxxxxxxxx"
+   ```
+   (commit ไฟล์นี้ได้ — Client ID ไม่ใช่ความลับ · **ห้ามใส่ client secret / token / PAT ในไฟล์นี้หรือที่ใดในรีโป**)
+6. รัน `node admin/broker.mjs` แล้วลองเข้าสู่ระบบ
+
+ใครล็อกอินได้: ทุกคนที่ GitHub ให้สิทธิ์ push รีโปนี้ (เจ้าของ หรือ collaborator ที่ชวนไว้) — ถอนสิทธิ์ที่รีโปจุดเดียวแล้วแผงปิดให้คนนั้นทันที (B6)
+
+## ขั้นที่ 2: ตัวแปรของ CI (ทำครั้งเดียว · ดู `ci/README.md`)
+
+| ตัวแปร | ตอนนี้ | วันย้ายไปโดเมนจริง |
+|---|---|---|
+| `SITE_ORIGIN` | ไม่ตั้ง → `https://lsmmgr99.github.io/lakornai` | `https://ailakorn.com` |
+| `PAGES_CNAME` | ไม่ตั้ง | `ailakorn.com` — **หลัง** ชี้ DNS แล้ว |
+| `SITE_PUBLISHED` | ไม่ตั้ง → robots ปิดดัชนี | `1` เมื่อพร้อมให้ Google เก็บ |
+
+ตั้งที่ GitHub → Settings → Secrets and variables → Actions → Variables
+
+---
+
+## ตั้งค่า (admin/config.json)
+
+```json
+{
+  "clientId": "",                       // Client ID ของ GitHub App (ค่าสาธารณะ) · ว่าง = ปุ่มล็อกอินปิด ใช้ได้แค่ส่งออกไฟล์
+  "owner": "lsmmgr99", "repo": "lakornai",
+  "draftBranch": "admin-drafts/content", // ปุ่ม "บันทึกร่าง" เขียนที่นี่ · สร้างเองถ้ายังไม่มี · ต้องขึ้นต้น admin-drafts/
+  "publishBranch": "main",              // ปุ่ม "เผยแพร่" เขียนที่นี่ · CI ตรวจ/build/ส่งขึ้นเว็บเอง
+  "siteUrl": "https://lsmmgr99.github.io/lakornai/", // ลิงก์ที่แผงแสดงเมื่อขึ้นเว็บแล้ว
+  "port": 4190
+}
+```
+
+env ตั้งทับได้ทุกค่า: `LAKORN_APP_CLIENT_ID` `LAKORN_REPO_OWNER` `LAKORN_REPO_NAME` `LAKORN_DRAFT_BRANCH` `LAKORN_PUBLISH_BRANCH` `LAKORN_SITE_URL` `LAKORN_PORT`
+
+## ขอบเขตความปลอดภัยของ broker (ADR-001 §12.1 ค — ยังครบทุกข้อ)
+
+- ผูก `127.0.0.1` เท่านั้น · ตรวจ `Host`/`Origin` ทุกคำขอ · CSRF token ต่อ session (B1–B3)
+- token ของ GitHub อยู่ในหน่วยความจำของ broker ไม่เขียนดิสก์ ไม่ลง log ไม่ส่งเบราว์เซอร์ · ปิดโปรเซส = session ตาย (B4–B5)
+- เปิดปุ่มเขียนก็ต่อเมื่อ GitHub ยืนยันว่าบัญชีมีสิทธิ์ push (B6)
+- เขียนได้แค่ `content.json` · `assets/covers/<slug>.<ext>` · `assets/covers-wide/<slug>.<ext>` — allowlist ตายตัว ไม่ใช่ prefix (B7 + §13.8) · ห้าม force push ห้ามลบ branch
+- ปกตรวจ magic bytes · ภาพกว้างวัดขนาดจริงด้วย `build/imgsize.mjs` ตัวเดียวกับ CI (B8)
+- branch ร่างต้องไม่ใช่ branch เผยแพร่ · การเผยแพร่เข้า `main` เป็นเส้นแยกที่ต้องกดยืนยัน และผ่าน CI ทุกด่านก่อนถึงเว็บ (B9 ฉบับแก้ §14)
+- ไม่มี credential ของเครื่องมือภายใน (harness) เกี่ยวข้อง · ไม่มีรหัสผ่านร่วม
+
+## ทดสอบ
 
 ```sh
-LAKORN_APP_CLIENT_ID=Iv1_PUBLIC_ID \
-LAKORN_REPO_OWNER=COMPANY LAKORN_REPO_NAME=REPO \
-LAKORN_DRAFT_BRANCH=admin-drafts/content LAKORN_PUBLISH_BRANCHES=main \
-node admin/broker.mjs
+node --test admin/*.test.mjs        # broker · provider · client · ตัวตรวจ · ปก (ไม่ต้องมีเครือข่าย)
+node admin/browser-test.mjs         # แผงในเบราว์เซอร์จริง โหมดไฟล์ (ต้องมี Chromium · CHROME=/path ตั้งทับได้)
+node admin/broker-browser-test.mjs  # แผง + broker กับ GitHub จำลอง: ล็อกอิน · บันทึกร่าง · เผยแพร่ · สถานะ CI
+node admin/check.mjs                # V1–V10 ของ content.json ที่ราก (CI รันตัวนี้)
+node admin/reproduce.mjs            # แก้ชื่อตอนในสำเนา → build → ตรวจ HTML (ไม่แตะไฟล์ในรีโป)
 ```
 
-เปิด http://127.0.0.1:4190/admin/ กดเข้าสู่ระบบ แล้วเปิด github.com/login/device
-ใส่ user code ด้วยตนเอง จากนั้นเลือกโหลดข้อมูล branch ร่างหรือเก็บร่างในหน้าไว้ก่อนบันทึก
-ปุ่มบันทึกเปิดหลังตรวจ permissions.push และตรวจซ้ำก่อนเขียน
-commit สร้าง blobs/tree/commit รวม JSON และปกในครั้งเดียว อัปเดต ref ด้วย force:false
-หากหัว branch เปลี่ยน จะปฏิเสธร่างเก่า ให้ส่งออกเก็บไว้แล้วโหลดข้อมูลล่าสุดก่อนปรับใหม่
-ไม่มีการรีเฟรช provider token: หมดอายุให้เข้าสู่ระบบใหม่
+## ถ้าเกิดปัญหา
 
-Session เป็นคุกกี้ HttpOnly/SameSite=Strict ไม่มีวันหมดอายุถาวร
-หน้าเว็บส่ง heartbeat ทุก 20 วินาทีและเมื่อกลับมาเปิดแท็บ; pagehide แจ้งปิดเฉพาะแท็บนั้น (session ใช้ร่วมกัน); เมื่อแท็บสุดท้ายปิดจะล้าง session และถ้าขาด heartbeat เกิน 5 นาที
-broker จะล้าง session (รวมกรณี browser crash) อายุสูงสุด 8 ชั่วโมงหรือเท่า token หากสั้นกว่า
-ปิดโปรเซสจะล้างทั้งหมด ไม่มี token/device code/refresh token เข้าดิสก์หรือส่งกลับ browser
-โปรเซสไม่อ่าน PAPERCLIP_GITHUB_* หรือ credential ของ harness
-API รับ POST JSON พร้อม Origin ตรงเท่านั้น ทุกคำขอหลัง bootstrap ต้องมี CSRF ต่อ session
-static navigation ไม่ส่ง Origin ตามปกติ จึงตรวจ Host และปฏิเสธ cross-site fetch metadata;
-ถ้ามี Origin จะต้องตรงเสมอ ไม่มี CORS และไม่เปิดไฟล์นอก allowlist
-
-เอกสารที่ตรวจ 23 ต.ค. 2026:
-- https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-a-user-access-token-for-a-github-app
-- https://docs.github.com/en/rest/git/refs#update-a-reference
-
-ผลที่ทดสอบจริง: mock HTTP trust boundary/CSRF, permissions.push, stale head,
-provider path allowlist (รวม .github/, build/, assets/*.js), unknown request fields, force:false, device polling/slow_down/denial/session expiry;
-unit validation/cover/tar; Chromium offline export; admin/check.mjs
-ยังไม่ทดสอบจริง: App installation, user consent, read-only user, token revocation,
-device flow กับ App จริง,
-GitHub commit attribution, concurrent remote updates, และ CI branch publish
-ต้องผ่าน Reviewer-Claude/Reviewer-Codex อิสระ + QA + Security ก่อน merge
-หากรีวิวขัดกันให้ CTO ตัดสิน ไม่ถือว่า mock tests เป็น live sign-off
-
-รอบแก้ review: mock commit ปก+JSON ผ่าน /api/commit, ปฏิเสธปกซ้ำ/slug ที่ไม่มี/ไบต์ผิด,
-heartbeat/logout ระหว่าง commit และ busy 409; client test แบบจำลอง DOM ตรวจการไม่โหลดทับร่าง
-แล้วยังบันทึกด้วย remote head และแยก heartbeat 409 จาก session 403
-ผลรอบก่อน 25/25 ผ่าน; Chromium ทดสอบเฉพาะเส้นส่งออก offline ไม่ใช่ OAuth จริง
-
-รอบแก้ QA Q1–Q4: ลงทะเบียนแท็บแยกกันและปิดเฉพาะแท็บด้วย CSRF; logout โดยผู้ใช้ยังล้างทุกแท็บ
-กรณี crash/ส่ง close-tab ไม่ถึง ใช้ idle timeout 5 นาทีเดิม; กลับจาก bfcache ลงทะเบียนใหม่และให้ login ก่อน save
-คำขอ commit ที่เริ่มแล้วอาจจบหลังปิดแท็บ/logout ต้องให้ Security ยืนยัน B5 เช่นเดิม
-validate ก่อน save แจ้งฟิลด์ที่ผิด; เมื่อ commit สำเร็จล้างเฉพาะปกใน snapshot ที่ยังไม่ถูกแก้ระหว่างรอ
-จำ path ปกที่บันทึกสำเร็จไว้สำหรับ JSON export แม้ checkout ในเครื่องยังไม่มีไฟล์จาก branch ร่าง
-body เกิน 18,000,000 ไบต์ถูกอ่านทิ้งจนจบโดยไม่สะสมเพิ่ม แล้วตอบ 413 พร้อมข้อความขนาด ไม่ทำลาย keep-alive
-`node admin/broker-browser-test.mjs` ใช้ Chromium + provider จำลอง ตรวจสองแท็บ/validation/ปกหลัง save/JSON export
-QA เคยยืนยัน hidden-tab throttling 420 วินาทีบน cd29402 แล้ว; รอบนี้ไม่ได้วัด 420 วินาทีซ้ำ
-ตรวจ GitHub Docs URL ข้างต้นอีกครั้ง: หัวข้อ device flow ระบุ HTTP 200 พร้อม error ระหว่างรอ user code ชัดเจน
-จึงปิดข้อสงสัยสมมติฐาน status ด้วยเอกสารได้ แต่ยังไม่ใช่ live OAuth sign-off
-
-ผลตรวจรอบนี้: node --test admin/*.test.mjs ผ่าน 29/29, admin/check.mjs ผ่าน,
-Chromium offline export และ broker-browser-test ผ่าน; git diff --check ผ่าน
+| อาการ | สาเหตุ/ทางแก้ |
+|---|---|
+| ปุ่มเข้าสู่ระบบเป็นสีจาง | `clientId` ใน `admin/config.json` ยังว่าง — ทำขั้นที่ 1 |
+| "GitHub ตอบกลับ 404/403" ตอนโหลด/บันทึก | App ยังไม่ได้ **Install** กับรีโป `lakornai` หรือ permission Contents ไม่ใช่ Read and write |
+| "บัญชีนี้ไม่มีสิทธิ์เขียนรีโป" | บัญชีที่ล็อกอินไม่ใช่ collaborator ที่มีสิทธิ์ push — เชิญที่ Settings → Collaborators |
+| 409 "ข้อมูลบน GitHub เปลี่ยนไป" | มีคน commit แทรก — ออกจากระบบแล้วล็อกอินใหม่เพื่อโหลดข้อมูลล่าสุด (ส่งออกร่างไว้ก่อนถ้ากลัวหาย) |
+| เผยแพร่แล้วแต่ "CI ล้ม" | เปิดลิงก์ run ที่แผงให้ — ส่วนมากเป็นด่าน V12–V13/ตัว build ซึ่งเป็นเรื่องโค้ด ไม่ใช่ข้อมูล · เว็บยังเป็นของเดิม ไม่เสียหาย |
+| ขึ้นเว็บแล้วแต่หน้าเว็บยังเก่า | GitHub Pages ใช้เวลาราว 1 นาทีหลัง `preview` เปลี่ยน · ลอง reload แบบข้ามแคช |

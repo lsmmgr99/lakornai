@@ -13,7 +13,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { normalizeOrigin, DEFAULT_SITE_ORIGIN, SITE_ORIGIN, PUBLISHED, robotsTxt } from '../build/seo.mjs';
+import { normalizeOrigin, DEFAULT_SITE_ORIGIN, SITE_ORIGIN, PUBLISHED, isPublished, robotsTxt } from '../build/seo.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -45,12 +45,22 @@ test('ค่าที่ใช้ไม่ได้ต้องล้มตอ�
 
 /* ---------------- รอบทดสอบต้องยังปิดดัชนี (ข้อ 4 ของ AIO-36) ---------------- */
 
-test('PUBLISHED ยังเป็น false และ robots.txt ปิดดัชนีทั้งเว็บ', () => {
-  assert.equal(PUBLISHED, false, 'รอบทดสอบต้องยัง Disallow: / · วันเปิดตัวจริงเป็นการตัดสินใจของลูกค้า แล้วต้องแก้เทสต์นี้ด้วยโดยเจตนา (docs/publish-test.md §6)');
-  const r = robotsTxt();
+test('ไม่ส่ง SITE_PUBLISHED = ยังไม่เผยแพร่ และ robots.txt ปิดดัชนีทั้งเว็บ', () => {
+  assert.equal(isPublished(undefined), false);
+  assert.equal(isPublished(''), false);
+  assert.equal(isPublished('0'), false);
+  assert.equal(isPublished('false'), false);
+  for (const on of ['1', 'true', 'TRUE', 'yes', ' on ']) assert.equal(isPublished(on), true, on);
+  if (!process.env.SITE_PUBLISHED) assert.equal(PUBLISHED, false, 'ค่าตั้งต้นต้องเป็น false — เปิดได้ด้วย env เท่านั้น (ADR-001 §14)');
+  const r = robotsTxt(false);
   assert.match(r, /^Disallow: \/$/m);
   assert.doesNotMatch(r, /^Allow: \//m);
   assert.doesNotMatch(r, /Sitemap:/, 'ยังไม่เผยแพร่ จึงไม่ควรชี้ sitemap ให้บอต');
+  const live = robotsTxt(true);
+  assert.match(live, /^Allow: \/$/m);
+  assert.doesNotMatch(live, /^Disallow: \/$/m);
+  assert.match(live, /^Sitemap: https:\/\/.+\/sitemap\.xml$/m);
+  for (const priv of ['/library/', '/settings/', '/notifications/', '/welcome/']) assert.match(live, new RegExp(`^Disallow: ${priv}$`, 'm'));
 });
 
 /* ---------------- build จริงทั้งเว็บ แล้ววัดผลจากไฟล์ที่เขียนออกมา ---------------- */

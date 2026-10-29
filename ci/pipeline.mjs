@@ -3,11 +3,12 @@
    ci/pipeline.test.mjs บังคับว่าทั้งสองที่ตรงกัน ถ้าใครแก้ที่เดียวแล้วลืมอีกที่ เทสต์ล้ม
    เหตุผล: ถ้า "วิธีตรวจซ้ำในเครื่อง" กับ "สิ่งที่ CI ทำจริง" ไม่ตรงกัน README ก็โกหกทันที */
 
+/* job แรก: ตรวจ → build → ตรวจ → artifact · รันทุก branch และทุก PR · ไม่มีสิทธิ์เขียน */
 export const STEPS = [
   {
     name: 'ทดสอบตัวด่านเอง',
-    argv: ['--test', 'ci/views-gate.test.mjs', 'ci/pipeline.test.mjs'],
-    why: 'ด่านที่พังเองจะปล่อยของผิดผ่านเงียบ ๆ จึงตรวจด่านก่อนตรวจงาน',
+    argv: ['--test', 'ci/views-gate.test.mjs', 'ci/pipeline.test.mjs', 'ci/deploy-branch.test.mjs'],
+    why: 'ด่านที่พังเองจะปล่อยของผิดผ่านเงียบ ๆ จึงตรวจด่านก่อนตรวจงาน — รวมขั้นส่งขึ้นด้วย เพราะมันคือด่านสุดท้าย',
   },
   {
     name: 'ตรวจข้อมูล V1–V10 ก่อน build',
@@ -17,7 +18,7 @@ export const STEPS = [
   {
     name: 'build HTML static',
     argv: ['build/build.mjs'],
-    why: 'ADR-001 §9.2 — CI เป็นคนรัน rebuild ไม่ใช่คน',
+    why: 'ADR-001 §9.2 — CI เป็นคนรัน rebuild ไม่ใช่คน · SITE_ORIGIN/SITE_PUBLISHED มาจาก repository variables',
   },
   {
     name: 'ตรวจ V11 หลัง build (ปิด JS แล้วต้องอ่านเนื้อหาได้)',
@@ -33,6 +34,16 @@ export const STEPS = [
     name: 'จัด build artifact',
     argv: ['ci/stage-artifact.mjs', '.', '_artifact'],
     why: 'ADR-001 §9.1 จบที่ artifact · ขั้นนี้อยู่หลังด่านทุกด่าน ข้อมูลผิดจึงไม่มี artifact ออกไป',
+  },
+];
+
+/* job ที่สอง (publish-site): วิ่งเฉพาะ push ขึ้น main หลัง job แรกผ่าน · มีสิทธิ์ contents: write เฉพาะ job นี้
+   ADR-001 §14 — ลูกค้าสั่ง 29 ต.ค. 2026 ให้ปิดวงจร "แก้ในแผง → เว็บอัปเดตเอง" · ci/rehearse.mjs ซ้อมขั้นนี้แบบ --dry-run */
+export const PUBLISH_STEPS = [
+  {
+    name: 'ส่งชุดไฟล์ขึ้น branch ของ GitHub Pages',
+    argv: ['ci/deploy-branch.mjs', '_artifact'],
+    why: 'ชุดที่ผ่านด่านครบแล้วเท่านั้นถึงจะถูกส่งขึ้น · สคริปต์ตรวจชุดไฟล์ซ้ำด้วย publish-gate ก่อน push ทุกครั้ง',
   },
 ];
 

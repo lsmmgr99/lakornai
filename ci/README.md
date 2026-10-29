@@ -1,50 +1,63 @@
-# CI ของ AiLakorn — commit เนื้อหา → ตรวจ V1–V13 → build artifact
+# CI ของ AiLakorn — commit เนื้อหา → ตรวจ V1–V13 → build artifact → ส่งขึ้น GitHub Pages
 
-เจ้าของ: DevOps (AIO-30) · ทำตาม `docs/adr/001-backend-architecture.md` §9 และ §12
+เจ้าของ: DevOps (AIO-30) · ทำตาม `docs/adr/001-backend-architecture.md` §9, §12 และ **§14** (เผยแพร่อัตโนมัติ · 29 ต.ค. 2026)
 
-**ขอบเขตที่ไฟล์ทั้งโฟลเดอร์นี้ไม่ข้าม** ตาม ADR-001 §8/§9.1: ปลายทางคือ **build artifact** เท่านั้น
-ไม่มี deploy · ไม่มี publish · ไม่ตั้งโดเมน · ไม่สมัครบริการ · ไม่แตะเซิร์ฟเวอร์ใด
-ขึ้น staging เป็นงานแยกที่ DevOps ทำเองได้แล้วรายงานบนงาน · ขึ้น production ต้องมีอนุมัติจาก CEO/บอร์ด บันทึกบนงาน **ต่อครั้ง**
+**ขอบเขต:** CI ตรวจและ build ทุก branch/PR โดยไม่มีสิทธิ์เขียน · เฉพาะ **push ขึ้น `main`** ที่ผ่านด่านครบ
+job `publish-site` จึงเอาชุดไฟล์เดียวกันนั้นส่งขึ้น branch **`preview`** ซึ่ง GitHub Pages เสิร์ฟอยู่
+ไม่มีเซิร์ฟเวอร์ของเราเข้ามาเกี่ยว · ไม่ตั้ง DNS (เป็นของเจ้าของโดเมน) · ไม่สมัครบริการใด
 
 ---
 
 ## เส้นทางที่ CI เดิน
 
 ```
-commit ที่แตะ content.json หรือ assets/covers/**
+commit ที่แตะ content.json / assets/covers/** / assets/covers-wide/** / build / ci
         │
-        ▼  ด่านก่อน build — ข้อมูลผิดล้มที่นี่ ไม่ถึง build
-   V1–V10   node admin/check.mjs .
+        ▼  job validate-build-artifact (ทุก branch · อ่านอย่างเดียว)
+   เทสต์ด่าน  node --test ci/views-gate.test.mjs ci/pipeline.test.mjs ci/deploy-branch.test.mjs
+   V1–V10     node admin/check.mjs .
+   build      node build/build.mjs              ← SITE_ORIGIN / SITE_PUBLISHED จาก repository variables
+   V11        node admin/check.mjs . --html
+   V12–V13    node ci/views-gate.mjs .
+   artifact   node ci/stage-artifact.mjs . _artifact   →  เก็บเป็น artifact ให้ดาวน์โหลด
+        │
+        ▼  job publish-site (เฉพาะ push ขึ้น main · needs: job แรกผ่าน · contents: write เฉพาะ job นี้)
+   ส่งขึ้น     node ci/deploy-branch.mjs _artifact      →  force-push ชุดไฟล์ขึ้น branch `preview`
         │
         ▼
-   build    node build/build.mjs
-        │
-        ▼  ด่านหลัง build — ตรวจไฟล์ที่เขียนลงดิสก์จริง
-   V11      node admin/check.mjs . --html
-   V12–V13  node ci/views-gate.mjs .
-        │
-        ▼  ขั้นนี้อยู่ท้ายสุด ของผิดจึงไม่มี artifact ออกไป
-   artifact node ci/stage-artifact.mjs . _artifact   →  เก็บเป็น artifact ให้ดาวน์โหลด ไม่ publish
+   GitHub Pages build จาก `preview` แล้วเสิร์ฟ (ราว 1 นาที)
 ```
 
 ไฟล์ที่ประกอบกันเป็นเส้นนี้:
 
 | ไฟล์ | หน้าที่ | เจ้าของ |
 |---|---|---|
-| `.github/workflows/content-ci.yml` | ตัวปลุกและลำดับขั้นที่รันจริง | DevOps |
-| `ci/pipeline.mjs` | ลำดับขั้นเขียนที่เดียว · YAML/README/ตัวซ้อมอ้างอันนี้ | DevOps |
+| `.github/workflows/content-ci.yml` | ตัวปลุก ลำดับขั้น และขอบเขตสิทธิ์ของสอง job | DevOps |
+| `ci/pipeline.mjs` | ลำดับขั้นเขียนที่เดียว (`STEPS` + `PUBLISH_STEPS`) · YAML/README/ตัวซ้อมอ้างอันนี้ | DevOps |
 | `ci/views-gate.mjs` | ด่าน **V12–V13** (§6.4 + §12.3) — กฎของ *ผลผลิต build* ไม่ใช่ของไฟล์ข้อมูล | DevOps |
 | `ci/site-files.mjs` | ขอบเขตของ "ไฟล์ที่เป็นของเว็บ" — คัดทุกชั้นของพาธ ไม่ใช่แค่ชั้นราก | DevOps |
 | `ci/stage-artifact.mjs` | คัดไฟล์ที่ผู้ชมต้องได้ แล้วเรียกด่านพิสูจน์ชุดไฟล์ทับอีกชั้น | DevOps |
 | `ci/publish-gate.mjs` | **ด่านพิสูจน์ชุดไฟล์ที่ส่งขึ้น** (AIO-36) — เดินไฟล์ดิบในชุดจริง ใช้เดี่ยว ๆ ได้ | DevOps |
-| `ci/rehearse.mjs` | ซ้อมทุกขั้นในเครื่อง ในสำเนาชั่วคราว | DevOps |
-| `ci/publish-branches.json` | แหล่งความจริงเดียวของ "branch ที่เส้นทางเผยแพร่ใช้" (ข้อ B9) | DevOps |
-| `admin/check.mjs` + `admin/validate.mjs` | ด่าน **V1–V11** — เป็น *ตัวตรวจร่วม* กับแผง admin ตาม §9.2 | Dev-Codex |
+| `ci/deploy-branch.mjs` | **ขั้นส่งขึ้น** — ตรวจชุดไฟล์ซ้ำ เขียน CNAME (ถ้าสั่ง) แล้ว force-push orphan commit ขึ้น `preview` | DevOps |
+| `ci/rehearse.mjs` | ซ้อมทุกขั้นในเครื่อง ในสำเนาชั่วคราว (ขั้นส่งขึ้นซ้อมแบบ `--dry-run`) | DevOps |
+| `ci/publish-branches.json` | แหล่งความจริงเดียวของ branch ต้นทาง/ผลผลิต/ร่าง | DevOps |
+| `admin/check.mjs` + `admin/validate.mjs` | ด่าน **V1–V11** — *ตัวตรวจร่วม* กับแผง admin ตาม §9.2 | Dev-Codex |
 | `build/build.mjs` | ตัว build หน้าเว็บ static | Dev-Claude |
 
 CI **ไม่มีตัวตรวจสำเนาของตัวเอง** สำหรับ V1–V11 — เรียก `admin/check.mjs` ตัวเดียวกับที่แผงใช้
 เพื่อให้ "ที่แผงเตือน" กับ "ที่ CI ตัดสิน" ไม่มีทางให้คำตอบต่างกัน (§9.2)
-และ `build/` ไม่ถูกแก้จากงานนี้แม้บรรทัดเดียว — เป็นของ Dev-Claude ตาม §6.8
+
+---
+
+## ตัวแปรที่ตั้งได้โดยไม่แก้โค้ด (Settings → Secrets and variables → Actions → **Variables**)
+
+| ตัวแปร | ความหมาย | ไม่ตั้ง = |
+|---|---|---|
+| `SITE_ORIGIN` | origin ที่เว็บเสิร์ฟจริง ใช้กับ canonical · og:url · sitemap · JSON-LD เช่น `https://ailakorn.com` | `https://lsmmgr99.github.io/lakornai` |
+| `SITE_PUBLISHED` | `1` = `robots.txt` เปิดให้เก็บดัชนีและชี้ sitemap | `0` = `Disallow: /` ทั้งเว็บ (รอบทดสอบ) |
+| `PAGES_CNAME` | โดเมนที่ผูกกับ GitHub Pages เช่น `ailakorn.com` — CI เขียนไฟล์ `CNAME` ให้ · **ตั้งหลังชี้ DNS แล้วเท่านั้น** ไม่งั้นที่อยู่ github.io จะ redirect ไปโดเมนที่ยังไม่ตอบ | ไม่เขียน CNAME · เว็บอยู่ที่ github.io |
+
+ลำดับวันย้ายไปโดเมนจริง: ชี้ DNS ของ `ailakorn.com` ไป GitHub Pages (A records `185.199.108.153` `.109.153` `.110.153` `.111.153` และ/หรือ `www` CNAME → `lsmmgr99.github.io`) → ตั้ง `PAGES_CNAME=ailakorn.com` และ `SITE_ORIGIN=https://ailakorn.com` → push อะไรก็ได้ที่แตะ `content.json`/`build/`/`ci/` หรือกด **Run workflow** → เปิด "Enforce HTTPS" ในหน้า Pages เมื่อใบรับรองออก → เมื่อพร้อมให้ Google เก็บจึงตั้ง `SITE_PUBLISHED=1`
 
 ---
 
@@ -58,9 +71,9 @@ node ci/rehearse.mjs            # ตรวจ working tree ตามที่�
 ```
 
 พิมพ์ทุกขั้นพร้อมผลผ่าน/ล้ม และถ้าล้มจะบอกพาธสำเนาชั่วคราวกับคำสั่งที่รันซ้ำขั้นนั้นเดี่ยว ๆ ได้
+ขั้นส่งขึ้นถูกซ้อมด้วย `node ci/deploy-branch.mjs _artifact --dry-run` (สร้าง commit ในสำเนา ไม่ push)
 
 สคริปต์นี้ **ทำงานในสำเนาชั่วคราวเสมอ** เพราะ `node build/build.mjs` เขียนหน้าเว็บทับที่รากรีโป
-และ workspace นี้ถูกใช้ร่วมกับงานอื่นอยู่ — วิธีเดียวกับที่ `admin/reproduce.mjs` ใช้
 
 ### ทางยาว — รันแต่ละขั้นด้วยมือ
 
@@ -68,12 +81,13 @@ node ci/rehearse.mjs            # ตรวจ working tree ตามที่�
 
 ```sh
 T=$(mktemp -d) && git archive HEAD | tar -x -C "$T" && cd "$T"
-node --test ci/views-gate.test.mjs ci/pipeline.test.mjs
+node --test ci/views-gate.test.mjs ci/pipeline.test.mjs ci/deploy-branch.test.mjs
 node admin/check.mjs .
 node build/build.mjs
 node admin/check.mjs . --html
 node ci/views-gate.mjs .
 node ci/stage-artifact.mjs . _artifact
+node ci/deploy-branch.mjs _artifact --dry-run
 ```
 
 ### ทดสอบตัวด่านเอง
@@ -82,10 +96,9 @@ node ci/stage-artifact.mjs . _artifact
 node --test ci/*.test.mjs
 ```
 
-ชุดนี้ครึ่งแรกพิสูจน์ว่าด่านจับของผิดได้ ครึ่งหลังพิสูจน์ว่ามัน **ไม่** จับของที่ §12.3 บอกว่าไม่ได้ห้าม
-(คำว่า "ยอดนิยม" ที่เป็นป้ายเมนู · URL `/popular` · เลขอันดับ 1–10 · คำว่า "ยอดวิว" ในประโยคชี้แจง)
-และ `ci/pipeline.test.mjs` บังคับว่า YAML กับ `ci/pipeline.mjs` กับ README นี้ไม่หลุดจากกัน
-พร้อมยืนยันว่า workflow ไม่มีสิทธิ์เขียน ไม่มีขั้น deploy/publish และขั้น artifact อยู่ท้ายด่านทุกด่าน
+`ci/pipeline.test.mjs` บังคับว่า YAML กับ `ci/pipeline.mjs` กับ README นี้ไม่หลุดจากกัน พร้อมยืนยันว่า
+job ตรวจ/build ไม่มีสิทธิ์เขียน · `contents: write` มีที่เดียวใน job `publish-site` · job นั้นวิ่งเฉพาะ push ขึ้น `main`
+และไม่มีทาง deploy อื่นแอบอยู่ · `ci/deploy-branch.test.mjs` ทดสอบขั้นส่งขึ้นกับ bare repo ในเครื่องจริง (ไม่ต้องมีเครือข่าย)
 
 ---
 
@@ -98,51 +111,41 @@ node --test ci/*.test.mjs
 |---|---|---|
 | **V12(ก)** | ตัวเลขติดคำว่า `วิว`/`views` หรือมีหน่วยย่อ (`ล้าน` `K` `M`) ทั้งในเนื้อหน้า ใน `<title>` ใน meta และใน JSON-LD | — |
 | **V12(ข)** | ป้าย `วิว` ที่ไม่มีตัวเลขนำหน้า — "ป้ายกำพร้า" ที่เกิดจาก `views: null` ตาม §12.2 C1 | คำว่า `ยอดวิว` ที่เป็นคำในประโยค · `preview`/`reviews` |
-| **V13** | ถ้อยคำที่อ้างว่ามีการวัดผู้ชม ใน `<title>` · `meta description`/`og:*` · JSON-LD · หัวเรื่อง `h1`/`h2` · ข้อความนำ `.page-head` · คำโปรย `.sub`<br>ชุดคำ: `ยอดนิยมสัปดาห์นี้` · `ยอดนิยม…สัปดาห์` · `TOP 10 สัปดาห์นี้` · `คนดูมากที่สุด` · `อันดับจากยอดวิว` · `most watched` · `trending` | คำว่า `ยอดนิยม` โดด ๆ · URL `/popular` · การจัดลำดับ · เลขอันดับ 1–10 (§12.3 ระบุไว้ชัดว่าไม่ห้าม) |
+| **V13** | ถ้อยคำที่อ้างว่ามีการวัดผู้ชม ใน `<title>` · `meta description`/`og:*` · JSON-LD · หัวเรื่อง `h1`/`h2` · ข้อความนำ `.page-head` · คำโปรย `.sub` | คำว่า `ยอดนิยม` โดด ๆ · URL `/popular` · การจัดลำดับ · เลขอันดับ 1–10 |
 
-รายงานทุกจุดเป็น `ไฟล์:บรรทัด` ของไฟล์ที่ build เขียนออกมา (มาร์กอัปถูกแทนด้วยช่องว่างความยาวเท่ากัน เลขบรรทัดจึงตรงกับไฟล์จริง)
-
-**V12–V13 ยังไม่ผ่านในวันส่งมอบ CI นี้** และนั่นคือสิ่งที่ด่านมีหน้าที่บอก — ไม่ใช่เรื่องที่ควรปิดเสียง
-ถ้อยคำและป้ายที่ผิดอยู่ใน `build/*.mjs` ซึ่งเป็นของ Dev-Claude ตาม §12.3 (ช่อง "เจ้าของ")
-ผลตรวจล่าสุดและรายการจุดที่ต้องแก้ อยู่ในคอมเมนต์ของงาน AIO-30
+รายงานทุกจุดเป็น `ไฟล์:บรรทัด` ของไฟล์ที่ build เขียนออกมา
 
 ---
 
-## branch ที่เส้นทางเผยแพร่ใช้ (ข้อ B9)
+## branch ในเส้นทางเผยแพร่
 
 ประกาศไว้ใน `ci/publish-branches.json` ให้อ่านได้ทั้งคนและเครื่อง:
 
 | | |
 |---|---|
-| branch ที่เส้นทางเผยแพร่ใช้ | **`main`** |
-| branch ที่ broker เขียนได้ | ต้องขึ้นต้นด้วย **`admin-drafts/`** เท่านั้น — ตรงกับ `LAKORN_DRAFT_BRANCH` ใน `admin/README.md` |
-| broker เขียนลง `main` | **ห้าม** จนกว่า Security จะเซ็นรับ (ADR-001 §12.1 ข้อ B9) |
-| CI deploy เองไหม | **ไม่** — `autoDeploy: false` และ workflow มี `permissions: contents: read` เท่านั้น |
+| branch ต้นทาง (content.json + โค้ด · CI ตรวจ/build) | **`main`** |
+| branch ผลผลิตที่ GitHub Pages เสิร์ฟ | **`preview`** — CI force-push ทับทุกครั้งที่ `main` เปลี่ยน · **ห้ามใครแก้ด้วยมือ** |
+| branch ร่างของแผง admin (ปุ่ม "บันทึกร่าง") | ขึ้นต้นด้วย **`admin-drafts/`** เท่านั้น — CI ตรวจให้แต่ไม่ส่งขึ้น |
+| แผง admin เผยแพร่ (ปุ่ม "เผยแพร่ขึ้นเว็บ") | commit ตรงเข้า **`main`** → CI ตรวจ → build → ส่งขึ้น `preview` เอง (ADR-001 §14) |
+| CI deploy เองไหม | **ใช่** — `autoDeploy: true` · เฉพาะ job `publish-site` มี `contents: write` และวิ่งเฉพาะ push ขึ้น `main` |
 
-CI รันด่านให้ทุก branch (ร่างของ broker จึงถูกตรวจก่อนเข้า `main` ได้) แต่คำว่า "ของที่มีสิทธิ์ถูกพิจารณาขึ้น staging/production"
-หมายถึง artifact ที่ออกจาก `main` เท่านั้น และการขึ้นจริงยังต้องผ่านประตูอนุมัติของมันเองทุกครั้ง
+ข้อมูลผิดไม่มีทางถึงเว็บ: ด่านทุกด่านอยู่ใน job แรก ถ้าล้ม job ส่งขึ้นไม่เริ่ม และ `preview` ยังเป็นชุดก่อนหน้า
+ย้อนกลับ = `git revert` commit บน `main` แล้ว CI ส่งของเดิมขึ้นให้เอง (ข้อได้เปรียบของ Git-as-CMS ตาม ADR-001 §9.2)
 
 ## เส้นส่งออกด้วยมือยังใช้ได้ (ADR-001 §12.1 ฉ)
 
-CI นี้ **ไม่ได้แทน** เส้นทางส่งออกด้วยมือ และไม่ได้ทำให้มันต้องมี auth เพิ่ม:
-แก้ในแผง → กด "ตรวจและส่งออก" → ผู้มีสิทธิ์เขียนรีโป commit `content.json` (และปก) → CI ตื่นเองจาก commit นั้น
-เส้นนี้คงอยู่ถาวรตาม §12.1 ฉ · ก่อน commit ยังรัน `node admin/check.mjs` และ `node admin/reproduce.mjs` ได้ตามเดิม
+แก้ในแผง → กด "ส่งออก content.json" → ผู้มีสิทธิ์เขียนรีโป commit ไฟล์นั้น (และปก) เข้า `main` → CI ตื่นเองจาก commit นั้น
+เส้นนี้คงอยู่ถาวร และตอนนี้มันก็ขึ้นเว็บเองเหมือนกัน เพราะปลายทางคือ `main` เท่ากัน
 
-## สิ่งที่ artifact มีและไม่มี
+## สิ่งที่ชุดไฟล์ที่ส่งขึ้นมีและไม่มี
 
-มี: ไฟล์ `.html` ทุกหน้า (รวม redirect stub) · `assets/` · `robots.txt` · `sitemap.xml` · `redirects.map` (ตาราง 301 ให้คนตั้งเซิร์ฟเวอร์) · `.nojekyll`
+มี: ไฟล์ `.html` ทุกหน้า (รวม redirect stub) · `assets/` · `robots.txt` · `sitemap.xml` · `redirects.map` · `.nojekyll` · `CNAME` (เฉพาะเมื่อตั้ง `PAGES_CNAME`)
 
-ไม่มี: `admin/` (รวม broker) · `build/` · `ci/` · `design/` · `docs/` · `tools/` · `.github/` ·
-โฟลเดอร์/ไฟล์ที่ขึ้นต้นด้วยจุด (`.claude/` `.DS_Store` …) ยกเว้น `.nojekyll` และ `.well-known/` ·
-`content.json` · ไฟล์ `.mjs` ใด ๆ · ไฟล์ `.md` (บันทึกภายใน เช่น `assets/share/README.md`) · symlink
+ไม่มี: `admin/` (รวม broker และ `config.json`) · `build/` · `ci/` · `design/` · `docs/` · `tools/` · `.github/` ·
+โฟลเดอร์/ไฟล์ที่ขึ้นต้นด้วยจุด ยกเว้น `.nojekyll` และ `.well-known/` · `content.json` · ไฟล์ `.mjs` ใด ๆ · ไฟล์ `.md` · symlink
 
-`ci/stage-artifact.mjs` ไม่เชื่อ allowlist ของตัวเอง — หลังคัดลอกแล้วมันเดินไฟล์ที่ได้จริงอีกรอบด้วย
-`allFiles()` ของ `ci/publish-gate.mjs` และล้มถ้าพบของต้องห้าม ขาดไฟล์ที่ต้องมี หรือจำนวนหน้า HTML น้อยกว่าที่ควร
-(เหตุผล: แผง admin กับ broker อยู่ในรีโปเดียวกับเว็บ ถ้ามันหลุดเข้า artifact มันจะกลายเป็นหน้าเว็บสาธารณะพร้อมปลายทาง API)
-
-**ยามต้องเดินไฟล์ดิบ ไม่ใช่รายชื่อที่ถูกกรองแล้ว** — ยามรุ่นก่อนอ่านรายชื่อจาก `siteFiles(dest)` ซึ่งตัด
-โฟลเดอร์ต้องห้ามออกไปก่อนแล้ว ของที่หลุดเข้า artifact จึงไม่เคยปรากฏในรายชื่อที่ยามเห็น = ยามนั้นจับอะไรไม่ได้เลย
-มิวเทชันเทสต์ที่ `ci/publish-gate.test.mjs` ตรึงข้อนี้ไว้ (แอบใส่ `admin/index.html` เข้าชุด → ด่านต้องแดง)
+`ci/stage-artifact.mjs` และ `ci/deploy-branch.mjs` ต่างเดินไฟล์ "ดิบ" ของชุดจริงด้วย `allFiles()` ของ `ci/publish-gate.mjs`
+แล้วล้มถ้าพบของต้องห้าม — สองชั้นโดยเจตนา: ชั้นหลังไม่เชื่อว่าชั้นหน้าทำแล้ว
 
 ## ด่านพิสูจน์ชุดไฟล์ที่ส่งขึ้น (AIO-36)
 
@@ -153,26 +156,19 @@ node ci/publish-gate.mjs _artifact --expect-noindex  # บังคับ robots
 node --test ci/publish-gate.test.mjs                 # เทสต์ของด่าน รวมมิวเทชันเทสต์
 ```
 
-พิมพ์ทั้ง "มีอะไร" (จำนวนไฟล์ · ขนาด · แยกตามนามสกุล · รายการที่ราก · ไฟล์ที่ต้องมีครบ)
-และ "ไม่มีอะไร" (ไล่ยืนยันทีละโฟลเดอร์/กฎ) แล้วคืน exit code ที่ใช้ในสคริปต์ได้
+## URL ของเว็บ: `SITE_ORIGIN`
 
-ด่านนี้ **ไม่ publish ไม่ deploy** · ขั้นตอนของวันขึ้นทดสอบจริงอยู่ที่ `docs/publish-test.md`
-
-## URL ของรอบทดสอบ: `SITE_ORIGIN`
-
-`build/seo.mjs` อ่าน `SITE_ORIGIN` จาก env ได้ ค่าตั้งต้นยังเป็น `https://ailakorn.com` เหมือนเดิมเมื่อไม่ส่ง env
+`build/seo.mjs` อ่าน `SITE_ORIGIN` จาก env · ค่าตั้งต้นในโค้ดคือ `https://ailakorn.com` · CI ส่งค่าจาก repository variable และถอยไปใช้ที่อยู่ github.io เมื่อยังไม่ตั้ง
 
 ```sh
 SITE_ORIGIN=https://lsmmgr99.github.io/lakornai node build/build.mjs
+SITE_PUBLISHED=1 node build/build.mjs       # robots.txt แบบเปิดดัชนี
 ```
 
-canonical · `og:url` · `og:image` · `twitter:image` · `sitemap.xml` · JSON-LD `@id` · canonical ใน redirect stub
-ตามค่านี้ทั้งชุด · รองรับ origin ที่มี path ต่อท้ายโดยไม่เกิด `//` ซ้อน และค่าที่ใช้ไม่ได้ทำให้ build ล้มทันที
 เทสต์: `node --test ci/site-origin.test.mjs` (build ทั้งเว็บในสำเนาชั่วคราว แล้ววัดจากไฟล์ที่เขียนออกมาจริง)
 
-## ของที่ CI นี้ยังไม่ได้ทำ และตั้งใจไม่ทำในงานนี้
+## ของที่ตั้งใจยังไม่ทำในชุดนี้
 
-- **ยังไม่ได้วิ่งบน runner ของจริง** — ไม่มี push จากงานนี้ ผลที่รายงานทั้งหมดมาจากการซ้อมในเครื่องด้วย `ci/rehearse.mjs`
-- ไม่ตั้ง branch protection / required status check — เป็นการตั้งค่าในหน้าเว็บของผู้ให้บริการ ไม่ใช่ไฟล์ในรีโป ขอให้เจ้าของรีโปทำแยก
+- ไม่ตั้ง branch protection / required status check — เป็นการตั้งค่าในหน้าเว็บของ GitHub ไม่ใช่ไฟล์ในรีโป ขอให้เจ้าของรีโปทำแยก (แนะนำ: ห้าม push ตรงเข้า `preview`)
 - ไม่ pin action เป็น commit SHA (ใช้แท็ก `@v4`) — ทำได้และควรทำ แต่ต้องยืนยัน SHA กับของจริง จึงแยกเป็นงานต่างหาก
-- ไม่มีขั้น deploy, ไม่มี environment, ไม่มี secret ใด ๆ ใน workflow นี้
+- ไม่สลับ Pages ไปแบบ "GitHub Actions source" — แบบ branch ใช้ได้กับการตั้งค่า Pages ที่เปิดอยู่แล้ว และไม่ต้องขอสิทธิ์ `pages: write`

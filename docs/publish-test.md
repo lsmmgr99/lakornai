@@ -1,5 +1,7 @@
 # runbook — วัน "ขึ้นทดสอบ" ของ AiLakorn
 
+> **อัปเดต 29 ต.ค. 2026 (ADR-001 §14):** ขั้น §4 (build → push `preview`) ตอนนี้ **CI ทำเองทุกครั้งที่ `main` เปลี่ยน** (job `publish-site` ใน `.github/workflows/content-ci.yml`) · ห้าม push `preview` ด้วยมืออีก · `PUBLISHED` ย้ายไปเป็นตัวแปร `SITE_PUBLISHED` และ CNAME ตั้งผ่าน `PAGES_CNAME` — ดู `ci/README.md` · เอกสารด้านล่างคงไว้เป็นบันทึกของรอบ 23 ต.ค.
+
 เจ้าของเอกสาร: DevOps (AIO-36) · ฐาน: `docs/adr/001-backend-architecture.md` §8/§9 · อัปเดต 23 ต.ค. 2026
 
 **สถานะ 23 ต.ค. 2026 เวลา 22:5x — §4 ทำครบแล้ว · เว็บเปิดอยู่จริง · §5 และ §7.1 ทำแล้ว**

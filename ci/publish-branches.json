@@ -1,9 +1,12 @@
 {
-  "_note": "แหล่งความจริงเดียวของคำว่า 'branch ที่เส้นทางเผยแพร่ใช้' — เจ้าของ: DevOps (AIO-30). ADR-001 §12.1 ข้อ B9 สั่งว่า branch ปลายทางของ broker ต้องไม่ใช่ branch นี้ จนกว่า Security จะเซ็นรับ. ไฟล์นี้ไม่ได้ให้สิทธิ์ deploy แก่ใคร: artifact จาก branch นี้คือของที่ 'มีสิทธิ์ถูกพิจารณา' ขึ้น staging/production ตามประตูอนุมัติของมันเอง ไม่ใช่ของที่ขึ้นเองอัตโนมัติ",
+  "_note": "แหล่งความจริงเดียวของ branch ในเส้นทางเผยแพร่ — เจ้าของ: DevOps. publish = branch ต้นทาง (content.json + โค้ด) ที่ CI ตรวจ/build · pagesBranch = branch ผลผลิตที่ GitHub Pages เสิร์ฟ ซึ่ง CI force-push ให้เองหลังด่านผ่านครบ (autoDeploy) · broker บันทึกร่างได้เฉพาะใต้ brokerDraftPrefix และเผยแพร่ได้เฉพาะ brokerPublish (= publish) ผ่าน /api/publish ตามคำสั่งลูกค้า 29 ต.ค. 2026 (ADR-001 §14) · ห้ามใครเขียน pagesBranch ด้วยมือ: มันถูกทับทุกครั้งที่ main เปลี่ยน",
   "publish": ["main"],
+  "pagesBranch": "preview",
   "brokerDraftPrefix": "admin-drafts/",
-  "brokerForbidden": ["main"],
-  "autoDeploy": false,
-  "deployGate": "staging = DevOps ทำเองได้แล้วรายงานบนงาน · production = ต้องมีอนุมัติจาก CEO/บอร์ด บันทึกบนงาน ต่อครั้ง",
-  "reviewedBy": null
+  "brokerPublish": ["main"],
+  "brokerDraftForbidden": ["main", "preview"],
+  "autoDeploy": true,
+  "deployGate": "ด่าน V1–V13 + publish-gate ใน CI ต้องผ่านครบก่อน job publish-site จะเริ่ม · job นี้มีสิทธิ์ contents: write เฉพาะตัวมันเอง และวิ่งเฉพาะ push ขึ้น main",
+  "customDomain": "ตั้ง repository variable PAGES_CNAME (เช่น ailakorn.com) หลังชี้ DNS แล้ว — CI จึงเขียนไฟล์ CNAME ให้ · ยังไม่ตั้ง = เว็บอยู่ที่ https://lsmmgr99.github.io/lakornai/",
+  "reviewedBy": "ลูกค้า (CEO) 29 ต.ค. 2026"
 }

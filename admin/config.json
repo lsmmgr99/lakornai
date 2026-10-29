@@ -1,0 +1,11 @@
+{
+  "_note": "ตั้งค่าแผงจัดการ (node admin/broker.mjs) · clientId คือ Client ID ของ GitHub App — เป็นค่าสาธารณะ ไม่ใช่ความลับ · ห้ามใส่ client secret หรือ token ใด ๆ ในไฟล์นี้ · ขั้นตอนสร้าง App อยู่ใน admin/README.md",
+  "clientId": "",
+  "owner": "lsmmgr99",
+  "repo": "lakornai",
+  "draftBranch": "admin-drafts/content",
+  "publishBranch": "main",
+  "publishBranches": ["main"],
+  "siteUrl": "https://lsmmgr99.github.io/lakornai/",
+  "port": 4190
+}

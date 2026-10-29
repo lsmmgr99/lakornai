@@ -47,4 +47,4 @@ const bytes = staged.files.reduce((a, f) => a + fs.statSync(path.join(dest, f)).
 console.log(`✓ artifact พร้อม: ${dest}`);
 console.log(`  ${staged.files.length} ไฟล์ (HTML ${html.length}) · ${(bytes / 1048576).toFixed(1)} MB · ไม่มี admin/ build/ ci/ design/ docs/ tools/ และไม่มี .mjs`);
 console.log(`  ดูชุดไฟล์ทั้งชุดและตรวจซ้ำแยกได้ที่:  node ci/publish-gate.mjs ${path.relative(root, dest) || dest}`);
-console.log('  นี่คือปลายทางของ ADR-001 §9.1 — การนำขึ้น staging/production เป็นงานแยกที่มีประตูอนุมัติของตัวเอง');
+console.log('  ชุดนี้คือสิ่งที่ job publish-site จะส่งขึ้น branch ของ GitHub Pages เมื่อเป็น push ขึ้น main (ADR-001 §14)');

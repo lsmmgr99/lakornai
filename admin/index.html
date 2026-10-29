@@ -1,1 +1,62 @@
-<!doctype html><html lang="th"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex,nofollow"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"><title>จัดการเนื้อหา AiLakorn</title><link rel="stylesheet" href="style.css"><main><h1>จัดการเนื้อหา AiLakorn</h1><p>โหมดร่างในเครื่อง · ส่งออกได้โดยไม่ต้องเข้าสู่ระบบ</p><p>แก้หลายตอนแล้วส่งออกพร้อมกัน ไฟล์จะยังไม่เผยแพร่จนผ่านการตรวจและ build</p><button id="login" disabled>เข้าสู่ระบบ GitHub</button><button id="logout" disabled>ออกจากระบบ</button><button id="save" disabled>บันทึกเข้า branch ร่าง</button><label>เปิดไฟล์ร่าง <input id="import" type="file" accept="application/json"></label><button id="export">ตรวจและส่งออก content.json</button><button id="export-bundle">ส่งออกชุดข้อมูลพร้อมปก</button><button id="add">เพิ่มเรื่อง</button><select id="series" aria-label="เลือกเรื่อง"></select><div id="editor"></div><pre id="message" role="status"></pre></main><script type="module" src="editor.mjs"></script></html>
+<!doctype html>
+<html lang="th">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>จัดการเนื้อหา AiLakorn</title>
+<link rel="stylesheet" href="style.css">
+
+<header class="top">
+  <div class="brand"><b>AiLakorn</b> <span>จัดการเนื้อหา</span></div>
+  <div class="conn">
+    <span id="conn" class="pill">กำลังเชื่อมต่อ…</span>
+    <span id="user" class="user"></span>
+    <button id="login" disabled>เข้าสู่ระบบ GitHub</button>
+    <button id="logout" hidden>ออกจากระบบ</button>
+  </div>
+</header>
+
+<section id="device" class="device" hidden>
+  <p>เปิด <a id="device-link" href="https://github.com/login/device" target="_blank" rel="noopener">github.com/login/device</a> แล้วกรอกรหัสนี้</p>
+  <code id="device-code"></code>
+  <p class="muted">รอการยืนยันจาก GitHub… หน้านี้จะอัปเดตเองเมื่อสำเร็จ</p>
+</section>
+
+<section class="toolbar" aria-label="คำสั่งหลัก">
+  <button id="check">ตรวจความถูกต้อง</button>
+  <button id="save" disabled title="เก็บงานค้างไว้บน branch ร่าง ยังไม่ขึ้นเว็บ">บันทึกร่าง</button>
+  <button id="publish" class="primary" disabled title="commit เข้า branch เผยแพร่ แล้ว CI จะ build และส่งขึ้นเว็บเอง">เผยแพร่ขึ้นเว็บ</button>
+  <span id="status" class="status"></span>
+  <span class="spacer"></span>
+  <label class="btn">เปิดไฟล์ร่าง <input id="import" type="file" accept="application/json"></label>
+  <button id="export">ส่งออก content.json</button>
+  <button id="export-bundle">ส่งออกพร้อมปก (.tar)</button>
+</section>
+
+<div class="layout">
+  <aside class="side">
+    <input id="filter" type="search" placeholder="ค้นหาเรื่อง…" aria-label="ค้นหาเรื่อง">
+    <nav id="series" aria-label="รายการเรื่อง"></nav>
+    <button id="add">+ เพิ่มเรื่องใหม่</button>
+    <form id="new-series" class="new-series" hidden>
+      <label>รหัสเรื่อง (a–z 0–9 และขีดกลาง · เปลี่ยนไม่ได้ทีหลัง)<input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" placeholder="เช่น moonlight-heir"></label>
+      <label>ชื่อเรื่อง<input name="title" required maxlength="80"></label>
+      <fieldset><legend>ทิศของวิดีโอ (ต้องเลือก)</legend>
+        <label class="inline"><input type="radio" name="orientation" value="vertical" required> แนวตั้ง 9:16</label>
+        <label class="inline"><input type="radio" name="orientation" value="horizontal" required> แนวนอน 16:9</label>
+      </fieldset>
+      <div class="row"><button type="submit" class="primary">สร้างเรื่อง</button><button type="button" id="new-cancel">ยกเลิก</button></div>
+    </form>
+  </aside>
+  <main id="editor" class="editor"></main>
+</div>
+
+<section id="problems" class="problems" hidden>
+  <h2>สิ่งที่ต้องแก้ก่อนบันทึก/เผยแพร่</h2>
+  <ul></ul>
+</section>
+
+<pre id="message" role="status" aria-live="polite"></pre>
+<script type="module" src="editor.mjs"></script>
+</html>

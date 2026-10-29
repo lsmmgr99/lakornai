@@ -12,7 +12,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { STEPS, command } from './pipeline.mjs';
+import { STEPS, PUBLISH_STEPS, command } from './pipeline.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const fromHead = process.argv.includes('--head');
@@ -60,5 +60,14 @@ if (failed) {
   process.exit(1);
 }
 
+/* ขั้นส่งขึ้นซ้อมแบบ --dry-run: ตรวจชุดไฟล์ + สร้าง commit ในสำเนา แต่ไม่ push ไปไหน (ADR-001 §14) */
+for (const step of PUBLISH_STEPS) {
+  const argv = [...step.argv, '--dry-run'];
+  console.log(`[ซ้อมส่งขึ้น] ${step.name}\n       $ ${command(step)} --dry-run`);
+  const r = spawnSync(process.execPath, argv, { cwd: temp, stdio: 'inherit', env: { ...process.env, PAGES_BRANCH: '', PAGES_CNAME: process.env.PAGES_CNAME || '' } });
+  if (r.status !== 0) { console.log(`       ✗ ล้ม (exit ${r.status}) — CI จะล้มที่ job publish-site และเว็บยังเป็นของเดิม`); process.exit(1); }
+  console.log('       ✓ ผ่าน (dry-run)\n');
+}
+
 console.log(`\nทุกขั้นผ่าน · artifact อยู่ที่ ${path.join(temp, '_artifact')}`);
-console.log('ไม่มีการ publish/deploy จากสคริปต์นี้ และ CI ก็ไม่มี — ปลายทางคือ artifact ตาม ADR-001 §8/§9.1');
+console.log('สคริปต์นี้ไม่ push อะไร — บน CI job publish-site จะส่งชุดนี้ขึ้น branch ของ GitHub Pages เองเมื่อเป็น push ขึ้น main (ADR-001 §14)');

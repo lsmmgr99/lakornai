@@ -1,13 +1,16 @@
+// โหมดไฟล์ล้วน: เสิร์ฟแผงจากดิสก์ ไม่มี API ไม่มี GitHub — ใช้ตรวจแผงหรือส่งออกร่างโดยไม่ต้องตั้งค่าอะไร
+// ใช้งานจริงให้รัน admin/broker.mjs ซึ่งเสิร์ฟไฟล์ชุดเดียวกันนี้บวก API เข้าสู่ระบบ/บันทึก/เผยแพร่
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
-const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const publicFiles=new Set(['/admin/index.html','/admin/editor.mjs','/admin/broker-client.mjs','/admin/covers.mjs','/admin/validate.mjs','/admin/style.css','/content.json']);
-const types={'.html':'text/html; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json','.css':'text/css','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg'};
-http.createServer((req,res)=>{
-  const p=new URL(req.url,'http://localhost').pathname.replace(/^\/admin\/$/,'/admin/index.html');
-  if(!['GET','HEAD'].includes(req.method)||(!publicFiles.has(p)&&!/^\/assets\/covers\/[a-z0-9][a-z0-9._-]*\.(webp|png|jpg|jpeg)$/.test(p))){res.writeHead(404).end();return;}
-  const file=path.join(root,p);if(!fs.existsSync(file)){res.writeHead(404).end();return;}
-  res.writeHead(200,{'content-type':types[path.extname(file)],'x-content-type-options':'nosniff','cache-control':'no-store'});res.end(req.method==='HEAD'?undefined:fs.readFileSync(file));
-}).listen(Number(process.argv[2])||4190,'127.0.0.1',()=>console.log('Admin draft: http://127.0.0.1:4190/admin/'));
+import { fileURLToPath } from 'node:url';
+import { resolvePublic, CONTENT_TYPES, CSP } from './static.mjs';
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const port = Number(process.argv[2]) || 4190;
+http.createServer((req, res) => {
+  const name = ['GET', 'HEAD'].includes(req.method) ? resolvePublic(new URL(req.url, 'http://localhost').pathname) : null;
+  const file = name && path.join(root, name);
+  if (!file || !fs.existsSync(file)) { res.writeHead(404).end(); return; }
+  res.writeHead(200, { 'content-type': CONTENT_TYPES[path.extname(file)] || 'application/octet-stream', 'x-content-type-options': 'nosniff', 'cache-control': 'no-store', 'content-security-policy': CSP });
+  res.end(req.method === 'HEAD' ? undefined : fs.readFileSync(file));
+}).listen(port, '127.0.0.1', () => console.log(`แผงจัดการ (โหมดไฟล์ ไม่มี GitHub): http://127.0.0.1:${port}/admin/`));

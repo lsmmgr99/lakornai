@@ -281,17 +281,19 @@ export function faqLd(items) {
 /* ============================================================
    robots.txt + sitemap.xml
    ============================================================ */
-/* โดเมนยังไม่ยืนยันและเว็บยังไม่เผยแพร่ → ปิดการเก็บดัชนีไว้ก่อน (AIO-19 P1)
-   วันเผยแพร่จริง: เปลี่ยน PUBLISHED เป็น true แล้ว build ใหม่
-   รอบ "ขึ้นทดสอบ" ต้องคงเป็น false — Disallow: / คือสิ่งที่ต้องการ เพราะเป็นการทดสอบ ไม่ใช่เปิดตัว
-   ใครเปลี่ยนตอนไหน เขียนไว้ที่ docs/publish-test.md §6 (AIO-36) */
-export const PUBLISHED = false;
+/* ปิดการเก็บดัชนีไว้เป็นค่าตั้งต้น (AIO-19 P1) — เปิดด้วย env ตอน build ไม่ต้องแก้โค้ด:
+     SITE_PUBLISHED=1 node build/build.mjs          (ใน CI: ตั้ง repository variable SITE_PUBLISHED = 1)
+   ไม่ส่ง env = false = Disallow: / ทั้งเว็บ ซึ่งคือสิ่งที่รอบทดสอบต้องการ
+   วันเปิดตัวจริงบนโดเมนจริงเป็นการตัดสินใจของลูกค้า: ตั้งตัวแปรแล้ว CI build ใหม่ให้เอง
+   ใครเปลี่ยนตอนไหน เขียนไว้ที่ docs/publish-test.md §6 (AIO-36) และ ADR-001 §14 */
+export const isPublished = (raw) => /^(1|true|yes|on)$/i.test((raw ?? '').trim());
+export const PUBLISHED = isPublished(process.env.SITE_PUBLISHED);
 
-export function robotsTxt() {
-  if (!PUBLISHED) {
+export function robotsTxt(published = PUBLISHED) {
+  if (!published) {
     return [
       '# AiLakorn — ยังไม่เผยแพร่ ปิดการเก็บดัชนีไว้ทั้งเว็บ',
-      '# วันขึ้นจริง: ตั้ง PUBLISHED = true ใน build/seo.mjs แล้ว build ใหม่',
+      '# วันขึ้นจริง: ตั้ง SITE_PUBLISHED=1 ตอน build (repository variable ใน CI) แล้ว build ใหม่',
       'User-agent: *',
       'Disallow: /',
       '',
