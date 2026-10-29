@@ -11,7 +11,7 @@ FROM node:22-bookworm-slim AS build
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV DATABASE_URL="file:./data/build.db" AUTH_SECRET="build-only-not-used-at-runtime-0000" UPLOAD_DIR="./data/uploads" SITE_ORIGIN="https://ailakorn.com"
+ENV DATABASE_URL="file:../data/build.db" AUTH_SECRET="build-only-not-used-at-runtime-0000" UPLOAD_DIR="./data/uploads" SITE_ORIGIN="https://ailakorn.com"
 # build ต้องมีฐานข้อมูลให้ generateStaticParams อ่าน (ว่างก็ได้) — สร้างชั่วคราวแล้วทิ้ง
 RUN npx prisma generate && npx prisma db push --skip-generate && npm run build && rm -rf data
 
