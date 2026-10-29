@@ -209,7 +209,7 @@ export function header(L, { active = '', back = null } = {}) {
     ${back
       ? `<a class="icon-btn" style="margin:0" href="${L(back[1])}" aria-label="ย้อนกลับไป ${esc(back[0])}">${ic('left')}</a>
          <b class="htitle">${esc(back[0])}</b>`
-      : `<a class="logo" href="${L(U.home)}" aria-label="LakornAI หน้าแรก"><b lang="en">Lakorn</b><i lang="en">AI</i></a>`}
+      : `<a class="logo" href="${L(U.home)}" aria-label="AiLakorn หน้าแรก"><i lang="en">AI</i><b lang="en">Lakorn</b></a>`}
     <nav class="topnav" aria-label="เมนูบนสุด">${links.map(([k, l, u]) =>
       `<a href="${L(u)}"${k === active ? ' aria-current="page"' : ''}>${l}</a>`).join('')}</nav>
     <div class="spacer"></div>
@@ -236,7 +236,7 @@ export function footer(L) {
       ['นโยบายคุกกี้', U.legal('cookies')]])}
   </div>
   <div class="stance">${ic('playf', 'sm')}<span>${FREE_LINE}</span></div>
-  <div class="btm">© LakornAI · lakornai.tv</div></div></footer>`;
+  <div class="btm">© AiLakorn · ailakorn.com</div></div></footer>`;
 }
 
 /* ---------- โครงหน้า ---------- */

@@ -1,4 +1,4 @@
-/* LakornAI v2 mockup — shared helpers (build-time only, ไม่ใช่โค้ด production) */
+/* AiLakorn v2 mockup — shared helpers (build-time only, ไม่ใช่โค้ด production) */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -170,7 +170,7 @@ export function header({ active = '', back = null, notif = true } = {}) {
     ${back
       ? `<button class="icon-btn" style="margin:0" aria-label="ย้อนกลับ">${ic('left')}</button>
          <b style="font-family:var(--display);font-weight:600;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${esc(back)}</b>`
-      : `<a class="logo" href="#"><b lang="en">Lakorn</b><i lang="en">AI</i></a>`}
+      : `<a class="logo" href="#"><i lang="en">AI</i><b lang="en">Lakorn</b></a>`}
     <nav class="topnav" aria-label="เมนูบนสุด">${links.map(([k, l]) =>
       `<a href="#"${k === active ? ' aria-current="page"' : ''}>${l}${k === 'browse' ? ic('down', 'sm') : ''}</a>`).join('')}</nav>
     <div class="spacer"></div>
@@ -193,7 +193,7 @@ export function footer() {
     ${col('ข้อกำหนด', ['ข้อตกลงการใช้', 'นโยบายความเป็นส่วนตัว', 'นโยบายคุกกี้'])}
   </div>
   <div class="stance">${ic('playf', 'sm')}<span>ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก</span></div>
-  <div class="btm">© LakornAI · lakornai.tv · ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง (mockup)</div></div></footer>`;
+  <div class="btm">© AiLakorn · ailakorn.com · ข้อมูลในหน้านี้เป็นข้อมูลตัวอย่าง (mockup)</div></div></footer>`;
 }
 
 /* ---------- การ์ด ---------- */
@@ -313,7 +313,7 @@ export function page({ title, body, bodyClass = '', desc = '' }) {
 <html lang="th"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>${esc(title)} · LakornAI v2 (ม็อกอัพเสนอแบบ)</title>
+<title>${esc(title)} · AiLakorn v2 (ม็อกอัพเสนอแบบ)</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="v2.css">

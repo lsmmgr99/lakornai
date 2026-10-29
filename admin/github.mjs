@@ -31,7 +31,7 @@ export function github(config, fetcher=fetch) {
         tree.push({path,mode:'100644',type:'blob',sha:blob.sha});
       }
       const next=await api(token,`${repo}/git/trees`,'POST',{base_tree:snapshot.tree,tree});
-      const commit=await api(token,`${repo}/git/commits`,'POST',{message:'Update LakornAI content draft',tree:next.sha,parents:[snapshot.head]});
+      const commit=await api(token,`${repo}/git/commits`,'POST',{message:'Update AiLakorn content draft',tree:next.sha,parents:[snapshot.head]});
       await api(token,`${repo}/git/refs/heads/${encodeURIComponent(config.branch)}`,'PATCH',{sha:commit.sha,force:false});
       return commit.sha;
     }

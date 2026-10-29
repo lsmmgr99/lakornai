@@ -1,4 +1,4 @@
-# LakornAI — commit เนื้อหา → ตรวจ V1–V13 → build artifact   (AIO-30 · ADR-001 §9 และ §12)
+# AiLakorn — commit เนื้อหา → ตรวจ V1–V13 → build artifact   (AIO-30 · ADR-001 §9 และ §12)
 #
 # ขอบเขตของไฟล์นี้ตามที่ ADR-001 §8/§9.1 ล็อกไว้:
 #   ปลายทางคือ "build artifact ที่พร้อม" เท่านั้น

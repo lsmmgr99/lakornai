@@ -210,7 +210,7 @@ function seriesCard(s) {
     vars: `--c1:${s.c1};--c2:${s.c2}`,
     body: `  <div class="in">
     <div class="col">
-      <span class="logo"><span class="mark">${PLAY}</span><b lang="en">Lakorn</b><i lang="en">AI</i></span>
+      <span class="logo"><span class="mark">${PLAY}</span><i lang="en">AI</i><b lang="en">Lakorn</b></span>
       <h1 data-size="${size}" data-max="170">${esc(s.title)}</h1>
       <p class="hook">${esc(s.hook)}</p>
       <div class="meta"><span class="ai">สร้างด้วย AI</span><span>${esc(s.genres.map(genreLabel)[0])}</span><span>${s.eps} ตอน</span></div>
@@ -232,7 +232,7 @@ function defaultCard() {
     .map(slug => D.series.find(s => s.slug === slug));
   return page({
     name: 'default',
-    title: 'LakornAI',
+    title: 'AiLakorn',
     cls: 'hero',
     vars: `--c1:${fan[0].c1};--c2:${fan[0].c2}`,
     body: `  <div class="fan">${fan.map(s => `
@@ -240,7 +240,7 @@ function defaultCard() {
   </div>
   <div class="in">
     <div class="col">
-      <span class="logo"><span class="mark">${PLAY}</span><b lang="en">Lakorn</b><i lang="en">AI</i></span>
+      <span class="logo"><span class="mark">${PLAY}</span><i lang="en">AI</i><b lang="en">Lakorn</b></span>
       <h2>ละครสั้นแนวตั้ง ดูจบในมือถือ</h2>
       <p class="sub">${D.series.length} เรื่อง · ${eps} ตอน · ตอนละไม่เกิน 3 นาที</p>
       <span class="free">${PLAY}${esc(FREE_LINE)}</span>
@@ -258,7 +258,7 @@ function sheetCard(names) {
   return `<!doctype html>
 <html lang="th"><head>
 <meta charset="utf-8">
-<title>ภาพแชร์ 1200×630 ทั้งชุด · LakornAI</title>
+<title>ภาพแชร์ 1200×630 ทั้งชุด · AiLakorn</title>
 <link rel="stylesheet" href="../tokens.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}

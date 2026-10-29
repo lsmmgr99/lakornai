@@ -9,11 +9,11 @@ const sw = (name, hex, note) => `<div class="sw">
 
 export function buildStyleguide() {
   write('styleguide.html', page({
-    title: 'Design system — LakornAI v2',
+    title: 'Design system — AiLakorn v2',
     body: `${header({})}<main id="main" class="page"><div class="wrap">
     <div class="page-head" style="padding-top:var(--s7)">
       <span style="display:inline-flex;align-items:center;gap:7px;color:var(--accent);font-size:var(--t-meta);font-weight:600">
-        ${ic('sparkle', 'sm')} LakornAI v2 · ม่านทอง (Golden Curtain)</span>
+        ${ic('sparkle', 'sm')} AiLakorn v2 · ม่านทอง (Golden Curtain)</span>
       <h1 style="margin-top:8px">ระบบดีไซน์ที่ dev เอาไปใช้ได้ตรง ๆ</h1>
       <p>ทุกค่าในหน้านี้อยู่ใน <code>design/v2/tokens.css</code> คัดลอกไปวางใน <code>:root</code> ของ <code>assets/style.css</code> ได้ทันทีหลังอนุมัติ</p></div>
 
@@ -293,10 +293,10 @@ export function buildIndex(screens) {
     <td class="num">${s.tier}</td>
     <td class="num">${s.shots.join('<br>')}</td></tr>`).join('');
   write('index.html', page({
-    title: 'ดัชนีม็อกอัพ LakornAI v2',
+    title: 'ดัชนีม็อกอัพ AiLakorn v2',
     body: `${header({})}<main id="main" class="page"><div class="wrap">
       <div class="page-head" style="padding-top:var(--s7)">
-        <h1>ม็อกอัพ LakornAI v2 — ดัชนีหน้าจอทั้งหมด</h1>
+        <h1>ม็อกอัพ AiLakorn v2 — ดัชนีหน้าจอทั้งหมด</h1>
         <p>เสนอแบบรอบที่ 1 · AIO-17 · 23 ต.ค. 2569 — ไฟล์ทั้งหมดอยู่ใต้ <code>design/v2/</code> และไม่แตะไฟล์ production เลย</p></div>
       <div class="btn-row" style="margin-bottom:var(--s5)">
         <a class="btn btn-accent" href="styleguide.html">ดู design system</a>

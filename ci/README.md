@@ -1,4 +1,4 @@
-# CI ของ LakornAI — commit เนื้อหา → ตรวจ V1–V13 → build artifact
+# CI ของ AiLakorn — commit เนื้อหา → ตรวจ V1–V13 → build artifact
 
 เจ้าของ: DevOps (AIO-30) · ทำตาม `docs/adr/001-backend-architecture.md` §9 และ §12
 
@@ -160,7 +160,7 @@ node --test ci/publish-gate.test.mjs                 # เทสต์ของ�
 
 ## URL ของรอบทดสอบ: `SITE_ORIGIN`
 
-`build/seo.mjs` อ่าน `SITE_ORIGIN` จาก env ได้ ค่าตั้งต้นยังเป็น `https://lakornai.tv` เหมือนเดิมเมื่อไม่ส่ง env
+`build/seo.mjs` อ่าน `SITE_ORIGIN` จาก env ได้ ค่าตั้งต้นยังเป็น `https://ailakorn.com` เหมือนเดิมเมื่อไม่ส่ง env
 
 ```sh
 SITE_ORIGIN=https://lsmmgr99.github.io/lakornai node build/build.mjs

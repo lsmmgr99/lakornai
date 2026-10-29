@@ -20,8 +20,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 /* ---------------- ตัวทำ origin ให้เป็นรูปเดียว ---------------- */
 
 test('ไม่ส่ง env = ค่าตั้งต้นเดิม ไม่เปลี่ยน', () => {
-  assert.equal(DEFAULT_SITE_ORIGIN, 'https://lakornai.tv');
-  for (const v of [undefined, null, '', '   ']) assert.equal(normalizeOrigin(v), 'https://lakornai.tv');
+  assert.equal(DEFAULT_SITE_ORIGIN, 'https://ailakorn.com');
+  for (const v of [undefined, null, '', '   ']) assert.equal(normalizeOrigin(v), 'https://ailakorn.com');
   /* กระบวนการที่รันเทสต์นี้ไม่ได้ตั้ง env ไว้ ค่าที่โมดูลคิดได้จึงต้องเท่าค่าตั้งต้น */
   if (!process.env.SITE_ORIGIN) assert.equal(SITE_ORIGIN, DEFAULT_SITE_ORIGIN);
 });
@@ -31,14 +31,14 @@ test('origin ที่มี path ต่อท้ายถูกเก็บไ�
   assert.equal(normalizeOrigin('https://lsmmgr99.github.io/lakornai/'), 'https://lsmmgr99.github.io/lakornai');
   assert.equal(normalizeOrigin('https://lsmmgr99.github.io/lakornai///'), 'https://lsmmgr99.github.io/lakornai');
   assert.equal(normalizeOrigin('https://lsmmgr99.github.io//lakornai//th/'), 'https://lsmmgr99.github.io/lakornai/th');
-  assert.equal(normalizeOrigin('https://lakornai.tv/'), 'https://lakornai.tv');
+  assert.equal(normalizeOrigin('https://ailakorn.com/'), 'https://ailakorn.com');
   assert.equal(normalizeOrigin('http://127.0.0.1:8080/'), 'http://127.0.0.1:8080');
-  assert.equal(normalizeOrigin('  https://lakornai.tv  '), 'https://lakornai.tv');
+  assert.equal(normalizeOrigin('  https://ailakorn.com  '), 'https://ailakorn.com');
 });
 
 test('ค่าที่ใช้ไม่ได้ต้องล้มตอน build ไม่ใช่ปล่อย URL เพี้ยนไปทั้งเว็บ', () => {
-  for (const bad of ['lakornai.tv', '/lakornai', 'ftp://lakornai.tv', 'https://lakornai.tv/?x=1',
-    'https://lakornai.tv/#a', 'https://user:pw@lakornai.tv']) {
+  for (const bad of ['ailakorn.com', '/lakornai', 'ftp://ailakorn.com', 'https://ailakorn.com/?x=1',
+    'https://ailakorn.com/#a', 'https://user:pw@ailakorn.com']) {
     assert.throws(() => normalizeOrigin(bad), /SITE_ORIGIN/, `ควรล้มกับ ${bad}`);
   }
 });
@@ -80,12 +80,12 @@ const walkHtml = (dir, base = '') => fs.readdirSync(path.join(dir, base), { with
 test('ไม่ส่ง env แล้ว URL ทุกตัวที่ build เขียนออกมายังเป็นโดเมนเดิม', () => {
   const dir = buildIn(null);
   const home = read(dir, 'index.html');
-  assert.match(home, /<link rel="canonical" href="https:\/\/lakornai\.tv\/">/);
-  assert.match(home, /<meta property="og:url" content="https:\/\/lakornai\.tv\/">/);
+  assert.match(home, /<link rel="canonical" href="https:\/\/ailakorn\.com\/">/);
+  assert.match(home, /<meta property="og:url" content="https:\/\/ailakorn\.com\/">/);
   /* เทียบกับไฟล์ที่อยู่ในรีโปจริง: ชุด URL สัมบูรณ์ต้องเหมือนกันทุกตัว */
   assert.deepEqual([...new Set(urlsIn(home))].sort(), [...new Set(urlsIn(read(root, 'index.html')))].sort());
   const hosts = new Set(locsIn(read(dir, 'sitemap.xml')).map(u => new URL(u).origin));
-  assert.deepEqual([...hosts], ['https://lakornai.tv']);
+  assert.deepEqual([...hosts], ['https://ailakorn.com']);
   fs.rmSync(dir, { recursive: true, force: true });
 });
 
@@ -125,7 +125,7 @@ test('ส่ง SITE_ORIGIN ที่มี path ต่อท้าย: canonica
   for (const rel of files) {
     for (const u of urlsIn(read(dir, rel))) {
       if (/\/\//.test(u.replace(/^https?:\/\//, ''))) bad.push(`${rel}: ${u}`);
-      if (u.startsWith('https://lakornai.tv')) bad.push(`${rel}: ยังเหลือโดเมนเดิม ${u}`);
+      if (u.startsWith('https://ailakorn.com')) bad.push(`${rel}: ยังเหลือโดเมนเดิม ${u}`);
     }
   }
   assert.deepEqual(bad.slice(0, 10), [], `พบ URL เพี้ยน ${bad.length} จุด`);

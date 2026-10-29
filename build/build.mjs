@@ -1,4 +1,4 @@
-/* generator ของเว็บจริง LakornAI v2 — AIO-22
+/* generator ของเว็บจริง AiLakorn v2 — AIO-22
    รัน:  node build/build.mjs      (จาก root ของ repo)
    เขียนออกเป็นไฟล์เว็บจริงที่ราก · ไม่แตะไฟล์ใด ๆ ใต้ design/v2/ (Visual เป็นเจ้าของ) */
 import fs from 'node:fs';
@@ -488,7 +488,7 @@ function stub(from, to) {
   const slug = isWatch ? from.replace(/^\/watch\/|\.html$/g, '') : '';
   return `<!doctype html>
 <html lang="th"><head><meta charset="utf-8">
-<title>ย้ายไปที่อยู่ใหม่ · LakornAI</title>
+<title>ย้ายไปที่อยู่ใหม่ · AiLakorn</title>
 <meta name="robots" content="noindex,follow">
 <link rel="canonical" href="${SITE_ORIGIN}${to}">
 <meta http-equiv="refresh" content="0;url=${rel}">
@@ -505,7 +505,7 @@ for (const [from, to] of REDIRECTS) {
   write(out, stub(from, to));
 }
 write('redirects.map',
-  '# LakornAI — ตาราง 301 สำหรับตั้งค่าที่เซิร์ฟเวอร์ (ยังไม่ deploy)\n'
+  '# AiLakorn — ตาราง 301 สำหรับตั้งค่าที่เซิร์ฟเวอร์ (ยังไม่ deploy)\n'
   + '# รูปแบบ: <เดิม> <ปลายทาง> 301\n'
   + '# หมายเหตุ: /watch/<slug>.html#ep<n> แมปด้วย 301 ไม่ได้ เพราะ fragment ไม่ถูกส่งไปกับ request\n'
   + '#          ต้องให้หน้าปลายทางอ่าน location.hash เอง — ทำไว้แล้วใน assets/app.js และในไฟล์ stub\n'

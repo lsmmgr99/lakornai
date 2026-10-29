@@ -46,5 +46,5 @@ http.createServer((req, res) => {
     try { res.writeHead(500, { 'content-type': TYPES['.txt'] }).end('server error: ' + e.message); } catch { /* ส่งหัวไปแล้ว */ }
   }
 }).listen(PORT, '127.0.0.1', () => {
-  console.log(`LakornAI · http://127.0.0.1:${PORT}/`);
+  console.log(`AiLakorn · http://127.0.0.1:${PORT}/`);
 });

@@ -11,7 +11,7 @@ import { ROOT, iso8601, genreLabel, COVER_WIDE_W, COVER_WIDE_H } from './content
      SITE_ORIGIN=https://lsmmgr99.github.io/lakornai node build/build.mjs
    ทั้งสองทาง canonical / og:url / og:image / sitemap / JSON-LD @id ตามทันทีทั้งเว็บ
    ============================================================ */
-export const DEFAULT_SITE_ORIGIN = 'https://lakornai.tv';
+export const DEFAULT_SITE_ORIGIN = 'https://ailakorn.com';
 
 /* ทำ origin ให้เป็นรูปเดียวก่อนใช้ · รองรับ origin ที่มี path ต่อท้าย (เช่น Pages ของโปรเจกต์)
    เพราะ abs() ด้านล่างต่อ "/..." ท้าย origin ตรง ๆ จึงต้องไม่มี / ปิดท้ายและไม่มี // ซ้อนกลางพาธ
@@ -31,7 +31,7 @@ export function normalizeOrigin(raw) {
 
 export const SITE_ORIGIN = normalizeOrigin(process.env.SITE_ORIGIN);
 
-export const SITE_NAME = 'LakornAI';
+export const SITE_NAME = 'AiLakorn';
 /* ถ้อยคำทางการที่ลูกค้าอนุมัติ — แก้ที่นี่ที่เดียว */
 export const FREE_LINE = 'ดูฟรีทุกตอน ไม่ต้องสมัครสมาชิก';
 
@@ -290,7 +290,7 @@ export const PUBLISHED = false;
 export function robotsTxt() {
   if (!PUBLISHED) {
     return [
-      '# LakornAI — ยังไม่เผยแพร่ ปิดการเก็บดัชนีไว้ทั้งเว็บ',
+      '# AiLakorn — ยังไม่เผยแพร่ ปิดการเก็บดัชนีไว้ทั้งเว็บ',
       '# วันขึ้นจริง: ตั้ง PUBLISHED = true ใน build/seo.mjs แล้ว build ใหม่',
       'User-agent: *',
       'Disallow: /',

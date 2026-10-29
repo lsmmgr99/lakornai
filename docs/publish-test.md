@@ -1,4 +1,4 @@
-# runbook — วัน "ขึ้นทดสอบ" ของ LakornAI
+# runbook — วัน "ขึ้นทดสอบ" ของ AiLakorn
 
 เจ้าของเอกสาร: DevOps (AIO-36) · ฐาน: `docs/adr/001-backend-architecture.md` §8/§9 · อัปเดต 23 ต.ค. 2026
 
@@ -101,7 +101,7 @@ build เขียนหน้าเว็บทับที่รากรี�
 ORIGIN=https://lsmmgr99.github.io/lakornai
 T=$(mktemp -d) && git archive main | tar -x -C "$T" && cd "$T"
 
-SITE_ORIGIN=$ORIGIN node build/build.mjs        # ค่าตั้งต้นคือ https://lakornai.tv — env ทับได้ ไม่ต้องแก้โค้ด
+SITE_ORIGIN=$ORIGIN node build/build.mjs        # ค่าตั้งต้นคือ https://ailakorn.com — env ทับได้ ไม่ต้องแก้โค้ด
 node admin/check.mjs .                          # V1–V10
 node admin/check.mjs . --html                    # V11
 node ci/views-gate.mjs .                         # V12–V13
@@ -189,7 +189,7 @@ done
 # 5.3 ยังปิดดัชนีอยู่
 curl -sS "$U/robots.txt"                       # ต้องเห็น Disallow: /
 
-# 5.4 URL ในหน้าเป็นของรอบทดสอบ ไม่ใช่ lakornai.tv และไม่มี // ซ้อน
+# 5.4 URL ในหน้าเป็นของรอบทดสอบ ไม่ใช่ ailakorn.com และไม่มี // ซ้อน
 curl -sS "$U/" | grep -oE '<link rel="canonical"[^>]*>|<meta property="og:(url|image)"[^>]*>'
 
 # 5.5 หน้าในสุดก็เปิดได้ (เส้นทางโฟลเดอร์ + ลิงก์ relative)
@@ -199,7 +199,7 @@ done
 ```
 
 ผลที่ต้องได้: 5.1 = `200` · 5.2 = `404` ทุกบรรทัด และเปิดในเบราว์เซอร์ต้องเห็นหน้า 404 ของเว็บ
-(`ไม่พบหน้าที่คุณหา (404) · LakornAI`) ไม่ใช่แผงหลังบ้าน · 5.3 เห็น `Disallow: /` · 5.5 = `200` ทุกบรรทัด
+(`ไม่พบหน้าที่คุณหา (404) · AiLakorn`) ไม่ใช่แผงหลังบ้าน · 5.3 เห็น `Disallow: /` · 5.5 = `200` ทุกบรรทัด
 
 **ถ้า 5.2 ได้ `200` แม้บรรทัดเดียว → ถอนกลับทันทีตาม §7 ก่อนบอกใครว่า URL พร้อม** แล้วกลับไปหาเหตุที่ชุดไฟล์ผิด
 

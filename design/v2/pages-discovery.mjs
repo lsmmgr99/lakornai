@@ -115,7 +115,7 @@ function homeSections({ emptyCont = false } = {}) {
   <section class="sec">
     <div class="btile" style="min-height:0;padding:var(--s6)">
       <h3>${ic('sparkle', 'sm')} ทุกเรื่องสร้างด้วย AI</h3>
-      <p>ปก บท และตัวละครทั้งหมดของ LakornAI สร้างด้วยปัญญาประดิษฐ์ โดยทีมงานคนไทยเป็นผู้กำกับทิศทาง</p>
+      <p>ปก บท และตัวละครทั้งหมดของ AiLakorn สร้างด้วยปัญญาประดิษฐ์ โดยทีมงานคนไทยเป็นผู้กำกับทิศทาง</p>
       <a class="btn btn-ghost" href="#" style="align-self:flex-start">ดูเบื้องหลังการสร้าง ${ic('right', 'sm')}</a>
     </div>
   </section>`;

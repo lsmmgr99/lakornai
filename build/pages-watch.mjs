@@ -13,8 +13,8 @@ const wrapF = (L, inner) => `<main id="main" class="page"><div class="wrap">${in
 
 /* ---------- กฎตัด title ของ onpage-audit §5.2 ---------- */
 function seriesTitle(s) {
-  let t = `${s.title} — ละครสั้น AI ${s.eps} ตอน ดูฟรี · LakornAI`;
-  if (t.length > 60) t = `${s.title} — ละครสั้น AI ${s.eps} ตอน · LakornAI`;
+  let t = `${s.title} — ละครสั้น AI ${s.eps} ตอน ดูฟรี · AiLakorn`;
+  if (t.length > 60) t = `${s.title} — ละครสั้น AI ${s.eps} ตอน · AiLakorn`;
   return t;
 }
 function seriesDesc(s) {
@@ -25,7 +25,7 @@ function seriesDesc(s) {
 }
 /* กฎตัดของ §5.3 — ห้ามตัด EP.{n} เพราะเป็นสิ่งเดียวที่ทำให้ 418 title ไม่ซ้ำกัน */
 function watchTitle(s, n, e) {
-  let t = `${s.title} EP.${n} ${e[0]} · LakornAI`;
+  let t = `${s.title} EP.${n} ${e[0]} · AiLakorn`;
   if (t.length > 60) t = `${s.title} EP.${n} ${e[0]}`;
   return t;
 }

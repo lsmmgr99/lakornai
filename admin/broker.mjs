@@ -92,5 +92,5 @@ export function createBroker(config,{provider,now=Date.now}={}){
 }
 if(process.argv[1]===fileURLToPath(import.meta.url)){
   const config={clientId:process.env.LAKORN_APP_CLIENT_ID,owner:process.env.LAKORN_REPO_OWNER,repo:process.env.LAKORN_REPO_NAME,branch:process.env.LAKORN_DRAFT_BRANCH,publishBranches:process.env.LAKORN_PUBLISH_BRANCHES?.split(',')};
-  createBroker(config).listen(4190,'127.0.0.1',()=>console.log('LakornAI broker: http://127.0.0.1:4190/admin/'));
+  createBroker(config).listen(4190,'127.0.0.1',()=>console.log('AiLakorn broker: http://127.0.0.1:4190/admin/'));
 }

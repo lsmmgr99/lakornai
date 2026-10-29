@@ -270,11 +270,11 @@ const origin = {
 };
 const logo = {
   file: 'build/ui.mjs',
-  line: findLine('build/ui.mjs', '<b lang="en">Lakorn</b><i lang="en">AI</i>'),
+  line: findLine('build/ui.mjs', '<i lang="en">AI</i><b lang="en">Lakorn</b>'),
   footer_line: findLine('build/ui.mjs', '© ' + OLD_NAME),
   footer_text: (readFileSync(resolve(REPO, 'build/ui.mjs'), 'utf8').match(/© LakornAI[^<]*/) || [])[0] ?? null,
 };
-const WORDMARK = '<b lang="en">Lakorn</b><i lang="en">AI</i>';
+const WORDMARK = '<i lang="en">AI</i><b lang="en">Lakorn</b>';
 const share = {
   jpg_count: git(['ls-files', 'assets/share/*.jpg']).split('\n').filter(Boolean).length,
   src_html_count: git(['ls-files', 'design/v2/share-src/*.html']).split('\n').filter(Boolean).length,

@@ -248,7 +248,7 @@ function sheetPage(names) {
   return `<!doctype html>
 <html lang="th"><head>
 <meta charset="utf-8">
-<title>ภาพกว้าง ${AR.toFixed(1)}:1 ทั้งชุด · LakornAI</title>
+<title>ภาพกว้าง ${AR.toFixed(1)}:1 ทั้งชุด · AiLakorn</title>
 <link rel="stylesheet" href="../tokens.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
